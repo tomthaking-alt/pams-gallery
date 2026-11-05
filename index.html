@@ -733,14 +733,12 @@ function hang(k,o,ry){
   roll(fm,-X-r,Y,X+r,Y,zt,r);roll(fm,-X-r,-Y,X+r,-Y,zt,r);roll(fm,-X,-Y-r,-X,Y+r,zt,r);roll(fm,X,-Y-r,X,Y+r,zt,r)});
  // baroque carving: acanthus leaf-run, a bead moulding, shell fans at the corners and a cartouche at each centre
  var zc=zt+.012,nz=bn(b,[0,0,1]);
- function lobe(cx,cy,ang,len,wid,dep,z){var c=Math.cos(ang),sn=Math.sin(ang);ell(fm,{o:bx(b,[cx+c*len*.5,cy+sn*len*.5,z]),x:bn(b,[c,sn,0]),y:bn(b,[-sn,c,0]),z:nz},[0,0,0],[len*.5,wid,dep],8)}
+ var SG=5;function lobe(cx,cy,ang,len,wid,dep,z){var c=Math.cos(ang),sn=Math.sin(ang);ell(fm,{o:bx(b,[cx+c*len*.5,cy+sn*len*.5,z]),x:bn(b,[c,sn,0]),y:bn(b,[-sn,c,0]),z:nz},[0,0,0],[len*.5,wid,dep],SG)}
  function fan(cx,cy,a0,a1,n,len,wid){for(var i=0;i<n;i++){var a=a0+(a1-a0)*i/(n-1);lobe(cx,cy,a,len*(.75+.25*Math.sin(Math.PI*i/(n-1))),wid,.013,zc)}
-  ell(fm,B(bx(b,[cx,cy,zc+.004])),[0,0,0],[wid*1.6,wid*1.6,.016],10)}
+  ell(fm,B(bx(b,[cx,cy,zc+.004])),[0,0,0],[wid*1.6,wid*1.6,.016],6)}
  var LR=ow+fw*.66;
- for(var t=-OX+.09;t<=OX-.09;t+=.034){lobe(t-.012,OY-.035,0,.03,.008,.008,zc-.004);lobe(t-.012,-OY+.035,0,.03,.008,.008,zc-.004)}
- for(t=-OY+.09;t<=OY-.09;t+=.034){lobe(-OX+.035,t-.012,Math.PI/2,.03,.008,.008,zc-.004);lobe(OX-.035,t-.012,Math.PI/2,.03,.008,.008,zc-.004)}
- for(t=-ow;t<=ow;t+=.02){ell(fm,B(bx(b,[t,oh+.018,zt-.004])),[0,0,0],[.0065,.0065,.006],6);ell(fm,B(bx(b,[t,-oh-.018,zt-.004])),[0,0,0],[.0065,.0065,.006],6)}
- for(t=-oh;t<=oh;t+=.02){ell(fm,B(bx(b,[ow+.018,t,zt-.004])),[0,0,0],[.0065,.0065,.006],6);ell(fm,B(bx(b,[-ow-.018,t,zt-.004])),[0,0,0],[.0065,.0065,.006],6)}
+ SG=4;for(var t=-OX+.09;t<=OX-.09;t+=.06){lobe(t-.02,OY-.035,0,.045,.01,.008,zc-.004);lobe(t-.02,-OY+.035,0,.045,.01,.008,zc-.004)}
+ for(t=-OY+.09;t<=OY-.09;t+=.06){lobe(-OX+.035,t-.02,Math.PI/2,.045,.01,.008,zc-.004);lobe(OX-.035,t-.02,Math.PI/2,.045,.01,.008,zc-.004)}SG=5;
  [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(function(q){var d=Math.atan2(q[1],q[0]);fan(q[0]*(OX-.03),q[1]*(OY-.03),d-1.1,d+1.1,7,.1,.016)});
  fan(0,OY-.02,.25,Math.PI-.25,9,.12,.017);fan(0,-OY+.02,-.25,-Math.PI+.25,9,.12,.017);
  fan(OX-.02,0,-1.05,1.05,5,.08,.014);fan(-OX+.02,0,Math.PI-1.05,Math.PI+1.05,5,.08,.014);
@@ -842,7 +840,7 @@ var ROSE=mat({col:'#f6f3ec',rough:.4});
  var y0=RH-.55;torus(Mx.gold,O,[0,y0,0],.3,.014,48);
  for(var k=0;k<14;k++){var a=k/14*Math.PI*2,px=Math.cos(a)*.3,pz=Math.sin(a)*.3;cyl(Mx.gold,B([cx+px,y0,cz+pz]),[0,0,0],.006,.11,6);ell(Mx.crystal,B([cx+px,y0+.13,cz+pz]),[0,0,0],[.012,.02,.012],8)}
  for(var t=0;t<5;t++){var y=y0-.02-t*.11,r=.3*(1-t*.17),n=Math.max(8,Math.round(Math.PI*2*r/.04));torus(Mx.gold,O,[0,y,0],r,.007,48);
-  for(var k2=0;k2<n;k2++){var a2=k2/n*Math.PI*2,bx2=Math.cos(a2)*r,bz2=Math.sin(a2)*r;for(var j=0;j<3;j++)ell(Mx.crystal,B([cx+bx2,y-.026*(j+1),cz+bz2]),[0,0,0],[.009,.012,.009],6)}}
+  for(var k2=0;k2<n;k2++){var a2=k2/n*Math.PI*2,bx2=Math.cos(a2)*r,bz2=Math.sin(a2)*r;for(var j=0;j<3;j++)ell(Mx.crystal,B([cx+bx2,y-.026*(j+1),cz+bz2]),[0,0,0],[.009,.012,.009],4)}}
  ell(Mx.crystal,O,[0,y0-.66,0],[.03,.06,.03],12);
  ell(Mx.candle,O,[0,y0-.25,0],[.07,.12,.07],14);
  LIGHTS.point.push({p:[cx,y0-.25,cz],c:[60,48,34]})})();
