@@ -139,6 +139,9 @@ dialog p{margin:.2rem 0;line-height:1.5}
 </dialog>
 <script>
 "use strict";
+// always begin the walk at the welcome view, not where the visitor was last time
+try{if("scrollRestoration" in history)history.scrollRestoration="manual"}catch(e){}
+scrollTo(0,0);
 /* ======================= Your details & artworks =======================
    EMAIL: where enquiries go.
    The works are listed in the order you meet them as you turn around the room.
@@ -1050,7 +1053,7 @@ fontReady.then(function(){
   sc,ax,ay,19,10.2,nrm,{go:function(){location.href='mailto:'+EMAIL},tip:'Write to '+EMAIL,far:120,on:function(){return false}},{unlit:1,emis:[2.2,2.15,2.1]});SKYTEXT.m=MATS[MATS.length-1];
  LABELS.forEach(function(f){f()});
  upload();resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;resize()});
- cur=progress();camAt(cur*(K.length-1));render(0);dirty=0;var ld=document.getElementById('loading');ld.style.opacity=0;setTimeout(function(){ld.style.display='none'},700);
+ scrollTo(0,0);cur=0;camAt(0);render(0);dirty=0;var ld=document.getElementById('loading');ld.style.opacity=0;setTimeout(function(){ld.style.display='none'},700);
  requestAnimationFrame(frame);
 });
 }
