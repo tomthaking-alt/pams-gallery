@@ -514,6 +514,14 @@ var TX={
  trav:texFrom(noiseTex(512,'#ddd2bf',220,16000,.07)),
  leaf:texFrom(leaves(512)),
  blob:texFrom(radial(),{clamp:1}),
+ oldgilt:texFrom((function(){var W=512,c=cnv(W,W),x=c.getContext('2d');x.fillStyle='#e6cf9c';x.fillRect(0,0,W,W);
+  function blot(n,rgb,a0,a1,r0,r1){for(var i=0;i<n;i++){var r=r0+rnd()*(r1-r0),px=rnd()*W,py=rnd()*W,g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'rgba('+rgb+','+(a0+rnd()*(a1-a0))+')');g.addColorStop(1,'rgba('+rgb+',0)');x.fillStyle=g;x.fillRect(px-r,py-r,2*r,2*r)}}
+  blot(220,'120,85,40',.10,.25,10,60);            // dulled, uneven gold
+  blot(90,'250,235,200',.08,.18,8,40);            // a few soft remaining highlights
+  for(var i=0;i<160;i++){x.fillStyle='rgba(138,58,34,'+(.25+rnd()*.35)+')';x.beginPath();x.ellipse(rnd()*W,rnd()*W,2+rnd()*9,1+rnd()*4,rnd()*3,0,7);x.fill()}   // red bole showing where worn
+  for(i=0;i<9000;i++){x.fillStyle='rgba(50,32,15,'+(rnd()*.25)+')';x.fillRect(rnd()*W,rnd()*W,1+rnd()*1.5,1+rnd()*1.5)}                                         // grime
+  x.lineWidth=.7;for(i=0;i<420;i++){var px=rnd()*W,py=rnd()*W;x.strokeStyle='rgba(60,38,18,'+(.12+rnd()*.2)+')';x.beginPath();x.moveTo(px,py);for(var k=0;k<4;k++){px+=(rnd()-.5)*14;py+=(rnd()-.5)*6;x.lineTo(px,py)}x.stroke()}   // age cracks
+  return c})()),
  patina:texFrom((function(){var c=noiseTex(512,'#efe2c4',150,9000,.16),x=c.getContext('2d');for(var i=0;i<900;i++){x.strokeStyle='rgba(70,45,20,'+(.03+rnd()*.06)+')';x.lineWidth=.6+rnd()*1.6;var px=rnd()*512,py=rnd()*512;x.beginPath();x.moveTo(px,py);x.lineTo(px+(rnd()-.5)*40,py+(rnd()-.5)*8);x.stroke()}return c})()),
  tile:texFrom((function(){var c=noiseTex(1024,'#d3cdc4',140,9000,.03),x=c.getContext('2d');x.fillStyle='rgba(90,80,70,.4)';[0,512].forEach(function(p){x.fillRect(p,0,2,1024);x.fillRect(0,p,1024,2)});return c})()),
  sky:null
@@ -526,8 +534,8 @@ var Mx={
  ceiling:mat({col:'#fbfaf8',rough:.14}),
  coffer:mat({col:'#f8f7f4',rough:.2}),
  gold:mat({col:'#d6ae5c',rough:.24,metal:1}),
- gold24:mat({col:'#ad8442',tex:TX.patina,rough:.5,metal:1,bump:.2,uvs:[.22,.22]}),
- goldDark:mat({col:'#6e5328',tex:TX.patina,rough:.55,metal:1,uvs:[.2,.2]}),
+ gold24:mat({col:'#957040',tex:TX.oldgilt,rough:.68,metal:.55,uvs:[.16,.16]}),
+ goldDark:mat({col:'#4a3518',tex:TX.oldgilt,rough:.8,metal:.3,uvs:[.16,.16]}),
  steel:mat({col:'#a9813e',rough:.32,metal:1}),
  bronze:mat({col:'#6b4a2e',rough:.36,metal:1}),
  gap:mat({col:'#151210',rough:.9}),
@@ -951,7 +959,7 @@ function drawScene(VPm,camPos,pass){
 function camDir(){var cp=Math.cos(cam.pitch);return[-Math.sin(cam.yaw)*cp,Math.sin(cam.pitch),-Math.cos(cam.yaw)*cp]}
 function render(time){
  var as=RT.w/RT.h;cam.fov=fovFor(as);
- var sw=reduce?0:1,T0=NOWS,eye=[cam.x+Math.sin(T0*.37)*.006*sw,cam.y+Math.sin(T0*.53+1)*.004*sw,cam.z],dd=camDir(),sy=Math.sin(T0*.29)*.0025*sw,sp2=Math.sin(T0*.41+2)*.0018*sw;
+ var sw=0,T0=NOWS,eye=[cam.x+Math.sin(T0*.37)*.006*sw,cam.y+Math.sin(T0*.53+1)*.004*sw,cam.z],dd=camDir(),sy=Math.sin(T0*.29)*.0025*sw,sp2=Math.sin(T0*.41+2)*.0018*sw;
  dd=v3.norm([dd[0]*Math.cos(sy)-dd[2]*Math.sin(sy),dd[1]+sp2,dd[0]*Math.sin(sy)+dd[2]*Math.cos(sy)]);
  var V=M4.look(eye,v3.add(eye,dd),[0,1,0]),Pm=M4.persp(cam.fov,as,.05,200),VP=M4.mul(Pm,V);
  gl.enable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
