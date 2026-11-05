@@ -515,6 +515,12 @@ var TX={
  trav:texFrom(noiseTex(512,'#ddd2bf',220,16000,.07)),
  leaf:texFrom(leaves(512)),
  blob:texFrom(radial(),{clamp:1}),
+ mahog:texFrom((function(){var W=512,c=cnv(W,W),x=c.getContext('2d');x.fillStyle='#8a5236';x.fillRect(0,0,W,W);
+  for(var i=0;i<160;i++){var y=rnd()*W,a=.05+rnd()*.12,dk=rnd()<.6;x.strokeStyle=dk?'rgba(45,20,10,'+a+')':'rgba(190,120,80,'+(a*.6)+')';x.lineWidth=1+rnd()*5;x.beginPath();
+   for(var X=-10;X<=W+10;X+=16){var Y=y+Math.sin(X*.012+i)*6+Math.sin(X*.05+i*2)*2;X<0?x.moveTo(X,Y):x.lineTo(X,Y)}x.stroke()}
+  for(i=0;i<40;i++){var px=rnd()*W,py=rnd()*W,r=10+rnd()*40,g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'rgba(30,12,6,'+(.08+rnd()*.12)+')');g.addColorStop(1,'rgba(30,12,6,0)');x.fillStyle=g;x.fillRect(px-r,py-r,2*r,2*r)}
+  for(i=0;i<6000;i++){x.fillStyle='rgba(20,8,4,'+(rnd()*.18)+')';x.fillRect(rnd()*W,rnd()*W,1,1)}
+  return c})()),
  oldgilt:texFrom((function(){var W=512,c=cnv(W,W),x=c.getContext('2d');x.fillStyle='#e6cf9c';x.fillRect(0,0,W,W);
   function blot(n,rgb,a0,a1,r0,r1){for(var i=0;i<n;i++){var r=r0+rnd()*(r1-r0),px=rnd()*W,py=rnd()*W,g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'rgba('+rgb+','+(a0+rnd()*(a1-a0))+')');g.addColorStop(1,'rgba('+rgb+',0)');x.fillStyle=g;x.fillRect(px-r,py-r,2*r,2*r)}}
   blot(220,'120,85,40',.10,.25,10,60);            // dulled, uneven gold
@@ -535,8 +541,8 @@ var Mx={
  ceiling:mat({col:'#fbfaf8',rough:.14}),
  coffer:mat({col:'#f8f7f4',rough:.2}),
  gold:mat({col:'#d6ae5c',rough:.24,metal:1}),
- gold24:mat({col:'#957040',tex:TX.oldgilt,rough:.68,metal:.55,uvs:[.16,.16]}),
- goldDark:mat({col:'#4a3518',tex:TX.oldgilt,rough:.8,metal:.3,uvs:[.16,.16]}),
+ gold24:mat({col:'#3f2416',tex:TX.mahog,rough:.6,metal:0,bump:.2,uvs:[.32,.32]}),
+ goldDark:mat({col:'#2c160b',tex:TX.mahog,rough:.6,metal:0,uvs:[.3,.3]}),
  steel:mat({col:'#a9813e',rough:.32,metal:1}),
  bronze:mat({col:'#6b4a2e',rough:.36,metal:1}),
  gap:mat({col:'#151210',rough:.9}),
@@ -556,9 +562,9 @@ var Mx={
  oliveA:mat({col:'#6f7d5c',rough:.55}),oliveB:mat({col:'#8c9a7b',rough:.5}),oliveC:mat({col:'#566447',rough:.6}),
  grassA:mat({col:'#b5a466',rough:.6}),grassB:mat({col:'#8d9a5c',rough:.6}),
  agave:mat({col:'#7e9b98',rough:.42}),
- crystal:mat({col:'#f4f6ff',rough:.05,metal:.35,emis:[1.6,1.5,1.35]}),
+ crystal:mat({col:'#f4f6ff',rough:.3,metal:.1,emis:[.3,.28,.25]}),
  wax:mat({col:'#f3ead8',rough:.5,emis:[1.1,.85,.55]}),
- candle:mat({col:'#ffffff',emis:[46,36,22]}),
+ candle:mat({col:'#ffffff',emis:[9,7.2,4.6]}),
  lantern:mat({col:'#ffffff',emis:[9,5.2,2.2]}),
  flame:mat({col:'#ff9a3c',emis:[9,3.6,.9]}),
  lens:mat({col:'#ffffff',emis:[16,15,13.5]}),
@@ -826,7 +832,7 @@ void main(){
  if(uPass==1&&vP.y<.002)discard;
  vec4 t=uHasTex==1?texture(uTex,vU):vec4(1.);
  vec3 alb=uCol*t.rgb;
- if(uArt>.5){o=vec4(t.rgb*1.2,uBlend>.5?1.:length(vP-uCam)/uFar);return;}
+ if(uArt>.5){o=vec4(t.rgb,-max(length(vP-uCam)/uFar,.0005));return;}   // negative alpha marks painting pixels
  float A=uBlend>.5?t.a*uAlpha:1.;
  if(uBlend>.5&&A<.004)discard;
  if(uUnlit>.5){o=vec4(alb*uEmis,uBlend>.5?A:length(vP-uCam)/uFar);return;}
@@ -853,16 +859,16 @@ void main(){
 var SVS='#version 300 es\nlayout(location=0) in vec3 aP;uniform mat4 uVP;void main(){gl_Position=uVP*vec4(aP,1.);}';
 var SFS='#version 300 es\nprecision mediump float;out vec4 o;void main(){o=vec4(1.);}';
 var QVS='#version 300 es\nout vec2 vU;void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);vU=p;gl_Position=vec4(p*2.-1.,0.,1.);}';
-var BRIGHT='#version 300 es\nprecision highp float;in vec2 vU;out vec4 o;uniform sampler2D uT;void main(){vec3 c=texture(uT,vU).rgb;float l=max(c.r,max(c.g,c.b));o=vec4(c*max(l-1.4,0.)/max(l,1e-3),1.);}';
+var BRIGHT='#version 300 es\nprecision highp float;in vec2 vU;out vec4 o;uniform sampler2D uT;void main(){vec3 c=texture(uT,vU).rgb;float l=max(c.r,max(c.g,c.b));o=vec4(c*max(l-2.4,0.)/max(l,1e-3),1.);}';
 var BLUR='#version 300 es\nprecision highp float;in vec2 vU;out vec4 o;uniform sampler2D uT;uniform vec2 uD;void main(){vec3 c=texture(uT,vU).rgb*.227;c+=(texture(uT,vU+uD*1.385).rgb+texture(uT,vU-uD*1.385).rgb)*.316;c+=(texture(uT,vU+uD*3.23).rgb+texture(uT,vU-uD*3.23).rgb)*.07;o=vec4(c,1.);}';
 var DOF=`#version 300 es
 precision highp float;in vec2 vU;out vec4 o;uniform sampler2D uT;uniform float uFocus,uFar,uK,uMax;uniform vec2 uPx;
 float coc(float d){return clamp(uK*abs(1./max(uFocus,.1)-1./max(d,.05)),0.,1.);}
-void main(){vec4 c0=texture(uT,vU);float d0=c0.a*uFar;float r0=coc(d0)*uMax;
+void main(){vec4 c0=texture(uT,vU);if(c0.a<0.){o=c0;return;}float d0=abs(c0.a)*uFar;float r0=coc(d0)*uMax;
  if(r0<.6){o=vec4(c0.rgb,c0.a);return;}
  vec3 acc=c0.rgb;float wt=1.;
  for(int i=1;i<32;i++){float fi=float(i);float rr=sqrt(fi/32.)*r0;float an=fi*2.39996;vec2 off=vec2(cos(an),sin(an))*rr;
-  vec4 sm=texture(uT,vU+off*uPx);float rs=coc(sm.a*uFar)*uMax;float w=clamp(rs-rr+1.,0.,1.);acc+=sm.rgb*w;wt+=w;}
+  vec4 sm=texture(uT,vU+off*uPx);float rs=coc(abs(sm.a)*uFar)*uMax;float w=clamp(rs-rr+1.,0.,1.);acc+=sm.rgb*w;wt+=w;}
  o=vec4(acc/wt,c0.a);}`;
 var COMP=`#version 300 es
 precision highp float;in vec2 vU;out vec4 o;uniform sampler2D uT,uB,uS;uniform float uExp,uTime,uBurn,uSec,uSA;uniform vec2 uRes;
@@ -870,8 +876,10 @@ float hsh(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hsh(i),hsh(i+vec2(1,0)),f.x),mix(hsh(i+vec2(0,1)),hsh(i+vec2(1,1)),f.x),f.y);}
 float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*vn(p);p*=2.03;a*=.5;}return s;}
 vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
-void main(){vec2 q=vU-.5;vec2 ca=vec2(0.);
- vec3 c=vec3(texture(uT,vU+ca).r,texture(uT,vU).g,texture(uT,vU-ca).b)+texture(uB,vU).rgb*.22;c*=uExp;c=aces(c);
+vec3 toSRGB(vec3 c){c=clamp(c,0.,1.);return mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(.0031308,c));}
+void main(){vec4 s0=texture(uT,vU);if(s0.a<-.00001){o=vec4(toSRGB(s0.rgb),1.);return;}
+ vec2 q=vU-.5;vec2 ca=vec2(0.);
+ vec3 c=vec3(texture(uT,vU+ca).r,texture(uT,vU).g,texture(uT,vU-ca).b)+texture(uB,vU).rgb*.12;c*=uExp;c=aces(c);
  float l=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(l),c,.9);c=c*vec3(1.01,1.,.975);
  c*=1.-dot(q,q)*.7;c=pow(c,vec3(1./2.2));c=mix(c,smoothstep(0.,1.,c),.12);
  if(uBurn<1.){
@@ -897,7 +905,7 @@ try{P=prog(VS,FS);PS=prog(SVS,SFS);PB=prog(QVS,BRIGHT);PBL=prog(QVS,BLUR);PC=pro
 /* ---------- render targets ---------- */
 var mobile=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 /* quality adapts to the device: starts sensible, then steps down if frames are slow */
-var Q={dpr:mobile?1.75:2,samples:4,refl:!mobile,bloom:true,dof:!mobile,level:0};
+var Q={dpr:mobile?1.5:1.6,samples:4,refl:!mobile,bloom:true,dof:!mobile,level:0};
 function degrade(){Q.level++;
  if(Q.level===1){Q.bloom=false}
  else if(Q.level===2){Q.refl=false}
@@ -1022,11 +1030,12 @@ var hint=document.getElementById('hint'),lab=document.getElementById('where');
 var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches,cur=0,lastLab='';
 function progress(){var max=document.documentElement.scrollHeight-innerHeight;return max>0?Math.min(1,Math.max(0,scrollY/max)):0}
 var idleT=0,lastT=0,ema=16,samplesN=0,rendered=false;
+var lastFT=0;
 function frame(time){
  requestAnimationFrame(frame);
  if(!col.hidden)return;                     // the collection page covers the 3D: don't draw
  NOWS=time/1000;if(!reduce&&!dlg.open&&!about.open&&time-idleT>(mobile?38:0)){dirty=Math.max(dirty,1);idleT=time}
- var p=progress(),prev=cur;cur+=(p-cur)*(reduce?1:.09);if(Math.abs(p-cur)<1e-5)cur=p;
+ var p=progress(),prev=cur;var dts=Math.min(.1,Math.max(.001,(time-lastFT)/1000||.016));lastFT=time;cur+=(p-cur)*(reduce?1:1-Math.exp(-dts*5.2));if(Math.abs(p-cur)<1e-5)cur=p;
  camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());
  var bA=burnAmt();if(bA<1&&!reduce)dirty=Math.max(dirty,1);
  focusT=sceneDist();var fd=focusT-focus;focus+=fd*(reduce?1:.12);if(Math.abs(fd)>.01)dirty=Math.max(dirty,1);
