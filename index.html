@@ -65,7 +65,7 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #george{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 24px);z-index:6;width:84px;height:84px;transform:translateY(160%);transition:transform .7s cubic-bezier(.3,1.5,.5,1);-webkit-tap-highlight-color:transparent}
 #george.in{transform:translateY(0)}
 #george.away{transform:translateX(-140%)}
-@media (max-width:700px){#george{bottom:calc(env(safe-area-inset-bottom,0px) + 86px);width:72px;height:72px}}
+@media (max-width:700px){#walk,#hint{display:none!important}#george{bottom:calc(env(safe-area-inset-bottom,0px) + 14px);width:70px;height:70px}#gBub{left:76px;bottom:4px;width:calc(100vw - 104px);max-height:46vh;overflow:auto;border-radius:16px 16px 16px 4px}#gTab{bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}}
 #gBtn{all:unset;display:block;width:100%;height:100%;cursor:pointer;border-radius:50%}
 #gBtn:focus-visible{outline:2px solid #b89a62;outline-offset:4px}
 #gSvg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 10px rgba(20,12,8,.28))}
@@ -156,7 +156,7 @@ dialog p{margin:.2rem 0;line-height:1.5}
 <div id="title" aria-hidden="true"><h1>Pam’s Gallery</h1><p>Welcome · come in and look around</p></div>
 <div id="hint">Scroll, swipe or tap to step inside</div>
 <script>try{if(matchMedia("(pointer:coarse)").matches)document.getElementById("hint").textContent="Swipe, tap or scroll to walk through"}catch(e){}</script>
-<div id="george" aria-live="polite"><button id="gBtn" type="button" aria-label="George the wood pigeon, your gallery guide"><svg id="gSvg" viewBox="0 0 120 120" aria-hidden="true"><defs>
+<div id="george" aria-live="polite"><button id="gBtn" type="button" aria-label="King George the wood pigeon, your gallery guide"><svg id="gSvg" viewBox="0 0 120 120" aria-hidden="true"><defs>
 <radialGradient id="gB" cx=".38" cy=".3" r=".75"><stop offset="0" stop-color="#cfd4de"/><stop offset=".6" stop-color="#a5abb9"/><stop offset="1" stop-color="#7f8596"/></radialGradient>
 <radialGradient id="gH" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#d3d8e2"/><stop offset=".65" stop-color="#a9afbd"/><stop offset="1" stop-color="#8a90a0"/></radialGradient>
 <radialGradient id="gR" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#e6b7bc"/><stop offset="1" stop-color="#b47b84"/></radialGradient>
@@ -186,8 +186,7 @@ dialog p{margin:.2rem 0;line-height:1.5}
  <path d="M78.5 26.6 C81.5 25 86 25.2 88.6 27.4" stroke="#6f7484" stroke-width="1.6" stroke-linecap="round" fill="none"/>
  <path d="M92.5 37.2 L105 40.3 C104.6 41.6 103.6 42.3 102 42.4 L93 42.6 Z" fill="#e8a59f"/><path d="M101 40 L105 40.3 C104.6 41.6 103.6 42.3 102 42.4 Z" fill="#c9837d"/><ellipse cx="93.6" cy="38.2" rx="2.7" ry="1.8" fill="#f8f2ec"/>
  <path class="jaw" d="M93 42.6 L103 42.3 C101.5 44.8 98 45.8 94.2 45.6 Z" fill="#d48f8a"/>
- <g transform="translate(76 54.5)"><path d="M0 0 L-9 -5.5 C-10.5 -2 -10.5 2 -9 5.5 Z M0 0 L9 -5.5 C10.5 -2 10.5 2 9 5.5 Z" fill="url(#gG)" stroke="#8f6a22" stroke-width=".7"/><rect x="-2.6" y="-2.8" width="5.2" height="5.6" rx="1.6" fill="#c99a3c" stroke="#8f6a22" stroke-width=".7"/></g>
-</g></g></svg></button><div id="gBub" role="dialog" aria-label="George says"><button class="x" id="gX" aria-label="Close">&times;</button><div class="who">George</div><div id="gTxt"></div><div class="opts" id="gOpts"></div></div></div><button id="gTab" type="button">Ask George</button><div id="wall" hidden><video id="wallV" playsinline muted autoplay></video><img id="wallBg" alt="" hidden><div id="wallArt"><img id="wallImg" alt=""></div><div id="wallMsg" hidden></div><div class="wtop"><span id="wallHint">Point at your wall · drag to move · pinch to resize</span><button id="wallX" type="button">Done</button></div><div class="wbot"><input type="range" id="wallSize" min="20" max="95" value="55" aria-label="Painting size"><label>Use a photo<input type="file" accept="image/*" id="wallFile" hidden></label></div></div><div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
+</g></g></svg></button><div id="gBub" role="dialog" aria-label="King George says"><button class="x" id="gX" aria-label="Close">&times;</button><div class="who">King George</div><div id="gTxt"></div><div class="opts" id="gOpts"></div></div></div><button id="gTab" type="button">Ask King George</button><div id="wall" hidden><video id="wallV" playsinline muted autoplay></video><img id="wallBg" alt="" hidden><div id="wallArt"><img id="wallImg" alt=""></div><div id="wallMsg" hidden></div><div class="wtop"><span id="wallHint">Point at your wall · drag to move · pinch to resize</span><button id="wallX" type="button">Done</button></div><div class="wbot"><input type="range" id="wallSize" min="20" max="95" value="55" aria-label="Painting size"><label>Use a photo<input type="file" accept="image/*" id="wallFile" hidden></label></div></div><div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
 <div id="tip"></div>
 <section id="enqPanel" aria-labelledby="enqTitle" aria-hidden="true">
  <h2 id="enqTitle">Enquiries</h2>
@@ -1399,7 +1398,7 @@ var K=[];
 function buildK(){var as=innerWidth/Math.max(1,innerHeight),vf=fovFor(as),hf=2*Math.atan(Math.tan(vf/2)*as),yaw=0;K.length=0;
  K.push([0,-1.6,0,0],[0,-1.6,0,0],[0,-5.2,0,0]);
  ARTPOS.forEach(function(a){var wide=as>1.05,sh=wide?.44:0,need=Math.max((a.w+(wide?2.0:1.0))/2/Math.tan(hf/2),(a.h+1.35)/2/Math.tan(vf/2)),st=Math.min(6.8,Math.max(1.9,need)),px=a.c[0]+a.n[0]*st+a.ax[0]*sh,pz=a.c[2]+a.n[2]*st+a.ax[2]*sh,y=Math.atan2(a.n[0],a.n[2]);
-  while(y<yaw-1e-3)y+=Math.PI*2;yaw=y;K.push([px,pz,y,0],[px,pz,y,0])});
+  while(y<yaw-1e-3)y+=Math.PI*2;yaw=y;var pp=as<.9?-.11:0;K.push([px,pz,y,pp],[px,pz,y,pp])});   // on phones tilt down a touch so the painting sits above King George
  K.push([0,-5.2,Math.PI*2,0],[0,-8.6,Math.PI*2,0],[0,-10.0,Math.PI*2,0],[0,-10.35,Math.PI*2,0],[0,-10.35,Math.PI*2,0])}
 buildK();
 var focus=4,focusT=4,SCROLLTEX=null,titleEl=document.getElementById('title');
@@ -1483,14 +1482,14 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  function stopTour(){touring=false;clearTimeout(tourT)}
  function tourAt(i){if(!touring)return;tourI=i;goStop(i);var t0=Date.now();
   (function wait(){if(!touring)return;var a=stopAt();if((a.i===i&&a.d<.04)||Date.now()-t0>4000){speakStop(i,true)}else tourT=setTimeout(wait,150)})()}
- function speakStop(i,tour){var st=STOPS[i],last=i===STOPS.length-1,next=tour?[{t:last?'Thanks, George':'Next',pri:1,go:function(){if(last){stopTour();close()}else tourAt(i+1)}},{t:'End the tour',go:function(){stopTour();close()}}]:null;
+ function speakStop(i,tour){var st=STOPS[i],last=i===STOPS.length-1,next=tour?[{t:last?'Thank you, King George':'Onward',pri:1,go:function(){if(last){stopTour();close()}else tourAt(i+1)}},{t:'End the tour',go:function(){stopTour();close()}}]:null;
   if(st.art!=null){var b=next||[{t:'Show me details',pri:1,go:function(){close();openArt(st.art)}}];if(TOUCH&&!tour)b.push({t:'See it on my wall',go:function(){close();viewOnWall(st.art)}});say(paintingLine(st.art),b,!!tour)}
   else if(last)say('Out here is the balcony. Keep an eye on the field — my tall friend loves to dance! If a painting has caught your eye, you can write to Pam right here.',next||[{t:'Email Pam',pri:1,href:'mailto:'+EMAIL},{t:'Thanks',go:close}],!!tour)
   else say('Welcome to Pam’s Gallery! Every painting here is an original by Pam. Scroll, swipe or use the arrows to stroll from painting to painting.',next||[{t:'Got it',go:close}],!!tour)}
  function menu(){var a=stopAt(),here=a.d<.35&&STOPS[a.i].art!=null?STOPS[a.i].art:null,b=[{t:'Give me the tour',pri:1,go:function(){touring=true;tourAt(0)}},{t:'How do I buy a painting?',go:buy}];
   if(TOUCH)b.push({t:'See a painting on my wall',go:function(){if(here!=null){close();viewOnWall(here)}else say('Walk up to any painting first, then tap me again — or tap the painting and choose “View on your wall”.',[{t:'OK',go:close}])}});
   b.push({t:'Contact Pam',go:function(){say('You can email Pam at <b>'+esc(EMAIL)+'</b>. She replies to every message personally.',[{t:'Write to Pam',pri:1,href:'mailto:'+EMAIL},{t:'Thanks',go:close}])}});
-  b.push({t:'Hide George',go:hide});say('Hello! I’m George. How can I help?',b,true)}
+  b.push({t:'Hide King George',go:hide});say('King George, at your service. How may I help?',b,true)}
  function buy(){say('Every painting is an original and available to buy. Tap a painting, then “Enquire about this work” — or email Pam directly and she’ll get back to you with the details.',[{t:'Email Pam',pri:1,href:'mailto:'+EMAIL},{t:'Thanks',go:close}])}
  $('gBtn').addEventListener('click',function(){if(bub.classList.contains('on')&&!touring){close()}else{stopTour();menu()}act('hop',500)});
  $('gX').addEventListener('click',function(){stopTour();close()});tab.addEventListener('click',show);
@@ -1498,7 +1497,7 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
   if(st.art!=null){if(tips<2){tips++;act('hop',500);speakStop(a.i,false)}}else if(a.i===STOPS.length-1){act('hop',500);speakStop(a.i,false)}}
  setInterval(onStop,600);
  function start(){if(started)return;started=true;if(store('georgeAway')==='1'){tab.classList.add('on');return}root.classList.add('in');seen[0]=1;
-  setTimeout(function(){act('hop',500);say('Hello, I’m George! I look after Pam’s gallery. Would you like a little tour?',[{t:'Yes, show me around',pri:1,go:function(){touring=true;tourAt(1)}},{t:'I’ll look around',go:function(){say('Lovely! Tap me any time if you need a hand.',[]);}}],true)},900)}
+  setTimeout(function(){act('hop',500);say('Greetings, I am King George II, guardian of the gallery. We have been expecting you. Come along, let me guide you on a journey through our treasury to find the next masterpiece for your private collection.',[{t:'Lead the way',pri:1,go:function(){touring=true;tourAt(1)}},{t:'I’ll explore alone',go:function(){say('Very well. '+(TOUCH?'Swipe or tap to stroll from painting to painting, and s':'Scroll or use the arrows to stroll through, and s')+'ummon me whenever you have need of me.',[]);}}],true)},900)}
  return{start:start,stopTour:stopTour}})();
 addEventListener('wheel',function(){George.stopTour()},{passive:true});
 window.__house={cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());render(0)},K:K,cam:cam};
