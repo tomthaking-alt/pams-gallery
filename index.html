@@ -485,6 +485,7 @@ var TX={
  trav:texFrom(noiseTex(512,'#ddd2bf',220,16000,.07)),
  leaf:texFrom(leaves(512)),
  blob:texFrom(radial(),{clamp:1}),
+ patina:texFrom((function(){var c=noiseTex(512,'#efe2c4',150,9000,.16),x=c.getContext('2d');for(var i=0;i<900;i++){x.strokeStyle='rgba(70,45,20,'+(.03+rnd()*.06)+')';x.lineWidth=.6+rnd()*1.6;var px=rnd()*512,py=rnd()*512;x.beginPath();x.moveTo(px,py);x.lineTo(px+(rnd()-.5)*40,py+(rnd()-.5)*8);x.stroke()}return c})()),
  tile:texFrom((function(){var c=noiseTex(1024,'#d3cdc4',140,9000,.03),x=c.getContext('2d');x.fillStyle='rgba(90,80,70,.4)';[0,512].forEach(function(p){x.fillRect(p,0,2,1024);x.fillRect(0,p,1024,2)});return c})()),
  sky:null
 };
@@ -496,8 +497,8 @@ var Mx={
  ceiling:mat({col:'#fbfaf8',rough:.14}),
  coffer:mat({col:'#f8f7f4',rough:.2}),
  gold:mat({col:'#d6ae5c',rough:.24,metal:1}),
- gold24:mat({col:'#ffe29a',rough:.13,metal:1}),
- goldDark:mat({col:'#a9813e',rough:.32,metal:1}),
+ gold24:mat({col:'#ad8442',tex:TX.patina,rough:.5,metal:1,bump:.2,uvs:[.22,.22]}),
+ goldDark:mat({col:'#6e5328',tex:TX.patina,rough:.55,metal:1,uvs:[.2,.2]}),
  steel:mat({col:'#a9813e',rough:.32,metal:1}),
  bronze:mat({col:'#6b4a2e',rough:.36,metal:1}),
  gap:mat({col:'#151210',rough:.9}),
@@ -858,7 +859,7 @@ try{P=prog(VS,FS);PS=prog(SVS,SFS);PB=prog(QVS,BRIGHT);PBL=prog(QVS,BLUR);PC=pro
 /* ---------- render targets ---------- */
 var mobile=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 /* quality adapts to the device: starts sensible, then steps down if frames are slow */
-var Q={dpr:mobile?1.35:2,samples:mobile?2:4,refl:true,bloom:true,dof:true,level:0};
+var Q={dpr:mobile?1.2:2,samples:mobile?2:4,refl:!mobile,bloom:true,dof:!mobile,level:0};
 function degrade(){Q.level++;
  if(Q.level===1){Q.bloom=false}
  else if(Q.level===2){Q.refl=false}
@@ -867,7 +868,7 @@ function degrade(){Q.level++;
  else if(Q.level<=6){Q.dpr=Math.max(.75,Q.dpr*.82)}
  else return false;
  resize();return true}
-var SHS=mobile?2048:4096,shadowTex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,shadowTex);gl.texStorage2D(gl.TEXTURE_2D,1,gl.DEPTH_COMPONENT24,SHS,SHS);
+var SHS=mobile?1536:4096,shadowTex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,shadowTex);gl.texStorage2D(gl.TEXTURE_2D,1,gl.DEPTH_COMPONENT24,SHS,SHS);
 gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_COMPARE_MODE,gl.COMPARE_REF_TO_TEXTURE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
 var shadowFB=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,shadowFB);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.TEXTURE_2D,shadowTex,0);
 var RT={},dirty=2;
@@ -981,11 +982,11 @@ canvas.addEventListener('click',function(e){var q=pickAt(e.clientX,e.clientY);if
 var hint=document.getElementById('hint'),lab=document.getElementById('where');
 var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches,cur=0,lastLab='';
 function progress(){var max=document.documentElement.scrollHeight-innerHeight;return max>0?Math.min(1,Math.max(0,scrollY/max)):0}
-var lastT=0,ema=16,samplesN=0,rendered=false;
+var idleT=0,lastT=0,ema=16,samplesN=0,rendered=false;
 function frame(time){
  requestAnimationFrame(frame);
  if(!col.hidden)return;                     // the collection page covers the 3D: don't draw
- NOWS=time/1000;if(!reduce&&!dlg.open&&!about.open)dirty=Math.max(dirty,1);
+ NOWS=time/1000;if(!reduce&&!dlg.open&&!about.open&&time-idleT>(mobile?38:0)){dirty=Math.max(dirty,1);idleT=time}
  var p=progress(),prev=cur;cur+=(p-cur)*(reduce?1:.09);if(Math.abs(p-cur)<1e-5)cur=p;
  camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=skyFade();
  var bA=burnAmt();if(bA<1&&!reduce)dirty=Math.max(dirty,1);
