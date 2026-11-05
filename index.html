@@ -591,10 +591,10 @@ var Mx={
  lantern:mat({col:'#ffffff',emis:[9,5.2,2.2]}),
  flame:mat({col:'#ff9a3c',emis:[9,3.6,.9]}),
  lens:mat({col:'#ffffff',emis:[16,15,13.5]}),
- sky:mat({isSky:1,unlit:1}),
+ sky:mat({isSky:1,unlit:1}),seaPlane:mat({isSky:1,unlit:1}),
  blob:mat({tex:TX.blob,unit:1,col:[0,0,0],blend:1,rough:1})
 };
-var NOSHADOW=[Mx.ring,Mx.flame,Mx.lens,Mx.sky,Mx.candle,Mx.lantern,Mx.crystal];
+var NOSHADOW=[Mx.seaPlane,Mx.ring,Mx.flame,Mx.lens,Mx.sky,Mx.candle,Mx.lantern,Mx.crystal];
 var LIGHTS={spot:[],point:[]},PICK=[],LABELS=[],LIGHTS_CANDLES=[];
 function blob(x,z,sx,sz){quadL(Mx.blob,B([x,0.004,z]),[0,0,0],[1,0,0],[0,0,-1],sx/2,sz/2,[0,1,0])}
 function rect(m,x0,x1,y0,y1,z0,z1,skip){box(m,B([0,0,0]),[(x0+x1)/2,(y0+y1)/2,(z0+z1)/2],[x1-x0,y1-y0,z1-z0],skip)}
@@ -700,6 +700,7 @@ oliveTree(-2.15,BAL+.6,1.0);oliveTree(2.15,BAL+.6,.94);
 
 /* ---------- sky ---------- */
 ell(Mx.sky,B([0,1.6,-10]),[0,0,0],[90,90,90],48);
+quadL(Mx.seaPlane,B([0,-6,0]),[0,0,-55],[1,0,0],[0,0,-1],85,41,[0,1,0]);
 var SKYTEXT={c:[0,5.3,-36]};
 
 /* ---------- paintings in gilded frames ---------- */
@@ -783,20 +784,22 @@ var WG=dmat({col:'#6f9a4a',rough:.55,unit:1}),WF=dmat({col:'#e8b48c',rough:.6,un
 buildBody(WG,WF,WP1,WP2,WL,WE);buildLeg(WLEG);buildArm(WARM);
 var WALKM=[WG,WF,WP1,WP2,WL,WE,WLEG,WARM];
 function sm(e0,e1,x){var t=Math.max(0,Math.min(1,(x-e0)/(e1-e0)));return t*t*(3-2*t)}
-function walkerState(t){var L=6.8,v=.32,tt=1.6,leg=L/v,T=2*(leg+tt),p=t%T,f;
- if(p<leg)return{x:-3.4+p*v,ry:Math.PI/2,d:p*v,w:1};
- if(p<leg+tt){f=(p-leg)/tt;return{x:3.4,ry:Math.PI/2-sm(0,1,f)*Math.PI,d:0,w:0}}   // turns to face you
- if(p<2*leg+tt){f=p-leg-tt;return{x:3.4-f*v,ry:-Math.PI/2,d:f*v,w:1}}
- f=(p-2*leg-tt)/tt;return{x:-3.4,ry:-Math.PI/2-sm(0,1,f)*Math.PI,d:0,w:0}}
+function walkerState(t){var L=150,v=1.15,tt=6,leg=L/v,T=2*(leg+tt),p=(t+40)%T,f;   // walks the full horizon, turning out of sight
+ if(p<leg)return{x:-75+p*v,ry:Math.PI/2,d:p*v,w:1};
+ if(p<leg+tt){f=(p-leg)/tt;return{x:75,ry:Math.PI/2+sm(0,1,f)*Math.PI,d:0,w:0}}
+ if(p<2*leg+tt){f=p-leg-tt;return{x:75-f*v,ry:-Math.PI/2,d:f*v,w:1}}
+ f=(p-2*leg-tt)/tt;return{x:-75,ry:-Math.PI/2+sm(0,1,f)*Math.PI,d:0,w:0}}
 function drawMatU(u,m){if(!m.vao)return;gl.uniform3fv(u.uCol,m.col);gl.uniform3fv(u.uEmis,m.emis);gl.uniform1f(u.uRough,m.rough);gl.uniform1f(u.uMetal,m.metal);gl.uniform1f(u.uBump,0);gl.uniform1f(u.uRefl,0);
  gl.uniform1f(u.uIsSky,0);gl.uniform1f(u.uArt,0);gl.uniform1f(u.uUnlit,0);gl.uniform1f(u.uBlend,0);gl.uniform1f(u.uAlpha,1);gl.uniform1i(u.uHasTex,0);gl.uniform1i(u.uHasH,0);gl.bindVertexArray(m.vao);gl.drawArrays(gl.TRIANGLES,0,m.n)}
-function drawWalker(u){var st=walkerState(NOWS),ph=st.d/.45*6.2832,sw=st.w?Math.sin(ph):0,bob=st.w?Math.abs(Math.cos(ph))*.012:0,
-  bump=Math.max(sm(.32,.16,Math.abs(st.x-1.5)),sm(.32,.16,Math.abs(st.x+1.5)))*.085,
-  W=mm(mT(st.x,1.11+bump+bob,BAL),mRy(st.ry),mS(.85));
+function drawWalker(u){var S=26,st=walkerState(NOWS),ph=st.d/(.42*S)*6.2832,sw=st.w?Math.sin(ph):0,bob=st.w?(Math.cos(ph*2)*.012):0,
+  W=mm(mT(st.x,-6-9.5+bob*S,-50),mRy(st.ry),mS(S)),
+  lean=.52+.06*Math.sin(ph*2),Wb=mm(W,mT(0,.5,0),mRx(lean),mRz(.05*sw),mT(0,-.5,0));    // hunched forward, swaying
  function dm(m,M){gl.uniformMatrix4fv(u.uM,false,M);drawMatU(u,m)}
- [WG,WF,WP1,WP2,WL,WE].forEach(function(m){dm(m,W)});
- dm(WLEG,mm(W,mT(-.055,.5,0),mRx(.42*sw)));dm(WLEG,mm(W,mT(.055,.5,0),mRx(-.42*sw)));
- dm(WARM,mm(W,mT(-.09,.8,0),mRz(-.12),mRx(-.38*sw)));dm(WARM,mm(W,mT(.09,.8,0),mRz(.12),mRx(.38*sw)));
+ gl.uniform1f(u.uFog,.2);
+ [WG,WF,WP1,WP2,WL,WE].forEach(function(m){dm(m,Wb)});
+ dm(WLEG,mm(W,mT(-.055,.5,0),mRx(.55*sw)));dm(WLEG,mm(W,mT(.055,.5,0),mRx(-.55*sw)));
+ dm(WARM,mm(Wb,mT(-.09,.8,0),mRz(-.22),mRx(-1.15-.35*sw)));dm(WARM,mm(Wb,mT(.09,.8,0),mRz(.22),mRx(-1.15+.35*sw)));   // long arms reaching ahead
+ gl.uniform1f(u.uFog,0);
  gl.uniformMatrix4fv(u.uM,false,IDM)}
 // polished ceiling with recessed brass-trimmed downlights in the coffers
 [-1.6,-3.2,-4.8,-6.4,-8.0].forEach(function(z){[-1.6,1.6].concat(Math.abs(z+5.2)>1?[0]:[]).forEach(function(x){
@@ -848,7 +851,7 @@ var FS=`#version 300 es
 precision highp float;precision highp sampler2DShadow;
 in vec3 vP;in vec3 vN;in vec2 vU;out vec4 o;
 uniform vec3 uCol,uEmis,uCam,uSunDir,uSunCol,uSky,uGround;
-uniform float uRough,uMetal,uBump,uRefl,uUnlit,uBlend,uAlpha,uRH,uX0,uX1,uZB,uZF,uIsSky,uSecs,uArt;uniform vec3 uSkySun,uDomeC;
+uniform float uRough,uMetal,uBump,uRefl,uUnlit,uBlend,uAlpha,uRH,uX0,uX1,uZB,uZF,uIsSky,uSecs,uArt,uFog;uniform vec3 uSkySun,uDomeC;
 float hsh(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
 float vno(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);return mix(mix(hsh(i),hsh(i+vec2(1,0)),u.x),mix(hsh(i+vec2(0,1)),hsh(i+vec2(1,1)),u.x),u.y);}
 float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<6;i++){s+=a*vno(p);p=mat2(1.6,1.2,-1.2,1.6)*p+vec2(17.1,9.2);a*=.5;}return s;}
@@ -936,6 +939,7 @@ void main(){
  col+=env*Fr*(1.-r*.6);
  if(uBlend>.5&&uAlpha<.5){A=clamp(A+dot(Fr,vec3(.33))*.6,0.,1.);}
  col+=uEmis;
+ if(uFog>0.){vec3 hz=skyBase(normalize(vec3(vP.x,max(vP.y,0.)*.3,vP.z+10.)))*.92;col=mix(col,hz,uFog*smoothstep(4.,60.,length(vP-uCam)));}
  o=vec4(col,uBlend>.5?A:length(vP-uCam)/uFar);
 }`;
 var SVS='#version 300 es\nlayout(location=0) in vec3 aP;uniform mat4 uVP;void main(){gl_Position=uVP*vec4(aP,1.);}';
@@ -1042,7 +1046,7 @@ function setLights(u){
  gl.uniform1i(u.uNP,ps.length);gl.uniform3fv(u.uPP,pp);gl.uniform3fv(u.uPC,pc);
 }
 function drawScene(VPm,camPos,pass){
- var u=P.u;gl.useProgram(P.p);gl.uniformMatrix4fv(u.uVP,false,VPm);gl.uniformMatrix4fv(u.uM,false,IDM);gl.uniform3fv(u.uCam,camPos);gl.uniform1i(u.uPass,pass);
+ var u=P.u;gl.useProgram(P.p);gl.uniformMatrix4fv(u.uVP,false,VPm);gl.uniformMatrix4fv(u.uM,false,IDM);gl.uniform1f(u.uFog,0);gl.uniform3fv(u.uCam,camPos);gl.uniform1i(u.uPass,pass);
  gl.uniform3fv(u.uSunDir,SUN);gl.uniform3fv(u.uSunCol,SUNCOL);gl.uniform3fv(u.uSky,SKY);gl.uniform3fv(u.uGround,GROUND);
  gl.uniform1f(u.uRH,RH);gl.uniform1f(u.uX0,X0);gl.uniform1f(u.uX1,X1);gl.uniform1f(u.uZB,ZB);gl.uniform1f(u.uZF,ZF);
  gl.uniformMatrix4fv(u.uSunVP,false,sunVP);gl.uniform2f(u.uShTexel,1/SHS,1/SHS);gl.uniform2f(u.uRes,RT.w,RT.h);
