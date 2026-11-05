@@ -97,6 +97,7 @@ dialog p{margin:.2rem 0;line-height:1.5}
 <header id="bar"><span class="name">Pam’s Gallery</span><span id="where" aria-live="polite">The Gallery</span><nav aria-label="Site"><button id="music" aria-pressed="false" title="Play or pause the music">&#9834; Music</button><button id="navCol">Collection</button><button id="navAbout">About<span class="wide"> &amp; Contact</span></button></nav></header>
 <div id="title" aria-hidden="true"><h1>Pam’s Gallery</h1><p>Original paintings</p></div>
 <div id="hint">Scroll or tap to walk through</div>
+<script>try{if(matchMedia("(pointer:coarse)").matches)document.getElementById("hint").textContent="Swipe, tap or scroll to walk through"}catch(e){}</script>
 <div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
 <div id="tip"></div>
 <section id="enqPanel" aria-labelledby="enqTitle" aria-hidden="true">
@@ -1041,11 +1042,18 @@ var STOPS=[{k:0,label:'Welcome'}];ART.forEach(function(p,i){STOPS.push({k:3+2*i+
 function stopAt(){var t=cur*(K.length-1),best=0,bd=1e9;STOPS.forEach(function(s,i){var d=Math.abs(s.k-t);if(d<bd){bd=d;best=i}});return{i:best,d:bd}}
 var nowEl=$('now'),lastNow='';
 function updateWalk(){var a=stopAt(),txt=a.d<.6?STOPS[a.i].label:(cam.z<ZF+.2?'The Balcony':'The Gallery');if(txt!==lastNow){lastNow=txt;nowEl.innerHTML=txt}}
-function goStop(i){i=Math.max(0,Math.min(STOPS.length-1,i));var max=document.documentElement.scrollHeight-innerHeight;scrollTo({top:max*STOPS[i].k/(K.length-1),behavior:reduce?'auto':'smooth'})}
-function step(dir){var a=stopAt(),t=cur*(K.length-1),i=a.i;if(a.d>.2&&((dir>0&&STOPS[i].k>t)||(dir<0&&STOPS[i].k<t)))goStop(i);else goStop(i+dir)}
+var tgtI=null,tgtT=0;
+function goStop(i){i=Math.max(0,Math.min(STOPS.length-1,i));tgtI=i;tgtT=Date.now();var max=document.documentElement.scrollHeight-innerHeight;scrollTo({top:max*STOPS[i].k/(K.length-1),behavior:reduce?'auto':'smooth'})}
+function step(dir){if(tgtI!==null&&Date.now()-tgtT<1600&&Math.abs(progress()*(K.length-1)-STOPS[tgtI].k)>.05){goStop(tgtI+dir);return}   // a quick second swipe or tap continues from where the first is heading
+ var a=stopAt(),t=cur*(K.length-1),i=a.i;if(a.d>.2&&((dir>0&&STOPS[i].k>t)||(dir<0&&STOPS[i].k<t)))goStop(i);else goStop(i+dir)}
 $('next').addEventListener('click',function(){step(1)});$('prev').addEventListener('click',function(){step(-1)});
 nowEl.addEventListener('click',function(){var a=stopAt();if(a.d<.6&&STOPS[a.i].art!=null)openArt(STOPS[a.i].art)});
 addEventListener('keydown',function(e){if(dlg.open||about.open||!col.hidden)return;if(e.key==='ArrowRight'){e.preventDefault();step(1)}else if(e.key==='ArrowLeft'){e.preventDefault();step(-1)}});
+/* swipe on phones: left = next painting, right = previous */
+(function(){var sx=0,sy=0,st=0,on=false;
+ addEventListener('touchstart',function(e){if(e.touches.length!==1||dlg.open||about.open||!col.hidden||e.target.closest('#bar,#walk,dialog,#collection')){on=false;return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();on=true},{passive:true});
+ addEventListener('touchend',function(e){if(!on)return;on=false;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+  if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4&&Date.now()-st<900)step(dx<0?1:-1)},{passive:true});})();
 window.__house={cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());render(0)},K:K,cam:cam};
 
 var fontReady=document.fonts&&document.fonts.load?Promise.race([Promise.all([document.fonts.load('italic 400 80px "Cormorant Garamond"'),document.fonts.load('italic 500 50px "Cormorant Garamond"'),document.fonts.load('300 27px Jost')]),new Promise(function(r){setTimeout(r,2500)})]).catch(function(){}):Promise.resolve();
