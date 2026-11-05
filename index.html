@@ -51,6 +51,15 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 @keyframes lb{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
 @media (prefers-reduced-motion:reduce){#loading .lb i{animation:none;width:100%}}
 #bar nav{display:flex;gap:clamp(.9rem,3vw,1.8rem)}
+#cap{position:fixed;left:50%;transform:translate(-50%,8px);bottom:calc(env(safe-area-inset-bottom,0px) + 82px);z-index:4;width:min(340px,calc(100vw - 32px));background:rgba(251,248,242,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(184,154,98,.55);border-radius:14px;padding:.85rem 1rem .8rem;box-shadow:0 12px 34px rgba(20,12,8,.28);color:#1c120c;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease}
+#cap.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#cap h3{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:600;font-size:1.45rem;line-height:1.1}
+#cap p{margin:.3rem 0 0;font-size:.86rem;color:#3a2c22}
+#cap .row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-top:.55rem}
+#cap .pr{font-weight:600;font-size:.95rem}
+#cap button{font:inherit;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border:0;border-radius:99px;padding:.55rem .95rem;background:#1c120c;color:#fbf8f2;cursor:pointer;min-height:40px}
+@media (min-aspect-ratio:21/20){#cap{display:none}}
+@media (max-width:600px){#title p{letter-spacing:.2em;font-size:.7rem;line-height:1.7}}
 #walk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:4;display:flex;align-items:center;gap:.25rem;background:rgba(250,249,247,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:99px;padding:.3rem;box-shadow:0 10px 30px rgba(20,12,8,.25);color:var(--walnut);max-width:calc(100vw - 24px)}
 #walk button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;border-radius:99px;min-width:44px;height:44px;font-size:1.25rem;line-height:1}
 #walk button:hover,#walk button:focus-visible{background:rgba(176,141,87,.18);outline:none}
@@ -105,7 +114,7 @@ dialog p{margin:.2rem 0;line-height:1.5}
 <div id="title" aria-hidden="true"><h1>Pam’s Gallery</h1><p>Welcome · come in and look around</p></div>
 <div id="hint">Scroll, swipe or tap to step inside</div>
 <script>try{if(matchMedia("(pointer:coarse)").matches)document.getElementById("hint").textContent="Swipe, tap or scroll to walk through"}catch(e){}</script>
-<div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
+<div id="cap" aria-live="polite"><h3 id="capT"></h3><p id="capM"></p><div class="row"><span class="pr" id="capP"></span><button id="capB" type="button">Enquire</button></div></div><div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
 <div id="tip"></div>
 <section id="enqPanel" aria-labelledby="enqTitle" aria-hidden="true">
  <h2 id="enqTitle">Enquiries</h2>
@@ -557,7 +566,7 @@ var TX={
 var Mx={
  floor:mat({tex:TX.floor,rough:.14,bump:.15,refl:.62,uvs:[2.4,2.4]}),
  marble:mat({tex:TX.marble,rough:.32,bump:.2,uvs:[1.4,1.4]}),
- wall:TX.wallP?mat({col:'#fbf6ee',tex:TX.wallP,htex:TX.wallH,rough:.88,bump:.5,uvs:[1.7,1.7]}):mat({col:'#efe6d6',tex:TX.plaster,rough:.9,bump:.12,uvs:[3,3]}),
+ wall:TX.wallP?mat({col:'#fbf6ee',tex:TX.wallP,htex:TX.wallH,rough:.88,bump:.22,uvs:[1.7,1.7]}):mat({col:'#efe6d6',tex:TX.plaster,rough:.9,bump:.12,uvs:[3,3]}),
  key:mat({col:'#f1ece3',rough:.55}),
  ceiling:mat({col:'#fbfaf8',rough:.14}),
  coffer:mat({col:'#f8f7f4',rough:.2}),
@@ -672,7 +681,7 @@ var PIG=(function(){function feathers(W,top,edge,bar){var c=cnv(W,W),x=c.getCont
   for(var r=0;r<W/10+2;r++)for(var k=-1;k<W/14+2;k++){var cx=k*14+(r%2)*7,cy=r*10;x.fillStyle=top;x.strokeStyle=edge;x.lineWidth=1.2;x.beginPath();x.ellipse(cx,cy,9,12,0,0,Math.PI);x.fill();x.stroke();
    x.strokeStyle='rgba(255,255,255,.08)';x.beginPath();x.moveTo(cx,cy);x.lineTo(cx,cy+11);x.stroke()}
   if(bar){x.fillStyle='rgba(250,250,250,.9)';x.fillRect(0,W*.55,W,W*.08);x.fillStyle='rgba(40,42,48,.85)';x.fillRect(0,W*.82,W,W*.18)}return c}
- return{back:texFrom(feathers(256,'#8f95a3','rgba(60,64,74,.45)')),wing:texFrom(feathers(256,'#8a909d','rgba(55,58,68,.5)',1)),breast:texFrom(feathers(256,'#b78f92','rgba(120,85,90,.35)'))}})();
+ return{back:texFrom(feathers(256,'#a4aab8','rgba(70,74,86,.4)')),wing:texFrom(feathers(256,'#9ea4b2','rgba(65,68,80,.45)',1)),breast:texFrom(feathers(256,'#b78f92','rgba(120,85,90,.35)'))}})();
 (function(){var G=mat({unit:1,col:'#ffffff',tex:PIG.back,rough:.75}),Wg=mat({unit:1,col:'#ffffff',tex:PIG.wing,rough:.72}),Br=mat({unit:1,col:'#ffffff',tex:PIG.breast,rough:.8}),
   Wh=mat({col:'#f1f0ec',rough:.75}),Ir=mat({col:'#5e7f62',rough:.25,metal:.4,emis:[.02,.04,.03]}),Tl=mat({col:'#3e4149',rough:.7}),Bk=mat({col:'#e2a29a',rough:.45}),Ce=mat({col:'#f3ece6',rough:.6}),
   Ey=mat({col:'#f0dc8a',rough:.15}),Pu=mat({col:'#0b0b0c',rough:.1}),Lg=mat({col:'#c97880',rough:.55}),src=dmat({unit:1}),W=mm(mT(-1.0,1.11,BAL),mRy(.5));
@@ -1054,12 +1063,17 @@ vec3 skyCol(vec3 d){float e=d.y;vec3 c=skyBase(d);
  vec2 sg=floor(d.xz/(d.y+.3)*220.);c+=vec3(1.)*step(.996,hsh(sg))*smoothstep(.1,.5,e)*.8;   // stars
  c=mix(c,skyBase(vec3(d.x,0.,d.z)),exp(-max(e,0.)*18.)*.5);
  return c;}
-vec3 seaCol(vec3 d){float e=-d.y;float dist=1./(e+.004);vec2 sp=d.xz*dist;   // rolling painted waves of green, gold and rust
- float w=fb3(sp*.06+vec2(0.,uSecs*.01))*6.;vec2 q=sp+vec2(sin(w),cos(w))*3.;
- float band=.5+.5*sin(q.x*.35+q.y*.12+w*.6);float streak=fb3(vec2(q.x*.4,q.y*1.8));
- vec3 c=mix(vec3(.12,.22,.05),vec3(.55,.62,.12),band);c=mix(c,vec3(.55,.22,.08),smoothstep(.62,.8,streak)*.7);c=mix(c,vec3(.85,.8,.4),smoothstep(.85,.97,band)*.4);
- c*=.55+.45*smoothstep(-.2,1.,band);
- c=mix(c,skyBase(vec3(d.x,0.,d.z))*.9,exp(-e*25.)*.85);
+vec3 seaCol(vec3 d){float e=-d.y;float dist=1./(e+.004);vec2 sp=d.xz*dist;   // rolling painted land of green, gold and rust
+ float det=smoothstep(.012,.14,e);
+ float w=fb3(sp*.05+vec2(0.,uSecs*.008))*6.;vec2 q=sp+vec2(sin(w),cos(w))*3.;
+ float band=.5+.5*sin(q.x*.3+q.y*.1+w*.6);band=mix(.5,band,det);
+ float hill=fb3(sp*.012),streak=fb3(vec2(q.x*.35,q.y*1.5));
+ vec3 c=mix(vec3(.10,.2,.05),vec3(.5,.6,.13),band);
+ c=mix(c,vec3(.5,.22,.08),smoothstep(.64,.82,streak)*.55*det);
+ c=mix(c,vec3(.8,.78,.4),smoothstep(.86,.97,band)*.35*det);
+ c*=(.6+.4*smoothstep(-.2,1.,band))*(.78+.44*hill);
+ c*=.93+.14*fb3(sp*1.7)*det*det;
+ c=mix(c,skyBase(vec3(d.x,0.,d.z))*.95,smoothstep(.09,0.,e)*.9);
  return c;}
 uniform int uHasTex,uHasH,uPass,uNS,uNP;uniform sampler2D uTex,uReflTex,uHTex;uniform float uFar;uniform sampler2DShadow uShadow;uniform mat4 uSunVP;uniform vec2 uRes,uShTexel;
 uniform vec3 uSP[10],uSD[10],uSC[10];uniform vec2 uSA[10];uniform vec3 uPP[6],uPC[6];
@@ -1320,7 +1334,9 @@ function frame(time){
 var STOPS=[{k:0,label:'Welcome'}];ART.forEach(function(p,i){STOPS.push({k:3+2*i+.5,label:'<i>'+esc(p.t)+'</i> \u00b7 '+(i+1)+'/'+ART.length,art:i})});STOPS.push({k:K.length-1,label:'The Balcony \u00b7 Enquiries'});
 function stopAt(){var t=cur*(K.length-1),best=0,bd=1e9;STOPS.forEach(function(s,i){var d=Math.abs(s.k-t);if(d<bd){bd=d;best=i}});return{i:best,d:bd}}
 var nowEl=$('now'),lastNow='';
-function updateWalk(){var a=stopAt(),txt=a.d<.6?STOPS[a.i].label:(cam.z<ZF+.2?'The Balcony':'The Gallery');if(txt!==lastNow){lastNow=txt;nowEl.innerHTML=txt}}
+var capEl=$('cap'),capArt=-1;$('capB').addEventListener('click',function(){if(capArt>=0)openArt(capArt)});
+function updateWalk(){var a=stopAt(),txt=a.d<.6?STOPS[a.i].label:(cam.z<ZF+.2?'The Balcony':'The Gallery');if(txt!==lastNow){lastNow=txt;nowEl.innerHTML=txt}
+ var ai=a.d<.35&&STOPS[a.i].art!=null?STOPS[a.i].art:-1;if(ai!==capArt){capArt=ai;if(ai>=0){var p=ART[ai];$('capT').textContent=p.t;$('capM').textContent=p.m+(p.s?' \u00b7 '+p.s:'');$('capP').textContent=p.p}capEl.classList.toggle('on',ai>=0)}}
 var tgtI=null,tgtT=0;
 function goStop(i){i=Math.max(0,Math.min(STOPS.length-1,i));tgtI=i;tgtT=Date.now();var max=document.documentElement.scrollHeight-innerHeight;scrollTo({top:max*STOPS[i].k/(K.length-1),behavior:reduce?'auto':'smooth'})}
 function step(dir){if(tgtI!==null&&Date.now()-tgtT<1600&&Math.abs(progress()*(K.length-1)-STOPS[tgtI].k)>.05){goStop(tgtI+dir);return}   // a quick second swipe or tap continues from where the first is heading
@@ -1330,7 +1346,7 @@ nowEl.addEventListener('click',function(){var a=stopAt();if(a.d<.6&&STOPS[a.i].a
 addEventListener('keydown',function(e){if(dlg.open||about.open||!col.hidden)return;if(e.key==='ArrowRight'){e.preventDefault();step(1)}else if(e.key==='ArrowLeft'){e.preventDefault();step(-1)}});
 /* swipe on phones: left = next painting, right = previous */
 (function(){var sx=0,sy=0,st=0,on=false;
- addEventListener('touchstart',function(e){if(e.touches.length!==1||dlg.open||about.open||!col.hidden||e.target.closest('#bar,#walk,dialog,#collection')){on=false;return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();on=true},{passive:true});
+ addEventListener('touchstart',function(e){if(e.touches.length!==1||dlg.open||about.open||!col.hidden||e.target.closest('#bar,#walk,#cap,dialog,#collection')){on=false;return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();on=true},{passive:true});
  addEventListener('touchend',function(e){if(!on)return;on=false;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
   if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4&&Date.now()-st<900)step(dx<0?1:-1)},{passive:true});})();
 window.__house={cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());render(0)},K:K,cam:cam};
