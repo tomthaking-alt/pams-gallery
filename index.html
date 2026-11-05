@@ -433,11 +433,11 @@ function scrollCanvas(){
  return c}
 function textCanvas(W,H,draw){var c=cnv(W,H),x=c.getContext('2d');draw(x,W,H);return c}
 function wrap(x,t,X,Y,mw,lh){var w=t.split(' '),line='',yy=Y;w.forEach(function(s){var tt=line?line+' '+s:s;if(x.measureText(tt).width>mw&&line){x.fillText(line,X,yy);line=s;yy+=lh}else line=tt});x.fillText(line,X,yy)}
-function plaqueCanvas(p){return textCanvas(1280,720,function(x){x.scale(2,2);var W=640,H=360;x.fillStyle='#fbf8f2';x.fillRect(0,0,W,H);x.strokeStyle='#b89a62';x.lineWidth=6;x.strokeRect(9,9,W-18,H-18);x.fillStyle='#1c120c';
+function plaqueCanvas(p){return textCanvas(2048,1152,function(x){x.scale(3.2,3.2);var W=640,H=360;x.fillStyle='#fbf8f2';x.fillRect(0,0,W,H);x.strokeStyle='#b89a62';x.lineWidth=6;x.strokeRect(9,9,W-18,H-18);x.fillStyle='#1c120c';
  x.font='italic 600 76px "Cormorant Garamond",Georgia,serif';wrap(x,p.t,38,96,W-70,70);
- x.font='400 30px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#3a2c22';x.fillText(p.m,40,H-112);
- x.font='500 36px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#1c120c';x.fillText(p.p,40,H-66);
- x.font='600 22px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#8a6a36';x.fillText('TAP TO ENQUIRE',40,H-28)})}
+ x.font='400 38px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#2e221a';x.fillText(p.m,40,H-122);
+ x.font='600 44px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#1c120c';x.fillText(p.p,40,H-70);
+ x.font='600 27px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#7a5a26';x.fillText('TAP TO ENQUIRE  →',40,H-28)})}
 
 /* ---------- GL helpers ---------- */
 function texFrom(c,o){o=o||{};var t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
@@ -648,7 +648,7 @@ rect(Mx.marble,X0-T,X1+T,CT,CT+.16,ZF-.35,ZF+.25);
 rect(Mx.key,X0-T,X1+T,CT+.16,CT+.44,ZF-.3,ZF+.2);
 rect(Mx.marble,X0-T,X1+T,CT+.44,RH+.3,ZF-.45,ZF+.25);
 rect(Mx.gold,X0-T,X1+T,CT+.155,CT+.17,ZF-.315,ZF+.215);
-[-3.3,-1.25,1.25,3.3].forEach(function(x){column(x,ZF,CT,.25)});
+[-3.3,3.3].forEach(function(x){column(x,ZF,CT,.25)});
 // interior columns framing the paintings
 [[X0+.45,-.7],[X0+.45,-5.1],[X1-.45,-.7],[X1-.45,-5.1],[0,ZB-.45]].forEach(function(q){column(q[0],q[1],CT,.22)});
 // balcony: travertine paving and a white marble balustrade with carved balusters, piers and urns
@@ -765,11 +765,11 @@ function hang(k,o,ry){
  if(p.img){var im=new Image();im.onload=function(){var c=cnv(im.naturalWidth,im.naturalHeight);c.getContext('2d').drawImage(im,0,0);pm.tex=texFrom(c);pm.htex=null;pm.bump=.3;pm.rough=.55;pm.col=[.4,.4,.4];pm.art=1;dirty=2};im.src=p.img}
  var ax=bn(b,[1,0,0]),ay=[0,1,0],n=bn(b,[0,0,1]),tipT='<i>'+p.t+'</i> · '+p.p;
  PICK.push({c:bx(b,[0,0,.05]),ax:ax,ay:ay,hw:w/2+fw,hh:h/2+fw,n:n,go:function(){openArt(k)},tip:tipT});
- var lc=bx(b,[w/2+fw+.4,-.3,.03]);
- LABELS.push(function(){label(plaqueCanvas(p),lc,ax,ay,.5,.281,n,{go:function(){openArt(k)},tip:tipT})});
+ var lc=bx(b,[w/2+fw+.46,-.3,.03]);
+ LABELS.push(function(){label(plaqueCanvas(p),lc,ax,ay,.6,.3375,n,{go:function(){openArt(k)},tip:tipT},{art:1,blend:0})});
  var center=bx(b,[0,0,0]);
  spotOn(center,v3.add([center[0],RH-.02,center[2]],v3.sc(n,1.6)),Math.max(w,h),30);
- ARTPOS[k]={c:center,n:n,w:w,h:h};
+ ARTPOS[k]={c:center,n:n,w:w,h:h,ax:ax};
  return center}
 function spotOn(target,from,size,power){
  var d=v3.sub(target,from),dist=Math.hypot(d[0],d[1],d[2]),dir=v3.norm(d),outer=Math.atan((size/2+1.0)/dist),inner=outer*.18;
@@ -1268,7 +1268,7 @@ function render(time){
 var K=[];
 function buildK(){var as=innerWidth/Math.max(1,innerHeight),vf=fovFor(as),hf=2*Math.atan(Math.tan(vf/2)*as),yaw=0;K.length=0;
  K.push([0,-1.6,0,0],[0,-1.6,0,0],[0,-5.2,0,0]);
- ARTPOS.forEach(function(a){var need=Math.max((a.w+1.0)/2/Math.tan(hf/2),(a.h+1.35)/2/Math.tan(vf/2)),st=Math.min(6.8,Math.max(1.9,need)),px=a.c[0]+a.n[0]*st,pz=a.c[2]+a.n[2]*st,y=Math.atan2(a.n[0],a.n[2]);
+ ARTPOS.forEach(function(a){var wide=as>1.05,sh=wide?.44:0,need=Math.max((a.w+(wide?2.0:1.0))/2/Math.tan(hf/2),(a.h+1.35)/2/Math.tan(vf/2)),st=Math.min(6.8,Math.max(1.9,need)),px=a.c[0]+a.n[0]*st+a.ax[0]*sh,pz=a.c[2]+a.n[2]*st+a.ax[2]*sh,y=Math.atan2(a.n[0],a.n[2]);
   while(y<yaw-1e-3)y+=Math.PI*2;yaw=y;K.push([px,pz,y,0],[px,pz,y,0])});
  K.push([0,-5.2,Math.PI*2,0],[0,-8.6,Math.PI*2,0],[0,-10.0,Math.PI*2,0],[0,-10.35,Math.PI*2,0],[0,-10.35,Math.PI*2,0])}
 buildK();
