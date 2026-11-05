@@ -96,7 +96,7 @@ dialog p{margin:.2rem 0;line-height:1.5}
 <canvas id="gl" aria-label="A walk around Pam’s Gallery and out onto the balcony"></canvas>
 <header id="bar"><span class="name">Pam’s Gallery</span><span id="where" aria-live="polite">The Gallery</span><nav aria-label="Site"><button id="music" aria-pressed="false" title="Play or pause the music">&#9834; Music</button><button id="navCol">Collection</button><button id="navAbout">About<span class="wide"> &amp; Contact</span></button></nav></header>
 <div id="title" aria-hidden="true"><h1>Pam’s Gallery</h1><p>Original paintings</p></div>
-<div id="hint">Scroll to enter the gallery</div>
+<div id="hint">Scroll or tap to walk through</div>
 <div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
 <div id="tip"></div>
 <section id="enqPanel" aria-labelledby="enqTitle" aria-hidden="true">
@@ -989,6 +989,7 @@ function sceneDist(){var o=[cam.x,cam.y,cam.z],d=camDir(),best=60;
  if(best<60)return best;
  [[0,X0],[0,X1],[2,ZB],[1,0],[1,RH]].forEach(function(pl){var ax=pl[0],v=pl[1],dd=d[ax];if(Math.abs(dd)<1e-4)return;var t=(v-o[ax])/dd;if(t>.2&&t<best){var p=v3.add(o,v3.sc(d,t));if(ax===0&&p[2]<ZF)return;best=t}});
  if(cam.z<ZF+.5)best=Math.max(best,25);return Math.min(best,25)}
+function enqFade(){var n=K.length-1,t=Math.max(0,Math.min(1,(cur*n-(n-1.7))/1.2));return t*t*(3-2*t)}
 function skyFade(){var t=Math.max(0,Math.min(1,(-6.5-cam.z)/2.6));return t*t*(3-2*t)}
 function camAt(t){var n=K.length-1;cam.y=1.6;t=Math.max(0,Math.min(n,t));var j=Math.min(n-1,Math.floor(t)),f=t-j;f=f*f*(3-2*f);var a=K[j],b=K[j+1];
  cam.x=a[0]+(b[0]-a[0])*f;cam.z=a[1]+(b[1]-a[1])*f;cam.yaw=a[2]+(b[2]-a[2])*f;cam.pitch=a[3]+(b[3]-a[3])*f}
@@ -1002,7 +1003,7 @@ function pickAt(cx,cy){
  PICK.forEach(function(q){var dn=v3.dot(d,q.n);if(dn>-1e-4)return;var t=v3.dot(v3.sub(q.c,o),q.n)/dn;if(t<=0||t>=bt||t>(q.far||9)||(q.on&&!q.on()))return;var p=v3.sub(v3.add(o,v3.sc(d,t)),q.c);
   if(Math.abs(v3.dot(p,q.ax))<=q.hw&&Math.abs(v3.dot(p,q.ay))<=q.hh){bt=t;best=q}});return best}
 canvas.addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;var q=pickAt(e.clientX,e.clientY);canvas.style.cursor=q?'pointer':'';if(q){tip.innerHTML=q.tip;tip.style.left=(e.clientX+16)+'px';tip.style.top=(e.clientY+16)+'px';tip.style.opacity=1}else tip.style.opacity=0});
-canvas.addEventListener('click',function(e){var q=pickAt(e.clientX,e.clientY);if(q){tip.style.opacity=0;q.go()}});
+canvas.addEventListener('click',function(e){var q=pickAt(e.clientX,e.clientY);if(q){tip.style.opacity=0;q.go()}else step(1)});   // tap a painting for details, anywhere else to walk on
 
 /* ---------- scroll ---------- */
 var hint=document.getElementById('hint'),lab=document.getElementById('where');
@@ -1014,7 +1015,7 @@ function frame(time){
  if(!col.hidden)return;                     // the collection page covers the 3D: don't draw
  NOWS=time/1000;if(!reduce&&!dlg.open&&!about.open&&time-idleT>(mobile?38:0)){dirty=Math.max(dirty,1);idleT=time}
  var p=progress(),prev=cur;cur+=(p-cur)*(reduce?1:.09);if(Math.abs(p-cur)<1e-5)cur=p;
- camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(skyFade());
+ camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());
  var bA=burnAmt();if(bA<1&&!reduce)dirty=Math.max(dirty,1);
  focusT=sceneDist();var fd=focusT-focus;focus+=fd*(reduce?1:.12);if(Math.abs(fd)>.01)dirty=Math.max(dirty,1);
  if(dirty){render(time);dirty--;
@@ -1034,7 +1035,7 @@ function step(dir){var a=stopAt(),t=cur*(K.length-1),i=a.i;if(a.d>.2&&((dir>0&&S
 $('next').addEventListener('click',function(){step(1)});$('prev').addEventListener('click',function(){step(-1)});
 nowEl.addEventListener('click',function(){var a=stopAt();if(a.d<.6&&STOPS[a.i].art!=null)openArt(STOPS[a.i].art)});
 addEventListener('keydown',function(e){if(dlg.open||about.open||!col.hidden)return;if(e.key==='ArrowRight'){e.preventDefault();step(1)}else if(e.key==='ArrowLeft'){e.preventDefault();step(-1)}});
-window.__house={cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(skyFade());render(0)},K:K,cam:cam};
+window.__house={cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());render(0)},K:K,cam:cam};
 
 var fontReady=document.fonts&&document.fonts.load?Promise.race([Promise.all([document.fonts.load('italic 400 80px "Cormorant Garamond"'),document.fonts.load('italic 500 50px "Cormorant Garamond"'),document.fonts.load('300 27px Jost')]),new Promise(function(r){setTimeout(r,2500)})]).catch(function(){}):Promise.resolve();
 fontReady.then(function(){
@@ -1046,7 +1047,7 @@ fontReady.then(function(){
   x.shadowColor='rgba(255,190,120,.9)';x.shadowBlur=18;x.fillStyle='#ffd27a';x.fillRect(W/2-300,445,250,4);x.fillRect(W/2+50,445,250,4);x.beginPath();x.moveTo(W/2,430);x.lineTo(W/2+17,447);x.lineTo(W/2,464);x.lineTo(W/2-17,447);x.fill();
   x.shadowColor='rgba(40,10,60,.9)';x.shadowBlur=20;x.fillStyle='#ffffff';x.font='400 66px Jost,Helvetica,Arial,sans-serif';x.fillText('Select any painting to see its details,',W/2,600);x.fillText('or write to',W/2,690);
   x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=22;x.fillStyle='#ffffff';x.font='italic 500 132px "Cormorant Garamond",Georgia,serif';x.fillText('Pam\u2019s Gallery',W/2,860);x.fillStyle='#ffd27a';var mw=x.measureText('Pam\u2019s Gallery').width;x.fillRect(W/2-mw/2,890,mw,5);x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=18;x.fillStyle='#ffffff';x.font='400 62px Jost,Helvetica,Arial,sans-serif';x.fillText(EMAIL,W/2,985)}),
-  sc,ax,ay,19,10.2,nrm,{go:function(){location.href='mailto:'+EMAIL},tip:'Write to '+EMAIL,far:120,on:function(){return cam.z<-9}},{unlit:1,emis:[2.2,2.15,2.1]});SKYTEXT.m=MATS[MATS.length-1];
+  sc,ax,ay,19,10.2,nrm,{go:function(){location.href='mailto:'+EMAIL},tip:'Write to '+EMAIL,far:120,on:function(){return false}},{unlit:1,emis:[2.2,2.15,2.1]});SKYTEXT.m=MATS[MATS.length-1];
  LABELS.forEach(function(f){f()});
  upload();resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;resize()});
  cur=progress();camAt(cur*(K.length-1));render(0);dirty=0;var ld=document.getElementById('loading');ld.style.opacity=0;setTimeout(function(){ld.style.display='none'},700);
