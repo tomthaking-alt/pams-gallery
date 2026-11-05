@@ -28,6 +28,18 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #title h1{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(3rem,9vw,6.8rem);line-height:1;color:#fffaf0;letter-spacing:.01em;text-shadow:0 2px 30px rgba(40,20,5,.55),0 1px 3px rgba(40,20,5,.5)}
 #title p{margin:1rem 0 0;font-size:clamp(.72rem,1.6vw,.85rem);letter-spacing:.42em;text-transform:uppercase;color:#fff6e6;text-shadow:0 1px 12px rgba(40,20,5,.7)}
 #hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 22px);z-index:3;color:#faf9f7;background:rgba(43,30,24,.85);backdrop-filter:blur(6px);padding:.65rem 1.3rem;border-radius:99px;font-size:.85rem;letter-spacing:.08em;pointer-events:none}
+#enqPanel{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:4;width:min(560px,calc(100vw - 32px));box-sizing:border-box;padding:clamp(1.5rem,4vw,2.4rem) clamp(1.25rem,4vw,2.4rem);text-align:center;color:#fffaf2;
+ background:rgba(24,16,30,.58);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);border:1px solid rgba(240,214,160,.35);border-radius:4px;box-shadow:0 24px 70px rgba(10,6,14,.45);
+ opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s}
+#enqPanel.live{pointer-events:auto}
+#enqPanel h2{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;font-size:clamp(2.6rem,8vw,3.6rem);line-height:1;color:#f6dca4;letter-spacing:.01em}
+#enqPanel .lead{margin:.9rem auto 0;max-width:40ch;font-size:clamp(1rem,2.6vw,1.1rem);line-height:1.6;color:#fffaf2}
+#enqPanel .mail{margin:1.1rem 0 0;font-size:clamp(1.15rem,3.6vw,1.45rem);font-weight:400;letter-spacing:.02em;color:#fff;user-select:all;-webkit-user-select:all;word-break:break-all}
+#enqPanel .row{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:1.4rem}
+#enqPanel .pbtn{font:inherit;font-size:.95rem;font-weight:400;padding:.75rem 1.2rem;min-height:44px;border-radius:2px;border:1px solid rgba(246,220,164,.7);background:transparent;color:#fffaf2;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+#enqPanel .pbtn.main{background:#f6dca4;color:#2a1c14;border-color:#f6dca4}
+#enqPanel .pbtn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+#enqPanel .note{margin:.8rem 0 0;min-height:1.2em;font-size:.85rem;color:#f6dca4}
 #tip{position:fixed;z-index:4;pointer-events:none;background:rgba(250,249,247,.94);color:var(--walnut);padding:.45rem .8rem;font-size:.85rem;letter-spacing:.03em;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .15s;white-space:nowrap}
 #tip i{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.1rem}
 #loading{position:fixed;inset:0;z-index:6;background:#16110e;display:flex;align-items:center;justify-content:center;color:#d9cfc2;letter-spacing:.2em;font-size:.75rem;text-transform:uppercase;transition:opacity .6s}
@@ -71,7 +83,7 @@ dialog{border:0;border-radius:2px;padding:0;max-width:min(94vw,880px);width:100%
 #dlg .pager button{font:inherit;color:var(--walnut);background:none;border:0;cursor:pointer;padding:.5rem 0}
 #about{max-width:min(94vw,560px)}
 #about .txt{padding:clamp(1.6rem,4vw,2.6rem)}
-@media (max-width:700px){#dlg .wrap{grid-template-columns:1fr}#dlg .pic{min-height:0}#dlg .pic img{max-height:36vh}#bar .name{font-size:1.2rem}#where{display:none}}
+@media (max-width:700px){#dlg .wrap{grid-template-columns:1fr}#dlg .pic{min-height:0}#dlg .pic img{max-height:36vh}#bar .name{font-size:1.2rem;white-space:nowrap}#where{display:none}#bar nav{gap:.85rem}#bar nav button{white-space:nowrap;font-size:.8rem}#bar .wide{display:none}}
 dialog::backdrop{background:rgba(22,15,11,.7);backdrop-filter:blur(3px)}
 dialog h2{margin:0 0 .3rem;font-size:clamp(1.7rem,4vw,2.3rem);font-style:italic;line-height:1.1}
 dialog p{margin:.2rem 0;line-height:1.5}
@@ -82,11 +94,18 @@ dialog p{margin:.2rem 0;line-height:1.5}
 </head>
 <body>
 <canvas id="gl" aria-label="A walk around Pam’s Gallery and out onto the balcony"></canvas>
-<header id="bar"><span class="name">Pam’s Gallery</span><span id="where" aria-live="polite">The Gallery</span><nav aria-label="Site"><button id="music" aria-pressed="false" title="Play or pause the music">&#9834; Music</button><button id="navCol">Collection</button><button id="navAbout">About &amp; Contact</button></nav></header>
+<header id="bar"><span class="name">Pam’s Gallery</span><span id="where" aria-live="polite">The Gallery</span><nav aria-label="Site"><button id="music" aria-pressed="false" title="Play or pause the music">&#9834; Music</button><button id="navCol">Collection</button><button id="navAbout">About<span class="wide"> &amp; Contact</span></button></nav></header>
 <div id="title" aria-hidden="true"><h1>Pam’s Gallery</h1><p>Original paintings</p></div>
 <div id="hint">Scroll to enter the gallery</div>
 <div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
 <div id="tip"></div>
+<section id="enqPanel" aria-labelledby="enqTitle" aria-hidden="true">
+ <h2 id="enqTitle">Enquiries</h2>
+ <p class="lead">Interested in a painting? Select any work in the gallery to see its details, or write to me directly.</p>
+ <p class="mail"><span id="enqMail"></span></p>
+ <div class="row"><a class="pbtn main" id="enqWrite" href="#">Email Pam</a><button class="pbtn" id="enqCopy" type="button">Copy email</button><button class="pbtn" id="enqCol" type="button">View the collection</button></div>
+ <p class="note" id="enqNote" role="status"></p>
+</section>
 <div id="loading">Opening the house</div>
 <section id="collection" hidden aria-labelledby="colh">
  <div class="top"><span class="name">Pam’s Gallery</span><button class="link" id="colClose">Back to the gallery</button></div>
@@ -224,6 +243,13 @@ var MUSIC=(function(){var AC=null,master,bus,choir,playing=false,timer=null,next
  ['pointerdown','keydown'].forEach(function(ev){addEventListener(ev,first,{capture:true})});
  document.addEventListener('visibilitychange',function(){if(!AC)return;if(document.hidden)AC.suspend();else if(playing)AC.resume()});
  return{play:play,pause:pause,state:function(){return{playing:playing,ctx:AC?AC.state:'none'}}}})();
+
+/* ---------- enquiries panel ---------- */
+var enqP=$('enqPanel');$('enqMail').textContent=EMAIL;$('enqWrite').href='mailto:'+EMAIL+'?subject='+encodeURIComponent('Enquiry for Pam’s Gallery');
+$('enqCol').addEventListener('click',function(){openCollection()});
+$('enqCopy').addEventListener('click',function(){var note=$('enqNote');function sel(){var r=document.createRange();r.selectNodeContents($('enqMail'));var s=getSelection();s.removeAllRanges();s.addRange(r);note.textContent='Email selected — copy it from here'}
+ try{navigator.clipboard.writeText(EMAIL).then(function(){note.textContent='Email copied'},sel)}catch(e){sel()}});
+function showEnq(f){enqP.style.opacity=f;enqP.style.visibility=f>.02?'visible':'hidden';var live=f>.5;enqP.classList.toggle('live',live);enqP.setAttribute('aria-hidden',live?'false':'true')}
 
 /* ---------- artwork details ---------- */
 var dlg=$('dlg'),curArt=0;
@@ -385,7 +411,7 @@ function scrollCanvas(){
  return c}
 function textCanvas(W,H,draw){var c=cnv(W,H),x=c.getContext('2d');draw(x,W,H);return c}
 function wrap(x,t,X,Y,mw,lh){var w=t.split(' '),line='',yy=Y;w.forEach(function(s){var tt=line?line+' '+s:s;if(x.measureText(tt).width>mw&&line){x.fillText(line,X,yy);line=s;yy+=lh}else line=tt});x.fillText(line,X,yy)}
-function plaqueCanvas(p){return textCanvas(640,360,function(x,W,H){x.fillStyle='#f6f3ee';x.fillRect(0,0,W,H);x.fillStyle='#2a1c14';
+function plaqueCanvas(p){return textCanvas(1280,720,function(x){x.scale(2,2);var W=640,H=360;x.fillStyle='#f6f3ee';x.fillRect(0,0,W,H);x.fillStyle='#2a1c14';
  x.font='italic 500 50px "Cormorant Garamond",Georgia,serif';wrap(x,p.t,36,82,W-72,52);
  x.font='300 27px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#5a4a40';x.fillText(p.m+', '+p.s,36,H-118);
  x.font='400 30px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#2a1c14';x.fillText(p.p,36,H-72);
@@ -832,7 +858,7 @@ float hsh(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hsh(i),hsh(i+vec2(1,0)),f.x),mix(hsh(i+vec2(0,1)),hsh(i+vec2(1,1)),f.x),f.y);}
 float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*vn(p);p*=2.03;a*=.5;}return s;}
 vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
-void main(){vec2 q=vU-.5;vec2 ca=q*.0022;
+void main(){vec2 q=vU-.5;vec2 ca=vec2(0.);
  vec3 c=vec3(texture(uT,vU+ca).r,texture(uT,vU).g,texture(uT,vU-ca).b)+texture(uB,vU).rgb*.22;c*=uExp;c=aces(c);
  float l=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(l),c,.9);c=c*vec3(1.01,1.,.975);
  c*=1.-dot(q,q)*.7;c=pow(c,vec3(1./2.2));c=mix(c,smoothstep(0.,1.,c),.12);
@@ -852,14 +878,14 @@ void main(){vec2 q=vU-.5;vec2 ca=q*.0022;
   vec2 sp=px+vec2(sin(uSec*2.+px.y*.02)*6.,-uSec*70.);vec2 cell=floor(sp/7.);float h=hsh(cell);
   float near=smoothstep(.22,0.,abs(e+.06));c+=vec3(1.,.6,.2)*step(.993,h)*near*(.6+.4*sin(uSec*20.+h*50.))*1.4;
  }
- float n=fract(sin(dot(gl_FragCoord.xy+uTime,vec2(12.9898,78.233)))*43758.5453);c+=(n-.5)/255.*1.5;o=vec4(c,1.);}`;
+ float n=fract(sin(dot(gl_FragCoord.xy+uTime,vec2(12.9898,78.233)))*43758.5453);c+=(n-.5)/255.*.7;o=vec4(c,1.);}`;
 var P,PS,PB,PBL,PC,PD;
 try{P=prog(VS,FS);PS=prog(SVS,SFS);PB=prog(QVS,BRIGHT);PBL=prog(QVS,BLUR);PC=prog(QVS,COMP);PD=prog(QVS,DOF)}catch(e){console.error(e);fallback();return}
 
 /* ---------- render targets ---------- */
 var mobile=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 /* quality adapts to the device: starts sensible, then steps down if frames are slow */
-var Q={dpr:mobile?1.2:2,samples:mobile?2:4,refl:!mobile,bloom:true,dof:!mobile,level:0};
+var Q={dpr:mobile?1.75:2,samples:4,refl:!mobile,bloom:true,dof:!mobile,level:0};
 function degrade(){Q.level++;
  if(Q.level===1){Q.bloom=false}
  else if(Q.level===2){Q.refl=false}
@@ -988,7 +1014,7 @@ function frame(time){
  if(!col.hidden)return;                     // the collection page covers the 3D: don't draw
  NOWS=time/1000;if(!reduce&&!dlg.open&&!about.open&&time-idleT>(mobile?38:0)){dirty=Math.max(dirty,1);idleT=time}
  var p=progress(),prev=cur;cur+=(p-cur)*(reduce?1:.09);if(Math.abs(p-cur)<1e-5)cur=p;
- camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=skyFade();
+ camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(skyFade());
  var bA=burnAmt();if(bA<1&&!reduce)dirty=Math.max(dirty,1);
  focusT=sceneDist();var fd=focusT-focus;focus+=fd*(reduce?1:.12);if(Math.abs(fd)>.01)dirty=Math.max(dirty,1);
  if(dirty){render(time);dirty--;
@@ -1008,7 +1034,7 @@ function step(dir){var a=stopAt(),t=cur*(K.length-1),i=a.i;if(a.d>.2&&((dir>0&&S
 $('next').addEventListener('click',function(){step(1)});$('prev').addEventListener('click',function(){step(-1)});
 nowEl.addEventListener('click',function(){var a=stopAt();if(a.d<.6&&STOPS[a.i].art!=null)openArt(STOPS[a.i].art)});
 addEventListener('keydown',function(e){if(dlg.open||about.open||!col.hidden)return;if(e.key==='ArrowRight'){e.preventDefault();step(1)}else if(e.key==='ArrowLeft'){e.preventDefault();step(-1)}});
-window.__house={cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=skyFade();render(0)},K:K,cam:cam};
+window.__house={cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(skyFade());render(0)},K:K,cam:cam};
 
 var fontReady=document.fonts&&document.fonts.load?Promise.race([Promise.all([document.fonts.load('italic 400 80px "Cormorant Garamond"'),document.fonts.load('italic 500 50px "Cormorant Garamond"'),document.fonts.load('300 27px Jost')]),new Promise(function(r){setTimeout(r,2500)})]).catch(function(){}):Promise.resolve();
 fontReady.then(function(){
