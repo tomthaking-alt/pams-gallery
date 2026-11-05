@@ -1160,7 +1160,7 @@ function frame(time){
  var bA=burnAmt();if(bA<1&&!reduce)dirty=Math.max(dirty,1);
  focusT=sceneDist();var fd=focusT-focus;focus+=fd*(reduce?1:.12);if(Math.abs(fd)>.01)dirty=Math.max(dirty,1);
  if(dirty){render(time);dirty--;
-  if(rendered&&lastT){var dt=time-lastT;if(dt<250){ema=ema*.9+dt*.1;if(++samplesN>40){samplesN=0;if(ema>30&&!window.__fixedQuality&&degrade())ema=16}}}
+  if(rendered&&lastT){var dt=time-lastT;if(dt<3000){ema=ema*.85+Math.min(dt,400)*.15;if(++samplesN>(ema>80?6:30)){samplesN=0;if(ema>30&&!window.__fixedQuality&&degrade())ema=20}}}
   rendered=true;lastT=time}else{rendered=false;lastT=0}
  updateWalk();
  hint.style.opacity=Math.max(0,1-p*28);titleEl.style.opacity=Math.max(0,1-p*18);
