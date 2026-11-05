@@ -43,6 +43,13 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #tip{position:fixed;z-index:4;pointer-events:none;background:rgba(250,249,247,.94);color:var(--walnut);padding:.45rem .8rem;font-size:.85rem;letter-spacing:.03em;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .15s;white-space:nowrap}
 #tip i{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.1rem}
 #loading{position:fixed;inset:0;z-index:6;background:#16110e;display:flex;align-items:center;justify-content:center;color:#d9cfc2;letter-spacing:.2em;font-size:.75rem;text-transform:uppercase;transition:opacity .6s}
+#loading .lw{display:flex;flex-direction:column;align-items:center;gap:.9rem;text-transform:none;letter-spacing:normal}
+#loading .lt{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:clamp(2.2rem,7vw,3.4rem);color:#f3e6cc}
+#loading .ls{font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:#cbbba3}
+#loading .lb{width:160px;height:1px;background:rgba(243,230,204,.2);overflow:hidden}
+#loading .lb i{display:block;height:100%;width:40%;background:#e7cf9c;animation:lb 1.6s ease-in-out infinite}
+@keyframes lb{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+@media (prefers-reduced-motion:reduce){#loading .lb i{animation:none;width:100%}}
 #bar nav{display:flex;gap:clamp(.9rem,3vw,1.8rem)}
 #walk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:4;display:flex;align-items:center;gap:.25rem;background:rgba(250,249,247,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:99px;padding:.3rem;box-shadow:0 10px 30px rgba(20,12,8,.25);color:var(--walnut);max-width:calc(100vw - 24px)}
 #walk button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;border-radius:99px;min-width:44px;height:44px;font-size:1.25rem;line-height:1}
@@ -107,7 +114,7 @@ dialog p{margin:.2rem 0;line-height:1.5}
  <div class="row"><a class="pbtn main" id="enqWrite" href="#">Email Pam</a><button class="pbtn" id="enqCopy" type="button">Copy email</button><button class="pbtn" id="enqCol" type="button">View the collection</button></div>
  <p class="note" id="enqNote" role="status"></p>
 </section>
-<div id="loading">Opening the house</div>
+<div id="loading"><div class="lw"><div class="lt">Pam’s Gallery</div><div class="ls">Original paintings · opening the doors</div><div class="lb"><i></i></div></div></div>
 <section id="collection" hidden aria-labelledby="colh">
  <div class="top"><span class="name">Pam’s Gallery</span><button class="link" id="colClose">Back to the gallery</button></div>
  <div class="in">
@@ -555,7 +562,7 @@ var Mx={
  ceiling:mat({col:'#fbfaf8',rough:.14}),
  coffer:mat({col:'#f8f7f4',rough:.2}),
  gold:mat({col:'#d6ae5c',rough:.24,metal:1}),
- gold24:TX.wood?mat({col:'#8f8279',tex:TX.wood,htex:TX.woodH,rough:.62,metal:0,bump:.35,uvs:[.36,.36]}):mat({col:'#3f2416',tex:TX.mahog,rough:.6,metal:0,bump:.2,uvs:[.32,.32]}),
+ gold24:TX.wood?mat({col:'#6d6058',tex:TX.wood,htex:TX.woodH,rough:.42,metal:0,bump:.35,uvs:[.36,.36]}):mat({col:'#3f2416',tex:TX.mahog,rough:.6,metal:0,bump:.2,uvs:[.32,.32]}),
  goldDark:TX.wood?mat({col:'#6a5a50',tex:TX.wood,rough:.62,metal:0,uvs:[.36,.36]}):mat({col:'#2c160b',tex:TX.mahog,rough:.6,metal:0,uvs:[.3,.3]}),
  steel:mat({col:'#a9813e',rough:.32,metal:1}),
  bronze:mat({col:'#6b4a2e',rough:.36,metal:1}),
@@ -568,11 +575,13 @@ var Mx={
  cypress:mat({col:'#9bb27a',tex:TX.leaf,rough:.8,bump:2,uvs:[.3,.3]}),
  rug:mat({tex:TX.rug,unit:1,rough:1,bump:.8}),
  ring:mat({col:'#ffffff',emis:[9,7.8,6]}),
+ liner:mat({col:'#efe7d8',tex:TX.linen,rough:.95,bump:.6,uvs:[.12,.12]}),
  tile:TX.trav?mat({tex:TX.trav,htex:TX.travH,rough:.55,bump:.5,refl:.2,uvs:[2.4,2.4]}):mat({tex:TX.tile,rough:.48,bump:.25,refl:.25,uvs:[2.4,2.4]}),
  black:mat({col:'#1a1a1a',rough:.32,metal:.6}),
  glass:mat({col:'#d6e4e2',rough:.04,blend:1,alpha:.1}),
  planter:mat({col:'#5b5752',tex:TX.trav,rough:.82,bump:.5,uvs:[.6,.6]}),
  soil:mat({col:'#2c221b',tex:TX.trav,rough:1,bump:1,uvs:[.3,.3]}),
+ lav:mat({col:'#8d6fd6',rough:.75}),lav2:mat({col:'#a98ae6',rough:.75}),lavStem:mat({col:'#87946a',rough:.8}),terracottaD:mat({col:'#6e3a24',rough:.8}),
  oliveA:mat({col:'#6f7d5c',rough:.55}),oliveB:mat({col:'#8c9a7b',rough:.5}),oliveC:mat({col:'#566447',rough:.6}),
  grassA:mat({col:'#b5a466',rough:.6}),grassB:mat({col:'#8d9a5c',rough:.6}),
  agave:mat({col:'#7e9b98',rough:.42}),
@@ -642,23 +651,32 @@ rect(Mx.gold,X0-T,X1+T,CT+.155,CT+.17,ZF-.315,ZF+.215);
 [-3.3,-1.25,1.25,3.3].forEach(function(x){column(x,ZF,CT,.25)});
 // interior columns framing the paintings
 [[X0+.45,-.7],[X0+.45,-5.1],[X1-.45,-.7],[X1-.45,-5.1],[0,ZB-.45]].forEach(function(q){column(q[0],q[1],CT,.22)});
-// balcony: large stone tiles, frameless glass balustrade, modern planters with real-looking plants
+// balcony: travertine paving and a white marble balustrade with carved balusters, piers and urns
 var BX0=X0-.4,BX1=X1+.4;
 rect(Mx.tile,BX0,BX1,-.3,0,BAL-.1,ZF-.05);
-(function(){var yr=1.05;
- // front and side runs of glass in a black base channel with a slim black handrail
- rect(Mx.black,BX0,BX1,0,.07,BAL-.05,BAL+.05);rect(Mx.black,BX0,BX1,yr,yr+.035,BAL-.025,BAL+.025);
- quadL(Mx.glass,B([0,0,0]),[0,(yr+.07)/2,BAL],[1,0,0],[0,1,0],(BX1-BX0)/2,(yr-.07)/2,[0,0,1]);
- [BX0,BX1].forEach(function(x,i){rect(Mx.black,x-.05,x+.05,0,.07,BAL,ZF-.1);rect(Mx.black,x-.025,x+.025,yr,yr+.035,BAL,ZF-.1);
-  quadL(Mx.glass,B([0,0,0]),[x,(yr+.07)/2,(BAL+ZF-.1)/2],[0,0,1],[0,1,0],(ZF-.1-BAL)/2,(yr-.07)/2,[i?-1:1,0,0])});
- for(var x=BX0+1.2;x<BX1-.5;x+=1.2)rect(Mx.black,x-.004,x+.004,.07,yr,BAL-.012,BAL+.012);   // fine joints between panes
+(function(){var yr=.98,bal=[[0,0],[.05,0],[.05,.04],[.034,.06],[.04,.1],[.068,.2],[.078,.32],[.06,.46],[.034,.58],[.03,.64],[.044,.7],[.058,.76],[.058,.82],[.044,.84],[0,.86]];
+ function run(x0,x1,z0,z1){rect(Mx.marble,x0,x1,0,.12,z0,z1);rect(Mx.marble,x0,x1,yr,yr+.09,z0+.01,z1-.01);
+  var cx=(x0+x1)/2,cz=(z0+z1)/2,ex=(x1-x0)>(z1-z0);rect(Mx.marble,ex?x0:cx-(x1-x0)/2-.03,ex?x1:cx+(x1-x0)/2+.03,yr+.09,yr+.13,ex?cz-(z1-z0)/2-.03:z0,ex?cz+(z1-z0)/2+.03:z1)}
+ function baluster(x,z){lathe(Mx.marble,B([x,.12,z]),[0,0,0],bal,20)}
+ function pier(x,z,urnTop){rect(Mx.marble,x-.17,x+.17,0,yr+.16,z-.17,z+.17);rect(Mx.marble,x-.2,x+.2,yr+.16,yr+.21,z-.2,z+.2);if(urnTop)amphora(x,yr+.21,z,.85)}
+ run(BX0,BX1,BAL-.12,BAL+.12);
+ [BX0,BX1].forEach(function(x){run(x-.12,x+.12,BAL,ZF-.1)});
+ var piersX=[BX0,-1.5,1.5,BX1];
+ for(var x=BX0+.24;x<BX1-.2;x+=.26){if(piersX.some(function(p){return Math.abs(p-x)<.24}))continue;baluster(x,BAL)}
+ [BX0,BX1].forEach(function(xx){for(var z=BAL+.26;z<ZF-.3;z+=.26)baluster(xx,z)});
+ pier(BX0,BAL,1);pier(BX1,BAL,1);pier(-1.5,BAL,0);pier(1.5,BAL,0);
 })();
+function urn(x,z,h,r){r=r||.3;lathe(Mx.terracotta,B([x,0,z]),[0,0,0],[[0,0],[r*.55,0],[r*.68,h*.08],[r,h*.4],[r*1.02,h*.6],[r*.85,h*.86],[r*.8,h*.9],[r*.95,h*.95],[r*.95,h],[r*.78,h],[0,h]],40);
+ lathe(Mx.soil,B([x,h-.035,z]),[0,0,0],[[0,0],[r*.78,0]],32);torus(Mx.terracottaD,B([x,h*.62,z]),[0,0,0],r*1.0,.012,40);blob(x,z,r*3,r*3);return h-.035}
+function lavender(x,top,z,s){for(var i=0;i<170;i++){var a=rnd()*6.283,rr=Math.sqrt(rnd())*.17*s,b=[x+Math.cos(a)*rr,top,z+Math.sin(a)*rr],o=[Math.cos(a),0,Math.sin(a)],h=(.42+rnd()*.22)*s,lean=.15+rnd()*.35,
+  tip=v3.add(b,[o[0]*h*lean,h,o[2]*h*lean]),d=v3.norm(v3.sub(tip,b)),sd=v3.norm(v3.cross(d,[0,1,0]).map(function(v,k){return v+(k===1?.001:0)}));
+  leaf(Mx.lavStem,b,d,sd,h,.0035);var sb=v3.sub(tip,v3.sc(d,.09*s));leaf(rnd()<.5?Mx.lav:Mx.lav2,sb,d,sd,.11*s,.012*s);leaf(rnd()<.5?Mx.lav:Mx.lav2,sb,d,v3.norm(v3.cross(d,sd)),.11*s,.012*s)}}
 function planter(x,z,w,d,h){rbox(Mx.planter,B([x,0,z]),[0,h/2,0],[w,h,d],.02);quadL(Mx.soil,B([x,h-.04,z]),[0,0,0],[1,0,0],[0,0,-1],w/2-.03,d/2-.03,[0,1,0]);blob(x,z,w*1.5,d*1.5);return h-.04}
 // a single leaf: a narrow, pointed blade
 function leaf(m,p,d,side,L,Wd){var tip=v3.add(p,v3.sc(d,L)),mid=v3.add(p,v3.sc(d,L*.42)),l=v3.add(mid,v3.sc(side,Wd)),r=v3.sub(mid,v3.sc(side,Wd)),n=v3.norm(v3.cross(d,side)),q=function(P){return{p:P,n:n,u:[0,0]}};tri(m,q(p),q(l),q(tip));tri(m,q(p),q(tip),q(r))}
 function rdir(){var u=rnd()*2-1,a=rnd()*6.283,r=Math.sqrt(1-u*u);return[r*Math.cos(a),u,r*Math.sin(a)]}
 // olive tree: twisting multi-stem trunk, branches, and thousands of small silver-green leaves
-function oliveTree(x,z,s){var top=planter(x,z,.72,.72,.62),base=[x,top,z],LEAF=[Mx.oliveA,Mx.oliveB,Mx.oliveC];
+function oliveTree(x,z,s){var top=urn(x,z,.7,.36),base=[x,top,z],LEAF=[Mx.oliveA,Mx.oliveB,Mx.oliveC];
  for(var st=0;st<3;st++){var a0=st*2.1+rnd(),lean=[Math.cos(a0)*.22,1,Math.sin(a0)*.22],len=(1.05+rnd()*.25)*s,p0=v3.add(base,[Math.cos(a0)*.05,0,Math.sin(a0)*.05]);
   cyl(Mx.bark,aim(p0,lean),[0,0,0],.045*s,len,10);var p1=v3.add(p0,v3.sc(v3.norm(lean),len));
   for(var br=0;br<4;br++){var ab=a0+(br-1.5)*.8+rnd()*.4,bd=v3.norm([Math.cos(ab)*.8,.8+rnd()*.5,Math.sin(ab)*.8]),bl=(.45+rnd()*.3)*s;
@@ -677,9 +695,7 @@ function agave(x,top,z,s){for(var i=0;i<26;i++){var a=i*2.39996,el=.25+(i/26)*1.
   if(prev){[[prev.l,prev.c,c,lft],[prev.c,prev.r,rgt,c]].forEach(function(qd){var nn=v3.norm(v3.cross(v3.sub(qd[1],qd[0]),v3.sub(qd[3],qd[0]))),q=function(P){return{p:P,n:nn,u:[0,0]}};tri(Mx.agave,q(qd[0]),q(qd[1]),q(qd[2]));tri(Mx.agave,q(qd[0]),q(qd[2]),q(qd[3]))})}
   prev={c:c,l:lft,r:rgt}}}}
 oliveTree(-2.15,BAL+.6,1.0);oliveTree(2.15,BAL+.6,.94);
-(function(){var t=planter(-4.12,-11.2,.42,1.6,.5);grass(-4.12,t,-10.75,.85,260,Mx.grassA,Mx.grassB);grass(-4.12,t,-11.6,.8,240,Mx.grassB,Mx.grassA);
- t=planter(4.12,-11.2,.42,1.6,.5);grass(4.12,t,-11.6,.85,260,Mx.grassA,Mx.grassB);agave(4.12,t,-10.75,.75);
- var t2=planter(-1.0,BAL+.4,.5,.5,.4);agave(-1.0,t2,BAL+.4,.85);t2=planter(1.0,BAL+.4,1.1,.4,.38);grass(.75,t2,BAL+.4,.6,180,Mx.grassA,Mx.grassB);grass(1.25,t2,BAL+.4,.55,170,Mx.grassB,Mx.grassA);})();
+(function(){[[-3.95,-11.0],[3.95,-11.0],[-.75,BAL+.45],[.75,BAL+.45]].forEach(function(q,i){var t=urn(q[0],q[1],.46,.24);lavender(q[0],t,q[1],i<2?1.05:.9)})})();
 
 
 /* ---------- sky ---------- */
@@ -689,7 +705,7 @@ var SKYTEXT={c:[0,5.3,-36]};
 /* ---------- paintings in gilded frames ---------- */
 var SCALE=1.7;
 function hang(k,o,ry){
- var p=ART[k],w=p.w*SCALE,h=p.h*SCALE,b=B(o,ry),fw=.095,fd=.07,gap=.012,fm=Mx.gold24;
+ var p=ART[k],w=p.w*SCALE,h=p.h*SCALE,b=B(o,ry),fw=.1,fd=.075,gap=.055,fm=Mx.gold24;
  var ow=w/2+gap,oh=h/2+gap,OX=ow+fw,OY=oh+fw,zt=fd*.7;
  // 24-carat gilded frame: base bars, a shadowed cove, a rounded outer roll, a raised ridge and a fine inner bead
  box(fm,b,[0,oh+fw/2,zt/2],[2*OX,fw,zt]);box(fm,b,[0,-oh-fw/2,zt/2],[2*OX,fw,zt]);
@@ -700,7 +716,7 @@ function hang(k,o,ry){
  var cv=(OX-.044+ow+fw*.42+.01)/2,cw=Math.max(.008,(OX-.044)-(ow+fw*.42+.01));
  [[0,oh+(cv-ow),2*OX-.06,cw],[0,-oh-(cv-ow),2*OX-.06,cw]].forEach(function(q){box(Mx.goldDark,b,[q[0],q[1],zt+.0015],[q[2],q[3],.003])});
  [[-cv,0],[cv,0]].forEach(function(q){box(Mx.goldDark,b,[q[0],q[1],zt+.0015],[cw,2*oh+2*(cv-ow)-.02,.003])});
- quadL(Mx.gap,b,[0,0,.004],[1,0,0],[0,1,0],ow,oh,[0,0,1]);
+ quadL(Mx.liner,b,[0,0,.012],[1,0,0],[0,1,0],ow,oh,[0,0,1]);box(Mx.gap,b,[0,0,.03],[w+.008,h+.008,.004],[4]);
  box(Mx.edge,b,[0,0,.0295],[w,h,.035],[4]);
  var pc=paintFor(k),pm=mat({tex:texFrom(pc),htex:texFrom(pc.height_,{lin:1}),unit:1,rough:.45,bump:.9});quadL(pm,b,[0,0,.047],[1,0,0],[0,1,0],w/2,h/2,[0,0,1]);
  if(p.img){var im=new Image();im.onload=function(){var c=cnv(im.naturalWidth,im.naturalHeight);c.getContext('2d').drawImage(im,0,0);pm.tex=texFrom(c);pm.htex=null;pm.bump=.3;pm.rough=.55;pm.col=[.4,.4,.4];pm.art=1;dirty=2};im.src=p.img}
@@ -709,15 +725,13 @@ function hang(k,o,ry){
  var lc=bx(b,[w/2+fw+.28,-.32,.03]);
  LABELS.push(function(){label(plaqueCanvas(p),lc,ax,ay,.3,.169,n,{go:function(){openArt(k)},tip:tipT})});
  var center=bx(b,[0,0,0]);
- spotOn(center,v3.add([center[0],RH-.3,center[2]],v3.sc(n,1.3)),Math.max(w,h),64);
+ spotOn(center,v3.add([center[0],RH-.02,center[2]],v3.sc(n,1.6)),Math.max(w,h),30);
  ARTPOS[k]={c:center,n:n,w:w,h:h};
  return center}
 function spotOn(target,from,size,power){
- var d=v3.sub(target,from),dist=Math.hypot(d[0],d[1],d[2]),dir=v3.norm(d),outer=Math.atan((size/2+.3)/dist),inner=outer*.62;
+ var d=v3.sub(target,from),dist=Math.hypot(d[0],d[1],d[2]),dir=v3.norm(d),outer=Math.atan((size/2+1.0)/dist),inner=outer*.18;
  LIGHTS.spot.push({p:from,d:dir,c:v3.sc([1,.94,.86],power||32),cos:[Math.cos(inner),Math.cos(outer)]});
- cyl(Mx.gold,aim(from,v3.sc(dir,-1)),[0,-.02,0],.036,.15,20,1);
- quadL(Mx.lens,aim(v3.add(from,v3.sc(dir,.021)),dir),[0,0,0],[1,0,0],[0,0,1],.024,.024,[0,1,0]);
- rect(Mx.gold,from[0]-.005,from[0]+.005,from[1]+.1,RH-.16,from[2]-.005,from[2]+.005);
+
 }
 var ARTPOS=[],CY=1.72,SPOTS=[
  hang(0,[X0+.025,CY,-7.3],Math.PI/2),
@@ -734,8 +748,56 @@ function bench(x,z){var b=B([x,0,z],Math.PI/2);rbox(Mx.marble,b,[0,.43,0],[1.8,.
 bench(-2.2,-5.1);bench(2.2,-5.1);
 // bronze sculptures on marble pedestals
 function sculpture(x,z,ry,v){var b=B([x,1.0,z],ry);if(v){ell(Mx.bronze,b,[0,.22,0],[.12,.22,.09],28);torus(Mx.bronze,b,[0,.5,0],.1,.028,40)}else{torus(Mx.bronze,{o:bx(b,[0,.26,0]),x:[1,0,0],y:[0,0,1],z:[0,-1,0]},[0,0,0],.2,.04,56);cyl(Mx.bronze,b,[0,0,0],.05,.06,20,1)}}
-pedestal(-3.4,-9.2,1.0);sculpture(-3.4,-9.2,.5,1);
-pedestal(3.4,-9.2,1.0);sculpture(3.4,-9.2,0,0);
+pedestal(-3.4,-9.2,1.0);
+pedestal(3.4,-9.2,1.0);
+/* ---------- the flower-faced figure from Pam's paintings ---------- */
+var IDM=new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+function mT(x,y,z){var m=new Float32Array(IDM);m[12]=x;m[13]=y;m[14]=z;return m}
+function mS(k){var m=new Float32Array(IDM);m[0]=m[5]=m[10]=k;return m}
+function mRx(a){var c=Math.cos(a),s=Math.sin(a);return new Float32Array([1,0,0,0,0,c,s,0,0,-s,c,0,0,0,0,1])}
+function mRy(a){var c=Math.cos(a),s=Math.sin(a);return new Float32Array([c,0,-s,0,0,1,0,0,s,0,c,0,0,0,0,1])}
+function mRz(a){var c=Math.cos(a),s=Math.sin(a);return new Float32Array([c,s,0,0,-s,c,0,0,0,0,1,0,0,0,0,1])}
+function mm(){var r=arguments[0];for(var i=1;i<arguments.length;i++)r=M4.mul(r,arguments[i]);return r}
+function dmat(o){var m=mat(o);MATS.pop();return m}
+function bake(src,M,dst){var v=src.v;for(var i=0;i<v.length;i+=8){var x=v[i],y=v[i+1],z=v[i+2],nx=v[i+3],ny=v[i+4],nz=v[i+5];
+ var p=[M[0]*x+M[4]*y+M[8]*z+M[12],M[1]*x+M[5]*y+M[9]*z+M[13],M[2]*x+M[6]*y+M[10]*z+M[14]],n=v3.norm([M[0]*nx+M[4]*ny+M[8]*nz,M[1]*nx+M[5]*ny+M[9]*nz,M[2]*nx+M[6]*ny+M[10]*nz]);
+ push(dst,p,n,dst.unit?[v[i+6],v[i+7]]:wuv(dst,p,n))}}
+var B0=B([0,0,0]);
+function buildBody(g,f,p1,p2,l,e){   // torso, neck and the sleeping face framed by petals (feet at y=0, faces +z)
+ lathe(g,B0,[0,0,0],[[0,.46],[.05,.47],[.068,.52],[.078,.6],[.072,.7],[.06,.77],[.04,.82],[.02,.84],[0,.845]],20);
+ cyl(g,B0,[0,.82,0],.018,.11,10);
+ var hy=.97;ell(f,B0,[0,hy,.005],[.062,.07,.046],18);ell(f,B0,[0,hy-.008,.048],[.009,.014,.01],8);ell(l,B0,[0,hy-.038,.04],[.017,.008,.008],10);
+ [-1,1].forEach(function(sx){ell(e,B0,[sx*.024,hy+.012,.042],[.015,.0035,.006],8);ell(f,B0,[sx*.03,hy+.03,.035],[.022,.008,.012],8)});
+ for(var k=0;k<5;k++){var a=Math.PI/2+k*1.2566,cx=Math.cos(a),sy=Math.sin(a);ell(k%2?p2:p1,{o:[cx*.1,hy+sy*.1,-.03],x:[cx,sy,0],y:[-sy,cx,0],z:[0,0,1]},[0,0,0],[.085,.055,.014],16)}}
+function buildLeg(g){lathe(g,B0,[0,0,0],[[0,-.47],[.016,-.47],[.02,-.32],[.026,-.24],[.032,-.12],[.036,-.02],[0,0]],12);ell(g,B0,[0,-.48,.03],[.022,.016,.05],10)}
+function buildArm(g){lathe(g,B0,[0,0,0],[[0,-.4],[.011,-.4],[.013,-.25],[.017,-.12],[.02,-.02],[0,0]],10);ell(g,B0,[0,-.42,0],[.018,.026,.01],8);
+ for(var k=0;k<4;k++)cyl(g,aim([(k-1.5)*.009,-.44,0],v3.norm([(k-1.5)*.35,-1,.08])),[0,0,0],.0042,.085,6,1)}   // long fingers, as in the paintings
+// two marble statues on the pedestals beside the balcony opening, each with one arm raised
+(function(){var pr=dmat({unit:1}),leg=dmat({unit:1}),arm=dmat({unit:1});buildBody(pr,pr,pr,pr,pr,pr);buildLeg(leg);buildArm(arm);
+ [[-3.4,.38,-1],[3.4,-.38,1]].forEach(function(q){var W=mm(mT(q[0],1.0,-9.2),mRy(q[1]),mS(.8)),up=q[2];
+  bake(pr,W,Mx.marble);bake(leg,mm(W,mT(-.055,.5,0)),Mx.marble);bake(leg,mm(W,mT(.055,.5,0),mRx(-.12)),Mx.marble);
+  bake(arm,mm(W,mT(up*.09,.8,0),mRz(up*2.5)),Mx.marble);bake(arm,mm(W,mT(-up*.09,.8,0),mRz(-up*.15)),Mx.marble)})})();
+// the living figure, in the colours of the paintings, who strolls along the top of the balustrade
+var WG=dmat({col:'#6f9a4a',rough:.55,unit:1}),WF=dmat({col:'#e8b48c',rough:.6,unit:1}),WP1=dmat({col:'#f4eff8',rough:.5,unit:1}),WP2=dmat({col:'#c4a8ec',rough:.5,unit:1}),
+ WL=dmat({col:'#b02a3c',rough:.4,unit:1}),WE=dmat({col:'#4a2a2a',rough:.6,unit:1}),WLEG=dmat({col:'#6f9a4a',rough:.55,unit:1}),WARM=dmat({col:'#6f9a4a',rough:.55,unit:1});
+buildBody(WG,WF,WP1,WP2,WL,WE);buildLeg(WLEG);buildArm(WARM);
+var WALKM=[WG,WF,WP1,WP2,WL,WE,WLEG,WARM];
+function sm(e0,e1,x){var t=Math.max(0,Math.min(1,(x-e0)/(e1-e0)));return t*t*(3-2*t)}
+function walkerState(t){var L=6.8,v=.32,tt=1.6,leg=L/v,T=2*(leg+tt),p=t%T,f;
+ if(p<leg)return{x:-3.4+p*v,ry:Math.PI/2,d:p*v,w:1};
+ if(p<leg+tt){f=(p-leg)/tt;return{x:3.4,ry:Math.PI/2-sm(0,1,f)*Math.PI,d:0,w:0}}   // turns to face you
+ if(p<2*leg+tt){f=p-leg-tt;return{x:3.4-f*v,ry:-Math.PI/2,d:f*v,w:1}}
+ f=(p-2*leg-tt)/tt;return{x:-3.4,ry:-Math.PI/2-sm(0,1,f)*Math.PI,d:0,w:0}}
+function drawMatU(u,m){if(!m.vao)return;gl.uniform3fv(u.uCol,m.col);gl.uniform3fv(u.uEmis,m.emis);gl.uniform1f(u.uRough,m.rough);gl.uniform1f(u.uMetal,m.metal);gl.uniform1f(u.uBump,0);gl.uniform1f(u.uRefl,0);
+ gl.uniform1f(u.uIsSky,0);gl.uniform1f(u.uArt,0);gl.uniform1f(u.uUnlit,0);gl.uniform1f(u.uBlend,0);gl.uniform1f(u.uAlpha,1);gl.uniform1i(u.uHasTex,0);gl.uniform1i(u.uHasH,0);gl.bindVertexArray(m.vao);gl.drawArrays(gl.TRIANGLES,0,m.n)}
+function drawWalker(u){var st=walkerState(NOWS),ph=st.d/.45*6.2832,sw=st.w?Math.sin(ph):0,bob=st.w?Math.abs(Math.cos(ph))*.012:0,
+  bump=Math.max(sm(.32,.16,Math.abs(st.x-1.5)),sm(.32,.16,Math.abs(st.x+1.5)))*.085,
+  W=mm(mT(st.x,1.11+bump+bob,BAL),mRy(st.ry),mS(.85));
+ function dm(m,M){gl.uniformMatrix4fv(u.uM,false,M);drawMatU(u,m)}
+ [WG,WF,WP1,WP2,WL,WE].forEach(function(m){dm(m,W)});
+ dm(WLEG,mm(W,mT(-.055,.5,0),mRx(.42*sw)));dm(WLEG,mm(W,mT(.055,.5,0),mRx(-.42*sw)));
+ dm(WARM,mm(W,mT(-.09,.8,0),mRz(-.12),mRx(-.38*sw)));dm(WARM,mm(W,mT(.09,.8,0),mRz(.12),mRx(.38*sw)));
+ gl.uniformMatrix4fv(u.uM,false,IDM)}
 // polished ceiling with recessed brass-trimmed downlights in the coffers
 [-1.6,-3.2,-4.8,-6.4,-8.0].forEach(function(z){[-1.6,1.6].concat(Math.abs(z+5.2)>1?[0]:[]).forEach(function(x){
  lathe(Mx.lens,B([x,RH-.004,z]),[0,0,0],[[0,0],[.05,0]],24);torus(Mx.gold,B([x,RH-.006,z]),[0,0,0],.062,.008,32)})});
@@ -777,11 +839,11 @@ function drawBirds(u){var data=birdGeom(NOWS);birdN=data.length/8;
  gl.uniform3fv(u.uCol,birdMat.col);gl.uniform3fv(u.uEmis,birdMat.emis);gl.uniform1f(u.uRough,.75);gl.uniform1f(u.uMetal,0);gl.uniform1f(u.uBump,0);gl.uniform1f(u.uRefl,0);gl.uniform1f(u.uIsSky,0);gl.uniform1f(u.uArt,0);gl.uniform1f(u.uUnlit,0);gl.uniform1f(u.uBlend,0);gl.uniform1f(u.uAlpha,1);gl.uniform1i(u.uHasTex,0);gl.uniform1i(u.uHasH,0);
  gl.drawArrays(gl.TRIANGLES,0,birdN)}
 var NOWS=0;
-function upload(){MATS.forEach(function(m){if(m.vao||!m.v||!m.v.length)return;m.n=m.v.length/8;var vao=gl.createVertexArray();gl.bindVertexArray(vao);var buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(m.v),gl.STATIC_DRAW);
+function upload(){MATS.concat(WALKM).forEach(function(m){if(m.vao||!m.v||!m.v.length)return;m.n=m.v.length/8;var vao=gl.createVertexArray();gl.bindVertexArray(vao);var buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(m.v),gl.STATIC_DRAW);
  gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,32,0);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,3,gl.FLOAT,false,32,12);gl.enableVertexAttribArray(2);gl.vertexAttribPointer(2,2,gl.FLOAT,false,32,24);m.vao=vao;m.v=null})}
 
 /* ---------- shaders ---------- */
-var VS='#version 300 es\nlayout(location=0) in vec3 aP;layout(location=1) in vec3 aN;layout(location=2) in vec2 aU;uniform mat4 uVP;out vec3 vP;out vec3 vN;out vec2 vU;void main(){vP=aP;vN=aN;vU=aU;gl_Position=uVP*vec4(aP,1.);}';
+var VS='#version 300 es\nlayout(location=0) in vec3 aP;layout(location=1) in vec3 aN;layout(location=2) in vec2 aU;uniform mat4 uVP,uM;out vec3 vP;out vec3 vN;out vec2 vU;void main(){vP=(uM*vec4(aP,1.)).xyz;vN=mat3(uM)*aN;vU=aU;gl_Position=uVP*vec4(vP,1.);}';
 var FS=`#version 300 es
 precision highp float;precision highp sampler2DShadow;
 in vec3 vP;in vec3 vN;in vec2 vU;out vec4 o;
@@ -791,36 +853,42 @@ float hsh(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(
 float vno(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);return mix(mix(hsh(i),hsh(i+vec2(1,0)),u.x),mix(hsh(i+vec2(0,1)),hsh(i+vec2(1,1)),u.x),u.y);}
 float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<6;i++){s+=a*vno(p);p=mat2(1.6,1.2,-1.2,1.6)*p+vec2(17.1,9.2);a*=.5;}return s;}
 vec3 skyBase(vec3 d){vec3 S=uSkySun;float e=max(d.y,0.),cs=max(dot(d,S),0.);
- vec3 hor=vec3(.95,.46,.22),mid=vec3(.34,.33,.48),zen=vec3(.05,.10,.26);
+ vec3 hor=vec3(1.0,.5,.36),mid=vec3(.52,.3,.6),zen=vec3(.07,.06,.22);
  vec3 c=mix(hor,mid,smoothstep(0.,.2,e));c=mix(c,zen,smoothstep(.12,.8,e));
- float away=1.-cs;c=mix(c,c*vec3(.82,.78,1.02),away*away*.5*(1.-e));             // cooler, rosier away from the sun
+ float away=1.-cs;c=mix(c,c*vec3(.85,.72,1.12),away*away*.6*(1.-e));             // cooler, rosier away from the sun
  c+=vec3(1.,.5,.2)*(pow(cs,10.)*.5+pow(cs,60.)*1.4)*(1.-e*.7);                   // glow around the low sun
  return c;}
-vec3 skyCol(vec3 d){vec3 S=uSkySun;float e=d.y,cs=dot(d,S);vec3 c=skyBase(d);vec3 hor=vec3(1.05,.56,.30);
+vec3 skyCol(vec3 d){vec3 S=uSkySun;float e=d.y,cs=dot(d,S);vec3 c=skyBase(d);vec3 hor=vec3(1.0,.5,.36);
+ vec3 M=normalize(vec3(.62,.3,-.73));float cm=dot(d,M);c+=vec3(1.,.97,.92)*smoothstep(.99935,.99965,cm)*2.2+vec3(.85,.75,1.)*pow(max(cm,0.),300.)*.35;   // a soft rising moon
+ c+=vec3(1.)*step(.9975,hsh(floor(d.xz/(d.y+.25)*260.)))*smoothstep(.32,.75,e)*.55;   // first stars
  c+=vec3(1.,.88,.7)*smoothstep(.99955,.9998,cs)*28.;                              // the sun's disc
  // two layers of cloud: soft cumulus banks and thin high streaks, lit from below by the setting sun
  float dist=1./(e+.035);vec2 cp=d.xz*dist+vec2(uSecs*.018,uSecs*.006);
+ float sw=fbm(cp*.09+vec2(8.,3.))*4.2;cp=mat2(cos(sw),sin(sw),-sin(sw),cos(sw))*cp;   // painterly swirls
  float w=fbm(cp*.18+vec2(3.,7.));float n=fbm(cp*.55+w*1.6+vec2(1.,2.));
  float cov=smoothstep(.5,.74,n)*smoothstep(.0,.05,e)*(1.-smoothstep(.45,.9,e));
  float det=fbm(cp*2.2+vec2(5.,1.));cov*=.7+.3*det;
  float lit=pow(clamp(cs*.5+.5,0.,1.),4.);
  float rim=1.-smoothstep(.5,.8,n);
- vec3 under=vec3(.22,.15,.22)*(.7+.6*lit),top=vec3(1.2,.58,.32)*(.4+1.4*lit);
+ vec3 under=vec3(.30,.16,.36)*(.7+.6*lit),top=mix(vec3(1.25,.52,.5),vec3(1.3,.68,.36),lit)*(.4+1.4*lit);top=mix(top,vec3(.45,.7,.75),(1.-lit)*.25);
  vec3 cc=mix(under,top,clamp(lit*.55+rim*.7*lit+det*.15,0.,1.));
  cc=mix(cc,c,exp(-e*14.)*.55);
  c=mix(c,cc,cov*.96);
  vec2 hp=d.xz*(1./(e+.12))+vec2(uSecs*.012,0.);float hi=smoothstep(.55,.85,fbm(vec2(hp.x*.5,hp.y*2.2)+vec2(9.,3.)))*smoothstep(.04,.2,e)*(1.-smoothstep(.6,1.,e));
- c=mix(c,vec3(1.2,.72,.55)*(.5+lit),hi*.35);
+ c=mix(c,vec3(1.2,.6,.75)*(.5+lit),hi*.38);
  // distant islands on the horizon, softened by haze
- float az=atan(d.x,-d.z),isl=max(0.,.022*sin(az*2.6+1.9)+.012*sin(az*6.1+.4)+.006*sin(az*15.)-.014);
- if(e<isl){vec3 ic=mix(vec3(.30,.24,.33),hor*.8,.55);c=ic*(.85+.15*vno(vec2(az*240.,e*900.)));}
+ float az=atan(d.x,-d.z);   // Greek island cliffs with white villages on the horizon
+ float i1=smoothstep(-1.42,-1.3,az)*(1.-smoothstep(-1.02,-.9,az)),i2=smoothstep(.32,.45,az)*(1.-smoothstep(.95,1.12,az)),i3=smoothstep(1.5,1.6,az)*(1.-smoothstep(1.9,2.05,az));
+ float isl=(i1*.05+i2*.038+i3*.022)*(.82+.18*vno(vec2(az*40.,1.)))+(i1+i2+i3)*.004*vno(vec2(az*300.,2.));
+ if(e<isl){vec3 ic=mix(vec3(.26,.16,.32),hor*.75,.45+.25*smoothstep(0.,.05,isl-e));c=ic*(.88+.12*vno(vec2(az*240.,e*900.)));
+  float vil=step(.62,hsh(floor(vec2(az*1400.,e*2600.))))*smoothstep(isl-.012,isl-.002,e)*step(.02,isl);c=mix(c,vec3(1.,.82,.8)*.95,vil*.85);}
  c=mix(c,hor*vec3(1.,.82,.76),exp(-abs(e)*34.)*.45);
  return c;}
 vec3 seaCol(vec3 d){vec3 S=uSkySun;float e=-d.y;float dist=1./(e+.002);vec2 sp=d.xz*dist+vec2(uSecs*.05,uSecs*.32);
  float w1=vno(sp*vec2(.9,3.2)),w2=vno(sp*vec2(2.7,9.)+vec2(4.,1.)),w3=vno(sp*vec2(7.,26.)+vec2(2.,9.));float wv=w1*.5+w2*.32+w3*.18;
  vec3 r=normalize(vec3(d.x+(w2-.5)*.035,max(e,.001)*(1.+(wv-.5)*1.2),d.z));
  float fres=.02+.98*pow(1.-clamp(e*(1.+(wv-.5)*.6),0.,1.),5.);
- vec3 deep=vec3(.012,.03,.055);vec3 c=mix(deep,skyBase(r)*.9,fres);
+ vec3 deep=vec3(.02,.025,.07);vec3 c=mix(deep,skyBase(r)*.9,fres);
  float cs=max(dot(r,S),0.);float spread=mix(80.,900.,clamp(e*6.,0.,1.));
  c+=vec3(1.,.66,.36)*pow(cs,spread*.25)*smoothstep(.45,.8,wv)*(4.5-e*3.);        // glitter path under the sun
  c+=vec3(1.,.8,.6)*pow(cs,12.)*.15;
@@ -903,11 +971,12 @@ float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*vn(p);p*=2.03;a*=.5;
 vec3 aces(vec3 x){return clamp((x*(2.51*x+.03))/(x*(2.43*x+.59)+.14),0.,1.);}
 vec3 toSRGB(vec3 c){c=clamp(c,0.,1.);return mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(.0031308,c));}
 void main(){vec4 s0=texture(uT,vU);if(s0.a<-.00001){o=vec4(toSRGB(s0.rgb),1.);return;}
- vec2 q=vU-.5;vec2 ca=vec2(0.);
- vec3 c=vec3(texture(uT,vU+ca).r,texture(uT,vU).g,texture(uT,vU-ca).b)+texture(uB,vU).rgb*.12;
+ vec2 q=vU-.5;vec2 ca=vec2(0.);vec2 px=1./uRes;
+ vec3 c0=s0.rgb,n1=texture(uT,vU+vec2(px.x,0.)).rgb,n2=texture(uT,vU-vec2(px.x,0.)).rgb,n3=texture(uT,vU+vec2(0.,px.y)).rgb,n4=texture(uT,vU-vec2(0.,px.y)).rgb;
+ vec3 mn=min(c0,min(min(n1,n2),min(n3,n4))),mx=max(c0,max(max(n1,n2),max(n3,n4)));vec3 c=clamp(c0+(c0-(n1+n2+n3+n4)*.25)*.55,mn,mx)+texture(uB,vU).rgb*.12;   // gentle sharpening without halos
  float ao=(texture(uA,vU+uAPx*vec2(.6,.2)).r+texture(uA,vU-uAPx*vec2(.6,.2)).r+texture(uA,vU+uAPx*vec2(-.2,.6)).r+texture(uA,vU-uAPx*vec2(-.2,.6)).r)*.25;
  c*=mix(1.,ao,uAOK);c*=uExp*1.18;c=neutral(c);
- float l=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(l),c,.86);
+ float l=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(l),c,.88);c+=vec3(.010,.0,.018)*(1.-smoothstep(0.,.45,l));
  c*=1.-dot(q,q)*.7;c=pow(c,vec3(1./2.2));c=mix(c,smoothstep(0.,1.,c),.12);
  if(uBurn<1.){
   vec2 px=vU*uRes;float sw=min(uRes.x*.92,uRes.y*.86*uSA);vec2 sz=vec2(sw,sw/uSA);vec2 lp=(px-uRes*.5)/sz+.5;vec4 pc=vec4(0.);
@@ -932,7 +1001,7 @@ try{P=prog(VS,FS);PS=prog(SVS,SFS);PB=prog(QVS,BRIGHT);PBL=prog(QVS,BLUR);PC=pro
 /* ---------- render targets ---------- */
 var mobile=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 /* quality adapts to the device: starts sensible, then steps down if frames are slow */
-var Q={dpr:mobile?1.5:1.6,samples:4,refl:!mobile,bloom:true,dof:!mobile,ao:true,level:0};
+var Q={dpr:mobile?1.6:2,samples:4,refl:!mobile,bloom:true,dof:!mobile,ao:true,level:0};
 function degrade(){Q.level++;
  if(Q.level===1){Q.bloom=false}
  else if(Q.level===2){Q.refl=false}
@@ -963,7 +1032,7 @@ function resize(){
 /* ---------- lighting: low evening sun through the glass ---------- */
 var SUN=v3.norm([-.6,.26,-.76]),SUNCOL=[4.4,3.6,2.7],SKY=lin('#eef0f2').map(function(v){return v*.44}),GROUND=lin('#8a6a52').map(function(v){return v*.2}),FAR=60,SKYSUN=v3.norm([-.6,.06,-.76]);
 var EXPOSURE=1.06,cam={x:0,y:1.62,z:-2.4,yaw:0,pitch:0,fov:1};
-function fovFor(as){var hf=(as>1?76:66)*Math.PI/180;var vf=2*Math.atan(Math.tan(hf/2)/as);return Math.max(.82,Math.min(1.45,vf))}
+function fovFor(as){var deg=as>=1.2?46:as>=.8?54:64;return deg*Math.PI/180}   // vertical field of view, like a 35-50mm film lens
 var sunVP=M4.mul(M4.ortho(-13,13,-13,13,1,80),M4.look(v3.add([0,1.5,-7],v3.sc(SUN,35)),[0,1.5,-7],[0,1,0])),shadowDone=false;
 function setLights(u){
  var sp=[],sd=[],sc=[],sa=[],pp=[],pc=[],ss=LIGHTS.spot.slice(0,10),ps=LIGHTS.point.slice(0,6);
@@ -973,7 +1042,7 @@ function setLights(u){
  gl.uniform1i(u.uNP,ps.length);gl.uniform3fv(u.uPP,pp);gl.uniform3fv(u.uPC,pc);
 }
 function drawScene(VPm,camPos,pass){
- var u=P.u;gl.useProgram(P.p);gl.uniformMatrix4fv(u.uVP,false,VPm);gl.uniform3fv(u.uCam,camPos);gl.uniform1i(u.uPass,pass);
+ var u=P.u;gl.useProgram(P.p);gl.uniformMatrix4fv(u.uVP,false,VPm);gl.uniformMatrix4fv(u.uM,false,IDM);gl.uniform3fv(u.uCam,camPos);gl.uniform1i(u.uPass,pass);
  gl.uniform3fv(u.uSunDir,SUN);gl.uniform3fv(u.uSunCol,SUNCOL);gl.uniform3fv(u.uSky,SKY);gl.uniform3fv(u.uGround,GROUND);
  gl.uniform1f(u.uRH,RH);gl.uniform1f(u.uX0,X0);gl.uniform1f(u.uX1,X1);gl.uniform1f(u.uZB,ZB);gl.uniform1f(u.uZF,ZF);
  gl.uniformMatrix4fv(u.uSunVP,false,sunVP);gl.uniform2f(u.uShTexel,1/SHS,1/SHS);gl.uniform2f(u.uRes,RT.w,RT.h);
@@ -988,7 +1057,7 @@ function drawScene(VPm,camPos,pass){
    gl.uniform1i(u.uHasH,m.htex?1:0);if(m.htex){gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,m.htex);gl.activeTexture(gl.TEXTURE0)}
    gl.uniform1i(u.uHasTex,m.tex?1:0);if(m.tex)gl.bindTexture(gl.TEXTURE_2D,m.tex);
    gl.bindVertexArray(m.vao);gl.drawArrays(gl.TRIANGLES,0,m.n)});
-  if(!bp&&pass===0)drawBirds(u);
+  if(!bp&&pass===0){drawBirds(u);drawWalker(u)}
   if(bp){gl.disable(gl.BLEND);gl.depthMask(true);gl.disable(gl.POLYGON_OFFSET_FILL)}
  });
 }
@@ -1019,7 +1088,7 @@ function render(time){
   var ty=Math.tan(cam.fov/2);gl.uniform2f(PA.u.uTan,ty*as,ty);gl.uniform2f(PA.u.uPx,1/RT.w,1/RT.h);gl.uniform1f(PA.u.uFar,FAR);gl.uniform1f(PA.u.uR,.42);gl.uniform1f(PA.u.uAsp,as);gl.drawArrays(gl.TRIANGLES,0,3)}
  var finalTex=RT.scene;
  if(Q.dof){gl.bindFramebuffer(gl.FRAMEBUFFER,RT.dofFB);gl.viewport(0,0,RT.w,RT.h);gl.useProgram(PD.p);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,RT.scene);gl.uniform1i(PD.u.uT,0);
-  gl.uniform1f(PD.u.uFocus,focus);gl.uniform1f(PD.u.uFar,FAR);gl.uniform1f(PD.u.uK,cam.z<ZF?.35:2.6);gl.uniform1f(PD.u.uMax,Math.max(3,RT.h/150));gl.uniform2f(PD.u.uPx,1/RT.w,1/RT.h);gl.drawArrays(gl.TRIANGLES,0,3);finalTex=RT.dof}
+  gl.uniform1f(PD.u.uFocus,focus);gl.uniform1f(PD.u.uFar,FAR);gl.uniform1f(PD.u.uK,cam.z<ZF?.25:1.4);gl.uniform1f(PD.u.uMax,Math.max(3,RT.h/150));gl.uniform2f(PD.u.uPx,1/RT.w,1/RT.h);gl.drawArrays(gl.TRIANGLES,0,3);finalTex=RT.dof}
  gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,RT.w,RT.h);gl.useProgram(PC.p);
  gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,finalTex);gl.uniform1i(PC.u.uT,0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,RT.b1);gl.uniform1i(PC.u.uB,1);
  gl.uniform1f(PC.u.uExp,EXPOSURE);gl.uniform1f(PC.u.uTime,(time||0)%100);gl.uniform1f(PC.u.uBurn,burnAmt());gl.uniform1f(PC.u.uSec,((time||0)/1000)%600);gl.uniform1f(PC.u.uSA,1600/1100);gl.uniform2f(PC.u.uRes,RT.w,RT.h);
@@ -1028,10 +1097,13 @@ function render(time){
 }
 
 /* ---------- camera path: stand in the room, turn to each painting, then out to the balcony ---------- */
-var K=[[0,-2.4,0,0],[0,-2.4,0,0],[0,-5.2,0,0]],C=[0,-5.2],yaw=0;
-ARTPOS.forEach(function(a){var st=Math.max(2.3,Math.max(a.w,a.h*1.25)*1.75+.25),px=a.c[0]+a.n[0]*st,pz=a.c[2]+a.n[2]*st,y=Math.atan2(a.n[0],a.n[2]);
- while(y<yaw-1e-3)y+=Math.PI*2;yaw=y;var pt=Math.atan2(a.c[1]-1.62,st);K.push([px,pz,y,pt],[px,pz,y,pt])});
-K.push([0,-5.2,Math.PI*2,0],[0,-8.6,Math.PI*2,.02],[0,-10.2,Math.PI*2,.06],[0,-10.45,Math.PI*2,.075],[0,-10.45,Math.PI*2,.075]);
+var K=[];
+function buildK(){var as=innerWidth/Math.max(1,innerHeight),vf=fovFor(as),hf=2*Math.atan(Math.tan(vf/2)*as),yaw=0;K.length=0;
+ K.push([0,-1.6,0,0],[0,-1.6,0,0],[0,-5.2,0,0]);
+ ARTPOS.forEach(function(a){var need=Math.max((a.w+1.0)/2/Math.tan(hf/2),(a.h+1.35)/2/Math.tan(vf/2)),st=Math.min(6.8,Math.max(1.9,need)),px=a.c[0]+a.n[0]*st,pz=a.c[2]+a.n[2]*st,y=Math.atan2(a.n[0],a.n[2]);
+  while(y<yaw-1e-3)y+=Math.PI*2;yaw=y;K.push([px,pz,y,0],[px,pz,y,0])});
+ K.push([0,-5.2,Math.PI*2,0],[0,-8.6,Math.PI*2,0],[0,-10.0,Math.PI*2,0],[0,-10.35,Math.PI*2,0],[0,-10.35,Math.PI*2,0])}
+buildK();
 var focus=4,focusT=4,SCROLLTEX=null,titleEl=document.getElementById('title');
 function burnAmt(){return SCROLLTEX?Math.max(0,Math.min(1,(cur-.003)/.045)):1}
 function sceneDist(){var o=[cam.x,cam.y,cam.z],d=camDir(),best=60;
@@ -1041,7 +1113,7 @@ function sceneDist(){var o=[cam.x,cam.y,cam.z],d=camDir(),best=60;
  if(cam.z<ZF+.5)best=Math.max(best,25);return Math.min(best,25)}
 function enqFade(){var n=K.length-1,t=Math.max(0,Math.min(1,(cur*n-(n-1.7))/1.2));return t*t*(3-2*t)}
 function skyFade(){var t=Math.max(0,Math.min(1,(-6.5-cam.z)/2.6));return t*t*(3-2*t)}
-function camAt(t){var n=K.length-1;cam.y=1.6;t=Math.max(0,Math.min(n,t));var j=Math.min(n-1,Math.floor(t)),f=t-j;f=f*f*(3-2*f);var a=K[j],b=K[j+1];
+function camAt(t){var n=K.length-1;cam.y=1.68;t=Math.max(0,Math.min(n,t));var j=Math.min(n-1,Math.floor(t)),f=t-j;f=f*f*(3-2*f);var a=K[j],b=K[j+1];
  cam.x=a[0]+(b[0]-a[0])*f;cam.z=a[1]+(b[1]-a[1])*f;cam.yaw=a[2]+(b[2]-a[2])*f;cam.pitch=a[3]+(b[3]-a[3])*f}
 
 /* ---------- picking ---------- */
@@ -1065,7 +1137,7 @@ function frame(time){
  requestAnimationFrame(frame);
  if(!col.hidden)return;                     // the collection page covers the 3D: don't draw
  NOWS=time/1000;if(!reduce&&!dlg.open&&!about.open&&time-idleT>(mobile?38:0)){dirty=Math.max(dirty,1);idleT=time}
- var p=progress(),prev=cur;var dts=Math.min(.1,Math.max(.001,(time-lastFT)/1000||.016));lastFT=time;cur+=(p-cur)*(reduce?1:1-Math.exp(-dts*5.2));if(Math.abs(p-cur)<1e-5)cur=p;
+ var p=progress(),prev=cur;var dts=Math.min(.1,Math.max(.001,(time-lastFT)/1000||.016));lastFT=time;cur+=(p-cur)*(reduce?1:1-Math.exp(-dts*3.8));if(Math.abs(p-cur)<1e-5)cur=p;
  camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());
  var bA=burnAmt();if(bA<1&&!reduce)dirty=Math.max(dirty,1);
  focusT=sceneDist();var fd=focusT-focus;focus+=fd*(reduce?1:.12);if(Math.abs(fd)>.01)dirty=Math.max(dirty,1);
@@ -1107,7 +1179,7 @@ fontReady.then(function(){
   x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=22;x.fillStyle='#ffffff';x.font='italic 500 132px "Cormorant Garamond",Georgia,serif';x.fillText('Pam\u2019s Gallery',W/2,860);x.fillStyle='#ffd27a';var mw=x.measureText('Pam\u2019s Gallery').width;x.fillRect(W/2-mw/2,890,mw,5);x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=18;x.fillStyle='#ffffff';x.font='400 62px Jost,Helvetica,Arial,sans-serif';x.fillText(EMAIL,W/2,985)}),
   sc,ax,ay,19,10.2,nrm,{go:function(){location.href='mailto:'+EMAIL},tip:'Write to '+EMAIL,far:120,on:function(){return false}},{unlit:1,emis:[2.2,2.15,2.1]});SKYTEXT.m=MATS[MATS.length-1];
  LABELS.forEach(function(f){f()});
- upload();resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;resize()});
+ upload();resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;buildK();camAt(cur*(K.length-1));resize()});
  scrollTo(0,0);cur=0;camAt(0);render(0);dirty=0;var ld=document.getElementById('loading');ld.style.opacity=0;setTimeout(function(){ld.style.display='none'},700);
  requestAnimationFrame(frame);
 });
