@@ -562,8 +562,8 @@ var Mx={
  ceiling:mat({col:'#fbfaf8',rough:.14}),
  coffer:mat({col:'#f8f7f4',rough:.2}),
  gold:mat({col:'#d6ae5c',rough:.24,metal:1}),
- gold24:TX.wood?mat({col:'#6d6058',tex:TX.wood,htex:TX.woodH,rough:.42,metal:0,bump:.35,uvs:[.36,.36]}):mat({col:'#3f2416',tex:TX.mahog,rough:.6,metal:0,bump:.2,uvs:[.32,.32]}),
- goldDark:TX.wood?mat({col:'#6a5a50',tex:TX.wood,rough:.62,metal:0,uvs:[.36,.36]}):mat({col:'#2c160b',tex:TX.mahog,rough:.6,metal:0,uvs:[.3,.3]}),
+ gold24:mat({col:'#c39a52',rough:.36,metal:1}),
+ goldDark:mat({col:'#5e4423',rough:.55,metal:.7}),
  steel:mat({col:'#a9813e',rough:.32,metal:1}),
  bronze:mat({col:'#6b4a2e',rough:.36,metal:1}),
  gap:mat({col:'#151210',rough:.9}),
@@ -585,7 +585,7 @@ var Mx={
  oliveA:mat({col:'#6f7d5c',rough:.55}),oliveB:mat({col:'#8c9a7b',rough:.5}),oliveC:mat({col:'#566447',rough:.6}),
  grassA:mat({col:'#b5a466',rough:.6}),grassB:mat({col:'#8d9a5c',rough:.6}),
  agave:mat({col:'#7e9b98',rough:.42}),
- crystal:mat({col:'#f4f6ff',rough:.3,metal:.1,emis:[.3,.28,.25]}),
+ crystal:mat({col:'#f4f6ff',rough:.25,metal:.1,emis:[.9,.85,.75]}),
  wax:mat({col:'#f3ead8',rough:.5,emis:[1.1,.85,.55]}),
  candle:mat({col:'#ffffff',emis:[9,7.2,4.6]}),
  lantern:mat({col:'#ffffff',emis:[9,5.2,2.2]}),
@@ -666,6 +666,23 @@ rect(Mx.tile,BX0,BX1,-.3,0,BAL-.1,ZF-.05);
  [BX0,BX1].forEach(function(xx){for(var z=BAL+.26;z<ZF-.3;z+=.26)baluster(xx,z)});
  pier(BX0,BAL,1);pier(BX1,BAL,1);pier(-1.5,BAL,0);pier(1.5,BAL,0);
 })();
+// a wood pigeon perched on the balcony rail
+(function(){var G=mat({col:'#a9aebb',rough:.7,emis:[.03,.03,.035]}),Wn=mat({col:'#959aa8',rough:.7,emis:[.02,.02,.025]}),Br=mat({col:'#c99aa0',rough:.75,emis:[.03,.02,.02]}),Wh=mat({col:'#f2f1ee',rough:.7}),
+  Tl=mat({col:'#4b4e58',rough:.75}),Bk=mat({col:'#e0aeb0',rough:.5}),Ey=mat({col:'#e6c65a',rough:.3}),Pu=mat({col:'#111',rough:.3}),Lg=mat({col:'#c97d82',rough:.6});
+ var P=B([.55,1.11,BAL],-.55),y0=.012;
+ function E(m,c,r,n){ell(m,P,c,r,n||14)}
+ cyl(Lg,B(bx(P,[.02,0,.025])),[0,0,0],.005,.03,6);cyl(Lg,B(bx(P,[.02,0,-.025])),[0,0,0],.005,.03,6);
+ E(G,[0,y0+.085,0],[.13,.075,.07],20);                // body
+ E(Br,[.055,y0+.075,0],[.08,.065,.062],18);           // rosy breast
+ E(Wn,[-.02,y0+.1,.045],[.11,.045,.03],16);E(Wn,[-.02,y0+.1,-.045],[.11,.045,.03],16);   // folded wings
+ E(Wh,[-.01,y0+.11,.068],[.035,.008,.006],8);E(Wh,[-.01,y0+.11,-.068],[.035,.008,.006],8); // white wing bars
+ E(Tl,[-.17,y0+.075,0],[.1,.012,.042],12);            // long dark tail
+ E(G,[.1,y0+.15,0],[.035,.045,.034],14);              // neck
+ E(Wh,[.1,y0+.15,.03],[.016,.012,.006],8);E(Wh,[.1,y0+.15,-.03],[.016,.012,.006],8);   // white neck patches
+ E(G,[.13,y0+.19,0],[.034,.032,.03],16);              // head
+ E(Bk,[.17,y0+.185,0],[.016,.006,.006],8);            // beak
+ [-1,1].forEach(function(k){E(Ey,[.145,y0+.197,k*.022],[.007,.007,.004],8);E(Pu,[.148,y0+.197,k*.0245],[.0035,.0035,.002],6)});
+})();
 function urn(x,z,h,r){r=r||.3;lathe(Mx.terracotta,B([x,0,z]),[0,0,0],[[0,0],[r*.55,0],[r*.68,h*.08],[r,h*.4],[r*1.02,h*.6],[r*.85,h*.86],[r*.8,h*.9],[r*.95,h*.95],[r*.95,h],[r*.78,h],[0,h]],40);
  lathe(Mx.soil,B([x,h-.035,z]),[0,0,0],[[0,0],[r*.78,0]],32);torus(Mx.terracottaD,B([x,h*.62,z]),[0,0,0],r*1.0,.012,40);blob(x,z,r*3,r*3);return h-.035}
 function lavender(x,top,z,s){for(var i=0;i<170;i++){var a=rnd()*6.283,rr=Math.sqrt(rnd())*.17*s,b=[x+Math.cos(a)*rr,top,z+Math.sin(a)*rr],o=[Math.cos(a),0,Math.sin(a)],h=(.42+rnd()*.22)*s,lean=.15+rnd()*.35,
@@ -703,7 +720,7 @@ ell(Mx.sky,B([0,1.6,-10]),[0,0,0],[90,90,90],48);
 quadL(Mx.seaPlane,B([0,-6,0]),[0,0,-55],[1,0,0],[0,0,-1],85,41,[0,1,0]);
 var SKYTEXT={c:[0,5.3,-36]};
 
-/* ---------- paintings in gilded frames ---------- */
+/* ---------- paintings in carved baroque gilt frames ---------- */
 var SCALE=1.7;
 function hang(k,o,ry){
  var p=ART[k],w=p.w*SCALE,h=p.h*SCALE,b=B(o,ry),fw=.1,fd=.075,gap=.055,fm=Mx.gold24;
@@ -714,6 +731,19 @@ function hang(k,o,ry){
  function roll(m,x0,y0,x1,y1,z,r){var p0=bx(b,[x0,y0,z]),dir=v3.sub(bx(b,[x1,y1,z]),p0),L=Math.hypot(dir[0],dir[1],dir[2]);cyl(m,aim(p0,dir),[0,0,0],r,L,14)}
  [[OX-.022,OY-.022,.022],[ow+fw*.42,oh+fw*.42,.01],[ow+.008,oh+.008,.007]].forEach(function(q){var X=q[0],Y=q[1],r=q[2];
   roll(fm,-X-r,Y,X+r,Y,zt,r);roll(fm,-X-r,-Y,X+r,-Y,zt,r);roll(fm,-X,-Y-r,-X,Y+r,zt,r);roll(fm,X,-Y-r,X,Y+r,zt,r)});
+ // baroque carving: acanthus leaf-run, a bead moulding, shell fans at the corners and a cartouche at each centre
+ var zc=zt+.012,nz=bn(b,[0,0,1]);
+ function lobe(cx,cy,ang,len,wid,dep,z){var c=Math.cos(ang),sn=Math.sin(ang);ell(fm,{o:bx(b,[cx+c*len*.5,cy+sn*len*.5,z]),x:bn(b,[c,sn,0]),y:bn(b,[-sn,c,0]),z:nz},[0,0,0],[len*.5,wid,dep],8)}
+ function fan(cx,cy,a0,a1,n,len,wid){for(var i=0;i<n;i++){var a=a0+(a1-a0)*i/(n-1);lobe(cx,cy,a,len*(.75+.25*Math.sin(Math.PI*i/(n-1))),wid,.013,zc)}
+  ell(fm,B(bx(b,[cx,cy,zc+.004])),[0,0,0],[wid*1.6,wid*1.6,.016],10)}
+ var LR=ow+fw*.66;
+ for(var t=-OX+.09;t<=OX-.09;t+=.034){lobe(t-.012,OY-.035,0,.03,.008,.008,zc-.004);lobe(t-.012,-OY+.035,0,.03,.008,.008,zc-.004)}
+ for(t=-OY+.09;t<=OY-.09;t+=.034){lobe(-OX+.035,t-.012,Math.PI/2,.03,.008,.008,zc-.004);lobe(OX-.035,t-.012,Math.PI/2,.03,.008,.008,zc-.004)}
+ for(t=-ow;t<=ow;t+=.02){ell(fm,B(bx(b,[t,oh+.018,zt-.004])),[0,0,0],[.0065,.0065,.006],6);ell(fm,B(bx(b,[t,-oh-.018,zt-.004])),[0,0,0],[.0065,.0065,.006],6)}
+ for(t=-oh;t<=oh;t+=.02){ell(fm,B(bx(b,[ow+.018,t,zt-.004])),[0,0,0],[.0065,.0065,.006],6);ell(fm,B(bx(b,[-ow-.018,t,zt-.004])),[0,0,0],[.0065,.0065,.006],6)}
+ [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(function(q){var d=Math.atan2(q[1],q[0]);fan(q[0]*(OX-.03),q[1]*(OY-.03),d-1.1,d+1.1,7,.1,.016)});
+ fan(0,OY-.02,.25,Math.PI-.25,9,.12,.017);fan(0,-OY+.02,-.25,-Math.PI+.25,9,.12,.017);
+ fan(OX-.02,0,-1.05,1.05,5,.08,.014);fan(-OX+.02,0,Math.PI-1.05,Math.PI+1.05,5,.08,.014);
  var cv=(OX-.044+ow+fw*.42+.01)/2,cw=Math.max(.008,(OX-.044)-(ow+fw*.42+.01));
  [[0,oh+(cv-ow),2*OX-.06,cw],[0,-oh-(cv-ow),2*OX-.06,cw]].forEach(function(q){box(Mx.goldDark,b,[q[0],q[1],zt+.0015],[q[2],q[3],.003])});
  [[-cv,0],[cv,0]].forEach(function(q){box(Mx.goldDark,b,[q[0],q[1],zt+.0015],[cw,2*oh+2*(cv-ow)-.02,.003])});
@@ -804,21 +834,18 @@ function drawWalker(u){var S=26,st=walkerState(NOWS),ph=st.d/(.42*S)*6.2832,sw=s
 // polished ceiling with recessed brass-trimmed downlights in the coffers
 [-1.6,-3.2,-4.8,-6.4,-8.0].forEach(function(z){[-1.6,1.6].concat(Math.abs(z+5.2)>1?[0]:[]).forEach(function(x){
  lathe(Mx.lens,B([x,RH-.004,z]),[0,0,0],[[0,0],[.05,0]],24);torus(Mx.gold,B([x,RH-.006,z]),[0,0,0],.062,.008,32)})});
-// crystal chandelier: two tiers of candle arms, hanging drops and draped strands of crystals
-(function(){var cx=0,cz=-5.2,y=2.62,O=B([cx,0,cz]);
- cyl(Mx.gold,O,[0,y+.45,0],.012,RH-.16-(y+.45),10);
- lathe(Mx.gold,O,[0,y-.12,0],[[0,0],[.06,.02],[.1,.1],[.07,.2],[.04,.32],[.06,.5],[.03,.58],[0,.6]],32);
- ell(Mx.crystal,O,[0,y-.2,0],[.05,.09,.05],16);
- [[8,.72,0],[6,.42,.34]].forEach(function(tier){var n=tier[0],r=tier[1],ty=y+tier[2],tips=[];
-  for(var i=0;i<n;i++){var t=i/n*Math.PI*2+(tier[2]?.3:0),tip=[cx+Math.cos(t)*r,ty,cz+Math.sin(t)*r],dir=[Math.cos(t),0,Math.sin(t)];tips.push(tip);
-   cyl(Mx.gold,aim([cx,ty-.04,cz],v3.add(dir,[0,.12,0])),[0,0,0],.009,r,8);
-   cyl(Mx.gold,B(tip),[0,-.04,0],.035,.04,16,1);
-   cyl(Mx.wax,B(tip),[0,0,0],.012,.11,12,1);
-   ell(Mx.candle,B(tip),[0,.14,0],[.017,.032,.017],10);
-   ell(Mx.crystal,B(tip),[0,-.12,0],[.014,.04,.014],8);
-   LIGHTS_CANDLES.push(tip)}
-  for(i=0;i<n;i++){var a1=tips[i],a2=tips[(i+1)%n];for(var k=1;k<10;k++){var f=k/10,p=v3.add(v3.sc(a1,1-f),v3.sc(a2,f));p[1]-=.05+Math.sin(Math.PI*f)*.14;ell(Mx.crystal,B(p),[0,0,0],[.011,.011,.011],6)}}});
- LIGHTS.point.push({p:[cx,y+.12,cz],c:[70,56,40]})})();
+// tiered crystal cascade chandelier with a brass crown, under a plaster ceiling rose (like Pam's living room)
+var ROSE=mat({col:'#f6f3ec',rough:.4});
+(function(){var cx=0,cz=-5.2,O=B([cx,0,cz]);
+ lathe(ROSE,B([cx,RH,cz]),[0,0,0],[[0,-.09],[.12,-.09],[.2,-.07],[.3,-.07],[.38,-.05],[.45,-.05],[.5,-.03],[.55,-.03],[.62,-.012],[.62,0],[0,0]],48);
+ lathe(Mx.gold,O,[0,RH-.36,0],[[0,0],[.05,0],[.03,.05],[.035,.12],[.06,.18],[.03,.22],[0,.27]],24);
+ var y0=RH-.55;torus(Mx.gold,O,[0,y0,0],.3,.014,48);
+ for(var k=0;k<14;k++){var a=k/14*Math.PI*2,px=Math.cos(a)*.3,pz=Math.sin(a)*.3;cyl(Mx.gold,B([cx+px,y0,cz+pz]),[0,0,0],.006,.11,6);ell(Mx.crystal,B([cx+px,y0+.13,cz+pz]),[0,0,0],[.012,.02,.012],8)}
+ for(var t=0;t<5;t++){var y=y0-.02-t*.11,r=.3*(1-t*.17),n=Math.max(8,Math.round(Math.PI*2*r/.04));torus(Mx.gold,O,[0,y,0],r,.007,48);
+  for(var k2=0;k2<n;k2++){var a2=k2/n*Math.PI*2,bx2=Math.cos(a2)*r,bz2=Math.sin(a2)*r;for(var j=0;j<3;j++)ell(Mx.crystal,B([cx+bx2,y-.026*(j+1),cz+bz2]),[0,0,0],[.009,.012,.009],6)}}
+ ell(Mx.crystal,O,[0,y0-.66,0],[.03,.06,.03],12);
+ ell(Mx.candle,O,[0,y0-.25,0],[.07,.12,.07],14);
+ LIGHTS.point.push({p:[cx,y0-.25,cz],c:[60,48,34]})})();
 var BIRDS=[];for(var bi=0;bi<6;bi++)BIRDS.push({cx:(rnd()-.5)*18,cy:4.5+rnd()*5,cz:-22-rnd()*14,r:5+rnd()*7,dir:rnd()<.5?1:-1,ph:rnd()*6.28,fl:4.6+rnd()*1.4,s:.95+rnd()*.25,glide:rnd()*6.28});
 var birdMat={col:lin('#8a8d94'),emis:[0,0,0],rough:.75,metal:0,bump:0,refl:0,alpha:1},birdBuf=null,birdVAO=null,birdN=0;
 function birdGeom(t){var out=[];
@@ -855,47 +882,34 @@ uniform float uRough,uMetal,uBump,uRefl,uUnlit,uBlend,uAlpha,uRH,uX0,uX1,uZB,uZF
 float hsh(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
 float vno(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);return mix(mix(hsh(i),hsh(i+vec2(1,0)),u.x),mix(hsh(i+vec2(0,1)),hsh(i+vec2(1,1)),u.x),u.y);}
 float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<6;i++){s+=a*vno(p);p=mat2(1.6,1.2,-1.2,1.6)*p+vec2(17.1,9.2);a*=.5;}return s;}
-vec3 skyBase(vec3 d){vec3 S=uSkySun;float e=max(d.y,0.),cs=max(dot(d,S),0.);
- vec3 hor=vec3(1.0,.5,.36),mid=vec3(.52,.3,.6),zen=vec3(.07,.06,.22);
- vec3 c=mix(hor,mid,smoothstep(0.,.2,e));c=mix(c,zen,smoothstep(.12,.8,e));
- float away=1.-cs;c=mix(c,c*vec3(.85,.72,1.12),away*away*.6*(1.-e));             // cooler, rosier away from the sun
- c+=vec3(1.,.5,.2)*(pow(cs,10.)*.5+pow(cs,60.)*1.4)*(1.-e*.7);                   // glow around the low sun
+float fb3(vec2 p){return .5*vno(p)+.25*vno(p*2.03+7.1)+.125*vno(p*4.1+3.3);}
+vec3 skyBase(vec3 d){float e=max(d.y,0.);
+ vec3 hor=vec3(.22,.12,.30),mid=vec3(.05,.04,.16),zen=vec3(.01,.012,.05);
+ vec3 c=mix(hor,mid,smoothstep(0.,.25,e));c=mix(c,zen,smoothstep(.2,.9,e));
+ float az=atan(d.x,-d.z);c+=vec3(.5,.22,.1)*exp(-pow((az+.9)/.5,2.))*exp(-e*6.)*.6;
  return c;}
-vec3 skyCol(vec3 d){vec3 S=uSkySun;float e=d.y,cs=dot(d,S);vec3 c=skyBase(d);vec3 hor=vec3(1.0,.5,.36);
- vec3 M=normalize(vec3(.62,.3,-.73));float cm=dot(d,M);c+=vec3(1.,.97,.92)*smoothstep(.99935,.99965,cm)*2.2+vec3(.85,.75,1.)*pow(max(cm,0.),300.)*.35;   // a soft rising moon
- c+=vec3(1.)*step(.9975,hsh(floor(d.xz/(d.y+.25)*260.)))*smoothstep(.32,.75,e)*.55;   // first stars
- c+=vec3(1.,.88,.7)*smoothstep(.99955,.9998,cs)*28.;                              // the sun's disc
- // two layers of cloud: soft cumulus banks and thin high streaks, lit from below by the setting sun
- float dist=1./(e+.035);vec2 cp=d.xz*dist+vec2(uSecs*.018,uSecs*.006);
- float sw=fbm(cp*.09+vec2(8.,3.))*4.2;cp=mat2(cos(sw),sin(sw),-sin(sw),cos(sw))*cp;   // painterly swirls
- float w=fbm(cp*.18+vec2(3.,7.));float n=fbm(cp*.55+w*1.6+vec2(1.,2.));
- float cov=smoothstep(.5,.74,n)*smoothstep(.0,.05,e)*(1.-smoothstep(.45,.9,e));
- float det=fbm(cp*2.2+vec2(5.,1.));cov*=.7+.3*det;
- float lit=pow(clamp(cs*.5+.5,0.,1.),4.);
- float rim=1.-smoothstep(.5,.8,n);
- vec3 under=vec3(.30,.16,.36)*(.7+.6*lit),top=mix(vec3(1.25,.52,.5),vec3(1.3,.68,.36),lit)*(.4+1.4*lit);top=mix(top,vec3(.45,.7,.75),(1.-lit)*.25);
- vec3 cc=mix(under,top,clamp(lit*.55+rim*.7*lit+det*.15,0.,1.));
- cc=mix(cc,c,exp(-e*14.)*.55);
- c=mix(c,cc,cov*.96);
- vec2 hp=d.xz*(1./(e+.12))+vec2(uSecs*.012,0.);float hi=smoothstep(.55,.85,fbm(vec2(hp.x*.5,hp.y*2.2)+vec2(9.,3.)))*smoothstep(.04,.2,e)*(1.-smoothstep(.6,1.,e));
- c=mix(c,vec3(1.2,.6,.75)*(.5+lit),hi*.38);
- // distant islands on the horizon, softened by haze
- float az=atan(d.x,-d.z);   // Greek island cliffs with white villages on the horizon
- float i1=smoothstep(-1.42,-1.3,az)*(1.-smoothstep(-1.02,-.9,az)),i2=smoothstep(.32,.45,az)*(1.-smoothstep(.95,1.12,az)),i3=smoothstep(1.5,1.6,az)*(1.-smoothstep(1.9,2.05,az));
- float isl=(i1*.05+i2*.038+i3*.022)*(.82+.18*vno(vec2(az*40.,1.)))+(i1+i2+i3)*.004*vno(vec2(az*300.,2.));
- if(e<isl){vec3 ic=mix(vec3(.26,.16,.32),hor*.75,.45+.25*smoothstep(0.,.05,isl-e));c=ic*(.88+.12*vno(vec2(az*240.,e*900.)));
-  float vil=step(.62,hsh(floor(vec2(az*1400.,e*2600.))))*smoothstep(isl-.012,isl-.002,e)*step(.02,isl);c=mix(c,vec3(1.,.82,.8)*.95,vil*.85);}
- c=mix(c,hor*vec3(1.,.82,.76),exp(-abs(e)*34.)*.45);
+vec3 skyCol(vec3 d){float e=d.y;vec3 c=skyBase(d);
+ vec2 p=d.xz/(e+.35)*1.6;
+ float sw=fb3(p*.35+vec2(uSecs*.004,0.))*5.;vec2 q=mat2(cos(sw),sin(sw),-sin(sw),cos(sw))*p;   // swirling nebula
+ float n1=fb3(q*.8+vec2(3.,1.)),n2=fb3(q*1.6+vec2(7.,2.));
+ vec3 neb=mix(vec3(.25,.12,.45),vec3(.10,.30,.55),n2);neb=mix(neb,vec3(.9,.42,.15),smoothstep(.55,.8,n1)*.8);
+ c+=neb*smoothstep(.35,.75,n1)*.55*smoothstep(0.,.15,e);
+ vec3 sd=normalize(vec3(-.45,.2,-.87));float cs=dot(d,sd);   // a great orange spiral, like the painted suns
+ if(cs>.9){vec3 rx=normalize(cross(vec3(0.,1.,0.),sd)),ry=cross(sd,rx);vec2 sp=vec2(dot(d,rx),dot(d,ry))/.42;float r=length(sp),a=atan(sp.y,sp.x);
+  float s1=.5+.5*sin(a+log(r+.02)*7.-uSecs*.05);float disc=smoothstep(1.,.2,r);c=mix(c,mix(vec3(.55,.18,.06),vec3(1.2,.62,.25),s1),disc*.85);c+=vec3(1.,.5,.2)*exp(-r*3.)*.25;}
+ vec3 od=normalize(vec3(.3,.24,-.92));float co=dot(d,od);   // the violet orb
+ if(co>.985){vec3 rx=normalize(cross(vec3(0.,1.,0.),od)),ry=cross(od,rx);vec2 op=vec2(dot(d,rx),dot(d,ry))/sqrt(1.-.985*.985);float r2=dot(op,op);
+  if(r2<1.){vec3 nn=normalize(vec3(op,sqrt(1.-r2)));float l=clamp(dot(nn,normalize(vec3(-.6,.5,.6))),0.,1.);vec3 oc=mix(vec3(.18,.08,.35),vec3(.62,.42,.95),l)+vec3(.3,.6,.9)*pow(1.-nn.z,3.)*.6;c=mix(c,oc,smoothstep(1.,.96,r2));}}
+ c+=vec3(.6,.75,1.)*pow(max(co,0.),400.)*.3;
+ vec2 sg=floor(d.xz/(d.y+.3)*220.);c+=vec3(1.)*step(.996,hsh(sg))*smoothstep(.1,.5,e)*.8;   // stars
+ c=mix(c,skyBase(vec3(d.x,0.,d.z)),exp(-max(e,0.)*18.)*.5);
  return c;}
-vec3 seaCol(vec3 d){vec3 S=uSkySun;float e=-d.y;float dist=1./(e+.002);vec2 sp=d.xz*dist+vec2(uSecs*.05,uSecs*.32);
- float w1=vno(sp*vec2(.9,3.2)),w2=vno(sp*vec2(2.7,9.)+vec2(4.,1.)),w3=vno(sp*vec2(7.,26.)+vec2(2.,9.));float wv=w1*.5+w2*.32+w3*.18;
- vec3 r=normalize(vec3(d.x+(w2-.5)*.035,max(e,.001)*(1.+(wv-.5)*1.2),d.z));
- float fres=.02+.98*pow(1.-clamp(e*(1.+(wv-.5)*.6),0.,1.),5.);
- vec3 deep=vec3(.02,.025,.07);vec3 c=mix(deep,skyBase(r)*.9,fres);
- float cs=max(dot(r,S),0.);float spread=mix(80.,900.,clamp(e*6.,0.,1.));
- c+=vec3(1.,.66,.36)*pow(cs,spread*.25)*smoothstep(.45,.8,wv)*(4.5-e*3.);        // glitter path under the sun
- c+=vec3(1.,.8,.6)*pow(cs,12.)*.15;
- c=mix(c,skyBase(vec3(d.x,.0,d.z))*.95,exp(-e*90.)*.8);                          // horizon haze
+vec3 seaCol(vec3 d){float e=-d.y;float dist=1./(e+.004);vec2 sp=d.xz*dist;   // rolling painted waves of green, gold and rust
+ float w=fb3(sp*.06+vec2(0.,uSecs*.01))*6.;vec2 q=sp+vec2(sin(w),cos(w))*3.;
+ float band=.5+.5*sin(q.x*.35+q.y*.12+w*.6);float streak=fb3(vec2(q.x*.4,q.y*1.8));
+ vec3 c=mix(vec3(.12,.22,.05),vec3(.55,.62,.12),band);c=mix(c,vec3(.55,.22,.08),smoothstep(.62,.8,streak)*.7);c=mix(c,vec3(.85,.8,.4),smoothstep(.85,.97,band)*.4);
+ c*=.55+.45*smoothstep(-.2,1.,band);
+ c=mix(c,skyBase(vec3(d.x,0.,d.z))*.9,exp(-e*25.)*.85);
  return c;}
 uniform int uHasTex,uHasH,uPass,uNS,uNP;uniform sampler2D uTex,uReflTex,uHTex;uniform float uFar;uniform sampler2DShadow uShadow;uniform mat4 uSunVP;uniform vec2 uRes,uShTexel;
 uniform vec3 uSP[10],uSD[10],uSC[10];uniform vec2 uSA[10];uniform vec3 uPP[6],uPC[6];
@@ -1061,7 +1075,7 @@ function drawScene(VPm,camPos,pass){
    gl.uniform1i(u.uHasH,m.htex?1:0);if(m.htex){gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,m.htex);gl.activeTexture(gl.TEXTURE0)}
    gl.uniform1i(u.uHasTex,m.tex?1:0);if(m.tex)gl.bindTexture(gl.TEXTURE_2D,m.tex);
    gl.bindVertexArray(m.vao);gl.drawArrays(gl.TRIANGLES,0,m.n)});
-  if(!bp&&pass===0){drawBirds(u);drawWalker(u)}
+  if(!bp&&pass===0){drawWalker(u)}
   if(bp){gl.disable(gl.BLEND);gl.depthMask(true);gl.disable(gl.POLYGON_OFFSET_FILL)}
  });
 }
