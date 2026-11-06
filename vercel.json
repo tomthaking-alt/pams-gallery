@@ -1,9 +1,50 @@
 {
   "redirects": [
-    { "source": "/((?!ar/|api/).+)", "destination": "/", "permanent": false }
+    {
+      "source": "/((?!ar/|api/|lib/|lab).+)",
+      "destination": "/",
+      "permanent": false
+    }
   ],
   "headers": [
-    { "source": "/ar/(.*)\\.usdz", "headers": [ { "key": "Content-Type", "value": "model/vnd.usdz+zip" }, { "key": "Cache-Control", "value": "public, max-age=3600" } ] },
-    { "source": "/ar/(.*)\\.glb", "headers": [ { "key": "Content-Type", "value": "model/gltf-binary" }, { "key": "Access-Control-Allow-Origin", "value": "*" }, { "key": "Cache-Control", "value": "public, max-age=3600" } ] }
+    {
+      "source": "/ar/(.*)\\.usdz",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "model/vnd.usdz+zip"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/ar/(.*)\\.glb",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "model/gltf-binary"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/lib/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
   ]
 }
