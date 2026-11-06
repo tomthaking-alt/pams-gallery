@@ -147,7 +147,66 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 .chart div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative}
 .chart i{width:100%;background:linear-gradient(#e2bd6a,#b8862f);border-radius:2px 2px 0 0;min-height:2px}
 .chart small{position:absolute;bottom:-1.3rem;font-size:.62rem;color:var(--muted);white-space:nowrap}
-.dtabs{margin-top:1.4rem}
+.dtabs{margin-top:1.4rem;flex-wrap:wrap;column-gap:1.2rem}
+.edbar{position:sticky;top:calc(-1 * clamp(1.2rem,3vw,2.2rem));z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;justify-content:flex-end;padding:.75rem 0;margin:.3rem 0 .6rem;background:var(--paper);border-bottom:1px solid rgba(75,46,34,.12)}
+.edst{margin-right:auto;font-size:.82rem;color:var(--muted);letter-spacing:.03em}
+.edbar .btn{padding:.6rem 1.1rem}
+.edbar .btn:disabled{opacity:.45;cursor:default}
+.edmsg{background:#f3f7ee;border:1px solid #c9d8b8;padding:.7rem .9rem;font-size:.88rem;border-radius:3px;line-height:1.5}
+.edhead{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:.6rem}
+.edhead h3,.edsec>h3,.vcard h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.5rem;font-weight:500;margin:.2rem 0;color:var(--walnut)}
+.edhint{font-size:.84rem;color:var(--muted);margin:.3rem 0 1rem;max-width:72ch;line-height:1.55}
+.edup{cursor:pointer;display:inline-flex;align-items:center}
+.edlist{display:flex;flex-direction:column;gap:.6rem}
+.edrow,.edcoll{background:#fff;border:1px solid rgba(75,46,34,.14);border-radius:3px;padding:.7rem .8rem}
+.edrow.open{border-color:rgba(176,141,87,.7);box-shadow:0 6px 20px rgba(30,18,12,.08)}
+.edcoll{margin-bottom:1rem}
+.edtop{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+.edth{width:56px;height:56px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(75,46,34,.15);flex:none;background:#efe9df}
+.edinfo{display:flex;flex-direction:column;min-width:0;flex:1}
+.edinfo b,.edtop>b{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:1.2rem;font-weight:500;color:var(--ink)}
+.edinfo span{font-size:.8rem;color:var(--muted)}
+.edacts{display:flex;gap:.35rem;flex-wrap:wrap;margin-left:auto}
+.sb{font:inherit;font-size:.8rem;padding:.45rem .75rem;min-height:36px;border:1px solid rgba(75,46,34,.28);border-radius:2px;background:#fff;color:var(--walnut);cursor:pointer}
+.sb:hover{background:#f6f1e8}.sb.ic{min-width:36px;padding:.45rem .5rem}.sb.warn{color:#8a3b2a;border-color:rgba(138,59,42,.4)}
+.sb[aria-pressed="true"]{background:var(--walnut);color:#faf6ee;border-color:var(--walnut)}
+.sb:disabled{opacity:.4;cursor:default}
+.edconfirm{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-top:.6rem;padding:.6rem .7rem;background:#fff6f2;border:1px solid rgba(138,59,42,.25);font-size:.86rem}
+.edconfirm[hidden]{display:none}
+.edform{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:.7rem 1rem;margin-top:.8rem}
+.ef{display:flex;flex-direction:column;gap:.3rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:0}
+.ef input,.ef textarea,.ef select,.edsz input,.edadd select{font:inherit;font-size:.92rem;letter-spacing:0;text-transform:none;color:var(--ink);padding:.55rem .6rem;min-height:40px;border:1px solid rgba(75,46,34,.25);border-radius:2px;background:#fff;width:100%;box-sizing:border-box}
+.ef textarea{min-height:78px;resize:vertical;line-height:1.5}
+.ef.wide,.efp{grid-column:1/-1}
+.efp .rad{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.2rem;text-transform:none;letter-spacing:0;font-size:.92rem;color:var(--ink)}
+.efp .rad label{display:flex;align-items:center;gap:.4rem;cursor:pointer}
+.ef input[type=radio],.ef input[type=checkbox],.efc input{width:auto;min-height:0;padding:0;margin:0;accent-color:var(--walnut);width:18px;height:18px;flex:none}
+.efp .rad input.dim{opacity:.45}
+.efp .rad input[type=text]{width:9rem;min-height:38px;font:inherit;font-size:.92rem;padding:.45rem .6rem;border:1px solid rgba(75,46,34,.25);border-radius:2px}
+.efc{display:flex;align-items:center;gap:.45rem;font-size:.9rem;color:var(--ink);align-self:end;min-height:40px}
+.edphoto{grid-column:1/-1;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+.edphoto img{width:92px;height:92px;object-fit:cover;box-shadow:0 0 0 1px rgba(75,46,34,.15)}
+.edsec{margin-top:1.2rem}
+.edpick{list-style:none;padding:0;margin:.4rem 0 .6rem;display:flex;flex-direction:column;gap:.4rem;counter-reset:pk}
+.pk{display:flex;align-items:center;gap:.7rem;background:#faf7f2;border:1px solid rgba(75,46,34,.1);padding:.35rem .5rem;border-radius:2px;counter-increment:pk}
+.pk::before{content:counter(pk);font-size:.75rem;color:var(--muted);width:1.1rem;text-align:right}
+.pk img{width:40px;height:40px;object-fit:cover;flex:none}
+.pk span{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:1.1rem;min-width:0;flex:1}
+.edlab{display:block;margin-top:.9rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.edadd{max-width:340px;margin-bottom:.4rem}
+.edsizes{display:flex;flex-direction:column;gap:.4rem;margin:.4rem 0 .5rem}
+.edsz{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto;gap:.4rem}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:1rem;margin-top:.8rem}
+.vcard{background:#fff;border:1px solid rgba(75,46,34,.14);padding:.9rem 1rem;border-radius:3px;min-width:0}
+.vcard .edtop{justify-content:space-between}
+.seg{display:flex;gap:.3rem}
+.vbars{display:flex;flex-direction:column;gap:.4rem;margin:.5rem 0 1rem}
+.vb{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto;gap:.6rem;align-items:center;font-size:.86rem}
+.vl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vt{height:8px;background:#f2ece2;border-radius:99px;overflow:hidden}
+.vt i{display:block;height:100%;background:linear-gradient(90deg,#e2bd6a,#b8862f);border-radius:99px}
+.vb b{font-weight:500;color:var(--walnut);font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
+.ddesc{margin:.9rem 0 0;color:var(--muted);line-height:1.65;font-size:.95rem}
 .tbl{overflow-x:auto;margin-top:.8rem;border:1px solid rgba(75,46,34,.14);background:#fff}
 .tbl table{width:100%;border-collapse:collapse;font-size:.86rem;min-width:720px}
 .tbl th,.tbl td{padding:.65rem .75rem;border-bottom:1px solid rgba(75,46,34,.09);text-align:left;vertical-align:top}
@@ -164,14 +223,15 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #walk #now{font-size:.82rem;letter-spacing:.04em;padding:0 .6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw;cursor:pointer}
 #walk #now i{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.05rem}
 #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 80px)!important}
-#collection{position:fixed;inset:0;z-index:8;background:var(--paper);overflow:auto;-webkit-overflow-scrolling:touch}
+#collection,#prints{position:fixed;inset:0;z-index:8;background:var(--paper);overflow:auto;-webkit-overflow-scrolling:touch}
+#prints[hidden]{display:none}
 #collection[hidden]{display:none}
-#collection .in{max-width:1360px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 96px) max(16px,min(5vw,56px)) 64px}
-#collection .top{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 14px) 5vw 14px;background:rgba(250,249,247,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(75,46,34,.12);z-index:1}
-#collection .in{padding-top:48px}
-#collection .top .name{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.45rem;color:var(--walnut)}
-#collection h2{font-size:clamp(2.2rem,5vw,3.4rem);margin:0 0 .4rem;color:var(--walnut)}
-#collection .lede{color:var(--muted);max-width:60ch;line-height:1.7;margin:0 0 2.4rem}
+#collection .in,#prints .in{max-width:1360px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 96px) max(16px,min(5vw,56px)) 64px}
+#collection .top,#prints .top{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 14px) 5vw 14px;background:rgba(250,249,247,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(75,46,34,.12);z-index:1}
+#collection .in,#prints .in{padding-top:48px}
+#collection .top .name,#prints .top .name{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.45rem;color:var(--walnut)}
+#collection h2,#prints h2{font-size:clamp(2.2rem,5vw,3.4rem);margin:0 0 .4rem;color:var(--walnut)}
+#collection .lede,#prints .lede{color:var(--muted);max-width:60ch;line-height:1.7;margin:0 0 2.4rem}
 .grid{list-style:none;padding:0;margin:0;display:grid;gap:2.4rem 1.8rem;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 .card button{all:unset;cursor:pointer;display:block;width:100%}
 .card .ph{aspect-ratio:1/1;background:#efe9df;display:flex;align-items:center;justify-content:center;padding:10%;transition:background .2s}
@@ -220,6 +280,18 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 @media (max-width:700px){.cindex{grid-template-columns:1fr;gap:.55rem;margin-bottom:2.6rem}.cindex img{width:44px;height:44px}.cindex .ct{font-size:1.2rem}
  .chead{display:block}.ccount{margin-top:.8rem}.cgrid .card h3{font-size:1.2rem}.soon h3{font-size:.95rem;margin-top:.55rem}.soon .lock{width:38px}.soon p{display:none}.coll+.coll{margin-top:3rem;padding-top:2.6rem}}
 @media (prefers-reduced-motion:reduce){.soon .blank::after{animation:none;display:none}}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:2.6rem 2rem}
+.pcard{display:flex;flex-direction:column;min-width:0}
+.pcard .ph{aspect-ratio:4/5;background:#efe9df;display:flex;align-items:center;justify-content:center;padding:11%;cursor:zoom-in}
+.pcard .ph img{max-width:100%;max-height:100%;display:block;box-shadow:0 12px 26px rgba(30,18,12,.24),0 0 0 9px #fff,0 0 0 10px rgba(75,46,34,.18)}
+.pcard h3{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;font-size:1.5rem;margin:1rem 0 .1rem;color:var(--ink)}
+.pcard .pd{margin:0 0 .7rem;color:var(--muted);font-size:.9rem;line-height:1.55}
+.sizes{display:flex;flex-wrap:wrap;gap:.45rem;margin:.3rem 0 .9rem}
+.sizes button{font:inherit;font-size:.82rem;padding:.5rem .8rem;min-height:40px;border:1px solid rgba(75,46,34,.28);border-radius:99px;background:#fff;color:var(--ink);cursor:pointer;display:flex;gap:.45rem;align-items:baseline}
+.sizes button b{font-weight:500;color:var(--walnut)}
+.sizes button[aria-pressed="true"]{border-color:var(--walnut);background:var(--walnut);color:#faf6ee}
+.sizes button[aria-pressed="true"] b{color:#f1d9a6}
+.pcard .btn{align-self:flex-start;margin-top:auto}
 .foot{margin-top:4rem;padding-top:1.6rem;border-top:1px solid rgba(75,46,34,.15);color:var(--muted);font-size:.85rem;display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between}
 .foot a{color:var(--walnut)}
 .link{font:inherit;color:var(--walnut);background:none;border:0;border-bottom:1px solid var(--bronze);padding:0;cursor:pointer;font-size:.85rem}
@@ -240,7 +312,7 @@ dialog{border:0;border-radius:2px;padding:0;max-width:min(94vw,880px);width:100%
 #about .txt{padding:clamp(1.6rem,4vw,2.6rem);min-width:0}
 #about .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 @media (max-width:700px){#about .abw{grid-template-columns:1fr}#about figure img{max-height:52vh;height:auto}}
-@media (max-width:700px){#dlg .wrap{grid-template-columns:1fr}#dlg .pic{min-height:0}#dlg .pic img{max-height:36vh}#bar .name{font-size:1.2rem;white-space:nowrap}#where{display:none}#bar nav{gap:.85rem}#bar nav button{white-space:nowrap;font-size:.8rem}#bar .wide{display:none}}
+@media (max-width:700px){#dlg .wrap{grid-template-columns:1fr}#dlg .pic{min-height:0}#dlg .pic img{max-height:36vh}#bar .name{font-size:1.2rem;white-space:nowrap}#where{display:none}#bar nav{gap:.85rem}#bar nav button{white-space:nowrap;font-size:.8rem}#bar .name{font-size:1.08rem!important}#music .mw{display:none}#bar .wide{display:none}}
 dialog::backdrop{background:rgba(22,15,11,.7);backdrop-filter:blur(3px)}
 /* ---------- the arrows and the zoom button on the walk bar ---------- */
 #walk button.end{opacity:.28;cursor:default}
@@ -325,7 +397,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
 </head>
 <body>
 <canvas id="gl" aria-label="A walk around Pam’s Gallery and out onto the balcony"></canvas>
-<header id="bar"><span class="name">Pam’s Gallery</span><span id="where" aria-live="polite">Welcome</span><nav aria-label="Site"><button id="music" aria-pressed="false" title="Play or pause the music">&#9834; Music</button><button id="navCol">Collections</button><button id="navAbout">About<span class="wide"> &amp; Contact</span></button><button id="navAcct" aria-label="Your account"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="10" cy="6.5" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 18c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="wide" id="navAcctTxt"> Account</span></button></nav></header>
+<header id="bar"><span class="name">Pam’s Gallery</span><span id="where" aria-live="polite">Welcome</span><nav aria-label="Site"><button id="music" aria-pressed="false" title="Play or pause the music">&#9834;<span class="mw"> Music</span></button><button id="navCol">Collections</button><button id="navPr">Prints</button><button id="navAbout">About<span class="wide"> &amp; Contact</span></button><button id="navAcct" aria-label="Your account"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="10" cy="6.5" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 18c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="wide" id="navAcctTxt"> Account</span></button></nav></header>
 <div id="title" aria-hidden="true"><h1>Pam’s Gallery</h1><p>Welcome · come in and look around</p></div>
 <div id="hint">Scroll, swipe or tap to step inside</div>
 <script>try{if(matchMedia("(pointer:coarse)").matches)document.getElementById("hint").textContent="Swipe, tap or scroll to walk through"}catch(e){}</script>
@@ -372,6 +444,15 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
  <p class="note" id="enqNote" role="status"></p>
 </section>
 <div id="loading"><div class="lw"><div class="lt">Pam’s Gallery</div><div class="ls">Original paintings · opening the doors</div><div class="lb"><i></i></div></div></div>
+<section id="prints" class="sheet" hidden aria-labelledby="prh">
+ <div class="top"><span class="name">Pam’s Gallery</span><button class="link" id="prClose">Back to the gallery</button></div>
+ <div class="in">
+  <h2 id="prh">Prints</h2>
+  <p class="lede">Fine-art prints of Pam’s paintings, made to order in a choice of sizes. Choose a size, then send your request — Pam replies personally to arrange payment and delivery.</p>
+  <div class="pgrid" id="pgrid"></div>
+  <p class="empty" id="prEmpty" hidden>New prints are on their way — please check back soon, or <a href="#" id="prAsk">ask Pam</a> about a print of a particular painting.</p>
+ </div>
+</section>
 <section id="collection" hidden aria-labelledby="colh">
  <div class="top"><span class="name">Pam’s Gallery</span><button class="link" id="colClose">Back to the gallery</button></div>
  <div class="in">
@@ -389,7 +470,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <div class="pic"><img id="dimg" alt="" title="Zoom in"><button id="dzoom" type="button" aria-label="Zoom in on this painting"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg>Zoom</button></div>
   <div class="txt">
    <h2 id="dt"></h2>
-   <p id="dp" class="serif" style="font-size:1.6rem;margin-top:.2rem"></p>
+   <p id="dp" class="serif" style="font-size:1.6rem;margin-top:.2rem"></p><p id="dd" class="ddesc" hidden></p>
    <dl><dt>Medium</dt><dd id="dm"></dd><dt>Size</dt><dd id="ds"></dd><dt>Year</dt><dd id="dy"></dd><dt>Availability</dt><dd id="da"></dd></dl>
    <div class="btns"><button class="btn main" id="buyBtn" type="button">Request to buy</button><a class="btn" id="enq" href="#">Email Pam</a><button class="btn" id="arBtn" type="button" hidden>View on your wall</button><button class="btn" id="close">Close</button></div>
    <div class="pager"><button id="dprev">&#8249; Previous</button><span id="dcount"></span><button id="dnext">Next &#8250;</button></div>
@@ -419,7 +500,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
  <div class="btns"><button class="btn" id="acClose" type="button">Close</button></div>
 </div></dialog>
 <dialog id="buy" aria-labelledby="buyH"><div class="txt">
- <p class="kick">Request to buy</p><h2 id="buyH"></h2>
+ <p class="kick" id="buyKick">Request to buy</p><h2 id="buyH"></h2>
  <form class="fm" id="fBuy" novalidate>
   <p class="note" id="buyWho"></p>
   <div id="buyGuest"><label>Your name<input name="name" autocomplete="name" maxlength="80"></label><label>Email<input type="email" name="email" autocomplete="email"></label></div>
@@ -446,7 +527,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap"><div><p class="kick">Owner</p><h2 id="dH">Gallery dashboard</h2></div><div class="btns" style="margin-top:0"><button class="btn" type="button" id="dRefresh">Refresh</button><button class="btn" type="button" id="dClose">Close</button></div></div>
  <div class="stats" id="dStats"></div>
  <div class="chart" id="dChart" aria-label="Visits over the last 14 days"></div>
- <div class="tabs dtabs" role="tablist"><button type="button" role="tab" data-t="o" aria-selected="true">Orders</button><button type="button" role="tab" data-t="m" aria-selected="false">Messages</button><button type="button" role="tab" data-t="p" aria-selected="false">Members</button></div>
+ <div class="tabs dtabs" role="tablist"><button type="button" role="tab" data-t="o" aria-selected="true">Orders</button><button type="button" role="tab" data-t="m" aria-selected="false">Messages</button><button type="button" role="tab" data-t="a" aria-selected="false">Paintings</button><button type="button" role="tab" data-t="g" aria-selected="false">Favourites &amp; collections</button><button type="button" role="tab" data-t="r" aria-selected="false">Prints</button><button type="button" role="tab" data-t="v" aria-selected="false">Visitors</button><button type="button" role="tab" data-t="p" aria-selected="false">Members</button></div>
  <div id="dBody"></div>
  <p class="err" id="dErr" role="alert"></p>
 </div></dialog>
@@ -540,6 +621,24 @@ function paintCanvas(p,MAX){
 function solidCanvas(col){var c=cnv(4,4),x=c.getContext('2d');x.fillStyle=col;x.fillRect(0,0,4,4);return c}
 var PAINT={};function paintFor(k){return PAINT[k]||(PAINT[k]=paintCanvas(ART[k],Math.min(innerWidth,innerHeight)<700?1024:1536))}
 var THUMB={};function thumb(k){if(THUMB[k])return THUMB[k];var p=ART[k];THUMB[k]=p.img||paintFor(k).toDataURL('image/jpeg',.88);return THUMB[k]}
+/* ---------- the live catalogue: paintings, this month's favourites, collections and prints, all edited from Pam's dashboard ---------- */
+var EMB={},FAVS=[],PRINTS=[];
+ART.forEach(function(p,i){p.id='p'+(i+1);p.emb=p.id;p.ar=true;p.mode='request';p.price='';p.p='Request to buy';EMB[p.id]={img:p.img}});
+FAVS=ART.map(function(p,i){return i});
+function priceOf(a){return a.mode==='price'&&a.p?a.p:'Request to buy'}
+function embImg(v){return /^emb:/.test(v||'')&&EMB[v.slice(4)]?EMB[v.slice(4)].img:v}
+function applyCat(c){if(!c||!Array.isArray(c.arts)||!c.arts.length)return false;
+ var list=c.arts.map(function(a){var e=/^emb:/.test(a.img),im=embImg(a.img);if(!im||/^emb:/.test(im))return null;
+  return{id:a.id,t:a.t,m:a.m||'',s:a.s||'Size on request',year:a.year||'',d:a.d||'',p:priceOf(a),price:a.p||'',mode:a.mode,status:a.status||'Available',w:a.w||.5,h:a.h||.7,bg:a.bg||'#cfc6d6',img:im,emb:e?a.img.slice(4):'',ar:e}}).filter(Boolean);
+ if(!list.length)return false;ART.length=0;list.forEach(function(a){ART.push(a)});THUMB={};
+ var ix={};ART.forEach(function(a,i){ix[a.id]=i});function map(L){return(L||[]).map(function(x){return ix[x]}).filter(function(i){return i!=null})}
+ FAVS=map(c.favs).slice(0,6);
+ COLLECTIONS.length=0;(c.colls||[]).forEach(function(k){COLLECTIONS.push({t:k.t,d:k.d||'',works:map(k.works),soon:k.soon==null?3:k.soon})});
+ PRINTS=(c.prints||[]).filter(function(q){return q.on!==false&&(q.img||ix[q.art]!=null)&&(q.sizes||[]).length}).map(function(q){var a=ix[q.art];
+  return{id:q.id,t:q.t||(a!=null?ART[a].t:'Print'),d:q.d||'',art:a==null?-1:a,img:q.img?embImg(q.img):ART[a].img,sizes:q.sizes}});
+ gridBuilt=false;prBuilt=false;return true}
+var CATP=new Promise(function(res){var done=false,t=setTimeout(function(){done=true;res()},2500);
+ fetch('/api/app?cat=1',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){if(done)return;clearTimeout(t);try{if(j&&j.cat)applyCat(j.cat)}catch(e){console.error(e)}res()}).catch(function(){if(!done){clearTimeout(t);res()}})});
 function $(id){return document.getElementById(id)}
 function isSold(p){return /sold/i.test(p.status||'')}
 function mailFor(p){var sub='Enquiry: '+p.t,body='Hello '+ARTIST+',\n\nI am interested in “'+p.t+'” ('+p.m+', '+p.s+(isSold(p)?'':', '+p.p)+').\nCould you tell me more about its availability, delivery and payment?\n\nKind regards,\n';
@@ -572,9 +671,9 @@ var MUSIC=(function(){var AC=null,master,bus,choir,playing=false,timer=null,next
    nextT+=dur;ci++}}
  function play(){if(!AC)init();AC.resume();if(!playing){playing=true;if(nextT<AC.currentTime)nextT=AC.currentTime+.1;schedule();timer=setInterval(schedule,300);
   master.gain.cancelScheduledValues(AC.currentTime);master.gain.setValueAtTime(master.gain.value,AC.currentTime);master.gain.linearRampToValueAtTime(.55,AC.currentTime+3)}
-  btn.setAttribute('aria-pressed','true');btn.innerHTML='&#9834; Music on'}
+  btn.setAttribute('aria-pressed','true');btn.innerHTML='&#9834;<span class="mw"> Music on</span>'}
  function pause(){if(!AC||!playing)return;playing=false;clearInterval(timer);var t=AC.currentTime;master.gain.cancelScheduledValues(t);master.gain.setValueAtTime(master.gain.value,t);master.gain.linearRampToValueAtTime(0,t+1.2);
-  setTimeout(function(){if(!playing)AC.suspend()},1400);btn.setAttribute('aria-pressed','false');btn.innerHTML='&#9834; Music'}
+  setTimeout(function(){if(!playing)AC.suspend()},1400);btn.setAttribute('aria-pressed','false');btn.innerHTML='&#9834;<span class="mw"> Music</span>'}
  btn.addEventListener('click',function(e){e.stopPropagation();started=true;playing?pause():play()});
  // browsers only allow sound after the visitor interacts, so start on the first click, tap or key press
  var started=false;function first(e){if(started||btn.contains(e.target))return;started=true;play()}
@@ -593,7 +692,7 @@ function showEnq(f){enqP.style.opacity=f;enqP.style.visibility=f>.02?'visible':'
 var dlg=$('dlg'),curArt=0;
 function openArt(k){k=(k+ART.length)%ART.length;curArt=k;var p=ART[k];
  $('dimg').src=thumb(k);$('dimg').alt=p.t+', '+p.m;$('dt').textContent=p.t;$('dp').textContent=isSold(p)?'Sold':p.p;
- $('dm').textContent=p.m;$('ds').textContent=p.s;$('dy').textContent=p.year||'—';$('da').innerHTML=statusTag(p).replace('class="status','style="margin-left:0" class="status');
+ $('dd').textContent=p.d||'';$('dd').hidden=!p.d;$('dm').textContent=p.m;$('ds').textContent=p.s;$('dy').textContent=p.year||'—';$('da').innerHTML=statusTag(p).replace('class="status','style="margin-left:0" class="status');
  var e=$('enq');e.href=mailFor(p);e.textContent=isSold(p)?'Ask about similar work':'Enquire about this work';
  $('dcount').textContent=(k+1)+' of '+ART.length;if(!dlg.open)dlg.showModal()}
 $('close').addEventListener('click',function(){dlg.close()});
@@ -668,9 +767,9 @@ addEventListener('resize',function(){if(!zv.open||!Z.iw)return;var rel=Z.s/Z.fit
 var TOUCH=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window,IOSAR=(function(){var a=document.createElement('a');return !!(a.relList&&a.relList.supports&&a.relList.supports('ar'))})(),ANDROID=/Android/i.test(navigator.userAgent);
 if(TOUCH)$('arBtn').hidden=false;
 $('arBtn').addEventListener('click',function(){viewOnWall(curArt)});
-function viewOnWall(k){var n=k+1,p=ART[k];
- if(IOSAR){var a=document.createElement('a');a.rel='ar';a.href='/ar/p'+n+'.usdz#allowsContentScaling=0';a.appendChild(document.createElement('img'));document.body.appendChild(a);a.click();setTimeout(function(){a.remove()},1500);return}
- if(ANDROID&&/^https:/.test(location.href)){var file=location.origin+'/ar/p'+n+'.glb',fb=location.origin+'/#wall'+n;
+function viewOnWall(k){var p=ART[k],n=p.emb?+p.emb.slice(1):0;
+ if(n&&IOSAR){var a=document.createElement('a');a.rel='ar';a.href='/ar/p'+n+'.usdz#allowsContentScaling=0';a.appendChild(document.createElement('img'));document.body.appendChild(a);a.click();setTimeout(function(){a.remove()},1500);return}
+ if(n&&ANDROID&&/^https:/.test(location.href)){var file=location.origin+'/ar/p'+n+'.glb',fb=location.origin+'/#wall'+n;
   location.href='intent://arvr.google.com/scene-viewer/1.0?file='+encodeURIComponent(file)+'&mode=ar_preferred&enable_vertical_placement=true&resizable=false&title='+encodeURIComponent(p.t)+'#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;S.browser_fallback_url='+encodeURIComponent(fb)+';end;';return}
  wallCam(k)}
 var wallStream=null,wallEl=$('wall');
@@ -692,7 +791,7 @@ $('wallFile').addEventListener('change',function(){var f=this.files&&this.files[
   if(n.d&&start.d)wallW(start.w*n.d/start.d)});
  function up(e){delete pts[e.pointerId];start=Object.keys(pts).length?info():null}
  art.addEventListener('pointerup',up);art.addEventListener('pointercancel',up)})();
-(function(){var m=/^#wall(\d+)$/.exec(location.hash);if(m){var k=+m[1]-1;if(ART[k])setTimeout(function(){history.replaceState(null,'',location.pathname);wallCam(k)},400)}})();
+CATP.then(function(){var m=/^#wall(\d+)$/.exec(location.hash);if(m){var k=-1;ART.forEach(function(a,i){if(a.emb==='p'+m[1])k=i});if(ART[k])setTimeout(function(){history.replaceState(null,'',location.pathname);wallCam(k)},400)}});
 
 /* ---------- members, rewards, buy requests, messages, visits and the owner dashboard ---------- */
 var API='/api/app',TOK=null,ME=null;
@@ -701,7 +800,7 @@ TOK=ls('pgTok');
 function api(body){var h={'Content-Type':'application/json'};if(TOK)h.Authorization='Bearer '+TOK;
  return fetch(API,{method:'POST',headers:h,body:JSON.stringify(body)}).then(function(r){return r.json().catch(function(){return{error:'Accounts aren’t available here yet.'}}).then(function(j){j=j||{};if(!r.ok&&!j.error)j.error='Something went wrong — please try again.';j._s=r.status;return j})})
  .catch(function(){return{error:'The gallery can’t be reached right now — please email Pam at '+EMAIL+'.'}})}
-(function(){var v=ls('pgVid');if(!v){v=Math.random().toString(36).slice(2)+Date.now().toString(36);ls('pgVid',v)}try{if(sessionStorage.getItem('pgSeen'))return;sessionStorage.setItem('pgSeen','1')}catch(e){}api({a:'visit',vid:v})})();
+(function(){var v=ls('pgVid');if(!v){v=Math.random().toString(36).slice(2)+Date.now().toString(36);ls('pgVid',v)}try{if(sessionStorage.getItem('pgSeen'))return;sessionStorage.setItem('pgSeen','1')}catch(e){}api({a:'visit',vid:v,ref:(function(){try{var h=document.referrer?new URL(document.referrer).hostname:'';return h&&h!==location.hostname?h:''}catch(e){return''}})()})})();
 function el(t,cls,txt){var e=document.createElement(t);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
 function fdate(t){try{return new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})}catch(e){return''}}
 var acct=$('acct'),buyD=$('buy'),msgD=$('msgD'),dashD=$('dash');
@@ -736,15 +835,16 @@ function showAcct(){var out=$('acOut'),inn=$('acIn');
 window.openAcct=showAcct;
 $('navAcct').addEventListener('click',showAcct);$('acClose').addEventListener('click',function(){acct.close()});
 /* request to buy */
-var buyArt=0;
-function openBuy(k){buyArt=k;var p=ART[k];$('buyH').textContent=p.t;var f=$('fBuy');f.reset();formErr(f);f.hidden=false;$('buyDone').hidden=true;
+var buyArt=0,buyPrint=null;
+function openBuy(k,pr){buyArt=k;buyPrint=pr||null;var p=ART[k]||{t:''};$('buyH').textContent=pr?pr.title:p.t;$('buyKick').textContent=pr?'Request a print':'Request to buy';var f=$('fBuy');f.reset();formErr(f);f.hidden=false;$('buyDone').hidden=true;
  $('buyGuest').hidden=!!ME;$('buyWho').textContent=ME?'Requesting as '+ME.name+' ('+ME.email+'). Pam will reply by email to arrange payment and delivery.':'Pam will reply by email to arrange payment and delivery.';
  var r=ME&&ME.rewards,perk='';$('buyCreditL').hidden=!(r&&r.points.credit>0);if(r&&r.points.credit>0)$('buyCreditT').textContent='Use my £'+r.points.credit+' loyalty reward on this painting';
- if(r&&r.welcome.available)perk='Your welcome gift of '+r.welcome.text+' will be applied.';else if(!ME)perk='Members get 5% off their first painting and earn loyalty points — create a free account from the Account button first if you’d like those.';
+ if(pr)perk=ME?'Members earn loyalty points on prints too.':'';else if(r&&r.welcome.available)perk='Your welcome gift of '+r.welcome.text+' will be applied.';else if(!ME)perk='Members get 5% off their first painting and earn loyalty points — create a free account from the Account button first if you’d like those.';
  $('buyPerk').textContent=perk;if(dlg.open)dlg.close();buyD.showModal()}
+function openBuyPrint(pi,si){var P=PRINTS[pi],z=P&&P.sizes[si];if(!P)return;openBuy(P.art,{id:P.id,size:si,title:P.t+(z?' — '+z.l+(z.p?' · '+z.p:''):'')})}
 $('buyBtn').addEventListener('click',function(){openBuy(curArt)});$('buyClose').addEventListener('click',function(){buyD.close()});$('buyDoneX').addEventListener('click',function(){buyD.close()});
 $('fBuy').addEventListener('submit',function(e){e.preventDefault();var f=this,d=new FormData(f);formErr(f);busy(f,true);
- api({a:'order',art:buyArt,name:d.get('name'),email:d.get('email'),phone:d.get('phone'),message:d.get('message'),useCredit:!!d.get('useCredit')}).then(function(j){busy(f,false);if(j.error)return formErr(f,j.error);f.hidden=true;$('buyDone').hidden=false})});
+ api({a:'order',id:buyPrint?undefined:(ART[buyArt]||{}).id,art:buyArt,print:buyPrint?buyPrint.id:undefined,size:buyPrint?buyPrint.size:undefined,name:d.get('name'),email:d.get('email'),phone:d.get('phone'),message:d.get('message'),useCredit:!!d.get('useCredit')}).then(function(j){busy(f,false);if(j.error)return formErr(f,j.error);f.hidden=true;$('buyDone').hidden=false})});
 /* messages */
 function openMsg(){var f=$('fMsg');f.reset();formErr(f);f.hidden=false;$('msgDone').hidden=true;$('msgGuest').hidden=!!ME;if(about.open)about.close();msgD.showModal()}
 $('aboutMsg').addEventListener('click',openMsg);$('msgClose').addEventListener('click',function(){msgD.close()});$('msgDoneX').addEventListener('click',function(){msgD.close()});
@@ -760,7 +860,121 @@ function drawDash(){var j=DASH,v=j.visits,today=v.perDay[v.perDay.length-1],wk=v
  var ch=$('dChart'),mx=Math.max.apply(null,v.perDay.concat([1]));ch.textContent='';v.perDay.forEach(function(n,i){var c=el('div'),b=el('i');b.style.height=Math.round(n/mx*100)+'%';b.title=v.days[i]+': '+n+' visits';c.appendChild(b);if((v.perDay.length-1-i)%(innerWidth<600?4:2)===0)c.appendChild(el('small',null,v.days[i].slice(5)));ch.appendChild(c)});
  drawTab()}
 function tableOf(heads){var w=el('div','tbl'),t=el('table'),th=el('thead'),tr=el('tr');heads.forEach(function(h){tr.appendChild(el('th',null,h))});th.appendChild(tr);t.appendChild(th);var tb=el('tbody');t.appendChild(tb);w.appendChild(t);return{w:w,tb:tb}}
+/* ---------- owner: paintings, favourites, collections and prints ---------- */
+var ED=null,EDdirty=false,EDopen={},EDmsg='',vRange='all';
+function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function seedCat(){return{arts:ART.map(function(a){return{id:a.id,t:a.t,m:a.m||'',s:a.s==='Size on request'?'':(a.s||''),year:a.year||'',d:a.d||'',p:a.price||'',mode:a.mode||'request',status:a.status||'Available',w:a.w,h:a.h,bg:a.bg||'#cfc6d6',img:a.emb?'emb:'+a.emb:a.img,ar:!!a.emb}}),
+ favs:FAVS.map(function(i){return ART[i].id}),colls:COLLECTIONS.map(function(c){return{t:c.t,d:c.d||'',works:c.works.map(function(i){return ART[i].id}),soon:c.soon}}),prints:PRINTS.map(function(q){return{id:q.id,art:q.art>=0?ART[q.art].id:'',t:'',d:q.d,img:'',sizes:q.sizes,on:true}})}}
+function loadED(cb){api({a:'catGet'}).then(function(j){if(j.error){$('dErr').textContent=j.error;return}ED=j.cat||seedCat();['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});cb()})}
+function markDirty(){EDdirty=true;EDmsg='';var b=$('edPub');if(b){b.disabled=false;$('edState').textContent='Unpublished changes'}}
+function artById(id){return ED.arts.filter(function(a){return a.id===id})[0]}
+function field(label,input,cls){var l=el('label','ef'+(cls?' '+cls:''));l.appendChild(el('span',null,label));l.appendChild(input);return l}
+function inp(v,ph,on,type){var i=el(type==='area'?'textarea':'input');if(type&&type!=='area')i.type=type;i.value=v==null?'':v;if(ph)i.placeholder=ph;i.addEventListener('input',function(){on(i.value);markDirty()});return i}
+function sbtn(t,cb,cls,aria){var b=el('button',cls||'sb',t);b.type='button';if(aria)b.setAttribute('aria-label',aria);b.addEventListener('click',cb);return b}
+function moveIn(arr,i,d){var j=i+d;if(j<0||j>=arr.length)return;var x=arr[i];arr[i]=arr[j];arr[j]=x;markDirty();drawTab()}
+function radio(name,on,label,cb){var l=el('label'),r=el('input');r.type='radio';r.name=name;r.checked=on;r.addEventListener('change',function(){if(r.checked)cb()});l.appendChild(r);l.appendChild(document.createTextNode(label));return l}
+function pubBar(body){var bar=el('div','edbar'),st=el('span','edst');st.id='edState';st.textContent=EDdirty?'Unpublished changes':'Everything is published';
+ var dis=sbtn('Discard changes',function(){EDdirty=false;EDmsg='';ED=null;drawTab()});dis.disabled=!EDdirty;
+ var pub=el('button','btn main','Publish changes');pub.id='edPub';pub.type='button';pub.disabled=!EDdirty;pub.addEventListener('click',publish);
+ bar.appendChild(st);bar.appendChild(dis);bar.appendChild(pub);body.appendChild(bar);
+ if(EDmsg){var m=el('p','edmsg');m.appendChild(document.createTextNode(EDmsg+' '));var rl=sbtn('Reload the gallery now',function(){location.reload()},'link');m.appendChild(rl);body.appendChild(m)}}
+function publish(){var b=$('edPub');b.disabled=true;$('edState').textContent='Publishing…';$('dErr').textContent='';
+ api({a:'catSave',cat:ED}).then(function(j){if(j.error){$('dErr').textContent=j.error;b.disabled=false;$('edState').textContent='Not published yet';return}
+  ED=j.cat;EDdirty=false;EDmsg='Published — visitors will see your changes from their next visit.';drawTab()})}
+function prepPhoto(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();
+ im.onload=function(){var W0=im.naturalWidth,H0=im.naturalHeight,k=Math.min(1,2400/Math.max(W0,H0)),W=Math.round(W0*k),H=Math.round(H0*k),c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').drawImage(im,0,0,W,H);URL.revokeObjectURL(u);
+  var q=.9,d=c.toDataURL('image/jpeg',q);while(d.length>3.3e6&&q>.5){q-=.08;d=c.toDataURL('image/jpeg',q)}res({data:d,W:W,H:H})};
+ im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('That photo couldn’t be opened here — please try a JPEG or PNG.'))};im.src=u})}
+function addPhoto(file,cb){$('dErr').textContent='';var st=$('edState');if(st)st.textContent='Uploading the photo…';
+ prepPhoto(file).then(function(r){return api({a:'imgUpload',data:r.data,type:'image/jpeg'}).then(function(j){if(j.error)throw new Error(j.error);var L=.7,w=r.W>=r.H?L:L*r.W/r.H,h=r.W>=r.H?L*r.H/r.W:L;cb(j.url,+w.toFixed(3),+h.toFixed(3))})})
+  .catch(function(e){$('dErr').textContent=e.message||'The upload didn’t work — please try again.';if(st)st.textContent=EDdirty?'Unpublished changes':'Everything is published'})}
+function rotatePhoto(src,cb){$('dErr').textContent='';var st=$('edState');if(st)st.textContent='Turning the photo…';var im=new Image();
+ im.onload=function(){var W=im.naturalHeight,H=im.naturalWidth,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');x.translate(W,0);x.rotate(Math.PI/2);x.drawImage(im,0,0);
+  var q=.92,d=c.toDataURL('image/jpeg',q);while(d.length>3.3e6&&q>.5){q-=.08;d=c.toDataURL('image/jpeg',q)}
+  api({a:'imgUpload',data:d,type:'image/jpeg'}).then(function(j){if(j.error){$('dErr').textContent=j.error;return}var L=.7;cb(j.url,+(W>=H?L:L*W/H).toFixed(3),+(W>=H?L*H/W:L).toFixed(3))})};
+ im.onerror=function(){$('dErr').textContent='That photo couldn’t be turned — please try again.'};im.src=src}
+function photoPicker(label,cb,cls){var up=el('label',cls||'btn edup');up.appendChild(document.createTextNode(label));var fi=el('input');fi.type='file';fi.accept='image/*';fi.hidden=true;up.appendChild(fi);
+ fi.addEventListener('change',function(){var f=fi.files[0];fi.value='';if(f)addPhoto(f,cb)});return up}
+function drawArts(body){pubBar(body);var head=el('div','edhead');head.appendChild(el('h3',null,'Paintings ('+ED.arts.length+')'));
+ head.appendChild(photoPicker('Add a painting',function(url,w,h){var a={id:newId(),t:'',m:'Oil on board',s:'',year:String(new Date().getFullYear()),d:'',p:'',mode:'request',status:'Available',w:w,h:h,bg:'#cfc6d6',img:url,ar:false};ED.arts.unshift(a);EDopen={};EDopen[a.id]=1;markDirty();drawTab()},'btn main edup'));
+ body.appendChild(head);
+ body.appendChild(el('p','edhint','Add a photo of a new painting, then fill in its details. To show it in the gallery, add it to This Month’s Favourites or to a collection on the next tab. Remember to press “Publish changes” when you’re happy.'));
+ var list=el('div','edlist');ED.arts.forEach(function(a,i){list.appendChild(artRow(a,i))});body.appendChild(list)}
+function artRow(a,i){var row=el('div','edrow'+(EDopen[a.id]?' open':'')),top=el('div','edtop'),th=el('img','edth');th.src=embImg(a.img);th.alt='';top.appendChild(th);
+ var info=el('div','edinfo');info.appendChild(el('b',null,a.t||'Untitled — add a title'));info.appendChild(el('span',null,a.status+' · '+(a.mode==='price'&&a.p?a.p:'Request to buy')));top.appendChild(info);
+ var acts=el('div','edacts');acts.appendChild(sbtn(EDopen[a.id]?'Done':'Edit',function(){EDopen[a.id]=!EDopen[a.id];drawTab()}));
+ acts.appendChild(sbtn('↑',function(){moveIn(ED.arts,i,-1)},'sb ic','Move up'));acts.appendChild(sbtn('↓',function(){moveIn(ED.arts,i,1)},'sb ic','Move down'));
+ var cf=el('div','edconfirm');cf.hidden=true;acts.appendChild(sbtn('Remove',function(){cf.hidden=false},'sb warn'));top.appendChild(acts);row.appendChild(top);
+ cf.appendChild(el('span',null,'Remove “'+(a.t||'Untitled')+'”? It will also come out of the favourites, collections and prints.'));
+ cf.appendChild(sbtn('Remove it',function(){ED.arts.splice(i,1);ED.favs=ED.favs.filter(function(x){return x!==a.id});ED.colls.forEach(function(c){c.works=c.works.filter(function(x){return x!==a.id})});ED.prints=ED.prints.filter(function(q){return q.art!==a.id||q.img});markDirty();drawTab()},'sb warn'));
+ cf.appendChild(sbtn('Keep it',function(){cf.hidden=true}));row.appendChild(cf);
+ if(!EDopen[a.id])return row;
+ var f=el('div','edform'),ph=el('div','edphoto'),pim=el('img');pim.src=embImg(a.img);pim.alt='';ph.appendChild(pim);
+ ph.appendChild(photoPicker('Replace the photo',function(url,w,h){a.img=url;a.w=w;a.h=h;a.ar=false;markDirty();drawTab()},'sb edup'));
+ ph.appendChild(sbtn('Turn the photo ↻',function(){rotatePhoto(embImg(a.img),function(url,w,h){a.img=url;a.w=w;a.h=h;a.ar=false;markDirty();drawTab()})}));
+ ph.appendChild(el('span','edhint','Tip: crop the photo to just the painting on your phone before adding it.'));f.appendChild(ph);
+ f.appendChild(field('Title',inp(a.t,'e.g. Orchid in the Clouds',function(v){a.t=v})));
+ f.appendChild(field('Medium',inp(a.m,'e.g. Oil on canvas',function(v){a.m=v})));
+ f.appendChild(field('Size',inp(a.s,'e.g. 60 × 80 cm',function(v){a.s=v})));
+ f.appendChild(field('Year',inp(a.year,'e.g. 2025',function(v){a.year=v})));
+ var st=el('select');['Available','On hold','Sold'].forEach(function(o){var op=el('option',null,o);op.value=o;if(a.status===o)op.selected=true;st.appendChild(op)});st.addEventListener('change',function(){a.status=st.value;markDirty()});f.appendChild(field('Availability',st));
+ var pr=el('div','ef efp');pr.appendChild(el('span',null,'Price'));var rad=el('div','rad'),pi=el('input');pi.type='text';pi.value=a.p||'';pi.placeholder='e.g. £450';pi.setAttribute('aria-label','Price');pi.classList.toggle('dim',a.mode!=='price');
+ pi.addEventListener('input',function(){a.p=pi.value;if(a.mode!=='price'){a.mode='price';r2.querySelector('input').checked=true;pi.classList.remove('dim')}markDirty()});
+ rad.appendChild(radio('pm'+a.id,a.mode!=='price',' “Request to buy” — no price shown',function(){a.mode='request';pi.classList.add('dim');markDirty()}));
+ var r2=radio('pm'+a.id,a.mode==='price',' Show a price:',function(){a.mode='price';pi.classList.remove('dim');pi.focus();markDirty()});r2.appendChild(pi);rad.appendChild(r2);pr.appendChild(rad);f.appendChild(pr);
+ f.appendChild(field('About this painting (optional)',inp(a.d,'A sentence or two visitors will read in the painting’s details…',function(v){a.d=v},'area'),'wide'));
+ row.appendChild(f);return row}
+function pickRow(a,btns){var li=el('li','pk'),im=el('img');im.src=embImg(a.img);im.alt='';li.appendChild(im);li.appendChild(el('span',null,a.t||'Untitled'));var d=el('div','edacts');btns.forEach(function(b){d.appendChild(b)});li.appendChild(d);return li}
+function addPicker(opts,cb,ph){var w=el('div','edadd'),sl=el('select');sl.setAttribute('aria-label',ph);var o0=el('option',null,ph);o0.value='';sl.appendChild(o0);opts.forEach(function(a){var o=el('option',null,a.t||'Untitled');o.value=a.id;sl.appendChild(o)});sl.disabled=!opts.length;sl.addEventListener('change',function(){if(sl.value)cb(sl.value)});w.appendChild(sl);return w}
+function drawGallery(body){pubBar(body);
+ var s1=el('section','edsec');s1.appendChild(el('h3',null,'This Month’s Favourites'));s1.appendChild(el('p','edhint','Up to six paintings, in the order visitors meet them when they turn right at the entrance.'));
+ var fl=el('ol','edpick');ED.favs.forEach(function(id,i){var a=artById(id);if(!a)return;fl.appendChild(pickRow(a,[sbtn('↑',function(){moveIn(ED.favs,i,-1)},'sb ic','Move up'),sbtn('↓',function(){moveIn(ED.favs,i,1)},'sb ic','Move down'),sbtn('Take off',function(){ED.favs.splice(i,1);markDirty();drawTab()},'sb warn')]))});s1.appendChild(fl);
+ if(ED.favs.length<6)s1.appendChild(addPicker(ED.arts.filter(function(a){return ED.favs.indexOf(a.id)<0}),function(id){ED.favs.push(id);markDirty();drawTab()},'Add a painting to the favourites…'));
+ else s1.appendChild(el('p','edhint','That’s six — take one off to add another.'));
+ body.appendChild(s1);
+ var s2=el('section','edsec');s2.appendChild(el('h3',null,'Collections'));s2.appendChild(el('p','edhint','The first three hang in the 3D Collections hall, a wall each (up to four paintings show on a wall); every collection appears on the Collections page.'));
+ ED.colls.forEach(function(c,ci){var card=el('div','edcoll'),hd=el('div','edtop');hd.appendChild(el('b',null,'Collection '+roman(ci)+(ci>2?' · Collections page only':'')));
+  var acts=el('div','edacts');acts.appendChild(sbtn('↑',function(){moveIn(ED.colls,ci,-1)},'sb ic','Move up'));acts.appendChild(sbtn('↓',function(){moveIn(ED.colls,ci,1)},'sb ic','Move down'));acts.appendChild(sbtn('Remove',function(){ED.colls.splice(ci,1);markDirty();drawTab()},'sb warn'));hd.appendChild(acts);card.appendChild(hd);
+  var f=el('div','edform');f.appendChild(field('Name',inp(c.t,'e.g. The Dreaming Garden',function(v){c.t=v})));
+  var so=inp(String(c.soon==null?3:c.soon),'',function(v){c.soon=Math.max(0,Math.min(6,parseInt(v,10)||0))},'number');so.min='0';so.max='6';f.appendChild(field('“Coming soon” frames',so));
+  f.appendChild(field('Description',inp(c.d,'One or two sentences about this collection',function(v){c.d=v},'area'),'wide'));card.appendChild(f);
+  card.appendChild(el('span','edlab','Paintings in this collection'));var wl=el('ol','edpick');
+  c.works.forEach(function(id,i){var a=artById(id);if(!a)return;wl.appendChild(pickRow(a,[sbtn('↑',function(){moveIn(c.works,i,-1)},'sb ic','Move up'),sbtn('↓',function(){moveIn(c.works,i,1)},'sb ic','Move down'),sbtn('Take out',function(){c.works.splice(i,1);markDirty();drawTab()},'sb warn')]))});card.appendChild(wl);
+  card.appendChild(addPicker(ED.arts.filter(function(a){return c.works.indexOf(a.id)<0}),function(id){c.works.push(id);markDirty();drawTab()},'Add a painting to this collection…'));s2.appendChild(card)});
+ if(ED.colls.length<8)s2.appendChild(sbtn('Add a collection',function(){ED.colls.push({t:'New collection',d:'',works:[],soon:3});markDirty();drawTab()},'btn'));
+ body.appendChild(s2)}
+var SIZES0=[{l:'A4 · 21 × 29.7 cm',p:''},{l:'A3 · 29.7 × 42 cm',p:''},{l:'A2 · 42 × 59.4 cm',p:''}];
+function drawPrintsEd(body){pubBar(body);var head=el('div','edhead');head.appendChild(el('h3',null,'Prints ('+ED.prints.length+')'));
+ head.appendChild(sbtn('Add a print',function(){var a=ED.arts[0];ED.prints.unshift({id:newId(),art:a?a.id:'',t:'',d:'',img:'',sizes:JSON.parse(JSON.stringify(SIZES0)),on:true});markDirty();drawTab()},'btn main'));body.appendChild(head);
+ body.appendChild(el('p','edhint','Each print is made from one of your paintings. Give every size its own price — visitors pick a size on the Prints page and send you a request. A print shows once it has at least one size.'));
+ if(!ED.prints.length)body.appendChild(el('p','empty','No prints yet — press “Add a print” to start.'));
+ ED.prints.forEach(function(P,pi){var card=el('div','edcoll'),hd=el('div','edtop'),src=artById(P.art)||{},th=el('img','edth');th.src=embImg(P.img||src.img||'');th.alt='';hd.appendChild(th);hd.appendChild(el('b',null,P.t||src.t||'Print'));
+  var acts=el('div','edacts');acts.appendChild(sbtn('↑',function(){moveIn(ED.prints,pi,-1)},'sb ic','Move up'));acts.appendChild(sbtn('↓',function(){moveIn(ED.prints,pi,1)},'sb ic','Move down'));acts.appendChild(sbtn('Remove',function(){ED.prints.splice(pi,1);markDirty();drawTab()},'sb warn'));hd.appendChild(acts);card.appendChild(hd);
+  var f=el('div','edform'),sel=el('select');ED.arts.forEach(function(a){var o=el('option',null,a.t||'Untitled');o.value=a.id;if(a.id===P.art)o.selected=true;sel.appendChild(o)});sel.addEventListener('change',function(){P.art=sel.value;markDirty();drawTab()});
+  f.appendChild(field('From the painting',sel));f.appendChild(field('Title (optional)',inp(P.t,'Leave blank to use the painting’s title',function(v){P.t=v})));
+  var on=el('input');on.type='checkbox';on.checked=P.on!==false;on.addEventListener('change',function(){P.on=on.checked;markDirty()});var onl=el('label','efc');onl.appendChild(on);onl.appendChild(document.createTextNode('Show on the Prints page'));f.appendChild(onl);
+  f.appendChild(field('Description (optional)',inp(P.d,'e.g. Giclée print on 310gsm cotton rag, signed by Pam',function(v){P.d=v},'area'),'wide'));card.appendChild(f);
+  card.appendChild(el('span','edlab','Sizes and prices'));var tb=el('div','edsizes');
+  (P.sizes||[]).forEach(function(z,zi){var r=el('div','edsz'),li=inp(z.l,'Size, e.g. A3 · 29.7 × 42 cm',function(v){z.l=v}),lp=inp(z.p,'Price, e.g. £65',function(v){z.p=v});li.setAttribute('aria-label','Size');lp.setAttribute('aria-label','Price');r.appendChild(li);r.appendChild(lp);r.appendChild(sbtn('✕',function(){P.sizes.splice(zi,1);markDirty();drawTab()},'sb ic','Remove this size'));tb.appendChild(r)});
+  card.appendChild(tb);card.appendChild(sbtn('Add a size',function(){P.sizes=P.sizes||[];P.sizes.push({l:'',p:''});markDirty();drawTab()}));body.appendChild(card)})}
+var RN=null;try{RN=new Intl.DisplayNames(['en'],{type:'region'})}catch(e){}
+function flagOf(cc){if(!/^[A-Z]{2}$/.test(cc)||cc==='XX')return'🌐';return String.fromCodePoint(127397+cc.charCodeAt(0),127397+cc.charCodeAt(1))}
+function cname(cc){if(cc==='XX')return'Unknown';try{return RN?RN.of(cc):cc}catch(e){return cc}}
+function bars(list,fmt){var w=el('div','vbars'),mx=Math.max.apply(null,list.map(function(x){return x[1]}).concat([1]));
+ list.forEach(function(x){var r=el('div','vb');r.appendChild(el('span','vl',fmt(x[0])));var tr=el('span','vt'),f=el('i');f.style.width=Math.max(2,x[1]/mx*100)+'%';tr.appendChild(f);r.appendChild(tr);r.appendChild(el('b',null,String(x[1])));w.appendChild(r)});return w}
+function drawVisitors(body){var g=DASH&&DASH.where;if(!g){body.appendChild(el('p','empty','Visitor locations will appear here soon.'));return}
+ var grid=el('div','vgrid'),c1=el('section','vcard'),hd=el('div','edtop');hd.appendChild(el('h3',null,'Countries'));var seg=el('div','seg');
+ [['all','All time'],['week','Last 7 days']].forEach(function(o){var b=sbtn(o[1],function(){vRange=o[0];drawTab()});b.setAttribute('aria-pressed',String(vRange===o[0]));seg.appendChild(b)});hd.appendChild(seg);c1.appendChild(hd);
+ var L=(vRange==='all'?g.countries:g.week).slice(0,25);c1.appendChild(L.length?bars(L,function(cc){return flagOf(cc)+'  '+cname(cc)}):el('p','empty','No visits counted yet.'));grid.appendChild(c1);
+ var c2=el('section','vcard');c2.appendChild(el('h3',null,'Towns & cities'));
+ c2.appendChild(g.cities.length?bars(g.cities.slice(0,25).map(function(c){return[c,c.n]}),function(c){return flagOf(c.cc)+'  '+c.city+(c.region&&!/^\d+$/.test(c.region)&&c.region.length>2?', '+c.region:'')}):el('p','empty','No visits counted yet.'));grid.appendChild(c2);
+ var c3=el('section','vcard');c3.appendChild(el('h3',null,'Devices'));c3.appendChild(g.devices.length?bars(g.devices,function(d){return d}):el('p','empty','—'));
+ c3.appendChild(el('h3',null,'How they found you'));c3.appendChild(g.sources.length?bars(g.sources.slice(0,12),function(r){return r==='direct'?'Typed the address, a bookmark or an app':r}):el('p','empty','—'));grid.appendChild(c3);
+ body.appendChild(grid);body.appendChild(el('p','edhint','Locations are approximate — the town or city of each visitor’s internet connection. No names, addresses or other personal details are kept. Counting began with this update.'))}
 function drawTab(){var body=$('dBody'),j=DASH;body.textContent='';
+ if(dTab==='a'||dTab==='g'||dTab==='r'){if(!ED){body.appendChild(el('p','empty','Loading…'));loadED(drawTab);return}({a:drawArts,g:drawGallery,r:drawPrintsEd})[dTab](body);return}
+ if(dTab==='v'){drawVisitors(body);return}
+ if(!j)return;
  if(dTab==='o'){if(!j.orders.length){body.appendChild(el('p','empty','No orders yet.'));return}
   var T=tableOf(['Date','Painting','Buyer','Message','Perks','Status','Sale']);j.orders.forEach(function(o){var tr=el('tr');tr.appendChild(el('td',null,fdate(o.ts)));tr.appendChild(el('td',null,o.title));
    var bu=el('td');bu.appendChild(el('div',null,o.name+(o.member?' (member)':'')));var a=el('a',null,o.email);a.href='mailto:'+o.email+'?subject='+encodeURIComponent('Your request: '+o.title);bu.appendChild(a);if(o.phone)bu.appendChild(el('div',null,o.phone));tr.appendChild(bu);
@@ -774,7 +988,7 @@ function drawTab(){var body=$('dBody'),j=DASH;body.textContent='';
    tr.appendChild(el('td','msg',m.message));var bt=el('td'),b=el('button',null,m.read?'Mark unread':'Mark read');b.type='button';b.addEventListener('click',function(){api({a:'dashMsg',id:m.id,read:!m.read}).then(function(r){if(!r.error){m.read=!m.read;drawDash()}})});bt.appendChild(b);tr.appendChild(bt);M.tb.appendChild(tr)});body.appendChild(M.w)}
  if(dTab==='p'){if(!j.members.list.length){body.appendChild(el('p','empty','No members yet.'));return}
   var P=tableOf(['Name','Email','Joined','Points','Paintings owned','News']);j.members.list.forEach(function(m){var tr=el('tr');tr.appendChild(el('td',null,m.name));tr.appendChild(el('td',null,m.email));tr.appendChild(el('td',null,fdate(m.joined)));tr.appendChild(el('td',null,String(m.points)));tr.appendChild(el('td',null,m.owned.join(', ')||'—'));tr.appendChild(el('td',null,m.news?'Yes':'—'));P.tb.appendChild(tr)});body.appendChild(P.w)}}
-[].forEach.call(document.querySelectorAll('#dash .dtabs button'),function(b){b.addEventListener('click',function(){dTab=b.getAttribute('data-t');[].forEach.call(document.querySelectorAll('#dash .dtabs button'),function(x){x.setAttribute('aria-selected',x===b)});if(DASH)drawTab()})});
+[].forEach.call(document.querySelectorAll('#dash .dtabs button'),function(b){b.addEventListener('click',function(){dTab=b.getAttribute('data-t');[].forEach.call(document.querySelectorAll('#dash .dtabs button'),function(x){x.setAttribute('aria-selected',x===b)});drawTab()})});
 $('dRefresh').addEventListener('click',loadDash);$('dClose').addEventListener('click',function(){dashD.close()});
 /* ---------- about & contact ---------- */
 var about=$('about');$('aboutText').textContent=ABOUT;$('aboutMail').textContent=EMAIL;$('aboutMail').href='mailto:'+EMAIL;$('aboutEnq').href='mailto:'+EMAIL+'?subject='+encodeURIComponent('Enquiry for '+ARTIST);
@@ -810,17 +1024,32 @@ function buildGrid(){if(gridBuilt)return;gridBuilt=true;var box=$('grid'),idx=$(
   var bt=document.createElement('button');bt.type='button';bt.innerHTML='<img alt="" decoding="async"><span><span class="cn">Collection '+roman(ci)+'</span><span class="ct"></span></span>';
   if(c.works.length)bt.querySelector('img').src=thumb(c.works[0]);bt.querySelector('.ct').textContent=c.t;
   bt.addEventListener('click',function(){var top=col.scrollTop+sec.getBoundingClientRect().top-col.getBoundingClientRect().top-(col.querySelector('.top').offsetHeight||0)-18;col.scrollTo({top:top,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'})});idx.appendChild(bt)})}
-function openCollection(){buildGrid();col.hidden=false;col.scrollTop=0;document.documentElement.style.overflow='hidden';$('colClose').focus()}
+/* ---------- prints: each in a choice of sizes, each size with its own price ---------- */
+var prs=$('prints'),prBuilt=false;
+function buildPrints(){if(prBuilt)return;prBuilt=true;var g=$('pgrid');g.textContent='';$('prEmpty').hidden=PRINTS.length>0;
+ PRINTS.forEach(function(P,pi){var c=el('article','pcard'),ph=el('div','ph'),im=el('img');im.alt=P.t+', print';im.decoding='async';im.src=P.img;ph.appendChild(im);c.appendChild(ph);
+  ph.addEventListener('click',function(){var a=P.art;if(a>=0)openZoom(a,im)});
+  c.appendChild(el('h3',null,P.t));if(P.d)c.appendChild(el('p','pd',P.d));
+  var sz=el('div','sizes'),pick=0;sz.setAttribute('role','group');sz.setAttribute('aria-label','Sizes for '+P.t);
+  P.sizes.forEach(function(z,si){var b=el('button');b.type='button';b.appendChild(document.createTextNode(z.l));if(z.p)b.appendChild(el('b',null,z.p));b.setAttribute('aria-pressed',si===0);
+   b.addEventListener('click',function(){pick=si;[].forEach.call(sz.children,function(x,i){x.setAttribute('aria-pressed',i===si)})});sz.appendChild(b)});
+  c.appendChild(sz);var go=el('button','btn main','Request this print');go.type='button';go.addEventListener('click',function(){openBuyPrint(pi,pick)});c.appendChild(go);g.appendChild(c)})}
+function openPrints(){if(!col.hidden)closeCollection();buildPrints();prs.hidden=false;prs.scrollTop=0;document.documentElement.style.overflow='hidden';$('prClose').focus()}
+function closePrints(){prs.hidden=true;document.documentElement.style.overflow=''}
+$('navPr').addEventListener('click',function(){CATP.then(openPrints)});$('prClose').addEventListener('click',closePrints);
+$('prAsk').addEventListener('click',function(e){e.preventDefault();closePrints();if(window.openMsg)window.openMsg()});
+addEventListener('keydown',function(e){if(e.key==='Escape'&&!prs.hidden&&!dlg.open&&!buyD.open&&!zv.open)closePrints()});
+function openCollection(){if(prs&&!prs.hidden)closePrints();buildGrid();col.hidden=false;col.scrollTop=0;document.documentElement.style.overflow='hidden';$('colClose').focus()}
 function openCollectionAt(ci){openCollection();var el=document.getElementById('coll-'+(ci+1));if(el)col.scrollTop=Math.max(0,el.getBoundingClientRect().top-col.getBoundingClientRect().top-(col.querySelector('.top').offsetHeight||0)-18)}
 function closeCollection(){col.hidden=true;document.documentElement.style.overflow=''}
-$('navCol').addEventListener('click',openCollection);$('colClose').addEventListener('click',closeCollection);
+$('navCol').addEventListener('click',function(){CATP.then(openCollection)});$('colClose').addEventListener('click',closeCollection);
 addEventListener('keydown',function(e){if(e.key==='Escape'&&!col.hidden&&!dlg.open&&!about.open)closeCollection()});
 
 /* structured data so search engines understand the works */
-(function(){var ld={"@context":"https://schema.org","@type":"ItemList","name":"Pam’s Gallery — Collections","itemListElement":ART.map(function(p,i){var o={"@type":"VisualArtwork","name":p.t,"artform":"Painting","artMedium":p.m,"creator":{"@type":"Person","name":ARTIST},"size":p.s};
+CATP.then(function(){var ld={"@context":"https://schema.org","@type":"ItemList","name":"Pam’s Gallery — Collections","itemListElement":ART.map(function(p,i){var o={"@type":"VisualArtwork","name":p.t,"artform":"Painting","artMedium":p.m,"creator":{"@type":"Person","name":ARTIST},"size":p.s};
   var amt=(p.p||'').replace(/[^0-9.]/g,'');if(amt&&!isSold(p))o.offers={"@type":"Offer","price":amt,"priceCurrency":/£/.test(p.p)?"GBP":/€/.test(p.p)?"EUR":"USD","availability":"https://schema.org/InStock"};
   return{"@type":"ListItem","position":i+1,"item":o}})};
- var sc=document.createElement('script');sc.type='application/ld+json';sc.textContent=JSON.stringify(ld);document.head.appendChild(sc)})();
+ var sc=document.createElement('script');sc.type='application/ld+json';sc.textContent=JSON.stringify(ld);document.head.appendChild(sc)});
 
 function fallback(){
  ['loading','gl','track','intro','hint','walk','where'].forEach(function(id){var e=$(id);if(e)e.style.display='none'});
@@ -1306,21 +1535,19 @@ function hang(k,o,ry,opt){opt=opt||{};
  var lc=bx(b,[w/2+fw+.46,-.3,.03]);
  LABELS.push(function(){label(plaqueCanvas(p),lc,ax,ay,.6,.3375,n,{go:function(){openArt(k)},tip:tipT},{art:1,blend:0})});
  spotOn(center,v3.add([center[0],RH-.02,center[2]],v3.sc(n,1.6)),Math.max(w,h),30);
- ARTPOS[k]={c:center,n:n,w:w,h:h,ax:ax};
+ ARTPOS.push({c:center,n:n,w:w,h:h,ax:ax,k:k});
  return center}
 function spotOn(target,from,size,power){
  var d=v3.sub(target,from),dist=Math.hypot(d[0],d[1],d[2]),dir=v3.norm(d),outer=Math.atan((size/2+1.0)/dist),inner=outer*.18;
  LIGHTS.spot.push({p:from,d:dir,c:v3.sc([1,.94,.86],power||32),cos:[Math.cos(inner),Math.cos(outer)]});
 
 }
-var ARTPOS=[],CY=1.72,SPOTS=[   // hung clockwise, so walking on to the next painting always turns to the right
- hang(0,[X1-.025,CY,-7.3],-Math.PI/2),
- hang(1,[X1-.025,CY,-2.9],-Math.PI/2),
- hang(2,[2.5,CY,ZB-.025],Math.PI,{sc:1.55}),
- hang(3,[.2,CY,ZB-.025],Math.PI,{sc:1.55}),
- hang(4,[-1.95,CY,ZB-.025],Math.PI,{sc:1.55}),
- hang(5,[X0+.025,CY,-7.3],Math.PI/2)
-];
+var ARTPOS=[],CY=1.72,SPOTS=[];   // hung clockwise, so walking on to the next painting always turns to the right
+(function(){var F=FAVS.slice(0,6),R=[[X1-.025,CY,-7.3],[X1-.025,CY,-2.9]],SB=1.55,back=F.slice(2,5);
+ // the back wall: up to three works, each with its label beside it, spaced evenly between the corner columns
+ var u=back.map(function(k){var w=ART[k].w*SB;return{a:w/2+.155,b:w/2+.86}}),sum=u.reduce(function(t,q){return t+q.a+q.b},0),g=u.length>1?Math.min(.6,Math.max(.1,(6.3-sum)/(u.length-1))):0,x=(sum+g*Math.max(0,u.length-1))/2,bx=[];
+ u.forEach(function(q){var cx=x-q.a;bx.push(cx);x=cx-q.b-g});
+ F.forEach(function(k,slot){SPOTS.push(slot<2?hang(k,R[slot],-Math.PI/2):slot<5?hang(k,[bx[slot-2],CY,ZB-.025],Math.PI,{sc:SB}):hang(k,[X0+.025,CY,-7.3],Math.PI/2))})})();
 
 /* ---------- the collections hall: one wall per collection, its works hung between locked frames still to come ---------- */
 function spaced(x,str,cx,y,sp){var ch=Array.from(str),w=-sp;ch.forEach(function(c){w+=x.measureText(c).width+sp});var px=cx-w/2,al=x.textAlign;x.textAlign='left';ch.forEach(function(c){x.fillText(c,px,y);px+=x.measureText(c).width+sp});x.textAlign=al}
@@ -1354,13 +1581,16 @@ LABELS.push(function(){
  label(carved('THE COLLECTIONS',2048,200,120,30),[X0+.0515,PH+.13,PZC],[0,0,-1],[0,1,0],2.3,.2246,[1,0,0],null,{blend:1});
  label(carved('THIS MONTH’S FAVOURITES',2048,200,96,16),[XW-.0515,PH+.13,PZC],[0,0,1],[0,1,0],2.3,.2246,[-1,0,0],null,{blend:1})});
 var COLPOS=[],SCC=1.4,CYC=1.58,CWALL=[{c:[XL+.025,CYC,-5.0],ry:Math.PI/2},{c:[XM,CYC,ZB-.025],ry:Math.PI},{c:[XW-.025,CYC,-7.15],ry:-Math.PI/2}];
-COLLECTIONS.forEach(function(c,ci){var W=CWALL[ci];if(!W)return;var b=B(W.c,W.ry),gap=.3,LW=.5,LH=.665,LF=.075;
+var AVW=[9.0,8.4,5.5];
+COLLECTIONS.forEach(function(c,ci){var W=CWALL[ci];if(!W)return;var b=B(W.c,W.ry),gap=.3,LW=.5,LH=.665,LF=.075,sc=SCC;
  // small locked frames alternate with the works: soon, work, soon, work, soon
- var works=c.works.filter(function(k){return ART[k]}).slice(0,4),soon=Math.min(c.soon||0,works.length+1),seq=[];
- for(var i=0;i<Math.max(works.length,soon);i++){if(i<soon)seq.push(-1);if(i<works.length)seq.push(works[i])}
- var widths=seq.map(function(k){return k<0?LW+2*LF:ART[k].w*SCC+.31}),tot=widths.reduce(function(a,v){return a+v},0)+gap*(seq.length-1),x=-tot/2,hung=[];
+ var works=c.works.filter(function(k){return ART[k]}).slice(0,4),soon=Math.min(c.soon||0,works.length+1),seq,widths,tot;
+ function lay(){seq=[];for(var i=0;i<Math.max(works.length,soon);i++){if(i<soon)seq.push(-1);if(i<works.length)seq.push(works[i])}
+  widths=seq.map(function(k){return k<0?LW+2*LF:ART[k].w*sc+.31});tot=widths.reduce(function(a,v){return a+v},0)+gap*Math.max(0,seq.length-1)}
+ lay();while(tot>AVW[ci]&&soon>0){soon--;lay()}if(tot>AVW[ci]){sc=SCC*Math.max(.6,(AVW[ci]-gap*(seq.length-1))/(tot-gap*(seq.length-1)));lay()}
+ if(!seq.length)return;var x=-tot/2,hung=[];
  seq.forEach(function(k,j){var cxl=x+widths[j]/2;x+=widths[j]+gap;var o=bx(b,[cxl,0,0]);
-  if(k<0)lockedFrame(o,W.ry,LW,LH,LF,c.t);else hung.push(hang(k,o,W.ry,{sc:SCC,col:1}))});
+  if(k<0)lockedFrame(o,W.ry,LW,LH,LF,c.t);else hung.push(hang(k,o,W.ry,{sc:sc,col:1}))});
  var n=bn(b,[0,0,1]),ax=bn(b,[1,0,0]),center=bx(b,[0,0,0]),tc=bx(b,[0,1.0,.012]);
  COLPOS[ci]={c:center,n:n,ax:ax,w:tot,h:1.95,works:hung};
  LABELS.push(function(){label(wallTitle(ci,c.t),tc,ax,[0,1,0],2.9,.425,n,null,{blend:1})});
@@ -1914,7 +2144,7 @@ function buildK(){var as=innerWidth/Math.max(1,innerHeight),vf=fovFor(as),hf=2*M
  KF.push([0,-5.2,-Math.PI*2,0],[0,-8.6,-Math.PI*2,0],[0,-10.0,-Math.PI*2,0],[0,-10.35,-Math.PI*2,0],[0,-10.35,-Math.PI*2,0]);
  // the collections: turn left, through the portal, then anticlockwise past each wall, stepping up close to every painting
  yaw=0;KC.push([0,-1.6,0,0],[0,-1.6,0,0],[-1.4,PZC,Math.PI/2,0],[-5.7,PZC,Math.PI/2,0]);
- COLPOS.forEach(function(a,ci){var y=Math.atan2(a.n[0],a.n[2]);while(y<yaw-1e-3)y+=Math.PI*2;yaw=y;
+ COLPOS.forEach(function(a,ci){if(!a)return;var y=Math.atan2(a.n[0],a.n[2]);while(y<yaw-1e-3)y+=Math.PI*2;yaw=y;
   var st=standAt({w:a.w,h:a.h-1.35+1.2},wide?1.6:.3,3,ci===1?9.4:8.6),px=a.c[0]+a.n[0]*st,pz=a.c[2]+a.n[2]*st;KC.push([px,pz,y,pp],[px,pz,y,pp]);
   a.works.forEach(function(q){var s2=standAt(q,wide?2.2:1.0,1.9,5.5),qx=q.c[0]+q.n[0]*s2,qz=q.c[2]+q.n[2]*s2;KC.push([qx,qz,y,pp],[qx,qz,y,pp])})});
  KC.push([XM,-8.4,Math.PI*2,0],[XM,-10.0,Math.PI*2,0],[XM,-10.35,Math.PI*2,0],[XM,-10.35,Math.PI*2,0])}
@@ -1950,7 +2180,7 @@ var idleT=0,lastT=0,ema=16,samplesN=0,rendered=false;
 var lastFT=0;
 function frame(time){
  requestAnimationFrame(frame);
- if(!col.hidden)return;                     // the collection page covers the 3D: don't draw
+ if(!col.hidden||!prs.hidden)return;        // a page covers the 3D: don't draw
  NOWS=time/1000;if(!reduce&&!dlg.open&&!zv.open&&!about.open&&time-idleT>(mobile?38:0)){dirty=Math.max(dirty,1);idleT=time}
  var p=progress(),prev=cur;var dts=Math.min(.1,Math.max(.001,(time-lastFT)/1000||.016));lastFT=time;cur+=(p-cur)*(reduce?1:1-Math.exp(-dts*3.8));if(Math.abs(p-cur)<1e-5)cur=p;
  camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());
@@ -1964,8 +2194,8 @@ function frame(time){
  var l=cam.z<ZF+.2?'The Balcony':atDoor()?'Welcome':route==='col'?'The Collections':'This Month’s Favourites';if(l!==lastLab){lastLab=l;lab.textContent=l}
 }
 /* ---------- previous / next: the arrows turn you the way they point; right for the favourites, left for the collections ---------- */
-var SF=[{k:0,label:'Welcome'}];ART.forEach(function(p,i){if(ARTPOS[i])SF.push({k:3+2*i+.5,label:'<i>'+esc(p.t)+'</i> · '+(i+1)+'/'+ART.length,art:i})});SF.push({k:KF.length-1,label:'The Balcony · Enquiries'});
-var SC=[{k:0,label:'Welcome'}];(function(){var k=4;COLPOS.forEach(function(a,ci){var c=COLLECTIONS[ci];SC.push({k:k+.5,label:'Collection '+roman(ci)+' · <i>'+esc(c.t)+'</i>',coll:ci});k+=2;
+var SF=[{k:0,label:'Welcome'}];ARTPOS.forEach(function(a,i){SF.push({k:3+2*i+.5,label:'<i>'+esc(ART[a.k].t)+'</i> · '+(i+1)+'/'+ARTPOS.length,art:a.k})});SF.push({k:KF.length-1,label:'The Balcony · Enquiries'});
+var SC=[{k:0,label:'Welcome'}];(function(){var k=4;COLPOS.forEach(function(a,ci){if(!a)return;var c=COLLECTIONS[ci];SC.push({k:k+.5,label:'Collection '+roman(ci)+' · <i>'+esc(c.t)+'</i>',coll:ci});k+=2;
  a.works.forEach(function(q){SC.push({k:k+.5,label:'<i>'+esc(ART[q.k].t)+'</i> · '+esc(c.t),art:q.k,coll:ci});k+=2})})})();SC.push({k:KC.length-1,label:'The Balcony · Enquiries'});
 var STOPS=SF,pend=null;
 function setRoute(r){if(r===route)return;route=r;K=r==='col'?KC:KF;STOPS=r==='col'?SC:SF;walkKey='';tgtI=null}
@@ -2008,10 +2238,10 @@ addEventListener('wheel',function(){tgtI=null},{passive:true});
 function hereArt(){var a=stopAt();return (a.d<.35||there(a.i,cur*(K.length-1)))&&STOPS[a.i].art!=null&&!document.body.classList.contains('gIntro')?STOPS[a.i].art:null}
 canvas.addEventListener('wheel',function(e){if(!e.ctrlKey)return;e.preventDefault();var k=hereArt();if(k!=null&&e.deltaY<0&&!zv.open)openZoom(k)},{passive:false});
 nowEl.addEventListener('click',function(){var a=stopAt();if(a.d>=.6)return;var S=STOPS[a.i];if(S.art!=null)openArt(S.art);else if(S.coll!=null)openCollectionAt(S.coll)});
-addEventListener('keydown',function(e){if(dlg.open||zv.open||about.open||!col.hidden)return;if(e.key==='ArrowRight'){e.preventDefault();step(1)}else if(e.key==='ArrowLeft'){e.preventDefault();step(-1)}});
+addEventListener('keydown',function(e){if(dlg.open||zv.open||about.open||!col.hidden||!prs.hidden||(buyD&&buyD.open))return;if(e.key==='ArrowRight'){e.preventDefault();step(1)}else if(e.key==='ArrowLeft'){e.preventDefault();step(-1)}});
 /* swipe on phones: swipe right to turn right (this month's favourites), left to turn left (the collections) */
 (function(){var sx=0,sy=0,st=0,on=false;
- addEventListener('touchstart',function(e){if(e.touches.length!==1||dlg.open||about.open||!col.hidden||e.target.closest('#bar,#walk,#ways,#pzoom,#george,#gTab,#wall,dialog,#collection')){on=false;return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();on=true},{passive:true});
+ addEventListener('touchstart',function(e){if(e.touches.length!==1||dlg.open||about.open||!col.hidden||e.target.closest('#bar,#walk,#ways,#pzoom,#george,#gTab,#wall,dialog,#collection,#prints')){on=false;return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();on=true},{passive:true});
  addEventListener('touchend',function(e){if(!on)return;on=false;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
   if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4&&Date.now()-st<900){George.stopTour();step(dx>0?1:-1);updateWalk()}},{passive:true});})();
 /* ---------- George the wood pigeon: a friendly guide who offers tours and tips ---------- */
@@ -2071,8 +2301,8 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  function steps(){var tap=TOUCH?'Tap':'Click',s=[];
   s.push({t:TOUCH?'First, the stroll. Swipe right for this month’s favourites, or left to walk through to Pam’s collections. Like so…':'First, the stroll. These arrows turn you the way they point — right for this month’s favourites, left through the portal to the collections. Or simply scroll. Like so…',
    ring:TOUCH?null:function(){return rectOf($('walk'))},demo:function(){setTimeout(function(){if(introOn&&iStep===1&&stopAt().i===0)goPlan({r:'fav',i:1})},1500)}});
-  s.push({t:'Every work here is an original by Pam. '+tap+' a painting to read its story, zoom right in on every brushstroke, and request to buy it.',ring:function(){return route==='fav'?paintRect(SF[1].art):null},demo:function(){if(stopAt().i===0)goPlan({r:'fav',i:1})}});
-  if(TOUCH)s.push({t:'Wondering how it would look at home? Open any painting and choose “View on your wall” — your camera hangs it right on your own wall.',ring:function(){return route==='fav'?paintRect(SF[1].art):null}});
+  s.push({t:'Every work here is an original by Pam. '+tap+' a painting to read its story, zoom right in on every brushstroke, and request to buy it.',ring:function(){return route==='fav'?paintRect(0):null},demo:function(){if(stopAt().i===0)goPlan({r:'fav',i:1})}});
+  if(TOUCH)s.push({t:'Wondering how it would look at home? Open any painting and choose “View on your wall” — your camera hangs it right on your own wall.',ring:function(){return route==='fav'?paintRect(0):null}});
   s.push({t:'Through the portal, each collection has a wall of its own, with new works on the way. “Collections” up here shows them all on one page, “About” tells you all about Pam, and “Music” sets the mood.',ring:function(){return union(['music','navCol','navAbout'])}});
   s.push({t:'And do join our collectors’ circle: 5% off your first painting, points on every purchase, and a special reward for completing a collection.',ring:function(){return rectOf($('navAcct'))}});
   return s}
@@ -2118,7 +2348,7 @@ fontReady.then(function(){
 }
 // let the loading screen paint before building the house
 function whenThree(){return new Promise(function(res){if(window.THREE)return res();addEventListener('three-ready',function(){res()},{once:true});setTimeout(res,20000)})}
-requestAnimationFrame(function(){setTimeout(function(){Promise.all([loadMats(),whenThree()]).then(function(){try{boot3D()}catch(e){console.error(e);fallback()}})},30)});
+requestAnimationFrame(function(){setTimeout(function(){Promise.all([loadMats(),CATP,whenThree()]).then(function(){try{boot3D()}catch(e){console.error(e);fallback()}})},30)});
 </script>
 </body>
 </html>
