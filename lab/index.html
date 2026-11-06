@@ -1329,17 +1329,20 @@ var NOWS=0;
 /* ---------- rendering: three.js scene graph, physically based materials, image-based lighting and custom shaders ---------- */
 var mobile=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 /* quality adapts to the device: starts high, then steps down if frames are slow */
-var Q={dpr:mobile?1.7:2,samples:4,refl:!mobile,bloom:true,dof:!mobile,ao:true,rays:true,level:0,spotSh:!mobile};
+var GPU='';try{var dri=gl.getExtension('WEBGL_debug_renderer_info');GPU=dri?String(gl.getParameter(dri.UNMASKED_RENDERER_WEBGL)):''}catch(e){}
+var LOWGPU=/[?&]q=high/.test(location.search)?false:/[?&]q=low/.test(location.search)||/Intel|Mali-(T\d+|G[1-6]\d\b)|Adreno[^\d]*[3-5]\d\d|PowerVR|SwiftShader|llvmpipe|Software/i.test(GPU)&&!/Iris\(R\) Xe|Arc/i.test(GPU);
+var Q=LOWGPU?{dpr:mobile?1.3:1.25,samples:2,refl:false,bloom:true,dof:false,ao:true,rays:true,level:2,spotSh:false}:{dpr:mobile?1.7:2,samples:4,refl:!mobile,bloom:true,dof:!mobile,ao:true,rays:true,level:0,spotSh:!mobile};
+var T3T={boot:performance.now()};
 function degrade(){Q.level++;
  if(Q.level===1){Q.refl=false}
  else if(Q.level===2){Q.dpr=Math.max(1,Q.dpr*.8)}
  else if(Q.level===3){Q.samples=Math.min(Q.samples,2);Q.dof=false}
  else if(Q.level===4){Q.ao=false}
  else if(Q.level===5){Q.bloom=false;Q.rays=false}
- else if(Q.level<=7){Q.dpr=Math.max(.75,Q.dpr*.82)}
- else return false;
+ else if(Q.level<=9){Q.dpr=Math.max(.6,Q.dpr*.82)}
+ else{Q.level=9;return false}
  resize();return true}
-var SHS=mobile?2048:4096,RT={w:2,h:2},dirty=2;
+var SHS=mobile||LOWGPU?2048:4096,RT={w:2,h:2},dirty=2;
 
 /* ---------- lighting: low evening sun through the opening ---------- */
 var SUN=v3.norm([-.6,.26,-.76]),SUNCOL=[4.4,3.6,2.7],SKY=lin('#eef0f2').map(function(v){return v*.44}),GROUND=lin('#8a6a52').map(function(v){return v*.2}),FAR=60,SKYSUN=v3.norm([-.6,.06,-.76]);
@@ -1465,14 +1468,14 @@ function buildLights(){
  var h=HEMI=new THREE.HemisphereLight(0xffffff,0xffffff,1);h.color.setRGB(SKY[0]*Math.PI,SKY[1]*Math.PI,SKY[2]*Math.PI,LINEAR);h.groundColor.setRGB(GROUND[0]*Math.PI,GROUND[1]*Math.PI,GROUND[2]*Math.PI,LINEAR);S3.add(h)}
 
 /* ---------- image-based lighting: the room itself, captured into a cube map and prefiltered ---------- */
-function initEnv(){PM=new THREE.PMREMGenerator(R3);var res=mobile?128:256,W=res*4,H=res*2,d=new Uint8Array(W*H*4);
+function initEnv(){PM=new THREE.PMREMGenerator(R3);var res=mobile||LOWGPU?128:256,W=res*4,H=res*2,d=new Uint8Array(W*H*4);
  for(var i=0;i<W*H;i++){var y=Math.floor(i/W)/H;d[i*4]=y<.5?120:70;d[i*4+1]=y<.5?110:58;d[i*4+2]=y<.5?100:48;d[i*4+3]=255}
  var t=new THREE.DataTexture(d,W,H);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;t.needsUpdate=true;ENVPH=PM.fromEquirectangular(t).texture;t.dispose();
  cubeRT=new THREE.WebGLCubeRenderTarget(res,{type:THREE.HalfFloatType});cubeCam=new THREE.CubeCamera(.05,200,cubeRT)}
 function syncBlend(){if(SKYTEXT.m)SKYTEXT.m.alpha=0;BLENDL.forEach(function(q){q[1].material.opacity=q[0].alpha;q[1].visible=q[0].alpha>.002})}
 function captureEnv(){var pp=G3.uPass.value;hideDyn();syncBlend();G3.uPass.value=2;
  [[[0,1.55,-4.6],ENVINM,'in'],[[0,1.45,-11.6],ENVOUTM,'out']].forEach(function(q){
-  for(var b=0;b<(mobile?1:2);b++){cubeCam.position.set(q[0][0],q[0][1],q[0][2]);cubeCam.updateMatrixWorld(true);cubeCam.update(R3,S3);
+  for(var b=0;b<(mobile||LOWGPU?1:2);b++){cubeCam.position.set(q[0][0],q[0][1],q[0][2]);cubeCam.updateMatrixWorld(true);cubeCam.update(R3,S3);
    var rt=PM.fromCubemap(cubeRT.texture);q[1].forEach(function(M){M.envMap=rt.texture});if(ENVRT[q[2]])ENVRT[q[2]].dispose();ENVRT[q[2]]=rt}});
  G3.uPass.value=pp;dirty=2}
 
@@ -1480,7 +1483,7 @@ function upload(){
  if(!LIT){LIT=true;upgradeMats();initEnv();buildLights()}
  MATS.forEach(function(m){if(m._3||!m.v||!m.v.length)return;build3(m)});
  WALKM.forEach(function(m){if(m._dyn||!m.v||!m.v.length)return;var M=mat3(m,ENVPH);if(M.isMeshStandardMaterial)ENVOUTM.push(M);m._dyn={g:geoFrom(new Float32Array(m.v)),M:M,pool:[],n:0};DYNL.push(m._dyn);m.v=null})}
-function prep3(cb){var done=false;function go(){if(done)return;done=true;try{captureEnv()}catch(e){console.error(e)}cb()}
+function prep3(cb){var done=false;T3T.built=performance.now();function go(){if(done)return;done=true;T3T.compiled=performance.now();try{captureEnv()}catch(e){console.error(e)}T3T.env=performance.now();cb()}
  camAt(0);var as=innerWidth/Math.max(1,innerHeight);C3.aspect=as;C3.fov=fovFor(as)*180/Math.PI;C3.updateProjectionMatrix();C3.position.set(cam.x,cam.y,cam.z);C3.updateMatrixWorld();
  setTimeout(function(){try{R3.compile(S3,C3)}catch(e){console.error(e)}go()},0)}
 
@@ -1605,7 +1608,7 @@ function render(time){
  cu.uT.value=finalTex;cu.uExp.value=EXPOSURE;cu.uTime.value=(time||0)%100;cu.uBurn.value=burnAmt();cu.uSec.value=((time||0)/1000)%600;cu.uRes.value.set(RT.w,RT.h);cu.uAPx.value.set(1/aoRT.width,1/aoRT.height);cu.uS.value=SCROLLTEX||BLACK;
  pass(COMPM,null)}
 
-window.__t3={RAYM:RAYM,ev:function(c){return eval(c)},Q:Q,R3:R3,S3:S3,G3:G3,ENVINM:ENVINM,ENVOUTM:ENVOUTM,hemi:function(){return HEMI},COMPM:COMPM,BDM:BDM,captureEnv:captureEnv,MATS:MATS,Mx:Mx};
+window.__t3={T:T3T,GPU:GPU,RAYM:RAYM,ev:function(c){return eval(c)},Q:Q,R3:R3,S3:S3,G3:G3,ENVINM:ENVINM,ENVOUTM:ENVOUTM,hemi:function(){return HEMI},COMPM:COMPM,BDM:BDM,captureEnv:captureEnv,MATS:MATS,Mx:Mx};
 
 /* ---------- camera path: stand in the room, turn to each painting, then out to the balcony ---------- */
 var K=[];
