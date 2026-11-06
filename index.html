@@ -65,7 +65,7 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #george{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 24px);z-index:6;width:84px;height:84px;transform:translateY(160%);transition:transform .7s cubic-bezier(.3,1.5,.5,1);-webkit-tap-highlight-color:transparent}
 #george.in{transform:translateY(0)}
 #george.away{transform:translateX(-140%)}
-@media (max-width:700px){#walk,#hint{display:none!important}#george{bottom:calc(env(safe-area-inset-bottom,0px) + 14px);width:70px;height:70px}#gBub{left:76px;bottom:4px;width:calc(100vw - 104px);max-height:46vh;overflow:auto;border-radius:16px 16px 16px 4px}#gTab{bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}}
+@media (max-width:700px){#walk,#hint{display:none!important}#george{bottom:calc(env(safe-area-inset-bottom,0px) + 14px);width:70px;height:70px}#gBub{left:76px;bottom:4px;width:calc(100vw - 104px);max-height:46vh;overflow:auto;border-radius:16px 16px 16px 4px}#gTab{bottom:calc(env(safe-area-inset-bottom,0px) + 16px)}}
 #gBtn{all:unset;display:block;width:100%;height:100%;cursor:pointer;border-radius:50%}
 #gBtn:focus-visible{outline:2px solid #b89a62;outline-offset:4px}
 #gSvg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 10px rgba(20,12,8,.28))}
@@ -89,8 +89,8 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #gBub .opts button,#gBub .opts a{font:inherit;font-size:.8rem;border:1px solid rgba(28,18,12,.22);background:#fff;color:#1c120c;border-radius:99px;padding:.45rem .8rem;min-height:36px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
 #gBub .opts .pri{background:#1c120c;color:#fbf8f2;border-color:#1c120c}
 #gBub .x{position:absolute;top:.35rem;right:.45rem;border:0;background:none;font-size:1.1rem;color:#7a6a5a;cursor:pointer;width:32px;height:32px;border-radius:50%}
-#gTab{position:fixed;left:0;bottom:calc(env(safe-area-inset-bottom,0px) + 140px);z-index:6;border:0;border-radius:0 99px 99px 0;background:rgba(252,250,246,.95);box-shadow:0 6px 18px rgba(20,12,8,.22);padding:.45rem .8rem .45rem .6rem;font:inherit;font-size:.78rem;color:#1c120c;cursor:pointer;display:none}
-#gTab.on{display:block}
+#gTab{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 24px);z-index:6;border:1px solid rgba(184,154,98,.55);border-radius:99px;background:rgba(252,250,246,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 8px 22px rgba(20,12,8,.2);padding:.5rem .95rem .5rem .75rem;min-height:44px;font:inherit;font-size:.8rem;letter-spacing:.04em;color:#1c120c;cursor:pointer;display:none;align-items:center;gap:.5rem;opacity:0;transition:opacity .4s ease}
+#gTab.on{display:inline-flex;opacity:1}
 @media (prefers-reduced-motion:reduce){#gSvg .bob,#gSvg.talk .jaw,#gSvg.hop .bob{animation:none}#george{transition:none}}
 /* ---------- view a painting on your own wall ---------- */
 #wall{position:fixed;inset:0;z-index:20;background:#111;color:#fff;touch-action:none;overflow:hidden}
@@ -187,7 +187,7 @@ dialog p{margin:.2rem 0;line-height:1.5}
  <path d="M92.5 37.2 L105 40.3 C104.6 41.6 103.6 42.3 102 42.4 L93 42.6 Z" fill="#e8a59f"/><path d="M101 40 L105 40.3 C104.6 41.6 103.6 42.3 102 42.4 Z" fill="#c9837d"/><ellipse cx="93.6" cy="38.2" rx="2.7" ry="1.8" fill="#f8f2ec"/>
  <path class="jaw" d="M93 42.6 L103 42.3 C101.5 44.8 98 45.8 94.2 45.6 Z" fill="#d48f8a"/>
 <g class="crown" transform="rotate(-10 80 21)"><path d="M70 22.4 L71.6 11 L76.4 17.2 L80 8.4 L83.6 17.2 L88.4 11 L90 22.4 Z" fill="url(#gG)" stroke="#8f6a22" stroke-width=".8" stroke-linejoin="round"/><rect x="69.4" y="20.2" width="21.2" height="4.4" rx="1.8" fill="url(#gG)" stroke="#8f6a22" stroke-width=".8"/><circle cx="71.6" cy="10.6" r="1.7" fill="#fff4d8" stroke="#c9a24e" stroke-width=".5"/><circle cx="80" cy="7.9" r="1.9" fill="#fff4d8" stroke="#c9a24e" stroke-width=".5"/><circle cx="88.4" cy="10.6" r="1.7" fill="#fff4d8" stroke="#c9a24e" stroke-width=".5"/><circle cx="80" cy="22.4" r="1.6" fill="#b3263a"/><circle cx="74.6" cy="22.4" r="1.05" fill="#2d5fa8"/><circle cx="85.4" cy="22.4" r="1.05" fill="#2d5fa8"/><path d="M71 21.2 L89 21.2" stroke="rgba(255,250,230,.6)" stroke-width=".6"/></g>
-</g></g></svg></button><div id="gBub" role="dialog" aria-label="King George says"><button class="x" id="gX" aria-label="Close">&times;</button><div class="who">King George</div><div id="gTxt"></div><div class="opts" id="gOpts"></div></div></div><button id="gTab" type="button">Ask King George</button><div id="wall" hidden><video id="wallV" playsinline muted autoplay></video><img id="wallBg" alt="" hidden><div id="wallArt"><img id="wallImg" alt=""></div><div id="wallMsg" hidden></div><div class="wtop"><span id="wallHint">Point at your wall · drag to move · pinch to resize</span><button id="wallX" type="button">Done</button></div><div class="wbot"><input type="range" id="wallSize" min="20" max="95" value="55" aria-label="Painting size"><label>Use a photo<input type="file" accept="image/*" id="wallFile" hidden></label></div></div><div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
+</g></g></svg></button><div id="gBub" role="dialog" aria-label="King George says"><button class="x" id="gX" aria-label="Close">&times;</button><div class="who">King George</div><div id="gTxt"></div><div class="opts" id="gOpts"></div></div></div><button id="gTab" type="button" aria-label="Call King George"><svg viewBox="0 0 24 16" width="22" height="15" aria-hidden="true"><path d="M2 14 L3 3 L8 8 L12 1 L16 8 L21 3 L22 14 Z" fill="#c99a3c" stroke="#8f6a22" stroke-width="1" stroke-linejoin="round"/></svg><span>King George</span></button><div id="wall" hidden><video id="wallV" playsinline muted autoplay></video><img id="wallBg" alt="" hidden><div id="wallArt"><img id="wallImg" alt=""></div><div id="wallMsg" hidden></div><div class="wtop"><span id="wallHint">Point at your wall · drag to move · pinch to resize</span><button id="wallX" type="button">Done</button></div><div class="wbot"><input type="range" id="wallSize" min="20" max="95" value="55" aria-label="Painting size"><label>Use a photo<input type="file" accept="image/*" id="wallFile" hidden></label></div></div><div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
 <div id="tip"></div>
 <section id="enqPanel" aria-labelledby="enqTitle" aria-hidden="true">
  <h2 id="enqTitle">Enquiries</h2>
@@ -1271,11 +1271,13 @@ vec3 toSRGB(vec3 c){c=clamp(c,0.,1.);return mix(c*12.92,1.055*pow(c,vec3(1./2.4)
 void main(){vec4 s0=texture(uT,vU);if(s0.a<-.00001){o=vec4(toSRGB(s0.rgb),1.);return;}
  vec2 q=vU-.5;vec2 ca=vec2(0.);vec2 px=1./uRes;
  vec3 c0=s0.rgb,n1=texture(uT,vU+vec2(px.x,0.)).rgb,n2=texture(uT,vU-vec2(px.x,0.)).rgb,n3=texture(uT,vU+vec2(0.,px.y)).rgb,n4=texture(uT,vU-vec2(0.,px.y)).rgb;
- vec3 mn=min(c0,min(min(n1,n2),min(n3,n4))),mx=max(c0,max(max(n1,n2),max(n3,n4)));vec3 c=clamp(c0+(c0-(n1+n2+n3+n4)*.25)*.55,mn,mx)+texture(uB,vU).rgb*.12;   // gentle sharpening without halos
+ vec3 mn=min(c0,min(min(n1,n2),min(n3,n4))),mx=max(c0,max(max(n1,n2),max(n3,n4)));vec3 c=clamp(c0+(c0-(n1+n2+n3+n4)*.25)*.55,mn,mx)+texture(uB,vU).rgb*.15;   // gentle sharpening without halos
  float ao=(texture(uA,vU+uAPx*vec2(.6,.2)).r+texture(uA,vU-uAPx*vec2(.6,.2)).r+texture(uA,vU+uAPx*vec2(-.2,.6)).r+texture(uA,vU-uAPx*vec2(-.2,.6)).r)*.25;
  c*=mix(1.,ao,uAOK);c*=uExp*1.18;c=neutral(c);
  float l=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(l),c,.88);c+=vec3(.010,.0,.018)*(1.-smoothstep(0.,.45,l));
  c*=1.-dot(q,q)*.7;c=pow(c,vec3(1./2.2));c=mix(c,smoothstep(0.,1.,c),.12);
+ float L2=dot(c,vec3(.2126,.7152,.0722));c+=vec3(-.008,.002,.012)*(1.-L2)*(1.-L2)+vec3(.014,.006,-.01)*L2*L2;   // cool shadows, warm highlights
+ c+=(hsh(gl_FragCoord.xy+fract(uTime*7.3)*97.)-.5)*.014;                                       // fine film grain
  if(uBurn<1.){
   vec2 px=vU*uRes;float sw=min(uRes.x*.92,uRes.y*.86*uSA);vec2 sz=vec2(sw,sw/uSA);vec2 lp=(px-uRes*.5)/sz+.5;vec4 pc=vec4(0.);
   if(lp.x>0.&&lp.x<1.&&lp.y>0.&&lp.y<1.)pc=texture(uS,vec2(lp.x,1.-lp.y));
@@ -1462,22 +1464,25 @@ addEventListener('keydown',function(e){if(dlg.open||about.open||!col.hidden)retu
 (function(){var sx=0,sy=0,st=0,on=false;
  addEventListener('touchstart',function(e){if(e.touches.length!==1||dlg.open||about.open||!col.hidden||e.target.closest('#bar,#walk,#george,#gTab,#wall,dialog,#collection')){on=false;return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();on=true},{passive:true});
  addEventListener('touchend',function(e){if(!on)return;on=false;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
-  if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4&&Date.now()-st<900)step(dx<0?1:-1)},{passive:true});})();
+  if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4&&Date.now()-st<900){George.stopTour();step(dx>0?1:-1)}},{passive:true});})();
 
 /* ---------- George the wood pigeon: a friendly guide who offers tours and tips ---------- */
-var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('gTxt'),opts=$('gOpts'),tab=$('gTab'),typing=null,hideT=null,touring=false,tourI=0,tourT=null,seen={},tips=0,started=false;
+var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('gTxt'),opts=$('gOpts'),tab=$('gTab'),typing=null,hideT=null,touring=false,tourI=0,tourT=null,seen={},started=false,present=false,leaveT=null,muted=false;
  function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
  function act(c,ms){svg.classList.add(c);setTimeout(function(){svg.classList.remove(c)},ms)}
  (function blink(){setTimeout(function(){act('blink',140);blink()},2200+Math.random()*3800)})();
  (function idle(){setTimeout(function(){if(!bub.classList.contains('on')){var r=Math.random();act(r<.4?'tilt':r<.7?'peck':'hop',r<.7?700:500)}idle()},3500+Math.random()*4000)})();
- function say(html,buttons,stay){clearTimeout(hideT);clearInterval(typing);bub.classList.add('on');opts.innerHTML='';
+ function enter(cb){clearTimeout(leaveT);tab.classList.remove('on');if(present){cb();return}present=true;root.classList.add('in');act('hop',500);setTimeout(cb,reduce?0:700)}
+ function leave(){if(touring||bub.classList.contains('on'))return;present=false;root.classList.remove('in');setTimeout(function(){if(!present&&started)tab.classList.add('on')},600)}
+ function say(html,buttons,stay){clearTimeout(hideT);clearInterval(typing);enter(function(){speak(html,buttons,stay)})}
+ function speak(html,buttons,stay){clearTimeout(hideT);clearInterval(typing);bub.classList.add('on');opts.innerHTML='';
   var tmp=document.createElement('div');tmp.innerHTML=html;var full=tmp.textContent,n=0;txt.textContent='';
   if(reduce){txt.innerHTML=html;done()}else{svg.classList.add('talk');typing=setInterval(function(){n+=2;txt.textContent=full.slice(0,n);if(n>=full.length){clearInterval(typing);txt.innerHTML=html;done()}},16)}
   function done(){svg.classList.remove('talk');(buttons||[]).forEach(function(b){var el=document.createElement(b.href?'a':'button');el.textContent=b.t;if(b.pri)el.className='pri';if(b.href){el.href=b.href}else{el.type='button';el.addEventListener('click',b.go)}opts.appendChild(el)});
-   if(!stay)hideT=setTimeout(close,(buttons&&buttons.length?16000:7000))}}
- function close(){clearTimeout(hideT);clearInterval(typing);svg.classList.remove('talk');bub.classList.remove('on')}
- function hide(){close();stopTour();root.classList.add('away');tab.classList.add('on');store('georgeAway','1')}
- function show(){root.classList.remove('away');root.classList.add('in');tab.classList.remove('on');store('georgeAway','0');act('hop',500);menu()}
+   if(!stay)hideT=setTimeout(close,Math.max(4500,full.length*60)+(buttons&&buttons.length?8000:0))}}
+ function close(){clearTimeout(hideT);clearInterval(typing);svg.classList.remove('talk');bub.classList.remove('on');clearTimeout(leaveT);leaveT=setTimeout(leave,1500)}
+ function hide(){muted=true;store('georgeAway','1');stopTour();close()}
+ function show(){muted=false;store('georgeAway','0');menu()}
  function paintingLine(i){var t='<i>'+esc(ART[i].t)+'</i>',L=['Here we have '+t+'. Tap the painting to see its details and price.','This one is '+t+'. Take your time — tap it if you’d like to know more.','Ah, '+t+'. One of my favourites. Tap it for the details.','And this is '+t+'. Tap the painting to enquire about it.'];
   return L[i%L.length]+(TOUCH?' You can even see it on your own wall!':'')}
  function stopTour(){touring=false;clearTimeout(tourT)}
@@ -1490,15 +1495,15 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  function menu(){var a=stopAt(),here=a.d<.35&&STOPS[a.i].art!=null?STOPS[a.i].art:null,b=[{t:'Give me the tour',pri:1,go:function(){touring=true;tourAt(0)}},{t:'How do I buy a painting?',go:buy}];
   if(TOUCH)b.push({t:'See a painting on my wall',go:function(){if(here!=null){close();viewOnWall(here)}else say('Walk up to any painting first, then tap me again — or tap the painting and choose “View on your wall”.',[{t:'OK',go:close}])}});
   b.push({t:'Contact Pam',go:function(){say('You can email Pam at <b>'+esc(EMAIL)+'</b>. She replies to every message personally.',[{t:'Write to Pam',pri:1,href:'mailto:'+EMAIL},{t:'Thanks',go:close}])}});
-  b.push({t:'Hide King George',go:hide});say('King George, at your service. How may I help?',b,true)}
+  b.push({t:'Only come when I call',go:hide});say('King George, at your service. How may I help?',b,true)}
  function buy(){say('Every painting is an original and available to buy. Tap a painting, then “Enquire about this work” — or email Pam directly and she’ll get back to you with the details.',[{t:'Email Pam',pri:1,href:'mailto:'+EMAIL},{t:'Thanks',go:close}])}
- $('gBtn').addEventListener('click',function(){if(bub.classList.contains('on')&&!touring){close()}else{stopTour();menu()}act('hop',500)});
+ $('gBtn').addEventListener('click',function(){if(bub.classList.contains('on')&&!touring){close()}else{stopTour();menu()}});
  $('gX').addEventListener('click',function(){stopTour();close()});tab.addEventListener('click',show);
- function onStop(){if(!started||touring||root.classList.contains('away'))return;var a=stopAt();if(a.d>.03)return;var st=STOPS[a.i];if(seen[a.i])return;seen[a.i]=1;
-  if(st.art!=null){if(tips<2){tips++;act('hop',500);speakStop(a.i,false)}}else if(a.i===STOPS.length-1){act('hop',500);speakStop(a.i,false)}}
+ function onStop(){if(!started||touring||muted||bub.classList.contains('on'))return;var a=stopAt();if(a.d>.03)return;if(seen[a.i])return;seen[a.i]=1;
+  if(a.i===STOPS.length-1)speakStop(a.i,false)}
  setInterval(onStop,600);
- function start(){if(started)return;started=true;if(store('georgeAway')==='1'){tab.classList.add('on');return}root.classList.add('in');seen[0]=1;
-  setTimeout(function(){act('hop',500);say('Greetings, I am King George II, guardian of the gallery. We have been expecting you. Come along, let me guide you on a journey through our treasury to find the next masterpiece for your private collection.',[{t:'Lead the way',pri:1,go:function(){touring=true;tourAt(1)}},{t:'I’ll explore alone',go:function(){say('Very well. '+(TOUCH?'Swipe or tap to stroll from painting to painting, and s':'Scroll or use the arrows to stroll through, and s')+'ummon me whenever you have need of me.',[]);}}],true)},900)}
+ function start(){if(started)return;started=true;seen[0]=1;if(store('georgeAway')==='1'){muted=true;tab.classList.add('on');return}
+  setTimeout(function(){say('Greetings, I am King George II, guardian of the gallery. We have been expecting you. Come along, let me guide you on a journey through our treasury to find the next masterpiece for your private collection.',[{t:'Lead the way',pri:1,go:function(){touring=true;tourAt(1)}},{t:'I’ll explore alone',go:function(){say('Very well. '+(TOUCH?'Swipe or tap to stroll from painting to painting, and s':'Scroll or use the arrows to stroll through, and s')+'ummon me whenever you have need of me.',[]);}}],true)},300)}
  return{start:start,stopTour:stopTour}})();
 addEventListener('wheel',function(){George.stopTour()},{passive:true});
 window.__house={cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());render(0)},K:K,cam:cam};
