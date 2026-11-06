@@ -209,6 +209,38 @@ dialog p{margin:.2rem 0;line-height:1.5}
 .btns{display:flex;gap:.7rem;margin-top:1.5rem;flex-wrap:wrap}
 .btn{font:inherit;font-weight:400;padding:.75rem 1.3rem;border-radius:2px;border:1px solid var(--walnut);background:transparent;color:var(--walnut);cursor:pointer;text-decoration:none}
 .btn.main{background:var(--walnut);color:#faf9f7}
+
+/* ---------- King George's royal welcome (first visit) ---------- */
+#gDim{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;transition:opacity .7s ease;background:radial-gradient(130% 95% at 25% 100%,rgba(12,8,6,.66),rgba(12,8,6,.34) 55%,rgba(12,8,6,.16))}
+#gDim.on{opacity:1}
+body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
+#gRing{position:fixed;left:0;top:0;width:0;height:0;z-index:7;pointer-events:none;border:2px solid #e8c983;border-radius:14px;opacity:0;transition:opacity .35s ease,left .45s ease,top .45s ease,width .45s ease,height .45s ease;box-shadow:0 0 0 3px rgba(232,201,131,.22),0 0 26px 4px rgba(232,201,131,.55);animation:gPulse 1.7s ease-in-out infinite}
+#gRing.on{opacity:1}
+@keyframes gPulse{0%,100%{box-shadow:0 0 0 3px rgba(232,201,131,.22),0 0 22px 2px rgba(232,201,131,.45)}50%{box-shadow:0 0 0 7px rgba(232,201,131,.12),0 0 34px 8px rgba(232,201,131,.7)}}
+#gBub .dots{display:none;gap:6px;margin-top:.75rem}
+#gBub .dots.on{display:flex}
+#gBub .dots span{width:7px;height:7px;border-radius:50%;background:rgba(138,106,54,.25);transition:background .3s,transform .3s}
+#gBub .dots span.on{background:#b8893a;transform:scale(1.25)}
+#george.stage,#george.stage.in{left:calc(max(16px,env(safe-area-inset-left,0px)) + 64px);bottom:calc(env(safe-area-inset-bottom,0px) + 92px);width:min(580px,calc(100vw - 112px));height:auto;transform:none;transition:none;animation:gRise .8s cubic-bezier(.2,1.25,.4,1) both;z-index:6}
+#george.stage::before{content:"";position:absolute;left:-74px;bottom:-74px;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(246,220,142,.5),rgba(246,220,142,0) 66%);pointer-events:none;animation:gHalo 3.2s ease-in-out infinite}
+#george.stage #gBtn{position:absolute;left:-22px;bottom:-16px;width:136px;height:136px;z-index:2}
+#george.stage #gBub{position:relative;left:auto;bottom:auto;width:auto;max-height:none;margin-left:100px;padding:1.1rem 1.25rem 1.05rem 1.7rem;font-size:1.02rem;line-height:1.55;border-radius:22px;opacity:1;transform:none;pointer-events:auto;box-shadow:0 22px 60px rgba(12,8,6,.45);border-color:rgba(184,154,98,.75)}
+#george.stage #gBub .who{font-size:1.3rem;margin-bottom:.3rem}
+#george.stage #gBub .opts{margin-top:.85rem}
+#george.stage #gBub .opts button{font-size:.88rem;padding:.55rem 1.05rem;min-height:42px}
+#george.stage .skip{border:0!important;background:none!important;color:#7a6a5a!important;text-decoration:underline;text-underline-offset:3px;padding-left:.4rem!important;padding-right:.4rem!important}
+#george.fly{animation:gSink .35s ease-in both}
+@keyframes gRise{from{opacity:0;transform:translateY(46px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes gSink{to{opacity:0;transform:translateY(36px) scale(.97)}}
+@keyframes gHalo{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+@media (max-width:700px){
+ #george.stage,#george.stage.in{left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:calc(100vw - 24px)}
+ #george.stage::before{left:-30px;bottom:auto;top:-120px;width:200px;height:200px}
+ #george.stage #gBtn{left:4px;bottom:auto;top:-70px;width:94px;height:94px}
+ #george.stage #gBub{margin-left:0;padding:1.5rem 1.05rem .95rem;font-size:.97rem;max-height:60vh;overflow:auto;border-radius:20px}
+ #george.stage #gBub .who{margin-left:88px;margin-top:-.6rem}
+}
+@media (prefers-reduced-motion:reduce){#gRing,#george.stage::before{animation:none}#george.stage{animation:none}}
 </style>
 <script type="module">import * as T from "/lib/three-r160.module.min.js";window.THREE=T;dispatchEvent(new Event("three-ready"))</script>
 </head>
@@ -218,7 +250,7 @@ dialog p{margin:.2rem 0;line-height:1.5}
 <div id="title" aria-hidden="true"><h1>Pam’s Gallery</h1><p>Welcome · come in and look around</p></div>
 <div id="hint">Scroll, swipe or tap to step inside</div>
 <script>try{if(matchMedia("(pointer:coarse)").matches)document.getElementById("hint").textContent="Swipe, tap or scroll to walk through"}catch(e){}</script>
-<div id="george" aria-live="polite"><button id="gBtn" type="button" aria-label="King George the wood pigeon, your gallery guide"><svg id="gSvg" viewBox="0 0 120 120" aria-hidden="true"><defs>
+<div id="gDim" aria-hidden="true"></div><div id="gRing" aria-hidden="true"></div><div id="george" aria-live="polite"><button id="gBtn" type="button" aria-label="King George the wood pigeon, your gallery guide"><svg id="gSvg" viewBox="0 0 120 120" aria-hidden="true"><defs>
 <radialGradient id="gB" cx=".38" cy=".3" r=".75"><stop offset="0" stop-color="#cfd4de"/><stop offset=".6" stop-color="#a5abb9"/><stop offset="1" stop-color="#7f8596"/></radialGradient>
 <radialGradient id="gH" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#d3d8e2"/><stop offset=".65" stop-color="#a9afbd"/><stop offset="1" stop-color="#8a90a0"/></radialGradient>
 <radialGradient id="gR" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#e6b7bc"/><stop offset="1" stop-color="#b47b84"/></radialGradient>
@@ -249,7 +281,7 @@ dialog p{margin:.2rem 0;line-height:1.5}
  <path d="M92.5 37.2 L105 40.3 C104.6 41.6 103.6 42.3 102 42.4 L93 42.6 Z" fill="#e8a59f"/><path d="M101 40 L105 40.3 C104.6 41.6 103.6 42.3 102 42.4 Z" fill="#c9837d"/><ellipse cx="93.6" cy="38.2" rx="2.7" ry="1.8" fill="#f8f2ec"/>
  <path class="jaw" d="M93 42.6 L103 42.3 C101.5 44.8 98 45.8 94.2 45.6 Z" fill="#d48f8a"/>
 <g class="crown" transform="rotate(-10 80 21)"><path d="M70 22.4 L71.6 11 L76.4 17.2 L80 8.4 L83.6 17.2 L88.4 11 L90 22.4 Z" fill="url(#gG)" stroke="#8f6a22" stroke-width=".8" stroke-linejoin="round"/><rect x="69.4" y="20.2" width="21.2" height="4.4" rx="1.8" fill="url(#gG)" stroke="#8f6a22" stroke-width=".8"/><circle cx="71.6" cy="10.6" r="1.7" fill="#fff4d8" stroke="#c9a24e" stroke-width=".5"/><circle cx="80" cy="7.9" r="1.9" fill="#fff4d8" stroke="#c9a24e" stroke-width=".5"/><circle cx="88.4" cy="10.6" r="1.7" fill="#fff4d8" stroke="#c9a24e" stroke-width=".5"/><circle cx="80" cy="22.4" r="1.6" fill="#b3263a"/><circle cx="74.6" cy="22.4" r="1.05" fill="#2d5fa8"/><circle cx="85.4" cy="22.4" r="1.05" fill="#2d5fa8"/><path d="M71 21.2 L89 21.2" stroke="rgba(255,250,230,.6)" stroke-width=".6"/></g>
-</g></g></svg></button><div id="gBub" role="dialog" aria-label="King George says"><button class="x" id="gX" aria-label="Close">&times;</button><div class="who">King George</div><div id="gTxt"></div><div class="opts" id="gOpts"></div></div></div><button id="gTab" type="button" aria-label="Call King George"><svg viewBox="0 0 24 16" width="22" height="15" aria-hidden="true"><path d="M2 14 L3 3 L8 8 L12 1 L16 8 L21 3 L22 14 Z" fill="#c99a3c" stroke="#8f6a22" stroke-width="1" stroke-linejoin="round"/></svg><span>King George</span></button><div id="wall" hidden><video id="wallV" playsinline muted autoplay></video><img id="wallBg" alt="" hidden><div id="wallArt"><img id="wallImg" alt=""></div><div id="wallMsg" hidden></div><div class="wtop"><span id="wallHint">Point at your wall · drag to move · pinch to resize</span><button id="wallX" type="button">Done</button></div><div class="wbot"><input type="range" id="wallSize" min="15" max="85" value="42" aria-label="Painting size"><label>Use a photo<input type="file" accept="image/*" id="wallFile" hidden></label></div></div><div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
+</g></g></svg></button><div id="gBub" role="dialog" aria-label="King George says"><button class="x" id="gX" aria-label="Close">&times;</button><div class="who">King George</div><div id="gTxt"></div><div class="dots" id="gDots" aria-hidden="true"></div><div class="opts" id="gOpts"></div></div></div><button id="gTab" type="button" aria-label="Call King George"><svg viewBox="0 0 24 16" width="22" height="15" aria-hidden="true"><path d="M2 14 L3 3 L8 8 L12 1 L16 8 L21 3 L22 14 Z" fill="#c99a3c" stroke="#8f6a22" stroke-width="1" stroke-linejoin="round"/></svg><span>King George</span></button><div id="wall" hidden><video id="wallV" playsinline muted autoplay></video><img id="wallBg" alt="" hidden><div id="wallArt"><img id="wallImg" alt=""></div><div id="wallMsg" hidden></div><div class="wtop"><span id="wallHint">Point at your wall · drag to move · pinch to resize</span><button id="wallX" type="button">Done</button></div><div class="wbot"><input type="range" id="wallSize" min="15" max="85" value="42" aria-label="Painting size"><label>Use a photo<input type="file" accept="image/*" id="wallFile" hidden></label></div></div><div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Previous painting">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="next" aria-label="Next painting">&#8250;</button></div>
 <div id="tip"></div>
 <section id="enqPanel" aria-labelledby="enqTitle" aria-hidden="true">
  <h2 id="enqTitle">Enquiries</h2>
@@ -1705,7 +1737,7 @@ addEventListener('keydown',function(e){if(dlg.open||about.open||!col.hidden)retu
   if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4&&Date.now()-st<900){George.stopTour();step(dx>0?1:-1)}},{passive:true});})();
 
 /* ---------- George the wood pigeon: a friendly guide who offers tours and tips ---------- */
-var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('gTxt'),opts=$('gOpts'),tab=$('gTab'),typing=null,hideT=null,touring=false,tourI=0,tourT=null,seen={},started=false,present=false,leaveT=null,muted=false,bubAt=-1,moving=false,arrived=true;
+var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('gTxt'),opts=$('gOpts'),tab=$('gTab'),typing=null,hideT=null,touring=false,tourI=0,tourT=null,seen={},started=false,present=false,leaveT=null,muted=false,bubAt=-1,moving=false,arrived=true,introOn=false,iStep=0,STEPS=null,ringFn=null,ringOn=false;
  function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
  function act(c,ms){svg.classList.add(c);setTimeout(function(){svg.classList.remove(c)},ms)}
  (function blink(){setTimeout(function(){act('blink',140);blink()},2200+Math.random()*3800)})();
@@ -1716,7 +1748,7 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  function speak(html,buttons,stay,at){clearTimeout(hideT);clearInterval(typing);bubAt=at!=null?at:dest().i;var dd=dest();arrived=dd.i===bubAt&&dd.d<.1;moving=false;bub.classList.add('on');opts.innerHTML='';
   var tmp=document.createElement('div');tmp.innerHTML=html;var full=tmp.textContent,n=0;txt.textContent='';
   if(reduce){txt.innerHTML=html;done()}else{svg.classList.add('talk');typing=setInterval(function(){n+=2;txt.textContent=full.slice(0,n);if(n>=full.length){clearInterval(typing);txt.innerHTML=html;done()}},16)}
-  function done(){svg.classList.remove('talk');(buttons||[]).forEach(function(b){var el=document.createElement(b.href?'a':'button');el.textContent=b.t;if(b.pri)el.className='pri';if(b.href){el.href=b.href}else{el.type='button';el.addEventListener('click',b.go)}opts.appendChild(el)});
+  function done(){svg.classList.remove('talk');(buttons||[]).forEach(function(b){var el=document.createElement(b.href?'a':'button');el.textContent=b.t;if(b.pri)el.className='pri';if(b.skip)el.className='skip';if(b.href){el.href=b.href}else{el.type='button';el.addEventListener('click',b.go)}opts.appendChild(el)});
    if(!stay)hideT=setTimeout(close,Math.max(4500,full.length*60)+(buttons&&buttons.length?8000:0))}}
  function close(){clearTimeout(hideT);clearInterval(typing);svg.classList.remove('talk');bub.classList.remove('on');clearTimeout(leaveT);leaveT=setTimeout(leave,1500)}
  function hide(){muted=true;store('georgeAway','1');stopTour();close()}
@@ -1732,21 +1764,58 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
   if(st.art!=null){var b=next||[{t:'Show me details',pri:1,go:function(){close();openArt(st.art)}}];if(TOUCH&&!tour)b.push({t:'See it on my wall',go:function(){close();viewOnWall(st.art)}});say(paintingLine(st.art),b,!!tour,i)}
   else if(last)say('Out here is the balcony. Keep an eye on the field — my tall friend loves to dance! If a painting has caught your eye, you can write to Pam right here.',next||[{t:'Email Pam',pri:1,href:'mailto:'+EMAIL},{t:'Thanks',go:close}],!!tour,i)
   else say('Welcome to Pam’s Gallery! Every painting here is an original by Pam. Scroll, swipe or use the arrows to stroll from painting to painting.',next||[{t:'Got it',go:close}],!!tour,i)}
- function menu(){var a=stopAt(),here=a.d<.35&&STOPS[a.i].art!=null?STOPS[a.i].art:null,b=[{t:'Give me the tour',pri:1,go:function(){touring=true;tourAt(0)}},{t:'How do I buy a painting?',go:buy}];
+ function menu(){var a=stopAt(),here=a.d<.35&&STOPS[a.i].art!=null?STOPS[a.i].art:null,b=[{t:'Give me the tour',pri:1,go:function(){touring=true;tourAt(0)}},{t:'How this gallery works',go:function(){intro(1)}},{t:'How do I buy a painting?',go:buy}];
   if(TOUCH)b.push({t:'See a painting on my wall',go:function(){if(here!=null){close();viewOnWall(here)}else say('Walk up to any painting first, then tap me again — or tap the painting and choose “View on your wall”.',[{t:'OK',go:close}])}});
   b.push({t:'Members’ rewards',go:function(){say('Join our collectors’ circle and enjoy 5% off your first painting, loyalty points on every purchase, and a signed print when you complete a series.',[{t:'Join or sign in',pri:1,go:function(){close();window.openAcct()}},{t:'Not now',go:close}])}});
   b.push({t:'Contact Pam',go:function(){say('You may send Pam a message right here, or email her at <b>'+esc(EMAIL)+'</b>. She replies to every message personally.',[{t:'Send a message',pri:1,go:function(){close();window.openMsg()}},{t:'Thanks',go:close}])}});
   b.push({t:'Only come when I call',go:hide});say('King George, at your service. How may I help?',b,true)}
  function buy(){say('Every painting is an original and available to buy. Tap a painting, then “Request to buy” — Pam will reply personally to arrange payment and delivery. Members also earn rewards.',[{t:'Become a member',pri:1,go:function(){close();window.openAcct()}},{t:'Thanks',go:close}])}
- $('gBtn').addEventListener('click',function(){if(bub.classList.contains('on')&&!touring){close()}else{stopTour();menu()}});
- $('gX').addEventListener('click',function(){stopTour();close()});tab.addEventListener('click',show);
- function onStop(){if(!started||touring||muted||bub.classList.contains('on'))return;var a=stopAt();if(a.d>.03)return;if(seen[a.i])return;seen[a.i]=1;
+ $('gBtn').addEventListener('click',function(){if(introOn)return;if(bub.classList.contains('on')&&!touring){close()}else{stopTour();menu()}});
+ $('gX').addEventListener('click',function(){if(introOn){endIntro('skip');return}stopTour();close()});tab.addEventListener('click',show);
+ function onStop(){if(!started||touring||muted||introOn||bub.classList.contains('on'))return;var a=stopAt();if(a.d>.03)return;if(seen[a.i])return;seen[a.i]=1;
   if(a.i===STOPS.length-1)speakStop(a.i,false)}
  setInterval(onStop,600);
- setInterval(function(){if(!bub.classList.contains('on')||moving)return;var a=dest();if(!arrived){if(a.i===bubAt&&a.d<.1)arrived=true;return}if(a.i!==bubAt&&a.d<.45){stopTour();close()}},250);   // moved to another painting: stop talking about the old one
+ setInterval(function(){if(!bub.classList.contains('on')||moving||introOn)return;var a=dest();if(!arrived){if(a.i===bubAt&&a.d<.1)arrived=true;return}if(a.i!==bubAt&&a.d<.45){stopTour();close()}},250);   // moved to another painting: stop talking about the old one
+ var GREET='Greetings, I am King George II, guardian of the gallery. We have been expecting you. Come along, let me guide you on a journey through our treasury to find the next masterpiece for your private collection.';
+ /* ---- the royal welcome: a short, skippable tour of everything a visitor can do ---- */
+ var dimEl=$('gDim'),ringEl=$('gRing'),dotsEl=$('gDots');
+ function rectOf(el){if(!el)return null;var r=el.getBoundingClientRect();return r.width>2&&r.height>2?{x:r.left,y:r.top,w:r.width,h:r.height}:null}
+ function union(ids){var u=null;ids.forEach(function(id){var r=rectOf($(id));if(!r)return;if(!u)u={x:r.x,y:r.y,w:r.w,h:r.h};else{var x1=Math.min(u.x,r.x),y1=Math.min(u.y,r.y),x2=Math.max(u.x+u.w,r.x+r.w),y2=Math.max(u.y+u.h,r.y+r.h);u={x:x1,y:y1,w:x2-x1,h:y2-y1}}});return u}
+ function paintRect(k){var A=ARTPOS[k];if(!A)return null;var as=innerWidth/Math.max(1,innerHeight),eye=[cam.x,cam.y,cam.z],M=M4.mul(M4.persp(fovFor(as),as,.05,200),M4.look(eye,v3.add(eye,camDir()),[0,1,0])),x1=1e9,y1=1e9,x2=-1e9,y2=-1e9,ok=true;
+  [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(q){var p=v3.add(v3.add(A.c,v3.sc(A.ax,q[0]*(A.w/2+.12))),[0,q[1]*(A.h/2+.12),0]),X=M[0]*p[0]+M[4]*p[1]+M[8]*p[2]+M[12],Y=M[1]*p[0]+M[5]*p[1]+M[9]*p[2]+M[13],W=M[3]*p[0]+M[7]*p[1]+M[11]*p[2]+M[15];
+   if(W<=.05){ok=false;return}var sx=(X/W*.5+.5)*innerWidth,sy=(1-(Y/W*.5+.5))*innerHeight;x1=Math.min(x1,sx);y1=Math.min(y1,sy);x2=Math.max(x2,sx);y2=Math.max(y2,sy)});
+  if(!ok||x2<0||y2<0||x1>innerWidth||y1>innerHeight)return null;return{x:x1,y:y1,w:x2-x1,h:y2-y1}}
+ function ringLoop(){if(!ringOn)return;var r=ringFn&&ringFn();if(r){var pd=8;ringEl.style.left=(r.x-pd)+'px';ringEl.style.top=(r.y-pd)+'px';ringEl.style.width=(r.w+2*pd)+'px';ringEl.style.height=(r.h+2*pd)+'px';ringEl.classList.add('on')}else ringEl.classList.remove('on');requestAnimationFrame(ringLoop)}
+ function ring(fn){ringFn=fn;if(fn&&!ringOn){ringOn=true;requestAnimationFrame(ringLoop)}if(!fn){ringEl.classList.remove('on');setTimeout(function(){if(!ringFn)ringOn=false},400)}}
+ function dots(i,n){dotsEl.innerHTML='';dotsEl.classList.toggle('on',i>=0);for(var k=0;k<n&&i>=0;k++){var d=document.createElement('span');if(k<=i)d.className='on';dotsEl.appendChild(d)}}
+ function steps(){var tap=TOUCH?'Tap':'Click',s=[];
+  s.push({t:TOUCH?'First, the stroll. Swipe left or right to walk from painting to painting. Like so…':'First, the stroll. Scroll, or use these arrows, to walk from painting to painting. Like so…',
+   ring:TOUCH?null:function(){return rectOf($('walk'))},demo:function(){setTimeout(function(){if(introOn&&iStep===1&&stopAt().i===0)goStop(1)},1500)}});
+  s.push({t:'Every work here is an original by Pam. '+tap+' a painting to see it up close, read its story and request to buy it.',ring:function(){return paintRect(STOPS[1].art)},demo:function(){if(stopAt().i===0)goStop(1)}});
+  if(TOUCH)s.push({t:'Wondering how it would look at home? Open any painting and choose “View on your wall” — your camera hangs it right on your own wall.',ring:function(){return paintRect(STOPS[1].art)}});
+  s.push({t:'Prefer to see everything at once? “Collection” shows every work together, “About” tells you all about Pam, and “Music” sets the mood.',ring:function(){return union(['music','navCol','navAbout'])}});
+  s.push({t:'And do join our collectors’ circle: 5% off your first painting, points on every purchase, and a special reward for completing a series.',ring:function(){return rectOf($('navAcct'))}});
+  return s}
+ function intro(from){if(introOn)return;introOn=true;stopTour();STEPS=steps();hush();clearTimeout(leaveT);
+  document.body.classList.add('gIntro');dimEl.classList.add('on');root.style.transition='none';root.classList.add('stage','in');present=true;void root.offsetWidth;root.style.transition='';
+  setTimeout(function(){act('peck',700)},700);showStep(from||0)}
+ function showStep(i){if(!introOn)return;iStep=i;var n=STEPS.length;ring(null);
+  if(i===0){dots(-1,0);say(GREET,[{t:'Show me around',pri:1,go:function(){showStep(1)}},{t:'I’ll explore alone',go:function(){endIntro('alone')}}],true);return}
+  if(i>n){dots(n-1,n);act('hop',500);say('And that is the grand tour! I shall wait right here — '+(TOUCH?'tap':'click')+' me whenever you need me. Shall I show you the paintings one by one?',[{t:'Yes, lead the way',pri:1,go:function(){endIntro('lead')}},{t:'I’ll explore alone',go:function(){endIntro('alone')}}],true);return}
+  var st=STEPS[i-1];dots(i-1,n);act(i%2?'tilt':'hop',600);
+  say(st.t,[{t:i===n?'Finish':'Next',pri:1,go:function(){showStep(i+1)}},{t:'Skip the tour',skip:1,go:function(){endIntro('skip')}}],true);
+  if(st.demo)st.demo();ring(st.ring||null)}
+ function endIntro(mode){if(!introOn)return;introOn=false;store('georgeIntro','done');ring(null);dimEl.classList.remove('on');hush();dots(-1,0);
+  root.classList.add('fly');setTimeout(function(){root.style.transition='none';root.classList.remove('stage','fly','in');present=false;void root.offsetWidth;root.style.transition='';document.body.classList.remove('gIntro');
+   setTimeout(function(){enter(function(){
+    if(mode==='lead'){touring=true;var a=stopAt();tourAt(a.i>0&&a.i<STOPS.length-1?a.i:1)}
+    else{say(mode==='alone'?'Very well. I shall be right here in the corner — '+(TOUCH?'tap':'click')+' me whenever you need me.':'As you wish. I am right here if you need me.',[],false);ring(function(){return rectOf($('gBtn'))});setTimeout(function(){if(!introOn)ring(null)},2600)}})},120)},360)}
+ /* someone who starts walking straight away would rather explore than listen */
+ setInterval(function(){if(introOn&&iStep===0&&progress()>.02)endIntro('alone')},300);
  function start(){if(started)return;started=true;seen[0]=1;if(store('georgeAway')==='1'){muted=true;tab.classList.add('on');return}
-  setTimeout(function(){say('Greetings, I am King George II, guardian of the gallery. We have been expecting you. Come along, let me guide you on a journey through our treasury to find the next masterpiece for your private collection.',[{t:'Lead the way',pri:1,go:function(){touring=true;tourAt(1)}},{t:'I’ll explore alone',go:function(){say('Very well. '+(TOUCH?'Swipe or tap to stroll from painting to painting, and s':'Scroll or use the arrows to stroll through, and s')+'ummon me whenever you have need of me.',[]);}}],true)},300)}
- return{start:start,stopTour:stopTour}})();window.__G=George;
+  if(store('georgeIntro')==='done'){setTimeout(function(){say('Welcome back to the gallery! '+(TOUCH?'Tap':'Click')+' me whenever you would like a guide.',[{t:'Show me around',go:function(){close();setTimeout(function(){intro(1)},300)}}],false)},300);return}
+  setTimeout(function(){intro(0)},250)}
+ return{start:start,stopTour:stopTour,intro:intro}})();window.__G=George;
 addEventListener('wheel',function(){George.stopTour()},{passive:true});
 window.__house={cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());render(0)},K:K,cam:cam};
 
