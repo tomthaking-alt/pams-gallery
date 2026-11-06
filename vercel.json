@@ -1,6 +1,6 @@
 {
   "redirects": [
-    { "source": "/((?!ar/).+)", "destination": "/", "permanent": false }
+    { "source": "/((?!ar/|api/).+)", "destination": "/", "permanent": false }
   ],
   "headers": [
     { "source": "/ar/(.*)\\.usdz", "headers": [ { "key": "Content-Type", "value": "model/vnd.usdz+zip" }, { "key": "Cache-Control", "value": "public, max-age=3600" } ] },
