@@ -86,7 +86,7 @@ function cleanCat(c) {
     id: String(p.id), art: ids.has(String(p.art)) ? String(p.art) : '', t: str(p.t, 90), d: str(p.d, 600), img: okImg(p.img) ? p.img : '',
     sizes: (Array.isArray(p.sizes) ? p.sizes : []).slice(0, 10).map(z => ({ l: str(z.l, 60), p: str(z.p, 30) })).filter(z => z.l), on: p.on !== false
   })).filter(p => p.art || p.img);
-  const texts = {}; if (c.texts && typeof c.texts === 'object') Object.keys(c.texts).slice(0, 60).forEach(k => { if (/^[a-z]{2,10}\.[a-z]{2,14}$/.test(k)) texts[k] = String(c.texts[k] == null ? '' : c.texts[k]).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').slice(0, 3000) });
+  const texts = {}; if (c.texts && typeof c.texts === 'object') Object.keys(c.texts).slice(0, 150).forEach(k => { if (/^[a-z]{2,10}\.[a-z]{2,14}$/.test(k)) texts[k] = String(c.texts[k] == null ? '' : c.texts[k]).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').slice(0, 3000) });
   const S = c.site && typeof c.site === 'object' ? c.site : {}, url = v => { v = str(v, 200); return /^https:\/\/[^\s"<>]+$/.test(v) ? v : '' };
   const social = {}; ['instagram', 'tiktok', 'facebook', 'x', 'pinterest', 'youtube', 'threads', 'linkedin', 'website'].forEach(k => { const u = url(S.social && S.social[k]); if (u) social[k] = u });
   const site = { email: okEmail(str(S.email, 200)) ? str(S.email, 200) : '', phone: str(S.phone, 40), place: str(S.place, 80), social,
