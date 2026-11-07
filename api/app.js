@@ -5,6 +5,12 @@ const crypto = require('crypto');
 const DB_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const DB_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 const OWNER = 'pts98@hotmail.co.uk';
+const SITE = 'https://itsamepameo.com';
+// payments and Google sign-in switch on when their keys are added in Vercel (Settings → Environment Variables)
+const STRIPE = process.env.STRIPE_SECRET_KEY || '';
+const GOOGLE_ID = process.env.GOOGLE_CLIENT_ID || '';
+// the built-in paintings' photographs (served from /lib/), for link previews when a painting is shared
+const EMB_IMG = {"p1": "/lib/g-c0fafcbf388e.jpg", "p2": "/lib/g-04b6c6b76917.jpg", "p3": "/lib/g-bab2acf08825.jpg", "p4": "/lib/g-f91d640d659d.jpg", "p5": "/lib/g-40cf8b507475.jpg", "p6": "/lib/g-d6fa78aecd0a.jpg"};
 const SECRET = crypto.createHash('sha256').update('pams-gallery-session|' + (DB_TOKEN || '')).digest();
 
 // ---- rewards (easy to change) ----
@@ -68,8 +74,9 @@ function cleanCat(c) {
   const okImg = v => typeof v === 'string' && (/^emb:p[1-9]$/.test(v) || /^\/api\/app\?img=[a-z0-9]{6,40}$/i.test(v));
   const arts = (Array.isArray(c.arts) ? c.arts : []).slice(0, 120).filter(a => a && okId(a.id) && okImg(a.img)).map(a => ({
     id: String(a.id), t: str(a.t, 90) || 'Untitled', m: str(a.m, 80), s: str(a.s, 80), year: str(a.year, 12), d: str(a.d, 1200),
-    p: str(a.p, 40), mode: a.mode === 'price' ? 'price' : 'request', status: ['Available', 'On hold', 'Sold'].indexOf(a.status) >= 0 ? a.status : 'Available',
-    w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, ar: !!a.ar && /^emb:p[1-9]$/.test(a.img), bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6'
+    p: str(a.p, 40), mode: ['price', 'auction'].indexOf(a.mode) >= 0 ? a.mode : 'request', status: ['Available', 'On hold', 'Sold'].indexOf(a.status) >= 0 ? a.status : 'Available',
+    w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, ar: !!a.ar && /^emb:p[1-9]$/.test(a.img), bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6',
+    auc: a.mode === 'auction' && a.auc ? { start: num(a.auc.start, 1, 1e7, 100), step: num(a.auc.step, 1, 1e6, 10), ends: Math.round(num(a.auc.ends, 0, 4e12, 0)) } : undefined
   }));
   const ids = new Set(arts.map(a => a.id));
   const favs = (Array.isArray(c.favs) ? c.favs : []).map(String).filter(x => ids.has(x)).filter((x, i, A) => A.indexOf(x) === i).slice(0, 6);
@@ -79,7 +86,13 @@ function cleanCat(c) {
     id: String(p.id), art: ids.has(String(p.art)) ? String(p.art) : '', t: str(p.t, 90), d: str(p.d, 600), img: okImg(p.img) ? p.img : '',
     sizes: (Array.isArray(p.sizes) ? p.sizes : []).slice(0, 10).map(z => ({ l: str(z.l, 60), p: str(z.p, 30) })).filter(z => z.l), on: p.on !== false
   })).filter(p => p.art || p.img);
-  return { v: Date.now(), arts, favs, colls, prints };
+  const texts = {}; if (c.texts && typeof c.texts === 'object') Object.keys(c.texts).slice(0, 60).forEach(k => { if (/^[a-z]{2,10}\.[a-z]{2,14}$/.test(k)) texts[k] = String(c.texts[k] == null ? '' : c.texts[k]).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').slice(0, 3000) });
+  const S = c.site && typeof c.site === 'object' ? c.site : {}, url = v => { v = str(v, 200); return /^https:\/\/[^\s"<>]+$/.test(v) ? v : '' };
+  const social = {}; ['instagram', 'tiktok', 'facebook', 'x', 'pinterest', 'youtube', 'threads', 'linkedin', 'website'].forEach(k => { const u = url(S.social && S.social[k]); if (u) social[k] = u });
+  const site = { email: okEmail(str(S.email, 200)) ? str(S.email, 200) : '', phone: str(S.phone, 40), place: str(S.place, 80), social,
+    banner: { on: !!(S.banner && S.banner.on), text: str(S.banner && S.banner.text, 160) }, commissions: !!S.commissions, offers: S.offers !== false,
+    share: S.share !== false, likes: S.likes !== false, cur: ['GBP', 'EUR', 'USD'].indexOf(S.cur) >= 0 ? S.cur : 'GBP' };
+  return { v: Date.now(), arts, favs, colls, prints, texts, site };
 }
 
 function rewards(u, cat) {
@@ -134,16 +147,37 @@ const actions = {
     await limit(req, 'login', 15, 900);
     const email = clean(b.email, 200).toLowerCase(), pw = String(b.password || '');
     const u = await user(email);
+    if (u && !u.hash) throw err('This account signs in with Google — please use the “Sign in with Google” button.', 401);
     const ok = u && crypto.timingSafeEqual(Buffer.from(hashPw(pw, u.salt), 'hex'), Buffer.from(u.hash, 'hex'));
     if (!ok) throw err('That email and password don’t match.', 401);
     return { token: sign(email), me: profile(u, await getCat()) };
   },
 
+  async google(req, b) {
+    await limit(req, 'google', 20, 900);
+    if (!GOOGLE_ID) throw err('Google sign-in isn’t switched on yet — please use your email for now.', 400);
+    const r = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(String(b.credential || '').slice(0, 4000)));
+    const t = r.ok ? await r.json() : null;
+    if (!t || t.aud !== GOOGLE_ID || !(t.email_verified === true || t.email_verified === 'true') || +t.exp * 1000 < Date.now() || !okEmail(String(t.email || '').toLowerCase())) throw err('Google sign-in didn’t work — please try again.', 401);
+    const email = String(t.email).toLowerCase(); let u = await user(email);
+    if (!u) {
+      u = { email, name: clean(t.name || t.given_name || email.split('@')[0], 80), salt: '', hash: '', google: String(t.sub), created: Date.now(), points: 0, owned: [], welcomeUsed: false, news: false };
+      await db('SET', 'u:' + email, JSON.stringify(u)); await db('ZADD', 'members', String(u.created), email);
+    } else if (!u.google) { u.google = String(t.sub); await db('SET', 'u:' + email, JSON.stringify(u)) }
+    return { token: sign(email), me: profile(u, await getCat()) };
+  },
+
   async me(req) {
     const u = await auth(req); if (!u) throw err('Please sign in again.', 401);
-    const ids = await db('LRANGE', 'u:' + u.email + ':orders', '0', '49');
-    const orders = (await pipe(ids.map(i => ['GET', 'o:' + i]))).map(J).filter(Boolean).map(o => ({ id: o.id, ts: o.ts, title: o.title, status: o.status }));
-    return { me: profile(u, await getCat()), orders };
+    const [ids, bidOn] = await pipe([['LRANGE', 'u:' + u.email + ':orders', '0', '49'], ['LRANGE', 'u:' + u.email + ':bids', '0', '99']]);
+    const orders = (await pipe((ids || []).map(i => ['GET', 'o:' + i]))).map(J).filter(Boolean).map(o => ({ id: o.id, ts: o.ts, title: o.title, status: o.status, offer: o.offer || 0, pay: o.pay && !o.pay.paid ? o.pay.url : '' }));
+    const cat = await getCat(), arts = Array.from(new Set(bidOn || [])), bids = [];
+    for (const aid of arts) {
+      const a = cat && (cat.arts || []).find(x => x.id === aid); if (!a || !a.auc) continue;
+      const top = topOf(await db('ZREVRANGE', 'bids:' + aid, '0', '0', 'WITHSCORES')), mine = top && top.email === u.email, over = Date.now() > a.auc.ends;
+      bids.push({ title: a.t, top: top ? top.amount : 0, ends: a.auc.ends, state: over ? (mine ? 'won' : 'lost') : (mine ? 'leading' : 'outbid') });
+    }
+    return { me: profile(u, cat), orders, bids, cur: cat && cat.site ? cat.site.cur : 'GBP' };
   },
 
   // a request to buy: a painting (by id, or the older painting number) or a print in a chosen size
@@ -162,10 +196,39 @@ const actions = {
       if (cat && !(cat.arts || []).some(a => a.id === aid)) throw err('That painting is no longer listed.', 404);
       title = titleOf(cat, aid);
     }
-    const o = { id: id(), ts: Date.now(), kind, artId: aid, title, name, email, phone: clean(b.phone, 40), message: clean(b.message, 2000), member: !!u,
+    const offer = Math.round(Math.max(0, Math.min(1e7, parseFloat(String(b.offer || '').replace(/[^0-9.]/g, '')) || 0)) * 100) / 100;
+    const o = { id: id(), ts: Date.now(), kind, artId: aid, title, name, email, phone: clean(b.phone, 40), message: clean(b.message, 2000), member: !!u, offer,
       welcome: !!(u && !u.welcomeUsed && kind === 'art'), useCredit: !!(u && b.useCredit && rewards(u, cat).points.credit > 0), status: 'new' };
     await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id]].concat(u ? [['LPUSH', 'u:' + email + ':orders', o.id]] : []));
     return { ok: true, id: o.id };
+  },
+
+  async like(req, b) {
+    await limit(req, 'like', 200, 3600);
+    const aid = clean(b.id, 24), vid = clean(b.vid, 40); if (!/^[a-z0-9]{1,24}$/i.test(aid) || !vid) throw err('Unknown painting.', 400);
+    const [, n] = await pipe([[b.on === false ? 'SREM' : 'SADD', 'lk:' + aid, vid], ['SCARD', 'lk:' + aid]]);
+    return { ok: true, n: +n || 0 };
+  },
+
+  async bid(req, b) {
+    await limit(req, 'bid', 30, 3600);
+    const u = await auth(req); if (!u) throw err('Please sign in or create an account to bid — it only takes a moment.', 401);
+    const cat = await getCat(), a = cat && (cat.arts || []).find(x => x.id === String(b.id));
+    if (!a || a.mode !== 'auction' || !a.auc) throw err('This painting isn’t in an auction.', 400);
+    if (a.status === 'Sold' || Date.now() > a.auc.ends) throw err('This auction has closed.', 400);
+    const amt = Math.round(Math.max(0, Math.min(1e7, parseFloat(String(b.amount || '').replace(/[^0-9.]/g, '')) || 0)) * 100) / 100;
+    const top = topOf(await db('ZREVRANGE', 'bids:' + a.id, '0', '0', 'WITHSCORES')), min = top ? top.amount + a.auc.step : a.auc.start;
+    if (amt < min) throw err('The next bid must be at least ' + money(min, cat.site && cat.site.cur) + '.', 400);
+    const bidr = { id: id(), ts: Date.now(), email: u.email, name: u.name, amount: amt };
+    const [, n] = await pipe([['ZADD', 'bids:' + a.id, String(amt), JSON.stringify(bidr)], ['ZCARD', 'bids:' + a.id], ['LPUSH', 'u:' + u.email + ':bids', a.id]]);
+    return { ok: true, top: amt, n: +n || 1 };
+  },
+
+  async sub(req, b) {
+    await limit(req, 'sub', 10, 3600);
+    const email = clean(b.email, 200).toLowerCase(); if (!okEmail(email)) throw err('Please enter a valid email address.', 400);
+    await pipe([['ZADD', 'subs', String(Date.now()), email]]);
+    return { ok: true };
   },
 
   async message(req, b) {
@@ -190,20 +253,28 @@ const actions = {
     const week = {}; wk.forEach(a => pairs(a).forEach(([k, n]) => { week[k] = (week[k] || 0) + n }));
     const cities = pairs(gcity), ll = cities.length ? await db('HMGET', 'g:ll', ...cities.map(c => c[0])) : [];
     const more = await pipe(oids.map(i => ['GET', 'o:' + i]).concat(mids.map(i => ['GET', 'm:' + i])).concat(emails.map(e => ['GET', 'u:' + e])));
-    const cat = await getCat();
+    const cat = await getCat(), arts = cat && cat.arts || [];
+    const extra = await pipe(arts.map(a => ['SCARD', 'lk:' + a.id]).concat(arts.map(a => ['ZREVRANGE', 'bids:' + a.id, '0', '19', 'WITHSCORES'])).concat([['ZREVRANGE', 'subs', '0', '499', 'WITHSCORES'], ['ZCARD', 'subs']]));
+    const likes = arts.map((a, i) => ({ id: a.id, t: a.t, n: +extra[i] || 0 })).filter(x => x.n).sort((x, y) => y.n - x.n);
+    const auctions = arts.map((a, i) => ({ a, L: extra[arts.length + i] })).filter(x => x.a.mode === 'auction' && x.a.auc).map(({ a, L }) => {
+      const bids = []; for (let k = 0; k + 1 < (L || []).length; k += 2) { const r = J(L[k]); if (r) bids.push({ name: r.name, email: r.email, amount: +L[k + 1] || r.amount, ts: r.ts }) }
+      return { id: a.id, t: a.t, start: a.auc.start, step: a.auc.step, ends: a.auc.ends, over: Date.now() > a.auc.ends, bids };
+    });
+    const SL = extra[arts.length * 2] || [], subs = []; for (let k = 0; k + 1 < SL.length; k += 2) subs.push({ email: SL[k], ts: +SL[k + 1] || 0 });
     const orders = more.slice(0, oids.length).map(J).filter(Boolean), msgs = more.slice(oids.length, oids.length + mids.length).map(J).filter(Boolean),
       members = more.slice(oids.length + mids.length).map(J).filter(Boolean).map(m => ({ name: m.name, email: m.email, joined: m.created, points: m.points || 0, owned: (m.owned || []).map(a => titleOf(cat, artId(a))), news: !!m.news }));
     return {
       visits: { total: +total || 0, unique: +uniq || 0, days, perDay: vis, uniquePerDay: uv },
       where: { countries: pairs(gcc), week: Object.keys(week).map(k => [k, week[k]]).sort((a, b) => b[1] - a[1]), cities: cities.map((c, i) => { const p = c[0].split('|'), q = String(ll[i] || '').split(','); return { city: p[0], region: p[1], cc: p[2], n: c[1], lat: +q[0] || null, lon: +q[1] || null } }), devices: pairs(gdev), sources: pairs(gref) },
-      members: { count: +nMembers || 0, list: members }, orders, msgs
+      members: { count: +nMembers || 0, list: members }, orders: await checkPaid(orders), msgs, likes, auctions, subs: { count: +extra[arts.length * 2 + 1] || 0, list: subs },
+      pay: !!STRIPE, google: !!GOOGLE_ID, cur: cat && cat.site ? cat.site.cur : 'GBP'
     };
   },
 
   async dashOrder(req, b) {
     await owner(req);
     const o = J(await db('GET', 'o:' + clean(b.id, 40))); if (!o) throw err('Order not found.', 404);
-    const st = ['new', 'contacted', 'completed', 'cancelled'].indexOf(b.status) >= 0 ? b.status : o.status;
+    const st = ORDER_ST.indexOf(b.status) >= 0 ? b.status : o.status;
     if (st === 'completed' && !o.awarded && o.member) {           // a sale: award points, record the piece for collection rewards, use up the welcome gift
       const m = await user(o.email);
       if (m) {
@@ -219,6 +290,35 @@ const actions = {
     return { ok: true, order: o };
   },
 
+  // a secure Stripe payment link for an enquiry, an accepted offer or a won auction: card, Apple Pay and Google Pay
+  async payLink(req, b) {
+    await owner(req);
+    if (!STRIPE) throw err('Payments aren’t switched on yet — add your Stripe key in Vercel first (see the Grow tab for the steps).', 400);
+    const o = J(await db('GET', 'o:' + clean(b.id, 40))); if (!o) throw err('Order not found.', 404);
+    const amt = Math.round(Math.max(0, Math.min(1e7, parseFloat(String(b.amount || '').replace(/[^0-9.]/g, '')) || 0)) * 100);
+    if (amt < 100) throw err('Enter the amount to charge.', 400);
+    const cat = await getCat(), cur = (cat && cat.site && cat.site.cur || 'GBP').toLowerCase();
+    const price = await stripe('prices', { currency: cur, unit_amount: amt, 'product_data[name]': o.title.slice(0, 240) });
+    const form = { 'line_items[0][price]': price.id, 'line_items[0][quantity]': 1, 'metadata[order]': o.id, 'after_completion[type]': 'redirect', 'after_completion[redirect][url]': SITE + '/?paid=1', 'phone_number_collection[enabled]': 'true' };
+    SHIP.forEach((c, i) => { form['shipping_address_collection[allowed_countries][' + i + ']'] = c });
+    const link = await stripe('payment_links', form);
+    o.pay = { url: link.url + (o.email ? '?prefilled_email=' + encodeURIComponent(o.email) : ''), link: link.id, amount: amt / 100, cur: cur.toUpperCase(), ts: Date.now(), paid: false };
+    if (['new', 'contacted'].indexOf(o.status) >= 0) o.status = 'awaiting';
+    await db('SET', 'o:' + o.id, JSON.stringify(o));
+    return { ok: true, order: o };
+  },
+
+  // an auction that has closed: the winner joins the sales list, ready for a payment link
+  async aucClose(req, b) {
+    await owner(req);
+    const cat = await getCat(), a = cat && (cat.arts || []).find(x => x.id === String(b.id)); if (!a || !a.auc) throw err('Auction not found.', 404);
+    const ex = await db('GET', 'aucord:' + a.id); if (ex) return { ok: true, id: ex };
+    const top = topOf(await db('ZREVRANGE', 'bids:' + a.id, '0', '0', 'WITHSCORES')); if (!top) throw err('No bids yet.', 400);
+    const o = { id: id(), ts: Date.now(), kind: 'auction', artId: a.id, title: 'Auction: ' + a.t, name: top.name, email: top.email, phone: '', message: 'Winning bid ' + money(top.amount, cat.site && cat.site.cur), member: true, offer: top.amount, welcome: false, useCredit: false, status: 'contacted' };
+    await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id], ['LPUSH', 'u:' + top.email + ':orders', o.id], ['SET', 'aucord:' + a.id, o.id]]);
+    return { ok: true, id: o.id };
+  },
+
   async dashMsg(req, b) {
     await owner(req);
     const m = J(await db('GET', 'm:' + clean(b.id, 40))); if (!m) throw err('Message not found.', 404);
@@ -227,6 +327,24 @@ const actions = {
 
   // ---- the catalogue ----
   async catGet(req) { await owner(req); return { cat: await getCat() } },
+  async catHist(req) {
+    await owner(req);
+    const L = (await db('LRANGE', 'cat:hist', '0', '9')).map(J).filter(Boolean);
+    return { list: L.map(c => ({ v: c.v, arts: (c.arts || []).length, colls: (c.colls || []).length, prints: (c.prints || []).length, texts: Object.keys(c.texts || {}).length })) };
+  },
+  async catRestore(req, b) {
+    await owner(req);
+    const L = (await db('LRANGE', 'cat:hist', '0', '9')).map(J).filter(Boolean), c = L.find(x => x.v === +b.v); if (!c) throw err('That version is no longer kept.', 404);
+    const n = cleanCat(c); await pipe([['SET', 'cat', JSON.stringify(n)], ['LPUSH', 'cat:hist', JSON.stringify(n)], ['LTRIM', 'cat:hist', '0', '9']]);
+    return { ok: true, cat: n };
+  },
+  async growGet(req) { await owner(req); return { grow: J(await db('GET', 'grow')) || { done: [], notes: {} } } },
+  async growSave(req, b) {
+    await owner(req); const g = b.grow || {}, notes = {};
+    if (g.notes && typeof g.notes === 'object') Object.keys(g.notes).slice(0, 120).forEach(k => { if (/^[a-z0-9-]{1,30}$/.test(k)) notes[k] = clean(g.notes[k], 600) });
+    const v = { done: (Array.isArray(g.done) ? g.done : []).map(String).filter(x => /^[a-z0-9-]{1,30}$/.test(x)).slice(0, 200), notes };
+    await db('SET', 'grow', JSON.stringify(v)); return { ok: true, grow: v };
+  },
   async catSave(req, b) {
     await owner(req);
     if (!b.cat || typeof b.cat !== 'object') throw err('Nothing to save.', 400);
@@ -247,6 +365,40 @@ const actions = {
   }
 };
 
+const ORDER_ST = ['new', 'contacted', 'awaiting', 'paid', 'sent', 'completed', 'cancelled'];
+const SHIP = ['GB', 'IE', 'US', 'CA', 'AU', 'NZ', 'FR', 'DE', 'ES', 'IT', 'NL', 'BE', 'LU', 'CH', 'AT', 'SE', 'NO', 'DK', 'FI', 'PT', 'PL', 'GR', 'JP', 'SG', 'HK', 'AE'];
+function topOf(L) { if (!L || L.length < 2) return null; const r = J(L[0]); return r ? Object.assign(r, { amount: +L[1] || r.amount }) : null }
+function money(n, cur) { return ({ GBP: '£', EUR: '€', USD: '$' }[cur || 'GBP'] || '£') + (Math.round(n * 100) / 100).toLocaleString('en-GB') }
+async function stripe(path, form, method) {
+  const r = await fetch('https://api.stripe.com/v1/' + path, { method: method || 'POST', headers: { Authorization: 'Bearer ' + STRIPE, 'Content-Type': 'application/x-www-form-urlencoded' }, body: method === 'GET' ? undefined : new URLSearchParams(form).toString() });
+  const j = await r.json(); if (!r.ok) throw err('Stripe: ' + (j.error && j.error.message || 'request failed'), 400); return j;
+}
+async function checkPaid(orders) {           // payment links still waiting: has Stripe taken the money yet?
+  if (!STRIPE) return orders;
+  const wait = orders.filter(o => o.pay && o.pay.link && !o.pay.paid).slice(0, 8);
+  await Promise.all(wait.map(async o => {
+    try {
+      const r = await fetch('https://api.stripe.com/v1/checkout/sessions?limit=5&payment_link=' + encodeURIComponent(o.pay.link), { headers: { Authorization: 'Bearer ' + STRIPE } });
+      const j = await r.json(), paid = (j.data || []).find(x => x.payment_status === 'paid');
+      if (paid) { o.pay.paid = true; o.pay.paidAt = Date.now(); o.pay.ship = paid.shipping_details || paid.collected_information && paid.collected_information.shipping_details || null; if (['new', 'contacted', 'awaiting'].indexOf(o.status) >= 0) o.status = 'paid'; await db('SET', 'o:' + o.id, JSON.stringify(o)) }
+    } catch (e) { }
+  }));
+  return orders;
+}
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+// a painting's own link: rich previews on social media and in messages, then straight into the gallery at that painting
+async function sharePage(aid, res) {
+  const cat = await getCat(), a = cat && (cat.arts || []).find(x => x.id === aid) || (!cat && /^p[1-6]$/.test(aid) ? { id: aid, t: ARTS[+aid.slice(1) - 1], m: 'Original painting', img: 'emb:' + aid } : null);
+  const img = a ? (/^emb:/.test(a.img) ? EMB_IMG[a.img.slice(4)] || '' : a.img) : '', go = '/' + (a ? '#art-' + a.id : '');
+  const t = a ? a.t + ' — an original painting by Pam' : 'Pam’s Gallery — original paintings', d = a ? (a.m ? a.m + '. ' : '') + 'See it in Pam’s gallery and enquire to buy.' : 'Original paintings by Pam.';
+  res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=300');
+  res.status(200).end('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>' + esc(t) + '</title><meta name="description" content="' + esc(d) + '">' +
+    '<meta property="og:type" content="website"><meta property="og:site_name" content="Pam’s Gallery"><meta property="og:title" content="' + esc(t) + '"><meta property="og:description" content="' + esc(d) + '">' +
+    (img ? '<meta property="og:image" content="' + esc(SITE + img) + '"><meta name="twitter:image" content="' + esc(SITE + img) + '">' : '') +
+    '<meta property="og:url" content="' + esc(SITE + '/api/app?s=' + (a ? a.id : '')) + '"><meta name="twitter:card" content="summary_large_image"><link rel="canonical" href="' + SITE + '/">' +
+    '<meta http-equiv="refresh" content="0;url=' + esc(go) + '"></head><body><p><a href="' + esc(go) + '">Open ' + esc(a ? a.t : 'Pam’s Gallery') + '</a></p><script>location.replace(' + JSON.stringify(go) + ')</script></body></html>');
+}
+
 async function getImage(key, res) {
   const meta = J(await db('GET', 'img:' + key)); if (!meta) { res.status(404).end(); return }
   const parts = await Promise.all(Array.from({ length: meta.n }, (_, i) => db('GET', 'img:' + key + ':' + i)));   // one piece per request keeps each reply small
@@ -262,7 +414,15 @@ module.exports = async (req, res) => {
       const q = req.query || {};
       if (!(DB_URL && DB_TOKEN)) { res.setHeader('Cache-Control', 'no-store'); res.status(503).json({ error: 'not_configured' }); return }
       if (q.img && /^[a-z0-9]{6,40}$/i.test(String(q.img))) { await getImage(String(q.img), res); return }
-      if (q.cat) { res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=5, stale-while-revalidate=30'); res.status(200).json({ cat: await getCat() }); return }
+      if (q.cat) { res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=5, stale-while-revalidate=30'); res.status(200).json({ cat: await getCat(), cfg: { google: GOOGLE_ID, pay: !!STRIPE } }); return }
+      if (q.s && /^[a-z0-9]{1,24}$/i.test(String(q.s))) { await sharePage(String(q.s), res); return }
+      if (q.live) {           // likes and the current bid on each auction, refreshed every few seconds
+        const cat = await getCat(), arts = cat && cat.arts || ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'].map(id => ({ id })), auc = arts.filter(a => a.mode === 'auction' && a.auc);
+        const r = await pipe(arts.map(a => ['SCARD', 'lk:' + a.id]).concat(auc.map(a => ['ZREVRANGE', 'bids:' + a.id, '0', '0', 'WITHSCORES'])).concat(auc.map(a => ['ZCARD', 'bids:' + a.id])));
+        const likes = {}; arts.forEach((a, i) => { if (+r[i]) likes[a.id] = +r[i] });
+        const bids = {}; auc.forEach((a, i) => { const t = topOf(r[arts.length + i]); bids[a.id] = { top: t ? t.amount : 0, n: +r[arts.length + auc.length + i] || 0, ends: a.auc.ends } });
+        res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=4, stale-while-revalidate=20'); res.status(200).json({ likes, bids }); return;
+      }
       res.setHeader('Cache-Control', 'no-store'); res.status(400).json({ error: 'Unknown request.' }); return;
     }
     res.setHeader('Cache-Control', 'no-store');
