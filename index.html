@@ -44,14 +44,40 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #tip{position:fixed;z-index:4;pointer-events:none;background:rgba(250,249,247,.94);color:var(--walnut);padding:.45rem .8rem;font-size:.85rem;letter-spacing:.03em;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .15s;white-space:nowrap}
 #tip i{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.1rem}
 #loading{position:fixed;inset:0;z-index:6;background:#140f0c;color:#e9dcc6;transition:opacity .75s ease;overflow:hidden}
-#ldc{position:absolute;inset:0;width:100%;height:100%;display:block}
-#loading .lw{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:.55rem;text-align:center;padding:0 16px;transition:top 1.2s cubic-bezier(.6,0,.2,1),transform 1.2s cubic-bezier(.6,0,.2,1)}
-#loading.up .lw{top:calc(env(safe-area-inset-top,0px) + 4.5vh);transform:translateY(0) scale(.8)}
-#loading .lt{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(2.7rem,8.5vw,4.4rem);line-height:1.05;color:#f7ecd6;position:relative;opacity:0;animation:ldT 1.3s .15s cubic-bezier(.2,.7,.2,1) forwards;text-shadow:0 2px 26px rgba(0,0,0,.55)}
+#loading{background:radial-gradient(ellipse 80% 70% at 50% 52%,#2d2118 0%,#1a130f 58%,#0d0907 100%)}
+#loading .ldust{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+#loading .ldust i{position:absolute;border-radius:50%;background:#f3d999;opacity:0;animation:ldDust 20s linear infinite;will-change:transform,opacity}
+@keyframes ldDust{0%{transform:translate3d(0,0,0);opacity:0}15%{opacity:.55}50%{opacity:.25}85%{opacity:.5}100%{transform:translate3d(14px,-38vh,0);opacity:0}}
+#loading .lw{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:.55rem;text-align:center;padding:0 16px;z-index:2}
+#loading .lt{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(2.7rem,8.5vw,4.4rem);line-height:1.05;color:#f7ecd6;position:relative;opacity:0;animation:ldT 1.3s .15s cubic-bezier(.2,.7,.2,1) forwards;text-shadow:0 2px 26px rgba(0,0,0,.55);will-change:transform,opacity}
 #loading .lt::after{content:"";position:absolute;left:6%;right:6%;bottom:-.2em;height:2px;background:linear-gradient(90deg,transparent,#e2c07a 22%,#f7e2a6 50%,#e2c07a 78%,transparent);transform:scaleX(0);animation:ldL 1.1s .6s cubic-bezier(.6,0,.2,1) forwards}
 #loading .ls{font-size:.68rem;letter-spacing:.42em;text-transform:uppercase;color:#cdbb9c;opacity:0;animation:ldF .9s 1s forwards;margin-top:.55rem}
-#loading .lcap{position:absolute;left:0;right:0;top:0;text-align:center;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:clamp(1.05rem,2.6vw,1.3rem);color:#ecdcbc;opacity:0;transition:opacity .9s;padding:0 16px;pointer-events:none;text-shadow:0 1px 12px rgba(0,0,0,.6)}
-#loading .lcap.on{opacity:1}
+#loading .lw{top:calc(env(safe-area-inset-top,0px) + 4.5vh);transform:translateY(calc(45.5vh - 50% - env(safe-area-inset-top,0px)));transition:transform 1.2s cubic-bezier(.6,0,.2,1);will-change:transform}
+#loading.up .lw{top:calc(env(safe-area-inset-top,0px) + 4.5vh);transform:translateY(0) scale(.8)}
+#loading .lt,#loading .ls,#loading .lt::after{animation-play-state:paused}
+#loading.go .lt,#loading.go .ls,#loading.go .lt::after{animation-play-state:running}
+#loading .lstage{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 4.5vh + 112px);bottom:calc(env(safe-area-inset-bottom,0px) + 4vh + 150px);pointer-events:none}
+@media (min-width:700px){#loading .lstage{top:calc(env(safe-area-inset-top,0px) + 4.5vh + 132px);bottom:calc(env(safe-area-inset-bottom,0px) + 4vh + 128px)}}
+#loading .lsl{position:absolute;inset:0;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;will-change:opacity}
+#loading .lfl{animation:ldFloat 7s ease-in-out infinite alternate;will-change:transform}
+@keyframes ldFloat{from{transform:translate3d(0,-3px,0)}to{transform:translate3d(0,3px,0)}}
+#loading .lfr{background:linear-gradient(135deg,#8a6326 0%,#ecce86 28%,#b98a3e 50%,#f3d892 74%,#7c5622 100%);box-shadow:0 22px 48px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.4)}
+#loading .lwin{overflow:hidden;outline:2px solid rgba(58,36,12,.85);position:relative}
+#loading .lwin::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,238,205,.1),rgba(0,0,0,.14))}
+#loading .lwin img{display:block;max-width:none;will-change:transform;backface-visibility:hidden}
+#loading figcaption{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:clamp(1.05rem,2.6vw,1.3rem);color:#ecdcbc;text-shadow:0 1px 12px rgba(0,0,0,.6);text-align:center;padding:0 16px}
+#loading .lbird{position:absolute;left:0;top:30%;width:0;height:0;pointer-events:none;animation:ldFly 12s linear 2.8s infinite both;will-change:transform}
+@keyframes ldFly{0%{transform:translate3d(-130px,0,0)}30%{transform:translate3d(calc(100vw + 30px),-4vh,0)}30.01%,100%{transform:translate3d(calc(100vw + 30px),-4vh,0)}}
+#loading .lbb{position:relative;width:112px;height:64px;transform:scale(var(--gs,.8));animation:ldBob .9s ease-in-out infinite alternate}
+@media (max-width:700px){#loading .lbb{--gs:.56}}
+@keyframes ldBob{from{translate:0 -5px}to{translate:0 5px}}
+#loading .lbd{position:absolute;left:0;top:0;width:112px;height:64px}
+#loading .lwg{position:absolute;left:13.6px;top:-10.4px;width:51.2px;height:48px;transform-origin:96.9% 90%;animation:ldFlap .28s ease-in-out infinite alternate;will-change:transform}
+#loading .lwg.far{animation-delay:-.28s;filter:brightness(.92)}
+#loading .lwg svg{display:block;width:100%;height:100%}
+@keyframes ldFlap{from{transform:scaleY(1)}to{transform:scaleY(-.8)}}
+#loading.off *{animation:none!important}
+@media (prefers-reduced-motion:reduce){#loading .lbird,#loading .ldust{display:none}#loading .lfl{animation:none}#loading .lw{transition:none}}
 #loading .lfoot{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 4vh);display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:0 16px}
 #loading .lb{width:min(220px,60vw);height:2px;background:rgba(243,230,204,.16);border-radius:2px;overflow:hidden;transition:opacity .5s}
 #loading .lb i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#c99a4a,#f3d999);transform-origin:left center;transform:scaleX(.03);transition:transform .6s ease}
@@ -60,7 +86,7 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #ldGo{font:inherit;font-size:.98rem;letter-spacing:.05em;padding:.85rem 1.8rem;min-height:48px;border-radius:99px;border:1px solid #e2c07a;background:#f4e5c2;color:#2a1b12;cursor:pointer;box-shadow:0 12px 32px rgba(0,0,0,.4);animation:ldG .6s ease both}
 #ldGo:hover{background:#fff2d4}
 #ldGo:focus-visible{outline:2px solid #f3d999;outline-offset:3px}
-@keyframes ldT{from{opacity:0;letter-spacing:.14em;filter:blur(6px)}to{opacity:1;letter-spacing:.01em;filter:none}}
+@keyframes ldT{from{opacity:0;transform:translate3d(0,14px,0) scale(.97)}to{opacity:1;transform:none}}
 @keyframes ldL{to{transform:scaleX(1)}}
 @keyframes ldF{to{opacity:1}}
 @keyframes ldG{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -599,71 +625,47 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
  <div class="follow" data-follow hidden></div>
 </section>
 <div id="loading" role="status" aria-label="Opening Pam’s Gallery">
- <canvas id="ldc" aria-hidden="true"></canvas>
+ <div class="ldust" aria-hidden="true"><i style="left:6%;top:82%;width:2.4px;height:2.4px;animation-duration:19s;animation-delay:-3s"></i><i style="left:14%;top:40%;width:1.6px;height:1.6px;animation-duration:23s;animation-delay:-11s"></i><i style="left:22%;top:68%;width:2.2px;height:2.2px;animation-duration:17s;animation-delay:-6s"></i><i style="left:31%;top:90%;width:1.4px;height:1.4px;animation-duration:25s;animation-delay:-15s"></i><i style="left:39%;top:30%;width:2.0px;height:2.0px;animation-duration:21s;animation-delay:-2s"></i><i style="left:47%;top:75%;width:1.6px;height:1.6px;animation-duration:18s;animation-delay:-9s"></i><i style="left:55%;top:52%;width:2.6px;height:2.6px;animation-duration:24s;animation-delay:-13s"></i><i style="left:63%;top:86%;width:1.5px;height:1.5px;animation-duration:20s;animation-delay:-4s"></i><i style="left:71%;top:36%;width:2.1px;height:2.1px;animation-duration:22s;animation-delay:-16s"></i><i style="left:79%;top:64%;width:1.7px;height:1.7px;animation-duration:19s;animation-delay:-7s"></i><i style="left:87%;top:88%;width:2.4px;height:2.4px;animation-duration:26s;animation-delay:-12s"></i><i style="left:94%;top:46%;width:1.5px;height:1.5px;animation-duration:18s;animation-delay:-1s"></i><i style="left:10%;top:20%;width:1.8px;height:1.8px;animation-duration:24s;animation-delay:-18s"></i><i style="left:58%;top:14%;width:1.6px;height:1.6px;animation-duration:21s;animation-delay:-5s"></i><i style="left:84%;top:22%;width:2.0px;height:2.0px;animation-duration:23s;animation-delay:-10s"></i><i style="left:35%;top:58%;width:1.4px;height:1.4px;animation-duration:20s;animation-delay:-14s"></i></div>
+ <div class="lstage" id="ldStage" aria-hidden="true"></div>
+ <div class="lbird" aria-hidden="true"><div class="lbb"><div class="lwg far"><svg viewBox="-62 -54 64 60" aria-hidden="true"><path fill="#68718a" d="M-8 0C-6-26-30-48-60-52C-47-36-34-18-26 4Z"/><path fill="#3d4352" d="M-60-52C-52-42-45-31-39-21L-47-26Z"/><path fill="#f4f1ea" d="M-10-14L-27-25L-25-20L-9-10Z"/></svg></div><svg class="lbd" viewBox="-75 -45 140 80" aria-hidden="true"><path fill="#5d6576" d="M-28 1L-66-7L-71 5L-65 14L-28 12Z"/><path fill="#3a3f4c" d="M-60-6L-71 5L-65 14L-57 11Z"/><ellipse cx="0" cy="4" rx="36" ry="19" fill="#8f99ad" transform="rotate(-4.6)"/><ellipse cx="18" cy="8" rx="17" ry="13" fill="#c79cab" transform="rotate(17 18 8)"/><ellipse cx="28" cy="-6" rx="11" ry="13" fill="#93a0b2" transform="rotate(29 28 -6)"/><ellipse cx="26" cy="-4" rx="7" ry="6" fill="rgba(110,160,128,.75)" transform="rotate(29 26 -4)"/><ellipse cx="27" cy="1" rx="5.5" ry="2.6" fill="#fff" transform="rotate(23 27 1)"/><circle cx="37" cy="-15" r="11" fill="#9ba7ba"/><path fill="#e6a07d" d="M46-17.5L57-13L46-10.5Z"/><circle cx="46" cy="-15.5" r="2.2" fill="#f4ece4"/><circle cx="40" cy="-17" r="3.1" fill="#f2c14e"/><circle cx="40.7" cy="-17" r="1.5" fill="#1a1410"/><path fill="#e3b450" d="M29-24L30-37L34-29L37-40L40-29L44-37L45-24Z"/><rect x="29" y="-26.5" width="16" height="3" fill="#b8862e"/><circle cx="37" cy="-28" r="1.7" fill="#c0392b"/></svg><div class="lwg"><svg viewBox="-62 -54 64 60" aria-hidden="true"><path fill="#8891a6" d="M-8 0C-6-26-30-48-60-52C-47-36-34-18-26 4Z"/><path fill="#474d5d" d="M-60-52C-52-42-45-31-39-21L-47-26Z"/><path fill="#f4f1ea" d="M-10-14L-27-25L-25-20L-9-10Z"/></svg></div></div></div>
  <div class="lw"><div class="lt" data-t="film.title">Pam’s Gallery</div><div class="ls" data-t="film.sub">Original paintings</div></div>
- <div class="lcap" id="ldcap" aria-hidden="true"></div>
  <div class="lfoot"><div class="lb"><i id="ldbar"></i></div><div class="lmsg" id="ldmsg">Opening the doors…</div><button id="ldGo" type="button" hidden>Enter the gallery<span aria-hidden="true"> ›</span></button></div>
 </div>
 <script>
-/* ---------- the opening film: Pam's paintings drift past in gold frames while the gallery loads, and King George flies by ---------- */
+/* ---------- the opening film: Pam's paintings drift past in gold frames while the gallery loads, and King George flies by.
+   Everything moves with CSS transforms, which the graphics card animates on its own, so the film stays smooth while the gallery is being built. ---------- */
 (function(){"use strict";
- var L=document.getElementById('loading'),C=document.getElementById('ldc'),x=C.getContext('2d'),cap=document.getElementById('ldcap'),bar=document.getElementById('ldbar'),msg=document.getElementById('ldmsg'),go=document.getElementById('ldGo');
- var RM=matchMedia('(prefers-reduced-motion:reduce)').matches,T0=performance.now(),W=1,H=1,D=1,raf=0,alive=true,arts=[],cur=-1,prev=-1,st=0,target=0,readyFn=null,autoT=0,seen=false,bg=null;
+ var L=document.getElementById('loading'),stage=document.getElementById('ldStage'),bar=document.getElementById('ldbar'),msg=document.getElementById('ldmsg'),go=document.getElementById('ldGo');
+ var RM=matchMedia('(prefers-reduced-motion:reduce)').matches,T0=performance.now(),target=0,readyFn=null,autoT=0,upT=0,seen=false,slides=[],built=false;
  try{seen=localStorage.getItem('pgFilm')==='1'}catch(e){}
- var HOLD=RM?3.4:2.6,FADE=RM?1.3:1.0,dust=[];for(var i=0;i<40;i++)dust.push({x:Math.random(),y:Math.random(),r:.5+Math.random()*1.7,s:.006+Math.random()*.014,p:Math.random()*6.3});
- function size(){D=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;C.width=Math.round(W*D);C.height=Math.round(H*D);bg=null}
- size();addEventListener('resize',size);
- setTimeout(function(){L.classList.add('up')},RM?150:1550);
- function box(im){var top=Math.max(110,H*.045+(W<700?96:128)),bot=H-(H*.04+(W<700?150:160)),aw=Math.min(W*(W<700?.8:.62),820),ah=Math.max(80,bot-top),r=im.naturalWidth/im.naturalHeight,w=aw,h=w/r;if(h>ah){h=ah;w=h*r}
-  return{x:(W-w)/2,y:top+(ah-h)/2,w:w,h:h}}
- function drawArt(a,al,age){if(!a||al<=0)return;var r=box(a.im),F=Math.max(7,Math.min(r.w,r.h)*.05),fl=RM?0:Math.sin(age*.8+a.ph)*3,k=RM?1:1.07-.07*Math.min(1,age/(HOLD+FADE*2));
-  x.globalAlpha=al;x.save();x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=46;x.shadowOffsetY=20;x.fillStyle='#1a120c';x.fillRect(r.x-F,r.y-F+fl,r.w+2*F,r.h+2*F);x.restore();
-  var g=x.createLinearGradient(r.x-F,r.y-F,r.x+r.w+F,r.y+r.h+F);g.addColorStop(0,'#8a6326');g.addColorStop(.28,'#ecce86');g.addColorStop(.5,'#b98a3e');g.addColorStop(.74,'#f3d892');g.addColorStop(1,'#7c5622');
-  x.fillStyle=g;x.fillRect(r.x-F,r.y-F+fl,r.w+2*F,r.h+2*F);x.fillStyle='rgba(58,36,12,.85)';x.fillRect(r.x-2,r.y-2+fl,r.w+4,r.h+4);
-  x.save();x.beginPath();x.rect(r.x,r.y+fl,r.w,r.h);x.clip();var iw=r.w*k,ih=r.h*k;x.drawImage(a.im,r.x+(r.w-iw)/2+a.dir*(k-1)*r.w*.35,r.y+fl+(r.h-ih)/2,iw,ih);
-  var lg=x.createLinearGradient(0,r.y,0,r.y+r.h);lg.addColorStop(0,'rgba(255,238,205,.10)');lg.addColorStop(1,'rgba(0,0,0,.14)');x.fillStyle=lg;x.fillRect(r.x,r.y+fl,r.w,r.h);x.restore();x.globalAlpha=1;
-  return r.y+r.h+F}
- function wing(f,c1,c2,dy){x.save();x.translate(4,-4+dy);x.scale(1,f);
-  x.fillStyle=c1;x.beginPath();x.moveTo(-8,0);x.bezierCurveTo(-6,-26,-30,-48,-60,-52);x.bezierCurveTo(-47,-36,-34,-18,-26,4);x.closePath();x.fill();
-  x.fillStyle=c2;x.beginPath();x.moveTo(-60,-52);x.bezierCurveTo(-52,-42,-45,-31,-39,-21);x.lineTo(-47,-26);x.closePath();x.fill();
-  x.fillStyle='#f4f1ea';x.beginPath();x.moveTo(-10,-14);x.lineTo(-27,-25);x.lineTo(-25,-20);x.lineTo(-9,-10);x.closePath();x.fill();x.restore()}
- function george(px,py,s,ph,tilt){var f=Math.sin(ph);x.save();x.translate(px,py);x.rotate(tilt);x.scale(s/100,s/100);
-  wing(-f*.85+.15,'#68718a','#3d4352',-5);
-  x.fillStyle='#5d6576';x.beginPath();x.moveTo(-28,1);x.lineTo(-66,-7);x.lineTo(-71,5);x.lineTo(-65,14);x.lineTo(-28,12);x.closePath();x.fill();
-  x.fillStyle='#3a3f4c';x.beginPath();x.moveTo(-60,-6);x.lineTo(-71,5);x.lineTo(-65,14);x.lineTo(-57,11);x.closePath();x.fill();
-  x.fillStyle='#8f99ad';x.beginPath();x.ellipse(0,4,36,19,-.08,0,6.3);x.fill();
-  x.fillStyle='#c79cab';x.beginPath();x.ellipse(18,8,17,13,.3,0,6.3);x.fill();
-  x.fillStyle='#93a0b2';x.beginPath();x.ellipse(28,-6,11,13,.5,0,6.3);x.fill();
-  x.fillStyle='rgba(110,160,128,.75)';x.beginPath();x.ellipse(26,-4,7,6,.5,0,6.3);x.fill();
-  x.fillStyle='#fff';x.beginPath();x.ellipse(27,1,5.5,2.6,.4,0,6.3);x.fill();
-  x.fillStyle='#9ba7ba';x.beginPath();x.arc(37,-15,11,0,6.3);x.fill();
-  x.fillStyle='#e6a07d';x.beginPath();x.moveTo(46,-17.5);x.lineTo(57,-13);x.lineTo(46,-10.5);x.closePath();x.fill();x.fillStyle='#f4ece4';x.beginPath();x.arc(46,-15.5,2.2,0,6.3);x.fill();
-  x.fillStyle='#f2c14e';x.beginPath();x.arc(40,-17,3.1,0,6.3);x.fill();x.fillStyle='#1a1410';x.beginPath();x.arc(40.7,-17,1.5,0,6.3);x.fill();
-  x.fillStyle='#e3b450';x.beginPath();x.moveTo(29,-24);x.lineTo(30,-37);x.lineTo(34,-29);x.lineTo(37,-40);x.lineTo(40,-29);x.lineTo(44,-37);x.lineTo(45,-24);x.closePath();x.fill();
-  x.fillStyle='#b8862e';x.fillRect(29,-26.5,16,3);x.fillStyle='#c0392b';x.beginPath();x.arc(37,-28,1.7,0,6.3);x.fill();
-  wing(f,'#8891a6','#474d5d',0);x.restore()}
- function frame(now){if(!alive)return;raf=requestAnimationFrame(frame);var t=(now-T0)/1000;x.setTransform(D,0,0,D,0,0);
-  if(!bg){bg=x.createRadialGradient(W/2,H*.5,0,W/2,H*.5,Math.max(W,H)*.78);bg.addColorStop(0,'#2d2118');bg.addColorStop(.55,'#1a130f');bg.addColorStop(1,'#0d0907')}
-  x.fillStyle=bg;x.fillRect(0,0,W,H);
-  x.fillStyle='#f3d999';dust.forEach(function(d){var yy=((d.y-(RM?0:t*d.s))%1+1)%1;x.globalAlpha=(.12+.32*(.5+.5*Math.sin(t*1.2+d.p)))*(RM?.6:1);x.beginPath();x.arc((d.x+Math.sin(t*.2+d.p)*.02)*W,yy*H,d.r,0,6.3);x.fill()});x.globalAlpha=1;
-  var n=arts.length,have=arts.filter(Boolean).length;
-  if(cur<0&&have&&t>1.9){cur=next(-1);st=t;showCap()}
-  else if(cur>=0&&have>1&&t-st>HOLD+FADE){prev=cur;cur=next(cur);st=t;showCap()}
-  var age=t-st,fin=Math.min(1,age/FADE),y=0;
-  if(prev>=0&&fin<1)drawArt(arts[prev],1-fin,age+HOLD+FADE);
-  if(cur>=0)y=drawArt(arts[cur],fin,age);
-  if(y)cap.style.transform='translateY('+Math.round(y+14)+'px)';
-  if(!RM){var fl=(t-2.7)%12;if(t>2.7&&fl<3.6){var u=fl/3.6,s=Math.max(46,Math.min(92,Math.min(W,H)*.12));george(-s+u*(W+2*s),H*.36-Math.sin(u*Math.PI)*H*.07+Math.sin(u*Math.PI*4)*6,s,t*11,Math.cos(u*Math.PI*2)*.07)}}}
- function next(i){var n=arts.length;for(var k=1;k<=n;k++){var j=(i+k+n)%n;if(arts[j])return j}return i}
- function showCap(){var a=arts[cur];cap.classList.remove('on');setTimeout(function(){if(!alive||!arts[cur])return;cap.textContent=arts[cur].t;cap.classList.add('on')},RM?0:350)}
- raf=requestAnimationFrame(frame);
- function setArt(list){arts=list.map(function(){return null});list.forEach(function(a,i){var im=new Image();im.decoding='async';im.onload=function(){arts[i]={im:im,t:a.t,ph:Math.random()*6,dir:i%2?1:-1}};im.src=a.src})}
+ var SLOT=RM?3.6:3.2,FADE=RM?1.2:1.0;
+ function now(){return(performance.now()-T0)/1000}
+ // the title waits for its typeface, so it never jumps from one font to another
+ var fontP=document.fonts&&document.fonts.load?Promise.race([document.fonts.load('italic 400 48px "Cormorant Garamond"'),new Promise(function(r){setTimeout(r,900)})]):Promise.resolve();
+ fontP.then(function(){L.classList.add('go')},function(){L.classList.add('go')});
+ upT=setTimeout(function(){L.classList.add('up')},RM?150:1600);
+ function fit(){var r=stage.getBoundingClientRect(),ph=innerWidth<700;slides.forEach(function(sl){var im=sl.im,ar=im.naturalWidth/im.naturalHeight||1,P=Math.round(Math.max(7,Math.min(16,Math.min(r.width,r.height)*.04))),
+   aw=Math.min(r.width*(ph?.84:.6),820)-2*P,ah=Math.max(60,r.height-48-2*P),w=aw,h=w/ar;if(h>ah){h=ah;w=h*ar}im.style.width=Math.round(w)+'px';im.style.height=Math.round(h)+'px';sl.fr.style.padding=P+'px'})}
+ addEventListener('resize',fit);
+ function build(list){if(built)return;built=true;var n=list.length;if(!n)return;var C=n*SLOT,f1=(FADE/C*100).toFixed(3),s1=(SLOT/C*100).toFixed(3),e1=((SLOT+FADE)/C*100).toFixed(3);
+  var st=document.createElement('style');st.textContent=n>1?'@keyframes lsv{0%{opacity:0}'+f1+'%{opacity:1}'+s1+'%{opacity:1}'+e1+'%{opacity:0}100%{opacity:0}}@keyframes lkb{0%{transform:scale(1.08) translateX(var(--dx))}'+e1+'%{transform:scale(1) translateX(0)}100%{transform:scale(1) translateX(0)}}'
+   :'@keyframes lsv{0%{opacity:0}100%{opacity:1}}@keyframes lkb{0%{transform:scale(1.08)}100%{transform:scale(1)}}';document.head.appendChild(st);
+  list.forEach(function(a,i){var fg=document.createElement('figure'),fl=document.createElement('div'),fr=document.createElement('div'),win=document.createElement('div'),cap=document.createElement('figcaption');
+   fg.className='lsl';fl.className='lfl';fr.className='lfr';win.className='lwin';cap.textContent=a.t;a.im.alt='';win.appendChild(a.im);fr.appendChild(win);fl.appendChild(fr);fg.appendChild(fl);fg.appendChild(cap);
+   var d=(i*SLOT)+'s';fg.style.animation=n>1?'lsv '+C+'s linear '+d+' infinite both':'lsv '+FADE+'s ease both';a.im.style.setProperty('--dx',(i%2?'-':'')+'2.2%');
+   a.im.style.animation=RM?'none':(n>1?'lkb '+C+'s linear '+d+' infinite both':'lkb 6s ease-out both');fl.style.animationDelay=(-i*1.7)+'s';
+   slides.push({fg:fg,fr:fr,im:a.im});stage.appendChild(fg)});fit()}
+ function setArt(list){var got=[],left=list.length,T=null;if(!left)return;var r0=Math.floor(Math.random()*left);list=list.slice(r0).concat(list.slice(0,r0));   // a different painting opens the film each visit
+
+  function done(){if(built||!got.filter(Boolean).length)return;var wait=Math.max(0,(RM?.3:1.9)-now());setTimeout(function(){build(got.filter(Boolean))},wait*1000)}
+  list.forEach(function(a,i){var im=new Image();im.decoding='async';try{im.fetchPriority='high'}catch(e){}im.onload=function(){(im.decode?im.decode():Promise.resolve()).catch(function(){}).then(function(){got[i]={im:im,t:a.t};left--;if(!left||got.filter(Boolean).length>=3)done()})};im.onerror=function(){left--;if(!left)done()};im.src=a.src});
+  T=setTimeout(done,2600)}
  function setP(f){target=Math.max(target,Math.min(1,f));bar.style.transform='scaleX('+Math.max(.03,target).toFixed(3)+')';msg.textContent=target>=1?'Welcome in':target>.6?'Hanging the paintings…':'Opening the doors…'}
- function stop(){alive=false;cancelAnimationFrame(raf);removeEventListener('resize',size);clearTimeout(autoT)}
- function enter(){if(INTRO.entered)return;INTRO.entered=true;INTRO.up=false;clearTimeout(autoT);try{localStorage.setItem('pgFilm','1')}catch(e){}
+ function stop(){removeEventListener('resize',fit);clearTimeout(autoT);clearTimeout(upT);L.classList.add('off')}
+ function enter(){if(INTRO.entered)return;INTRO.entered=true;INTRO.up=false;clearTimeout(autoT);clearTimeout(upT);try{localStorage.setItem('pgFilm','1')}catch(e){}
   L.style.opacity=0;L.style.pointerEvents='none';setTimeout(function(){L.style.display='none';stop()},800);if(readyFn)try{readyFn()}catch(e){console.error(e)}}
- function ready(fn){readyFn=fn;setP(1);L.classList.add('done');var el=(performance.now()-T0)/1000,min=seen?1.1:6.6;
-  if(el>=min){enter();return}if(min-el>1.2){go.hidden=false}autoT=setTimeout(enter,(min-el)*1000)}
+ function ready(fn){readyFn=fn;setP(1);L.classList.add('done');var el=now(),min=seen?3.8:6.6;
+  if(el>=min){enter();return}if(min-el>.6){go.hidden=false}autoT=setTimeout(enter,(min-el)*1000)}
  go.addEventListener('click',enter);
  window.INTRO={up:true,entered:false,art:setArt,progress:setP,ready:ready,stop:function(){stop();INTRO.up=false;L.style.display='none'}};
 })();
@@ -889,6 +891,44 @@ function $(id){return document.getElementById(id)}
 /* ---------- the site's words, contact details, links and selling options: all set from Pam's dashboard ---------- */
 var SITE={email:EMAIL,phone:'',place:'',social:{},banner:{on:false,text:''},commissions:false,offers:true,share:true,likes:true,cur:'GBP'},CFG={google:'',pay:false},TXT={},TXD=null;
 var GREET_DEF='Greetings, I am King George II, guardian of the gallery. We have been expecting you. To your right hang this month’s favourites; through the portal to your left, Pam’s collections. Come — perhaps you will find the next masterpiece for your private collection.';
+var GDEF={'george.greet':GREET_DEF,
+ 'george.tourap':'Swipe **right** for **This Month’s Favourites** — each swipe brings the next painting in from the right. Like so…',
+ 'george.tourac':'Press the **right arrow** (or simply scroll) for **This Month’s Favourites** — each press brings the next painting in from the right. Like so…',
+ 'george.tourbp':'Stop at any painting and its price appears below it, with **Enquire to buy** — Pam replies to every enquiry personally. Tap a painting for its story; the **magnifier** zooms right in on every brushstroke, and “View on your wall” shows it hanging in your own home.',
+ 'george.tourbc':'Stop at any painting and its price appears below it, with **Enquire to buy** — Pam replies to every enquiry personally. Click a painting for its story; the **magnifier** zooms right in on every brushstroke.',
+ 'george.tourcp':'Swipe **left** from the entrance to step through the marble portal into the **Collections hall**. Inside, keep swiping **right** to walk round its walls and up close to each painting; one more swipe at the end brings you back out. Let me show you…',
+ 'george.tourcc':'Press the **left arrow** from the entrance to step through the marble portal into the **Collections hall**. Inside, keep pressing **right** to walk round its walls and up close to each painting; one more at the end brings you back out. Let me show you…',
+ 'george.tourd':'Up here, **Collections** shows every collection on one page, **Prints** offers prints in a choice of sizes, **About** tells you all about Pam, and **Music** sets the mood.',
+ 'george.toure':'And do join our **collectors’ circle**: 5% off your first painting, points on every purchase, and a special reward for completing a collection.',
+ 'george.tourend':'That is everything! I shall be in the corner whenever you need me — {tap} me any time. Where shall we begin?',
+ 'george.alone':'Very well. I shall be right here in the corner — {tap} me whenever you need me.',
+ 'george.skip':'As you wish. I am right here if you need me.',
+ 'george.back':'Welcome back to the gallery! {Tap} me whenever you would like a guide.',
+ 'george.doorp':'Welcome to Pam’s Gallery! Swipe right for this month’s favourites, or swipe left through the marble portal into Pam’s collections. Every painting is an original.',
+ 'george.doorc':'Welcome to Pam’s Gallery! Go right for this month’s favourites, or left through the marble portal into Pam’s collections. Every painting is an original.',
+ 'george.arta':'Here we have {painting}. {Tap} the painting to see its details and price.',
+ 'george.artb':'This one is {painting}. Take your time — {tap} it if you’d like to know more.',
+ 'george.artc':'Ah, {painting}. One of my favourites. {Tap} it for the details.',
+ 'george.artd':'And this is {painting}. {Tap} the painting to enquire about it.',
+ 'george.artwall':'You can even see it on your own wall!',
+ 'george.coll':'Collection {number}: {collection}. {description} Walk on and I shall take you up close to each painting — the locked frames are new works still in Pam’s studio.',
+ 'george.collend':'And that is the collections — new works join them as they leave Pam’s studio. From the entrance, swipe right whenever you like for this month’s favourites.',
+ 'george.leftp':'I hope you enjoyed the collections! Now swipe right for this month’s favourites.',
+ 'george.leftc':'I hope you enjoyed the collections! Now go right for this month’s favourites.',
+ 'george.balcony':'Out here is the balcony. Keep an eye on the field — my tall friend loves to dance! If a painting has caught your eye, you can write to Pam right here.',
+ 'george.menu':'King George, at your service. How may I help?',
+ 'george.buy':'Every painting is an original. Stop at any painting, or tap it, and choose “Enquire to buy” — you can make an offer too. Some paintings go to auction: just place a bid before it closes. Pam replies personally to arrange secure payment and delivery. Members also earn rewards.',
+ 'george.prints':'Indeed! Prints of Pam’s paintings come in a choice of sizes, each with its own price. Pick a size and send a request — Pam replies personally.',
+ 'george.noprints':'Prints are on their way — Pam is preparing them now. In the meantime you are welcome to ask her about a print of any painting.',
+ 'george.members':'Join our collectors’ circle and enjoy 5% off your first painting, loyalty points on every purchase, and a signed print when you complete a collection.',
+ 'george.contact':'You may send Pam a message right here, or email her at {email}. She replies to every message personally.',
+ 'george.wall':'Walk up to any painting first, then tap me again — or tap the painting and choose “View on your wall”.'};
+var TXN={'King George — the welcome tour':'Words in {curly brackets} fill themselves in, so keep them as they are: {tap} becomes “tap” on phones and “click” on computers ({Tap} with a capital). Put **two stars** around words to make them bold.',
+ 'King George — around the gallery':'Words in {curly brackets} fill themselves in, so keep them as they are: {painting} is the painting’s name; {number}, {collection} and {description} are the collection’s number, name and description; {tap} becomes “tap” or “click”. Put **two stars** around words to make them bold.',
+ 'King George — when visitors tap him':'{email} is your email address. Put **two stars** around words to make them bold.'};
+/* King George's words: the owner's wording (or the original), made safe, with bold and the filled-in words */
+function GL(k,v){var t=esc(siteT(k)).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>'),T=TOUCH,V={tap:T?'tap':'click',Tap:T?'Tap':'Click',email:'<b>'+esc(EMAIL)+'</b>'};v=v||{};
+ return t.replace(/\{(\w+)\}/g,function(m,n){return v[n]!=null?v[n]:V[n]!=null?V[n]:m})}
 function applySite(c){var S=c&&c.site||{};Object.keys(S).forEach(function(k){SITE[k]=S[k]});if(SITE.email)EMAIL=SITE.email;TXT=c&&c.texts||{}}
 var TX=[['film.title','Opening film','Title','#loading .lt'],['film.sub','Opening film','Line under the title','#loading .ls'],
  ['hero.title','Entrance','Big title','#title h1'],['hero.sub','Entrance','Line under the title','#title p'],['bar.name','Top bar','Gallery name','#bar .name'],
@@ -897,16 +937,34 @@ var TX=[['film.title','Opening film','Title','#loading .lt'],['film.sub','Openin
  ['pr.title','Prints page','Heading','#prh'],['pr.lede','Prints page','Introduction','#prints .lede',1],
  ['enq.title','The balcony','Heading','#enqTitle'],['enq.lead','The balcony','Text','#enqPanel .lead',1],
  ['buy.done','Forms','Thank-you after an enquiry','#buyDone .note',1],['msg.done','Forms','Thank-you after a message','#msgDone .note',1],
- ['george.greet','King George','His welcome',null,1],
+ ['george.name','King George — his name','His name (shown above his speech and on his button)','#gBub .who'],
+ ['george.greet','King George — the welcome tour','His first greeting',null,1],
+ ['george.tourap','King George — the welcome tour','Step 1 — on phones',null,1],['george.tourac','King George — the welcome tour','Step 1 — on computers',null,1],
+ ['george.tourbp','King George — the welcome tour','Step 2 — on phones',null,1],['george.tourbc','King George — the welcome tour','Step 2 — on computers',null,1],
+ ['george.tourcp','King George — the welcome tour','Step 3 — on phones',null,1],['george.tourcc','King George — the welcome tour','Step 3 — on computers',null,1],
+ ['george.tourd','King George — the welcome tour','Step 4 (the menu at the top)',null,1],['george.toure','King George — the welcome tour','Step 5 (collectors’ circle)',null,1],
+ ['george.tourend','King George — the welcome tour','At the end of the tour',null,1],['george.alone','King George — the welcome tour','If the visitor would rather explore alone',null,1],
+ ['george.skip','King George — the welcome tour','If the visitor skips the tour',null,1],['george.back','King George — the welcome tour','Welcome back (returning visitors)',null,1],
+ ['george.doorp','King George — around the gallery','At the entrance — on phones',null,1],['george.doorc','King George — around the gallery','At the entrance — on computers',null,1],
+ ['george.arta','King George — around the gallery','About a painting (1st way of saying it)',null,1],['george.artb','King George — around the gallery','About a painting (2nd way)',null,1],
+ ['george.artc','King George — around the gallery','About a painting (3rd way)',null,1],['george.artd','King George — around the gallery','About a painting (4th way)',null,1],
+ ['george.artwall','King George — around the gallery','Added after a painting line on phones',null],
+ ['george.coll','King George — around the gallery','At each collection wall',null,1],['george.collend','King George — around the gallery','At the end of the collections',null,1],
+ ['george.leftp','King George — around the gallery','Back at the entrance after the collections — on phones',null,1],['george.leftc','King George — around the gallery','Back at the entrance after the collections — on computers',null,1],
+ ['george.balcony','King George — around the gallery','On the balcony',null,1],
+ ['george.menu','King George — when visitors tap him','His question',null],['george.buy','King George — when visitors tap him','“How do I buy a painting?”',null,1],
+ ['george.prints','King George — when visitors tap him','“Can I buy a print?” (when you have prints)',null,1],['george.noprints','King George — when visitors tap him','“Can I buy a print?” (before you have prints)',null,1],
+ ['george.members','King George — when visitors tap him','“Members’ rewards”',null,1],['george.contact','King George — when visitors tap him','“Contact Pam”',null,1],
+ ['george.wall','King George — when visitors tap him','“See a painting on my wall” (when not at a painting)',null,1],
  ['seo.title','Google & link previews','Page title (shown in Google and browser tabs)',null],['seo.desc','Google & link previews','Description (shown under the title in Google)',null,1]];
 function siteT(k){var v=TXT[k];return v!=null&&String(v).trim()!==''?String(v):(TXD&&TXD[k]!=null?TXD[k]:'')}
-function txDefaults(){if(TXD)return;TXD={};TX.forEach(function(x){var e=x[3]&&document.querySelector(x[3]);TXD[x[0]]=e?e.textContent:''});TXD['george.greet']=GREET_DEF;TXD['seo.title']=document.title;var md=document.querySelector('meta[name=description]');TXD['seo.desc']=md?md.content:''}
+function txDefaults(){if(TXD)return;TXD={};TX.forEach(function(x){var e=x[3]&&document.querySelector(x[3]);TXD[x[0]]=e?e.textContent:''});Object.keys(GDEF).forEach(function(k){TXD[k]=GDEF[k]});TXD['seo.title']=document.title;var md=document.querySelector('meta[name=description]');TXD['seo.desc']=md?md.content:''}
 var SOC=[['instagram','Instagram'],['tiktok','TikTok'],['facebook','Facebook'],['x','X'],['pinterest','Pinterest'],['youtube','YouTube'],['threads','Threads'],['linkedin','LinkedIn'],['website','Website']];
 function CUR(){return({GBP:'£',EUR:'€',USD:'$'})[SITE.cur]||'£'}
 function money(n){return CUR()+(Math.round((+n||0)*100)/100).toLocaleString('en-GB')}
 function siteRefresh(){txDefaults();
  TX.forEach(function(x){if(!x[3])return;var e=document.querySelector(x[3]);if(e)e.textContent=siteT(x[0])});
- [].forEach.call(document.querySelectorAll('#prints .top .name,#collection .top .name'),function(e){e.textContent=siteT('bar.name')});
+ [].forEach.call(document.querySelectorAll('#prints .top .name,#collection .top .name'),function(e){e.textContent=siteT('bar.name')});var gn=siteT('george.name')||'King George',gtb=document.querySelector('#gTab span');if(gtb)gtb.textContent=gn;$('gTab').setAttribute('aria-label','Call '+gn);
  document.title=siteT('seo.title');var md=document.querySelector('meta[name=description]');if(md)md.content=siteT('seo.desc');
  $('enqMail').textContent=EMAIL;$('enqWrite').href='mailto:'+EMAIL+'?subject='+encodeURIComponent('Enquiry for '+siteT('bar.name'));$('aboutMail').textContent=EMAIL;$('aboutMail').href='mailto:'+EMAIL;
  $('aboutEnq').href='mailto:'+EMAIL+'?subject='+encodeURIComponent('Enquiry for '+ARTIST);$('footMail').textContent=EMAIL;$('footMail').href='mailto:'+EMAIL;
@@ -1217,7 +1275,7 @@ function chk(label,on,cb){var l=el('label','chk'),c=el('input');c.type='checkbox
 function edsec(body,t,note){var s=el('section','edsec');s.appendChild(el('h3',null,t));if(note)s.appendChild(el('p','note',note));var g=el('div','edgrid');s.appendChild(g);body.appendChild(s);return g}
 function drawTexts(body){pubBar(body);txDefaults();body.appendChild(el('p','note','Change any of the words on your site. Boxes you leave alone keep the original wording, and “Use the original” puts it back. Press “Publish changes” when you’re happy — you’ll see them straight away.'));
  var groups={},order=[];TX.forEach(function(x){if(!groups[x[1]]){groups[x[1]]=[];order.push(x[1])}groups[x[1]].push(x)});
- order.forEach(function(g){var grid=edsec(body,g);groups[g].forEach(function(x){var k=x[0],w=el('div','txf'+(ED.texts[k]!=null?' chg':'')),lab=el('div','txl'),inpEl=el(x[4]?'textarea':'input'),id='tx_'+k.replace('.','_');
+ order.forEach(function(g){var grid=edsec(body,g,TXN[g]);groups[g].forEach(function(x){var k=x[0],w=el('div','txf'+(ED.texts[k]!=null?' chg':'')),lab=el('div','txl'),inpEl=el(x[4]?'textarea':'input'),id='tx_'+k.replace('.','_');
    var lt=el('label',null,x[2]);lt.htmlFor=id;lab.appendChild(lt);var rs=sbtn('Use the original',function(){delete ED.texts[k];inpEl.value=TXD[k]||'';w.classList.remove('chg');markDirty()},'link');lab.appendChild(rs);
    inpEl.id=id;inpEl.value=ED.texts[k]!=null?ED.texts[k]:(TXD[k]||'');inpEl.addEventListener('input',function(){if(inpEl.value===(TXD[k]||''))delete ED.texts[k];else ED.texts[k]=inpEl.value;w.classList.toggle('chg',ED.texts[k]!=null);markDirty()});
    w.appendChild(lab);w.appendChild(inpEl);if(x[4])w.style.gridColumn='1 / -1';grid.appendChild(w)})})}
@@ -2756,35 +2814,35 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  function close(){clearTimeout(hideT);clearInterval(typing);svg.classList.remove('talk');bub.classList.remove('on');clearTimeout(leaveT);leaveT=setTimeout(leave,1500)}
  function hide(){muted=true;store('georgeAway','1');stopTour();close()}
  function show(){muted=false;store('georgeAway','0');menu()}
- function paintingLine(i){var t='<i>'+esc(ART[i].t)+'</i>',L=['Here we have '+t+'. Tap the painting to see its details and price.','This one is '+t+'. Take your time — tap it if you’d like to know more.','Ah, '+t+'. One of my favourites. Tap it for the details.','And this is '+t+'. Tap the painting to enquire about it.'];
-  return L[i%L.length]+(TOUCH?' You can even see it on your own wall!':'')}
+ function paintingLine(i){var v={painting:'<i>'+esc(ART[i].t)+'</i>'},L=['george.arta','george.artb','george.artc','george.artd'];
+  return GL(L[i%L.length],v)+(TOUCH&&siteT('george.artwall')?' '+GL('george.artwall'):'')}
  function stopTour(){touring=false;clearTimeout(tourT)}
  function dest(){var t=progress()*(K.length-1),bi=0,bd=1e9;if(pend)return{i:-1,d:9};STOPS.forEach(function(s,i){var d=Math.abs(s.k-t);if(d<bd){bd=d;bi=i}});return{i:bi,d:bd}}   // where the visitor is heading
  function hush(){clearTimeout(hideT);clearInterval(typing);svg.classList.remove('talk');bub.classList.remove('on')}
- function tourAt(i,r){if(!touring)return;r=r||route;if(r==='col'&&i===SC.length-1){stopTour();goPlan(plan(1));say('And that is the collections — new works join them as they leave Pam’s studio. From the entrance, swipe right whenever you like for this month’s favourites.',[{t:'Thank you, King George',pri:1,go:close}],false);return}
+ function tourAt(i,r){if(!touring)return;r=r||route;if(r==='col'&&i===SC.length-1){stopTour();goPlan(plan(1));say(GL('george.collend'),[{t:'Thank you, King George',pri:1,go:close}],false);return}
   tourI=i;moving=true;hush();goPlan({r:r,i:i});var t0=Date.now();
   (function wait(){if(!touring)return;if(route!==r||pend){if(Date.now()-t0<15000)tourT=setTimeout(wait,150);return}var a=dest(),c=stopAt();if((a.i===i&&a.d<.02&&c.i===i&&c.d<.25)||Date.now()-t0>9000){speakStop(i,true)}else tourT=setTimeout(wait,150)})()}
- function collLine(ci){var c=COLLECTIONS[ci];return 'Collection '+roman(ci)+': <i>'+esc(c.t)+'</i>. '+esc(c.d)+' Walk on and I shall take you up close to each painting — the locked frames are new works still in Pam’s studio.'}
+ function collLine(ci){var c=COLLECTIONS[ci];return GL('george.coll',{number:roman(ci),collection:'<i>'+esc(c.t)+'</i>',description:esc(c.d||'')})}
  function speakStop(i,tour){var st=STOPS[i],last=i===STOPS.length-1,next=tour?[{t:last?'Thank you, King George':'Onward',pri:1,go:function(){if(last){stopTour();close()}else tourAt(i+1)}},{t:'End the tour',go:function(){stopTour();close()}}]:null;
   if(st.art==null&&st.coll!=null){say(collLine(st.coll),next||[{t:'See the whole collection',pri:1,go:function(){close();openCollectionAt(st.coll)}},{t:'Thanks',go:close}],!!tour,i);return}
   if(st.art!=null){var b=next||[{t:'Show me details',pri:1,go:function(){close();openArt(st.art)}}];if(TOUCH&&!tour)b.push({t:'See it on my wall',go:function(){close();viewOnWall(st.art)}});say(paintingLine(st.art),b,!!tour,i)}
-  else if(last)say('Out here is the balcony. Keep an eye on the field — my tall friend loves to dance! If a painting has caught your eye, you can write to Pam right here.',next||[{t:'Email Pam',pri:1,href:'mailto:'+EMAIL},{t:'See the collections',go:function(){close();goPlan({r:'col',i:1})}},{t:'Thanks',go:close}],!!tour,i)
-  else say('Welcome to Pam’s Gallery! '+(TOUCH?'Swipe right':'Go right')+' for this month’s favourites, or '+(TOUCH?'swipe left':'left')+' through the marble portal into Pam’s collections. Every painting is an original.',next||[{t:'Got it',go:close}],!!tour,i)}
+  else if(last)say(GL('george.balcony'),next||[{t:'Email Pam',pri:1,href:'mailto:'+EMAIL},{t:'See the collections',go:function(){close();goPlan({r:'col',i:1})}},{t:'Thanks',go:close}],!!tour,i)
+  else say(GL(TOUCH?'george.doorp':'george.doorc'),next||[{t:'Got it',go:close}],!!tour,i)}
  function menu(){var a=stopAt(),here=a.d<.35&&STOPS[a.i].art!=null?STOPS[a.i].art:null,b=[{t:'Tour this month’s favourites',pri:1,go:function(){touring=true;tourAt(0,'fav')}},{t:'Show me the collections',go:function(){touring=true;tourAt(1,'col')}},{t:'How this gallery works',go:function(){intro(1)}},{t:'How do I buy a painting?',go:buy}];
-  if(TOUCH)b.push({t:'See a painting on my wall',go:function(){if(here!=null){close();viewOnWall(here)}else say('Walk up to any painting first, then tap me again — or tap the painting and choose “View on your wall”.',[{t:'OK',go:close}])}});
-  b.push({t:'Can I buy a print?',go:function(){if(PRINTS.length)say('Indeed! Prints of Pam’s paintings come in a choice of sizes, each with its own price. Pick a size and send a request — Pam replies personally.',[{t:'See the prints',pri:1,go:function(){close();openPrints()}},{t:'Thanks',go:close}]);else say('Prints are on their way — Pam is preparing them now. In the meantime you are welcome to ask her about a print of any painting.',[{t:'Ask Pam',pri:1,go:function(){close();window.openMsg()}},{t:'Thanks',go:close}])}});
-  b.push({t:'Members’ rewards',go:function(){say('Join our collectors’ circle and enjoy 5% off your first painting, loyalty points on every purchase, and a signed print when you complete a collection.',[{t:'Join or sign in',pri:1,go:function(){close();window.openAcct()}},{t:'Not now',go:close}])}});
-  b.push({t:'Contact Pam',go:function(){say('You may send Pam a message right here, or email her at <b>'+esc(EMAIL)+'</b>. She replies to every message personally.',[{t:'Send a message',pri:1,go:function(){close();window.openMsg()}},{t:'Thanks',go:close}])}});
-  b.push({t:'Only come when I call',go:hide});say('King George, at your service. How may I help?',b,true)}
- function buy(){say('Every painting is an original. Stop at any painting, or tap it, and choose “Enquire to buy” — you can make an offer too. Some paintings go to auction: just place a bid before it closes. Pam replies personally to arrange secure payment and delivery. Members also earn rewards.',[{t:'Become a member',pri:1,go:function(){close();window.openAcct()}},{t:'Thanks',go:close}])}
+  if(TOUCH)b.push({t:'See a painting on my wall',go:function(){if(here!=null){close();viewOnWall(here)}else say(GL('george.wall'),[{t:'OK',go:close}])}});
+  b.push({t:'Can I buy a print?',go:function(){if(PRINTS.length)say(GL('george.prints'),[{t:'See the prints',pri:1,go:function(){close();openPrints()}},{t:'Thanks',go:close}]);else say(GL('george.noprints'),[{t:'Ask Pam',pri:1,go:function(){close();window.openMsg()}},{t:'Thanks',go:close}])}});
+  b.push({t:'Members’ rewards',go:function(){say(GL('george.members'),[{t:'Join or sign in',pri:1,go:function(){close();window.openAcct()}},{t:'Not now',go:close}])}});
+  b.push({t:'Contact Pam',go:function(){say(GL('george.contact'),[{t:'Send a message',pri:1,go:function(){close();window.openMsg()}},{t:'Thanks',go:close}])}});
+  b.push({t:'Only come when I call',go:hide});say(GL('george.menu'),b,true)}
+ function buy(){say(GL('george.buy'),[{t:'Become a member',pri:1,go:function(){close();window.openAcct()}},{t:'Thanks',go:close}])}
  $('gBtn').addEventListener('click',function(){if(introOn)return;if(bub.classList.contains('on')&&!touring){close()}else{stopTour();menu()}});
  $('gX').addEventListener('click',function(){if(introOn){endIntro('skip');return}stopTour();close()});tab.addEventListener('click',show);
  function onStop(){if(!started||touring||muted||introOn||bub.classList.contains('on'))return;if(pend)return;var a=stopAt();if(a.d>.03)return;
-  if(leftCol&&!seen.leftCol&&route==='fav'&&a.i===0){seen.leftCol=1;say('I hope you enjoyed the collections! Now '+(TOUCH?'swipe right':'go right')+' for this month’s favourites.',[{t:'Show me the favourites',pri:1,go:function(){close();goPlan({r:'fav',i:1})}},{t:'Not now',go:close}]);return}if(seen[route+a.i])return;seen[route+a.i]=1;
+  if(leftCol&&!seen.leftCol&&route==='fav'&&a.i===0){seen.leftCol=1;say(GL(TOUCH?'george.leftp':'george.leftc'),[{t:'Show me the favourites',pri:1,go:function(){close();goPlan({r:'fav',i:1})}},{t:'Not now',go:close}]);return}if(seen[route+a.i])return;seen[route+a.i]=1;
   if(a.i===STOPS.length-1)speakStop(a.i,false)}
  setInterval(onStop,600);
  setInterval(function(){if(!bub.classList.contains('on')||moving||introOn)return;var a=dest();if(!arrived){if(a.i===bubAt&&a.d<.1)arrived=true;return}if(a.i!==bubAt&&a.d<.45){stopTour();close()}},250);   // moved to another painting: stop talking about the old one
- var GREET=siteT('george.greet')||GREET_DEF;
+ var GREET=GL('george.greet');
  /* ---- the royal welcome: a short, skippable tour of everything a visitor can do ---- */
  var dimEl=$('gDim'),ringEl=$('gRing'),dotsEl=$('gDots');
  function rectOf(el){if(!el)return null;var r=el.getBoundingClientRect();return r.width>2&&r.height>2?{x:r.left,y:r.top,w:r.width,h:r.height}:null}
@@ -2797,21 +2855,21 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  function ring(fn){ringFn=fn;if(fn&&!ringOn){ringOn=true;requestAnimationFrame(ringLoop)}if(!fn){ringEl.classList.remove('on');setTimeout(function(){if(!ringFn)ringOn=false},400)}}
  function dots(i,n){dotsEl.innerHTML='';dotsEl.classList.toggle('on',i>=0);for(var k=0;k<n&&i>=0;k++){var d=document.createElement('span');if(k<=i)d.className='on';dotsEl.appendChild(d)}}
  function steps(){var s=[],T=TOUCH;
-  s.push({t:T?'Swipe <b>right</b> for <b>This Month’s Favourites</b> — each swipe brings the next painting in from the right. Like so…':'Press the <b>right arrow</b> (or simply scroll) for <b>This Month’s Favourites</b> — each press brings the next painting in from the right. Like so…',
+  s.push({t:GL(T?'george.tourap':'george.tourac'),
    ring:function(){return T?rectOf($('wayR').querySelector('.ar')):rectOf($('next'))},demo:function(){setTimeout(function(){if(introOn&&iStep===1&&route==='fav'&&stopAt().i===0)goPlan({r:'fav',i:1})},1400)}});
-  s.push({t:'Stop at any painting and its price appears below it, with <b>Enquire to buy</b> — Pam replies to every enquiry personally. '+(T?'Tap':'Click')+' a painting for its story; the <b>magnifier</b> zooms right in on every brushstroke'+(T?', and “View on your wall” shows it hanging in your own home.':'.'),
+  s.push({t:GL(T?'george.tourbp':'george.tourbc'),
    ring:function(){return route==='fav'?paintRect(0):null},demo:function(){if(route==='fav'&&stopAt().i===0)goPlan({r:'fav',i:1})}});
-  s.push({t:T?'Swipe <b>left</b> from the entrance to step through the marble portal into the <b>Collections hall</b>. Inside, keep swiping <b>right</b> to walk round its walls and up close to each painting; one more swipe at the end brings you back out. Let me show you…':'Press the <b>left arrow</b> from the entrance to step through the marble portal into the <b>Collections hall</b>. Inside, keep pressing <b>right</b> to walk round its walls and up close to each painting; one more at the end brings you back out. Let me show you…',
+  s.push({t:GL(T?'george.tourcp':'george.tourcc'),
    ring:function(){return T?rectOf($('wayL').querySelector('.ar')):rectOf($('prev'))},demo:function(){setTimeout(function(){if(introOn&&iStep===3)goPlan({r:'col',i:1})},1400)}});
-  s.push({t:'Up here, <b>Collections</b> shows every collection on one page, <b>Prints</b> offers prints in a choice of sizes, <b>About</b> tells you all about Pam, and <b>Music</b> sets the mood.',ring:function(){return union(['music','navCol','navPr','navAbout'])}});
-  s.push({t:'And do join our <b>collectors’ circle</b>: 5% off your first painting, points on every purchase, and a special reward for completing a collection.',ring:function(){return rectOf($('navAcct'))}});
+  s.push({t:GL('george.tourd'),ring:function(){return union(['music','navCol','navPr','navAbout'])}});
+  s.push({t:GL('george.toure'),ring:function(){return rectOf($('navAcct'))}});
   return s}
  function intro(from){if(introOn)return;introOn=true;stopTour();STEPS=steps();hush();clearTimeout(leaveT);
   document.body.classList.add('gIntro');dimEl.classList.add('on');root.style.transition='none';root.classList.add('stage','in');present=true;void root.offsetWidth;root.style.transition='';
   setTimeout(function(){act('peck',700)},700);showStep(from||0)}
  function showStep(i){if(!introOn)return;iStep=i;var n=STEPS.length;ring(null);
   if(i===0){dots(-1,0);say(GREET,[{t:'Show me around',pri:1,go:function(){showStep(1)}},{t:'I’ll explore alone',go:function(){endIntro('alone')}}],true);return}
-  if(i>n){dots(n-1,n);act('hop',500);say('That is everything! I shall be in the corner whenever you need me — '+(TOUCH?'tap':'click')+' me any time. Where shall we begin?',[{t:'The Collections',pri:1,go:function(){endIntro('leadc')}},{t:'This Month’s Favourites',pri:1,go:function(){endIntro('lead')}},{t:'I’ll explore alone',go:function(){endIntro('alone')}}],true);return}
+  if(i>n){dots(n-1,n);act('hop',500);say(GL('george.tourend'),[{t:'The Collections',pri:1,go:function(){endIntro('leadc')}},{t:'This Month’s Favourites',pri:1,go:function(){endIntro('lead')}},{t:'I’ll explore alone',go:function(){endIntro('alone')}}],true);return}
   var st=STEPS[i-1];dots(i-1,n);act(i%2?'tilt':'hop',600);
   say(st.t,[{t:i===n?'Finish':'Next',pri:1,go:function(){showStep(i+1)}},{t:'Skip the tour',skip:1,go:function(){endIntro('skip')}}],true);
   if(st.demo)st.demo();ring(st.ring||null)}
@@ -2819,11 +2877,11 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
   root.classList.add('fly');setTimeout(function(){root.style.transition='none';root.classList.remove('stage','fly','in');present=false;void root.offsetWidth;root.style.transition='';document.body.classList.remove('gIntro');
    setTimeout(function(){enter(function(){
     if(mode==='lead'||mode==='leadc'){touring=true;var a=stopAt(),r=mode==='leadc'?'col':'fav';tourAt(route===r&&a.i>0&&!STOPS[a.i].exit&&a.i<STOPS.length-1?a.i:1,r)}
-    else{say(mode==='alone'?'Very well. I shall be right here in the corner — '+(TOUCH?'tap':'click')+' me whenever you need me.':'As you wish. I am right here if you need me.',[],false);ring(function(){return rectOf($('gBtn'))});setTimeout(function(){if(!introOn)ring(null)},2600)}})},120)},360)}
+    else{say(GL(mode==='alone'?'george.alone':'george.skip'),[],false);ring(function(){return rectOf($('gBtn'))});setTimeout(function(){if(!introOn)ring(null)},2600)}})},120)},360)}
  /* someone who starts walking straight away would rather explore than listen */
  setInterval(function(){if(introOn&&iStep===0&&progress()>.02)endIntro('alone')},300);
  function start(){if(started)return;started=true;seen.fav0=seen.col0=1;if(store('georgeAway')==='1'){muted=true;tab.classList.add('on');return}
-  if(store('georgeIntro')==='done'){setTimeout(function(){say('Welcome back to the gallery! '+(TOUCH?'Tap':'Click')+' me whenever you would like a guide.',[{t:'Show me around',go:function(){close();setTimeout(function(){intro(1)},300)}}],false)},300);return}
+  if(store('georgeIntro')==='done'){setTimeout(function(){say(GL('george.back'),[{t:'Show me around',go:function(){close();setTimeout(function(){intro(1)},300)}}],false)},300);return}
   setTimeout(function(){intro(0)},250)}
  return{start:start,stopTour:stopTour,intro:intro}})();window.__G=George;
 addEventListener('wheel',function(){George.stopTour()},{passive:true});
