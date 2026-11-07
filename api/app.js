@@ -13,16 +13,17 @@ const GOOGLE_ID = process.env.GOOGLE_CLIENT_ID || '';
 const RESEND = process.env.RESEND_API_KEY || '';
 const MAIL_FROM = process.env.MAIL_FROM || 'Pam’s Gallery <onboarding@resend.dev>';
 const BUYER_MAIL = !!(RESEND && process.env.MAIL_FROM);
-// the built-in paintings' photographs (served from /lib/), for link previews when a painting is shared
-const EMB_IMG = {"p1": "/lib/g-c0fafcbf388e.jpg", "p2": "/lib/g-04b6c6b76917.jpg", "p3": "/lib/g-bab2acf08825.jpg", "p4": "/lib/g-f91d640d659d.jpg", "p5": "/lib/g-40cf8b507475.jpg", "p6": "/lib/g-d6fa78aecd0a.jpg"};
+// the artworks built into the site: titles and details, and their image files under /lib/ (wm = the watermarked copy
+// used for link previews, so the clean image never leaves the gallery)
+const EMB = {"p1": {"t": "Orchid in the Clouds", "m": "Oil on board", "d": "", "w": 0.5, "h": 0.706, "img": "/lib/g-e8cca6370e22.jpg", "wm": "/lib/g-ee86cd76b1bc.jpg"}, "p2": {"t": "Violet Garden", "m": "Oil on canvas board", "d": "", "w": 0.66, "h": 0.49, "img": "/lib/g-0c6b5f892136.jpg", "wm": "/lib/g-a9a3bfaef716.jpg"}, "p3": {"t": "Three Masks in Blue", "m": "Oil on board", "d": "", "w": 0.7, "h": 0.507, "img": "/lib/g-5ac75187fe3a.jpg", "wm": "/lib/g-0e6ddd8f947e.jpg"}, "p4": {"t": "Three Masks in Green", "m": "Oil on board", "d": "", "w": 0.55, "h": 0.545, "img": "/lib/g-a969f2953493.jpg", "wm": "/lib/g-b2340e8d7987.jpg"}, "p5": {"t": "The Messenger", "m": "Oil on board", "d": "", "w": 0.5, "h": 0.713, "img": "/lib/g-da433a8146b7.jpg", "wm": "/lib/g-25cfba5fbf73.jpg"}, "p6": {"t": "White Bloom over Ember", "m": "Oil on board", "d": "", "w": 0.5, "h": 0.706, "img": "/lib/g-7aff2fadbb10.jpg", "wm": "/lib/g-3920c65ce810.jpg"}, "p7": {"t": "The Hall of Many Stairs", "m": "Oil on board", "d": "Staircases climb from every direction towards arched doorways and fan out around a stepped temple. An impossible city in teal, violet and gold, with not a soul in sight.", "w": 0.7, "h": 0.522, "img": "/lib/g-55c28051b4d3.jpg", "wm": "/lib/g-78751f52ab15.jpg"}, "p8": {"t": "The Paper Nest", "m": "Oil on board", "d": "A plump violet bird keeps watch over two sleepy little figures, tucked into a nest of folded paper triangles on a calm sea-green ground.", "w": 0.6, "h": 0.596, "img": "/lib/g-47be435a9695.jpg", "wm": "/lib/g-2402ea68c9fb.jpg"}, "p9": {"t": "The Petal Choir", "m": "Oil on board", "d": "A crowd of flower-headed faces, eyes closed and lips pursed as if mid-song, packed tight in bold black outlines. Jewel colours glow between the lines like stained glass.", "w": 0.7, "h": 0.506, "img": "/lib/g-e58107129201.jpg", "wm": "/lib/g-8224abae5b42.jpg"}, "p10": {"t": "The Stair Keepers", "m": "Oil on board", "d": "Two round-faced characters perch on a great teal staircase, one crowned in violet petals, the other in a spotted turquoise bonnet. They look as if they have guarded these steps for a very long time.", "w": 0.7, "h": 0.505, "img": "/lib/g-b076501e59c4.jpg", "wm": "/lib/g-dd93214b250b.jpg"}, "p11": {"t": "Unravelling", "m": "Pen and ink on paper", "d": "A long-limbed figure flings its arms wide as tangled loops spin out around it like thread coming loose. Drawn entirely in fine black ink, it is all motion and release.", "w": 0.66, "h": 0.573, "img": "/lib/g-3b3cbc4ca575.jpg", "wm": "/lib/g-3d3d854c3c20.jpg"}, "p12": {"t": "Three in the Tangle", "m": "Pen and ink on paper", "d": "Three quiet faces drift together in a cloud of looping lines and tiny bubbles, eyes half closed and lips pursed. Every loop is drawn by hand in fine black ink.", "w": 0.7, "h": 0.482, "img": "/lib/g-9bed9b93d225.jpg", "wm": "/lib/g-2df85d7787ef.jpg"}, "p13": {"t": "The Dance of the Petal Folk", "m": "Pen and ink on paper", "d": "Three flower-headed figures stumble, stretch and tumble through a storm of loops, one of them flung right off its feet. A joyful, chaotic little dance in pen and ink.", "w": 0.7, "h": 0.47, "img": "/lib/g-ad43cd45fb1d.jpg", "wm": "/lib/g-d7846d56a03e.jpg"}, "p14": {"t": "Happy Hour in the Gorge", "m": "Digital painting", "d": "One crow lounges in a pink-and-yellow rubber ring with a martini held high, while a second swoops in looking thoroughly unimpressed. They drift on glassy, faceted water between cliffs of red and smoky crystal.", "w": 0.95, "h": 0.398, "img": "/lib/g-747839fd9fed.jpg", "wm": "/lib/g-ae3ebf1a7e4f.jpg"}, "p15": {"t": "The Welcoming Committee", "m": "Digital painting", "d": "Two curious pigeons lean right into the picture to take a good look at you, while a crowd of crows gathers across rippling, melted dunes under a streaked blue sky. Every gallery needs a welcoming committee.", "w": 0.95, "h": 0.398, "img": "/lib/g-038804eca3d8.jpg", "wm": "/lib/g-30cc566730c9.jpg"}};
 const SECRET = crypto.createHash('sha256').update('pams-gallery-session|' + (DB_TOKEN || '')).digest();
 
 // ---- rewards (easy to change) ----
 const WELCOME = { pct: 5, text: '5% off your first painting' };
 const POINTS = { per: 1, every: 500, worth: 50, text: '1 point for every £1 spent · every 500 points = £50 off' };
 const SET_REWARD = 'a signed print of your choice';
-// the six paintings the site was built with; used until Pam saves her own catalogue
-const ARTS = ['Orchid in the Clouds', 'Violet Garden', 'Three Masks in Blue', 'Three Masks in Green', 'The Messenger', 'White Bloom over Ember'];
+// the artworks built into the site; used until Pam saves her own catalogue
+const ARTS = Object.keys(EMB).map(k => EMB[k].t);
 const BASE_SETS = [
   { name: 'The Dreaming Garden', arts: ['p1', 'p2'] },
   { name: 'The Masquerade', arts: ['p3', 'p4'] },
@@ -65,9 +66,16 @@ async function limit(req, key, max, secs) {
 }
 
 // ---- the catalogue Pam edits from her dashboard ----
-async function getCat() { return J(await db('GET', 'cat')) }
+async function getCat() { return withEmb(J(await db('GET', 'cat'))) }
+// works added to the site itself join Pam's saved catalogue (at the end) until she removes them
+function withEmb(c) {
+  if (!c || !Array.isArray(c.arts)) return c;
+  const seen = new Set(Array.isArray(c.seen) && c.seen.length ? c.seen : ['p1', 'p2', 'p3', 'p4', 'p5', 'p6']), have = new Set(c.arts.map(a => a.id));
+  Object.keys(EMB).forEach(id => { if (!seen.has(id) && !have.has(id)) { const e = EMB[id]; c.arts.push({ id, t: e.t, m: e.m, s: '', year: '', d: e.d, p: '', mode: 'request', status: 'Available', w: e.w, h: e.h, bg: '#cfc6d6', img: 'emb:' + id, ar: false }) } });
+  return c;
+}
 const artId = a => typeof a === 'number' ? 'p' + (a + 1) : String(a);      // older records stored painting numbers
-function titleOf(cat, aid) { if (cat) { const a = (cat.arts || []).find(x => x.id === aid); if (a) return a.t } const n = /^p(\d)$/.exec(aid); return n ? ARTS[+n[1] - 1] || aid : aid }
+function titleOf(cat, aid) { if (cat) { const a = (cat.arts || []).find(x => x.id === aid); if (a) return a.t } const n = /^p(\d{1,2})$/.exec(aid); return n ? ARTS[+n[1] - 1] || aid : aid }
 function setsOf(cat) {
   if (cat && Array.isArray(cat.colls) && cat.colls.length) return cat.colls.filter(c => c.works && c.works.length).map(c => ({ name: c.t, arts: c.works }));
   return BASE_SETS;
@@ -75,11 +83,12 @@ function setsOf(cat) {
 function cleanCat(c) {
   const str = (v, n) => clean(v, n), num = (v, lo, hi, d) => { const x = parseFloat(v); return isFinite(x) ? Math.max(lo, Math.min(hi, x)) : d };
   const okId = v => /^[a-z0-9]{1,24}$/i.test(String(v || ''));
-  const okImg = v => typeof v === 'string' && (/^emb:p[1-9]$/.test(v) || /^\/api\/app\?img=[a-z0-9]{6,40}$/i.test(v));
+  const okUp = v => typeof v === 'string' && /^\/api\/app\?img=[a-z0-9]{6,40}$/i.test(v);
+  const okImg = v => typeof v === 'string' && ((/^emb:p\d{1,2}$/.test(v) && !!EMB[v.slice(4)]) || okUp(v));
   const arts = (Array.isArray(c.arts) ? c.arts : []).slice(0, 120).filter(a => a && okId(a.id) && okImg(a.img)).map(a => ({
     id: String(a.id), t: str(a.t, 90) || 'Untitled', m: str(a.m, 80), s: str(a.s, 80), year: str(a.year, 12), d: str(a.d, 1200),
     p: str(a.p, 40), mode: ['price', 'auction'].indexOf(a.mode) >= 0 ? a.mode : 'request', status: ['Available', 'On hold', 'Sold'].indexOf(a.status) >= 0 ? a.status : 'Available',
-    w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, ar: !!a.ar && /^emb:p[1-9]$/.test(a.img), bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6',
+    w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, ar: !!a.ar && /^emb:p[1-6]$/.test(a.img), wm: okUp(a.wm) && a.wmOf === a.img ? a.wm : undefined, wmOf: okUp(a.wm) && a.wmOf === a.img ? a.img : undefined, bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6',
     auc: a.mode === 'auction' && a.auc ? { start: num(a.auc.start, 1, 1e7, 100), step: num(a.auc.step, 1, 1e6, 10), ends: Math.round(num(a.auc.ends, 0, 4e12, 0)) } : undefined
   }));
   const ids = new Set(arts.map(a => a.id));
@@ -96,7 +105,8 @@ function cleanCat(c) {
   const site = { email: okEmail(str(S.email, 200)) ? str(S.email, 200) : '', phone: str(S.phone, 40), place: str(S.place, 80), social,
     banner: { on: !!(S.banner && S.banner.on), text: str(S.banner && S.banner.text, 160) }, commissions: S.commissions !== false, offers: S.offers !== false,
     share: S.share !== false, likes: S.likes !== false, cur: ['GBP', 'EUR', 'USD'].indexOf(S.cur) >= 0 ? S.cur : 'GBP' };
-  return { v: Date.now(), arts, favs, colls, prints, texts, site };
+  const seen = (Array.isArray(c.seen) ? c.seen : []).map(String).filter(x => /^p\d{1,2}$/.test(x)).slice(0, 99);
+  return { v: Date.now(), arts, favs, colls, prints, texts, site, seen };
 }
 
 function rewards(u, cat) {
@@ -445,9 +455,10 @@ async function checkPaid(orders) {           // payment links still waiting: has
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 // a painting's own link: rich previews on social media and in messages, then straight into the gallery at that painting
 async function sharePage(aid, res) {
-  const cat = await getCat(), a = cat && (cat.arts || []).find(x => x.id === aid) || (!cat && /^p[1-6]$/.test(aid) ? { id: aid, t: ARTS[+aid.slice(1) - 1], m: 'Original painting', img: 'emb:' + aid } : null);
-  const img = a ? (/^emb:/.test(a.img) ? EMB_IMG[a.img.slice(4)] || '' : a.img) : '', go = '/' + (a ? '#art-' + a.id : '');
-  const t = a ? a.t + ' — an original painting by Pam' : 'Pam’s Gallery — original paintings', d = a ? (a.m ? a.m + '. ' : '') + 'See it in Pam’s gallery and enquire to buy.' : 'Original paintings by Pam.';
+  const cat = await getCat(), a = cat && (cat.arts || []).find(x => x.id === aid) || (!cat && EMB[aid] ? { id: aid, t: EMB[aid].t, m: EMB[aid].m, img: 'emb:' + aid } : null);
+  const img = a ? (/^emb:/.test(a.img) ? (EMB[a.img.slice(4)] || {}).wm || '' : (a.wm || a.img)) : '', go = '/' + (a ? '#art-' + a.id : '');
+  const kind = a && /digital/i.test(a.m || '') ? 'digital painting' : a && /ink|pen\b|pencil|drawing|charcoal|graphite/i.test(a.m || '') ? 'drawing' : 'painting';
+  const t = a ? a.t + ' — an original ' + kind + ' by Pam' : 'Pam’s Gallery — original paintings', d = a ? (a.m ? a.m + '. ' : '') + 'See it in Pam’s gallery and enquire to buy.' : 'Original paintings by Pam.';
   res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=300');
   res.status(200).end('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>' + esc(t) + '</title><meta name="description" content="' + esc(d) + '">' +
     '<meta property="og:type" content="website"><meta property="og:site_name" content="Pam’s Gallery"><meta property="og:title" content="' + esc(t) + '"><meta property="og:description" content="' + esc(d) + '">' +
@@ -474,7 +485,7 @@ module.exports = async (req, res) => {
       if (q.cat) { res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=5, stale-while-revalidate=30'); res.status(200).json({ cat: await getCat(), cfg: { google: GOOGLE_ID, pay: !!STRIPE } }); return }
       if (q.s && /^[a-z0-9]{1,24}$/i.test(String(q.s))) { await sharePage(String(q.s), res); return }
       if (q.live) {           // likes and the current bid on each auction, refreshed every few seconds
-        const cat = await getCat(), arts = cat && cat.arts || ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'].map(id => ({ id })), auc = arts.filter(a => a.mode === 'auction' && a.auc);
+        const cat = await getCat(), arts = cat && cat.arts || Object.keys(EMB).map(id => ({ id })), auc = arts.filter(a => a.mode === 'auction' && a.auc);
         const r = await pipe(arts.map(a => ['SCARD', 'lk:' + a.id]).concat(auc.map(a => ['ZREVRANGE', 'bids:' + a.id, '0', '0', 'WITHSCORES'])).concat(auc.map(a => ['ZCARD', 'bids:' + a.id])));
         const likes = {}; arts.forEach((a, i) => { if (+r[i]) likes[a.id] = +r[i] });
         const bids = {}; auc.forEach((a, i) => { const t = topOf(r[arts.length + i]); bids[a.id] = { top: t ? t.amount : 0, n: +r[arts.length + auc.length + i] || 0, ends: a.auc.ends } });
