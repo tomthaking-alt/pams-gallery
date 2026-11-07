@@ -280,6 +280,15 @@ section.page .pl{white-space:pre-line;line-height:1.75;color:var(--ink);max-widt
 .pworks button:focus-visible{outline:2px solid var(--walnut);outline-offset:4px}
 .pworks .pw{aspect-ratio:1;background:#efe9df;display:flex;align-items:center;justify-content:center;container-type:size;overflow:hidden}
 .pworks img{max-width:78cqw;max-height:78cqh;box-shadow:0 8px 18px rgba(30,18,12,.22),0 0 0 6px #fff}
+.pworks .pw{position:relative}
+.pworks img.prt{position:absolute;inset:0;margin:auto;opacity:0;pointer-events:none}
+img,canvas{-webkit-touch-callout:none;-webkit-user-drag:none}
+img{-webkit-user-select:none;user-select:none}
+.protT{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translateY(12px);z-index:2147483000;max-width:min(92vw,460px);box-sizing:border-box;display:flex;gap:.8rem;align-items:center;
+ padding:.8rem .9rem .8rem 1.1rem;background:rgba(36,24,18,.94);color:#f7f1e8;border-radius:14px;box-shadow:0 14px 34px rgba(20,12,8,.35);font-size:.9rem;line-height:1.45;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.protT.on{opacity:1;transform:none;pointer-events:auto}
+.protT button{all:unset;cursor:pointer;flex:none;padding:.45rem .8rem;border-radius:99px;background:#f2e3c8;color:#3b2418;font-weight:500;font-size:.85rem;white-space:nowrap}
+.protT button:focus-visible{outline:2px solid #f2e3c8;outline-offset:2px}
 .pworks b{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;font-size:1.15rem;margin-top:.5rem}
 .pworks span{font-size:.82rem;color:var(--muted);line-height:1.5}
 .printonly{display:none}
@@ -332,6 +341,9 @@ section.page .pl{white-space:pre-line;line-height:1.75;color:var(--ink);max-widt
  #press .printonly{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:13pt;color:#4b2e22;border-bottom:1px solid #d9c9b0;padding-bottom:8pt;margin-bottom:14pt}
  #press .pworks{grid-template-columns:repeat(3,1fr)}
  #press .pworks button{break-inside:avoid}
+ #press .pw.haswm img.scr{display:none!important}
+ #press .pw.haswm img.prt{position:static!important;opacity:1!important}
+ #press .pw:not(.haswm) img{visibility:hidden!important}
  #press .pfacts{border:1px solid #ddd}
 }
 #prints[hidden]{display:none}
@@ -942,12 +954,21 @@ var EMAIL="pts98@hotmail.co.uk";
 var ARTIST="Pam";
 var ABOUT="Original paintings in oil and acrylic, made to be lived with. Each work is one of a kind and ships ready to hang. Collectors, galleries and dealers are welcome to enquire about availability, framing, shipping and trade terms.";
 var ART=[
- {t:"Orchid in the Clouds",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:.5,h:.706,frame:"gold",bg:"#d9d2e2",d:[],img:"/lib/g-c0fafcbf388e.jpg",full:"/lib/g-3d3b7f4e83fd.jpg",tn:"/lib/g-178ac1c9ed32.jpg"},
- {t:"Violet Garden",m:"Oil on canvas board",s:"Size on request",p:"Price on request",status:"Available",year:"2024",w:0.66,h:0.49,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-04b6c6b76917.jpg",full:"/lib/g-874904f60cd4.jpg",tn:"/lib/g-3aa21fbc833d.jpg"},
- {t:"Three Masks in Blue",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.7,h:0.507,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-bab2acf08825.jpg",full:"/lib/g-75d56b6c917d.jpg",tn:"/lib/g-8921bca5512f.jpg"},
- {t:"Three Masks in Green",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"2025",w:0.55,h:0.545,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-f91d640d659d.jpg",full:"/lib/g-59f23ee9ceb2.jpg",tn:"/lib/g-dd544ee80234.jpg"},
- {t:"The Messenger",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.5,h:0.713,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-40cf8b507475.jpg",full:"/lib/g-bbb0c123e7a2.jpg",tn:"/lib/g-9c582b2e90f1.jpg"},
- {t:"White Bloom over Ember",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.5,h:0.706,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-d6fa78aecd0a.jpg",full:"/lib/g-592bd1ac4c6a.jpg",tn:"/lib/g-1f31b0022891.jpg"}
+ {t:"Orchid in the Clouds",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:.5,h:.706,frame:"gold",bg:"#d9d2e2",d:[],img:"/lib/g-e8cca6370e22.jpg",full:"/lib/g-27063578b181.jpg",tn:"/lib/g-1a8bb7fd0a7c.jpg",wm:"/lib/g-ee86cd76b1bc.jpg"},
+ {t:"Violet Garden",m:"Oil on canvas board",s:"Size on request",p:"Price on request",status:"Available",year:"2024",w:0.66,h:0.49,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-0c6b5f892136.jpg",full:"/lib/g-4012fab2eba4.jpg",tn:"/lib/g-26dedc1586a5.jpg",wm:"/lib/g-a9a3bfaef716.jpg"},
+ {t:"Three Masks in Blue",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.7,h:0.507,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-5ac75187fe3a.jpg",full:"/lib/g-cceeb07b675a.jpg",tn:"/lib/g-a502fdf26999.jpg",wm:"/lib/g-0e6ddd8f947e.jpg"},
+ {t:"Three Masks in Green",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"2025",w:0.55,h:0.545,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-a969f2953493.jpg",full:"/lib/g-985c67332f50.jpg",tn:"/lib/g-6f4e029ba2e8.jpg",wm:"/lib/g-b2340e8d7987.jpg"},
+ {t:"The Messenger",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.5,h:0.713,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-da433a8146b7.jpg",full:"/lib/g-4cf972ff6e52.jpg",tn:"/lib/g-cb057757e1ee.jpg",wm:"/lib/g-25cfba5fbf73.jpg"},
+ {t:"White Bloom over Ember",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.5,h:0.706,frame:"gold",bg:"#cfc6d6",d:[],img:"/lib/g-7aff2fadbb10.jpg",full:"/lib/g-e1cc98a65817.jpg",tn:"/lib/g-b3083e250215.jpg",wm:"/lib/g-3920c65ce810.jpg"},
+ {t:"The Hall of Many Stairs",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.7,h:0.522,frame:"gold",bg:"#cfc6d6",d:"Staircases climb from every direction towards arched doorways and fan out around a stepped temple. An impossible city in teal, violet and gold, with not a soul in sight.",img:"/lib/g-55c28051b4d3.jpg",full:"/lib/g-b50b4f549f6d.jpg",tn:"/lib/g-d588e66ae6ea.jpg",wm:"/lib/g-78751f52ab15.jpg"},
+ {t:"The Paper Nest",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.6,h:0.596,frame:"gold",bg:"#cfc6d6",d:"A plump violet bird keeps watch over two sleepy little figures, tucked into a nest of folded paper triangles on a calm sea-green ground.",img:"/lib/g-47be435a9695.jpg",full:"/lib/g-4579e29c8b85.jpg",tn:"/lib/g-d211740213a4.jpg",wm:"/lib/g-2402ea68c9fb.jpg"},
+ {t:"The Petal Choir",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.7,h:0.506,frame:"gold",bg:"#cfc6d6",d:"A crowd of flower-headed faces, eyes closed and lips pursed as if mid-song, packed tight in bold black outlines. Jewel colours glow between the lines like stained glass.",img:"/lib/g-e58107129201.jpg",full:"/lib/g-65e67e96a026.jpg",tn:"/lib/g-59bb7675900e.jpg",wm:"/lib/g-8224abae5b42.jpg"},
+ {t:"The Stair Keepers",m:"Oil on board",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.7,h:0.505,frame:"gold",bg:"#cfc6d6",d:"Two round-faced characters perch on a great teal staircase, one crowned in violet petals, the other in a spotted turquoise bonnet. They look as if they have guarded these steps for a very long time.",img:"/lib/g-b076501e59c4.jpg",full:"/lib/g-7550223ff47c.jpg",tn:"/lib/g-eea6f35ec723.jpg",wm:"/lib/g-dd93214b250b.jpg"},
+ {t:"Unravelling",m:"Pen and ink on paper",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.66,h:0.573,frame:"gold",bg:"#cfc6d6",d:"A long-limbed figure flings its arms wide as tangled loops spin out around it like thread coming loose. Drawn entirely in fine black ink, it is all motion and release.",img:"/lib/g-3b3cbc4ca575.jpg",full:"/lib/g-f8298043ae9d.jpg",tn:"/lib/g-0b05bdb83dac.jpg",wm:"/lib/g-3d3d854c3c20.jpg"},
+ {t:"Three in the Tangle",m:"Pen and ink on paper",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.7,h:0.482,frame:"gold",bg:"#cfc6d6",d:"Three quiet faces drift together in a cloud of looping lines and tiny bubbles, eyes half closed and lips pursed. Every loop is drawn by hand in fine black ink.",img:"/lib/g-9bed9b93d225.jpg",full:"/lib/g-bb59724ab4e1.jpg",tn:"/lib/g-5c986316e01c.jpg",wm:"/lib/g-2df85d7787ef.jpg"},
+ {t:"The Dance of the Petal Folk",m:"Pen and ink on paper",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.7,h:0.47,frame:"gold",bg:"#cfc6d6",d:"Three flower-headed figures stumble, stretch and tumble through a storm of loops, one of them flung right off its feet. A joyful, chaotic little dance in pen and ink.",img:"/lib/g-ad43cd45fb1d.jpg",full:"/lib/g-51d0bb49b1fc.jpg",tn:"/lib/g-50955095990f.jpg",wm:"/lib/g-d7846d56a03e.jpg"},
+ {t:"Happy Hour in the Gorge",m:"Digital painting",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.95,h:0.398,frame:"gold",bg:"#cfc6d6",d:"One crow lounges in a pink-and-yellow rubber ring with a martini held high, while a second swoops in looking thoroughly unimpressed. They drift on glassy, faceted water between cliffs of red and smoky crystal.",img:"/lib/g-747839fd9fed.jpg",full:"/lib/g-7ff18316b9d6.jpg",tn:"/lib/g-c43c10b5c5fa.jpg",wm:"/lib/g-ae3ebf1a7e4f.jpg"},
+ {t:"The Welcoming Committee",m:"Digital painting",s:"Size on request",p:"Price on request",status:"Available",year:"",w:0.95,h:0.398,frame:"gold",bg:"#cfc6d6",d:"Two curious pigeons lean right into the picture to take a good look at you, while a crowd of crows gathers across rippling, melted dunes under a streaked blue sky. Every gallery needs a welcoming committee.",img:"/lib/g-038804eca3d8.jpg",full:"/lib/g-99ac6300a7c6.jpg",tn:"/lib/g-4f4f6d942495.jpg",wm:"/lib/g-30cc566730c9.jpg"}
 ];
 /* ====================================================================== */
 
@@ -998,13 +1019,16 @@ var PAINT={};function paintFor(k){return PAINT[k]||(PAINT[k]=paintCanvas(ART[k],
 var THUMB={};function thumb(k){if(THUMB[k])return THUMB[k];var p=ART[k];THUMB[k]=p.img||paintFor(k).toDataURL('image/jpeg',.88);return THUMB[k]}
 /* ---------- the live catalogue: paintings, this month's favourites, collections and prints, all edited from Pam's dashboard ---------- */
 var EMB={},FAVS=[],PRINTS=[];
-ART.forEach(function(p,i){p.id='p'+(i+1);p.emb=p.id;p.ar=true;p.mode='request';p.price='';p.p='Price on request';EMB[p.id]={img:p.img,full:p.full||p.img,tn:p.tn||p.img}});
-FAVS=ART.map(function(p,i){return i});
+ART.forEach(function(p,i){p.id='p'+(i+1);p.emb=p.id;p.ar=i<6;p.mode='request';p.price='';p.p='Price on request';p.wm=p.wm||'';if(typeof p.d!=='string')p.d='';EMB[p.id]={img:p.img,full:p.full||p.img,tn:p.tn||p.img,wm:p.wm,t:p.t,m:p.m,d:p.d,w:p.w,h:p.h,bg:p.bg}});
+FAVS=ART.slice(0,6).map(function(p,i){return i});
 function priceOf(a){return a.mode==='auction'?'Auction':a.mode==='price'&&a.p?a.p:'Price on request'}
 function embImg(v){return /^emb:/.test(v||'')&&EMB[v.slice(4)]?EMB[v.slice(4)].img:v}
-function applyCat(c){if(!c||!Array.isArray(c.arts)||!c.arts.length)return false;
+/* works added to the site itself appear in Pam's catalogue until she removes them */
+function withEmb(c){if(!c||!Array.isArray(c.arts))return c;var seen=Array.isArray(c.seen)&&c.seen.length?c.seen:['p1','p2','p3','p4','p5','p6'],have={};c.arts.forEach(function(a){have[a.id]=1});
+ Object.keys(EMB).forEach(function(id){var e=EMB[id];if(seen.indexOf(id)<0&&!have[id])c.arts.push({id:id,t:e.t,m:e.m||'',s:'',year:'',d:e.d||'',p:'',mode:'request',status:'Available',w:e.w,h:e.h,bg:e.bg||'#cfc6d6',img:'emb:'+id,ar:false})});return c}
+function applyCat(c){if(!c||!Array.isArray(c.arts)||!c.arts.length)return false;c=withEmb(c);
  var list=c.arts.map(function(a){var e=/^emb:/.test(a.img),im=embImg(a.img);if(!im||/^emb:/.test(im))return null;
-  return{id:a.id,t:a.t,m:a.m||'',s:a.s||'Size on request',year:a.year||'',d:a.d||'',p:priceOf(a),price:a.p||'',mode:a.mode,status:a.status||'Available',w:a.w||.5,h:a.h||.7,bg:a.bg||'#cfc6d6',auc:a.mode==='auction'?a.auc:undefined,img:im,full:e?EMB[a.img.slice(4)].full:im,tn:e?EMB[a.img.slice(4)].tn:im,emb:e?a.img.slice(4):'',ar:e}}).filter(Boolean);
+  return{id:a.id,t:a.t,m:a.m||'',s:a.s||'Size on request',year:a.year||'',d:a.d||'',p:priceOf(a),price:a.p||'',mode:a.mode,status:a.status||'Available',w:a.w||.5,h:a.h||.7,bg:a.bg||'#cfc6d6',auc:a.mode==='auction'?a.auc:undefined,img:im,full:e?EMB[a.img.slice(4)].full:im,tn:e?EMB[a.img.slice(4)].tn:im,emb:e?a.img.slice(4):'',ar:e&&/^emb:p[1-6]$/.test(a.img),wm:e?EMB[a.img.slice(4)].wm:(a.wm&&a.wmOf===a.img?a.wm:'')}}).filter(Boolean);
  if(!list.length)return false;ART.length=0;list.forEach(function(a){ART.push(a)});THUMB={};
  var ix={};ART.forEach(function(a,i){ix[a.id]=i});function map(L){return(L||[]).map(function(x){return ix[x]}).filter(function(i){return i!=null})}
  FAVS=map(c.favs).slice(0,6);
@@ -1069,6 +1093,8 @@ var PDEF={'press.kick':'For galleries, dealers & press','press.title':'Pam — p
  'trust.help':'Questions about a painting, its size, delivery or anything else? Pam replies personally to every message.',
  'trust.faq':'Can I see a painting in my home before I buy?\nOn a phone, tap a painting and choose “View on your wall” to see it in your own room at its real size.\n\nDo you deliver abroad?\nYes — Pam sends paintings worldwide. Ask for a delivery quote when you enquire.\n\nCan I make an offer?\nYes — add your offer when you enquire, and Pam will reply personally.\n\nAre prints available?\nYes — see Prints for sizes and prices, or ask about a print of any painting.\n\nDo you work with galleries and designers?\nYes — see “For galleries & press”, or send Pam a message.',
  'trust.line':'Signed certificate of authenticity · Secure payment · Tracked, insured delivery · 14-day returns',
+ 'newart.title':'New from the studio','newart.text':'The newest works, fresh from Pam’s studio. Each will find its place in a collection soon.',
+ 'prot.note':'Pam’s artwork is protected by copyright, so saving images is switched off. Would you like a print, or permission to use an image? Just ask Pam.',
  'george.comm':'Indeed she can! Pam paints original commissions in her own style — tell her your idea, and she will reply personally with thoughts and a quote.',
  'george.trade':'Welcome! Galleries, dealers and the press will find Pam’s statement, background, selected works and a press kit on one page.'};
 var TXN={'King George — the welcome tour':'Words in {curly brackets} fill themselves in, so keep them as they are: {tap} becomes “tap” on phones and “click” on computers ({Tap} with a capital). Put **two stars** around words to make them bold.',
@@ -1117,6 +1143,8 @@ var TX=[['film.title','Opening film','Title','#loading .lt'],['film.sub','Openin
  ['trust.pay','Delivery, returns & authenticity page','Secure payment',null,1],['trust.help','Delivery, returns & authenticity page','Any questions?',null,1],
  ['trust.faq','Delivery, returns & authenticity page','Questions & answers — a question on one line, its answer on the next, then an empty line',null,1],
  ['trust.line','Delivery, returns & authenticity page','The short reassurance line in the enquiry and bid forms',null,1],
+ ['newart.title','Collections page','Heading for new works that are not in a collection yet',null],['newart.text','Collections page','Introduction for those new works',null,1],
+ ['prot.note','Protecting your artwork','The message people see if they try to save or copy a painting',null,1],
  ['george.comm','King George — when visitors tap him','“Can Pam paint something for me?”',null,1],['george.trade','King George — when visitors tap him','“I’m a gallery, dealer or journalist”',null,1],
  ['seo.title','Google & link previews','Page title (shown in Google and browser tabs)',null],['seo.desc','Google & link previews','Description (shown under the title in Google)',null,1]];
 function siteT(k){var v=TXT[k];return v!=null&&String(v).trim()!==''?String(v):(TXD&&TXD[k]!=null?TXD[k]:'')}
@@ -1156,9 +1184,10 @@ function aucOf(p){var L=LIVE.bids&&LIVE.bids[p.id]||{};return{top:L.top||0,n:L.n
 function aucLive(p){return p&&p.mode==='auction'&&p.auc&&!isSold(p)&&Date.now()<p.auc.ends}
 function leftTxt(ms){if(ms<=0)return'closed';var m=Math.floor(ms/6e4),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?d+'d '+h+'h':h?h+'h '+(m%60)+'m':(m%60||1)+'m'}
 /* sharing: each painting has its own link, with a proper preview on social media */
-function shareArt(k){var p=ART[k];if(!p)return;var url=location.origin+'/api/app?s='+encodeURIComponent(p.id),title=p.t+' — an original painting by '+ARTIST,text='“'+p.t+'”, an original painting by '+ARTIST+' — see it in her gallery:';
+function artKind(p){var m=(p&&p.m||'').toLowerCase();return/digital/.test(m)?'digital painting':/ink|pen\b|pencil|drawing|charcoal|graphite/.test(m)?'drawing':'painting'}
+function shareArt(k){var p=ART[k];if(!p)return;var url=location.origin+'/api/app?s='+encodeURIComponent(p.id),title=p.t+' — an original '+artKind(p)+' by '+ARTIST,text='“'+p.t+'”, an original '+artKind(p)+' by '+ARTIST+' — see it in her gallery:';
  if(navigator.share&&matchMedia('(pointer:coarse)').matches){navigator.share({title:title,text:text,url:url}).catch(function(){});return}
- $('shH').textContent=p.t;var g=$('shGrid');g.textContent='';var img=/^\//.test(p.full||p.img||'')?location.origin+(p.full||p.img):'';
+ $('shH').textContent=p.t;var g=$('shGrid');g.textContent='';var img=/^\//.test(p.wm||'')?location.origin+p.wm:'';
  var cp=el('button',null,'Copy link');cp.type='button';cp.addEventListener('click',function(){var u=$('shUrl');try{navigator.clipboard.writeText(url).then(function(){cp.textContent='Link copied ✓'},function(){u.select()})}catch(e){u.select()}});g.appendChild(cp);
  [['WhatsApp','https://wa.me/?text='+encodeURIComponent(text+' '+url)],['Facebook','https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url)],['X','https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(url)],
   ['Pinterest','https://www.pinterest.com/pin/create/button/?url='+encodeURIComponent(url)+(img?'&media='+encodeURIComponent(img):'')+'&description='+encodeURIComponent(title)],['Email','mailto:?subject='+encodeURIComponent(title)+'&body='+encodeURIComponent(text+'\n'+url)]].forEach(function(o){
@@ -1172,7 +1201,7 @@ $('noteX').addEventListener('click',function(){$('noteD').close()});
 var PAGES={press:$('press'),commission:$('commission'),buying:$('buying')};
 function anyPage(){for(var k in PAGES)if(!PAGES[k].hidden)return true;return false}
 function openPage(k){var pg=PAGES[k];if(!pg)return;closePage(true);if(!col.hidden)closeCollection();if(!prs.hidden)closePrints();[about,dlg,buyD,bidD,$('msgD'),acct].forEach(function(d){if(d&&d.open)d.close()});
- if(k==='press')buildPress();if(k==='commission')commReset();pg.hidden=false;pg.scrollTop=0;document.documentElement.style.overflow='hidden';pg.querySelector('.pclose').focus();try{if(location.hash!=='#'+k)history.replaceState(null,'','#'+k)}catch(e){}}
+ if(k==='press'){buildPress();setTimeout(pressPrintImgs,1500)}if(k==='commission')commReset();pg.hidden=false;pg.scrollTop=0;document.documentElement.style.overflow='hidden';pg.querySelector('.pclose').focus();try{if(location.hash!=='#'+k)history.replaceState(null,'','#'+k)}catch(e){}}
 function closePage(keep){for(var k in PAGES)PAGES[k].hidden=true;if(keep!==true){document.documentElement.style.overflow='';if(/^#(press|commission|buying)$/.test(location.hash))try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}}
 [].forEach.call(document.querySelectorAll('section.page .pclose'),function(b){b.addEventListener('click',function(){closePage()})});
 addEventListener('keydown',function(e){if(e.key==='Escape'&&anyPage()&&!document.querySelector('dialog[open]'))closePage()});
@@ -1180,9 +1209,23 @@ document.addEventListener('click',function(e){var a=e.target.closest&&e.target.c
 addEventListener('hashchange',function(){var k=location.hash.slice(1);if(PAGES[k]&&PAGES[k].hidden)openPage(k)});
 $('navCom').addEventListener('click',function(){openPage('commission')});
 /* galleries & press: selected works, a press kit to save as PDF, high-res images on request */
-function buildPress(){var w=$('psWorks');w.textContent='';ART.forEach(function(p,k){var b=el('button'),fr=el('div','pw'),im=el('img');im.src=p.tn||p.img;im.alt='';im.decoding='async';fr.appendChild(im);b.appendChild(fr);b.appendChild(el('b',null,p.t));
+function buildPress(){var w=$('psWorks');w.textContent='';ART.forEach(function(p,k){var b=el('button'),fr=el('div','pw'),im=el('img','scr');im.src=p.tn||p.img;im.alt='';im.decoding='async';fr.appendChild(im);if(p.wm){fr.classList.add('haswm');var pm=el('img','prt');pm.alt='';pm.decoding='async';pm.dataset.src=p.wm;fr.appendChild(pm)}b.appendChild(fr);b.appendChild(el('b',null,p.t));
   b.appendChild(el('span',null,[p.m,p.s&&!/request/i.test(p.s)?p.s:'',p.year].filter(Boolean).join(' · ')+(isSold(p)?' · Sold':'')));b.setAttribute('aria-label',p.t+', see details');b.addEventListener('click',function(){openArt(k)});w.appendChild(b)})}
-$('psKit').addEventListener('click',function(){buildPress();setTimeout(function(){try{window.print()}catch(e){}},300)});
+function pressPrintImgs(){return Promise.all([].map.call(document.querySelectorAll('#psWorks img.prt'),function(im){if(!im.getAttribute('src'))im.src=im.dataset.src;
+ return im.complete&&im.naturalWidth?0:new Promise(function(r){im.addEventListener('load',r);im.addEventListener('error',r);setTimeout(r,6000)})}))}
+$('psKit').addEventListener('click',function(){var b=$('psKit');buildPress();b.disabled=true;pressPrintImgs().then(function(){b.disabled=false;setTimeout(function(){try{window.print()}catch(e){}},150)})});
+addEventListener('beforeprint',function(){pressPrintImgs()});
+/* ---------- protecting Pam's artwork: the gallery shows clean images, but they can't simply be saved ---------- */
+(function(){var t=null,tm=0;
+ function host(){var d=[].slice.call(document.querySelectorAll('dialog[open]')).pop();return d||document.body}
+ function show(){if(!t){t=document.createElement('div');t.className='protT';t.setAttribute('role','status');t.innerHTML='<span></span><button type="button">Ask Pam</button>';
+   t.querySelector('button').addEventListener('click',function(){t.classList.remove('on');[].forEach.call(document.querySelectorAll('dialog[open]'),function(d){if(d.id!=='msgD')try{d.close()}catch(e){}});msgWith('Hello Pam,\n\nI’d love a print of / permission to use an image of: \n\n')})}
+  t.querySelector('span').textContent=siteT('prot.note');var h=host();if(t.parentNode!==h)h.appendChild(t);
+  requestAnimationFrame(function(){t.classList.add('on')});clearTimeout(tm);tm=setTimeout(function(){t.classList.remove('on')},5200)}
+ function art(e){var x=e.target;return x&&(x.tagName==='IMG'||x.tagName==='CANVAS')&&!(x.closest&&x.closest('#dash,#fComm'))}
+ document.addEventListener('contextmenu',function(e){if(art(e)){e.preventDefault();show()}});
+ document.addEventListener('dragstart',function(e){if(art(e))e.preventDefault()});
+ window.protNote=show})();
 function msgWith(t){openMsg();var f=$('fMsg');f.message.value=t;setTimeout(function(){try{f.message.focus()}catch(e){}},100)}
 $('psHiRes').addEventListener('click',function(){msgWith('Hello Pam,\n\nCould you send me high-resolution images of: \n\nI’m writing from: ')});
 $('psMsg').addEventListener('click',function(){msgWith('')});$('byMsg').addEventListener('click',function(){msgWith('')});
@@ -1329,7 +1372,7 @@ addEventListener('resize',function(){if(!zv.open||!Z.iw)return;var rel=Z.s/Z.fit
 var TOUCH=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window,IOSAR=(function(){var a=document.createElement('a');return !!(a.relList&&a.relList.supports&&a.relList.supports('ar'))})(),ANDROID=/Android/i.test(navigator.userAgent);
 if(TOUCH)$('arBtn').hidden=false;
 $('arBtn').addEventListener('click',function(){viewOnWall(curArt)});
-function viewOnWall(k){var p=ART[k],n=p.emb?+p.emb.slice(1):0;
+function viewOnWall(k){var p=ART[k],n=p.ar&&p.emb?+p.emb.slice(1):0;
  if(n&&IOSAR){var a=document.createElement('a');a.rel='ar';a.href='/ar/p'+n+'.usdz#allowsContentScaling=0';a.appendChild(document.createElement('img'));document.body.appendChild(a);a.click();setTimeout(function(){a.remove()},1500);return}
  if(n&&ANDROID&&/^https:/.test(location.href)){var file=location.origin+'/ar/p'+n+'.glb',fb=location.origin+'/#wall'+n;
   location.href='intent://arvr.google.com/scene-viewer/1.0?file='+encodeURIComponent(file)+'&mode=ar_preferred&enable_vertical_placement=true&resizable=false&title='+encodeURIComponent(p.t)+'#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;S.browser_fallback_url='+encodeURIComponent(fb)+';end;';return}
@@ -1497,7 +1540,7 @@ function drawSettings(body){pubBar(body);var S=ED.site;
  api({a:'catHist'}).then(function(j){hl.textContent='';if(j.error||!j.list||!j.list.length){hl.appendChild(el('p','note',j.error||'Nothing published yet.'));return}
   j.list.forEach(function(v,i){var r=el('div','hrow');r.appendChild(el('span',null,new Date(v.v).toLocaleString(undefined,{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})+' — '+v.arts+' paintings, '+v.colls+' collections, '+v.prints+' prints'+(i===0?' (live now)':'')));
    if(i>0){var b=sbtn('Restore',function(){if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Tap again to restore';return}b.disabled=true;api({a:'catRestore',v:v.v}).then(function(r){if(r.error){$('dErr').textContent=r.error;b.disabled=false;return}
-    ED=r.cat;['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Restored the version from '+new Date(v.v).toLocaleString()+'.';applySite(ED);siteRefresh();drawTab()})});r.appendChild(b)}hl.appendChild(r)})})}
+    ED=withEmb(r.cat);ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Restored the version from '+new Date(v.v).toLocaleString()+'.';applySite(ED);siteRefresh();drawTab()})});r.appendChild(b)}hl.appendChild(r)})})}
 /* ---------- the Grow plan: how the gallery finds collectors, dealers, promoters and everyday buyers ---------- */
 function siteUrl(){return location.origin.indexOf('localhost')>=0?'https://itsamepameo.com':location.origin}
 var GROW=[
@@ -1574,9 +1617,9 @@ function tableOf(heads){var w=el('div','tbl'),t=el('table'),th=el('thead'),tr=el
 /* ---------- owner: paintings, favourites, collections and prints ---------- */
 var ED=null,EDdirty=false,EDopen={},EDmsg='',vRange='all';
 function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
-function seedCat(){return{arts:ART.map(function(a){return{id:a.id,t:a.t,m:a.m||'',s:a.s==='Size on request'?'':(a.s||''),year:a.year||'',d:a.d||'',p:a.price||'',mode:a.mode||'request',auc:a.auc,status:a.status||'Available',w:a.w,h:a.h,bg:a.bg||'#cfc6d6',img:a.emb?'emb:'+a.emb:a.img,ar:!!a.emb}}),
+function seedCat(){return{arts:ART.map(function(a){return{id:a.id,t:a.t,m:a.m||'',s:a.s==='Size on request'?'':(a.s||''),year:a.year||'',d:a.d||'',p:a.price||'',mode:a.mode||'request',auc:a.auc,status:a.status||'Available',w:a.w,h:a.h,bg:a.bg||'#cfc6d6',img:a.emb?'emb:'+a.emb:a.img,ar:!!a.ar}}),seen:Object.keys(EMB),
  favs:FAVS.map(function(i){return ART[i].id}),colls:COLLECTIONS.map(function(c){return{t:c.t,d:c.d||'',works:c.works.map(function(i){return ART[i].id}),soon:c.soon}}),prints:PRINTS.map(function(q){return{id:q.id,art:q.art>=0?ART[q.art].id:'',t:'',d:q.d,img:'',sizes:q.sizes,on:true}})}}
-function loadED(cb){api({a:'catGet'}).then(function(j){if(j.error){$('dErr').textContent=j.error;return}ED=j.cat||seedCat();['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};cb()})}
+function loadED(cb){api({a:'catGet'}).then(function(j){if(j.error){$('dErr').textContent=j.error;return}ED=withEmb(j.cat)||seedCat();ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};cb()})}
 function markDirty(){EDdirty=true;EDmsg='';var b=$('edPub');if(b){b.disabled=false;$('edState').textContent='Unpublished changes'}}
 function artById(id){return ED.arts.filter(function(a){return a.id===id})[0]}
 function field(label,input,cls){var l=el('label','ef'+(cls?' '+cls:''));l.appendChild(el('span',null,label));l.appendChild(input);return l}
@@ -1589,9 +1632,21 @@ function pubBar(body){var bar=el('div','edbar'),st=el('span','edst');st.id='edSt
  var pub=el('button','btn main','Publish changes');pub.id='edPub';pub.type='button';pub.disabled=!EDdirty;pub.addEventListener('click',publish);
  bar.appendChild(st);bar.appendChild(dis);bar.appendChild(pub);body.appendChild(bar);
  if(EDmsg){var m=el('p','edmsg');m.appendChild(document.createTextNode(EDmsg+' '));var rl=sbtn('Reload the gallery now',function(){location.reload()},'link');m.appendChild(rl);body.appendChild(m)}}
+/* the watermark on copies that can leave the site (link previews, Pinterest, Google, the press kit) */
+function wmCanvas(im,L){var W0=im.naturalWidth,H0=im.naturalHeight,k=Math.min(1,(L||1600)/Math.max(W0,H0)),W=Math.round(W0*k),H=Math.round(H0*k),c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');x.drawImage(im,0,0,W,H);
+ var fs=Math.max(14,Math.round(Math.max(W,H)*.022)),txt='© PAM’S GALLERY  ·  ITSAMEPAMEO.COM',F=' Jost, Inter, Arial, sans-serif';x.save();x.font='600 '+fs+'px'+F;var tw=x.measureText(txt).width,gap=fs*3.2,rh=fs*5.5,D=Math.hypot(W,H);
+ x.translate(W/2,H/2);x.rotate(-24*Math.PI/180);x.textBaseline='top';
+ for(var r=0,y=-D/2;y<D/2;y+=rh,r++)for(var X=-D/2-(r%2)*(tw+gap)/2;X<D/2;X+=tw+gap){x.fillStyle='rgba(0,0,0,.16)';x.fillText(txt,X+fs*.08,y+fs*.08);x.fillStyle='rgba(255,255,255,.26)';x.fillText(txt,X,y)}
+ x.restore();var bs=Math.max(12,Math.round(Math.min(W,H)*.03)),bt='© Pam’s Gallery · itsamepameo.com';x.font='600 '+bs+'px'+F;var bw=x.measureText(bt).width,p=bs*.6,m=Math.round(bs*.8);
+ x.fillStyle='rgba(20,14,10,.62)';x.beginPath();if(x.roundRect)x.roundRect(W-bw-2*p-m,H-bs-2*p-m,bw+2*p,bs+2*p,bs*.4);else x.rect(W-bw-2*p-m,H-bs-2*p-m,bw+2*p,bs+2*p);x.fill();
+ x.fillStyle='rgba(255,255,255,.94)';x.textBaseline='middle';x.fillText(bt,W-bw-p-m,H-m-p-bs/2);return c}
+function ensureWM(cat){var todo=(cat.arts||[]).filter(function(a){return/^\/api\/app\?img=/.test(a.img||'')&&!(a.wm&&a.wmOf===a.img)});
+ return todo.reduce(function(pr,a){return pr.then(function(){return new Promise(function(res){var im=new Image();
+  im.onload=function(){try{var d=wmCanvas(im,1600).toDataURL('image/jpeg',.85);api({a:'imgUpload',data:d,type:'image/jpeg'}).then(function(j){if(j&&j.url){a.wm=j.url;a.wmOf=a.img}res()},function(){res()})}catch(e){res()}};
+  im.onerror=function(){res()};im.src=a.img})})},Promise.resolve())}
 function publish(){var b=$('edPub');b.disabled=true;$('edState').textContent='Publishing…';$('dErr').textContent='';
- api({a:'catSave',cat:ED}).then(function(j){if(j.error){$('dErr').textContent=j.error;b.disabled=false;$('edState').textContent='Not published yet';return}
-  ED=j.cat;ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Published — visitors will see your changes from their next visit.';applySite(ED);siteRefresh();drawTab()})}
+ ensureWM(ED).then(function(){return api({a:'catSave',cat:ED})}).then(function(j){if(j.error){$('dErr').textContent=j.error;b.disabled=false;$('edState').textContent='Not published yet';return}
+  ED=withEmb(j.cat);ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Published — visitors will see your changes from their next visit.';applySite(ED);siteRefresh();drawTab()})}
 function prepPhoto(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();
  im.onload=function(){var W0=im.naturalWidth,H0=im.naturalHeight,k=Math.min(1,2400/Math.max(W0,H0)),W=Math.round(W0*k),H=Math.round(H0*k),c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').drawImage(im,0,0,W,H);URL.revokeObjectURL(u);
   var q=.9,d=c.toDataURL('image/jpeg',q);while(d.length>3.3e6&&q>.5){q-=.08;d=c.toDataURL('image/jpeg',q)}res({data:d,W:W,H:H})};
@@ -1721,10 +1776,12 @@ var COLLECTIONS=[
  {t:'Embers & Omens',d:'Warm, surreal visions in ember and rose — a winged messenger, and a pale bloom drifting over the glow.',works:[4,5],soon:3}];
 var LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.4" r="1.2" fill="currentColor" stroke="none"/></svg>';
 function roman(n){return['I','II','III','IV','V','VI','VII','VIII','IX','X'][n]||String(n+1)}
+function gridList(){var inC={},nw=[];COLLECTIONS.forEach(function(c){c.works.forEach(function(k){inC[k]=1})});ART.forEach(function(p,k){if(!inC[k])nw.push(k)});
+ var L=COLLECTIONS.slice();if(nw.length)L.unshift({t:siteT('newart.title')||'New from the studio',d:siteT('newart.text'),works:nw,soon:0,isNew:true});return L}
 function buildGrid(){if(gridBuilt)return;gridBuilt=true;var box=$('grid'),idx=$('cindex'),SH=[{w:'64%',a:.72},{w:'100%',a:1.32},{w:'84%',a:1}];
- COLLECTIONS.forEach(function(c,ci){var sec=document.createElement('section');sec.className='coll';sec.id='coll-'+(ci+1);sec.setAttribute('aria-labelledby','ct'+ci);
+ gridList().forEach(function(c,ci){var cn=c.isNew?'Just arrived':'Collection '+roman(COLLECTIONS.indexOf(c)),sec=document.createElement('section');sec.className='coll'+(c.isNew?' cnew':'');sec.id=c.isNew?'coll-new':'coll-'+(COLLECTIONS.indexOf(c)+1);sec.setAttribute('aria-labelledby','ct'+ci);
   var n=c.works.length;
-  sec.innerHTML='<div class="chead"><div><p class="cnum">Collection '+roman(ci)+'</p><h3 class="ctitle" id="ct'+ci+'"></h3><p class="cdesc"></p></div><p class="ccount"><b>'+n+' painting'+(n===1?'':'s')+'</b>'+(c.soon?' · '+c.soon+' coming soon':'')+'</p></div><ul class="cgrid"></ul>';
+  sec.innerHTML='<div class="chead"><div><p class="cnum">'+cn+'</p><h3 class="ctitle" id="ct'+ci+'"></h3><p class="cdesc"></p></div><p class="ccount"><b>'+n+(c.isNew?' new':'')+' work'+(n===1?'':'s')+'</b>'+(c.soon?' · '+c.soon+' coming soon':'')+'</p></div><ul class="cgrid"></ul>';
   sec.querySelector('.ctitle').textContent=c.t;sec.querySelector('.cdesc').textContent=c.d;var ul=sec.querySelector('ul');
   c.works.forEach(function(k){var p=ART[k];if(!p)return;var li=document.createElement('li');li.className='card';
    li.innerHTML='<button aria-label="'+esc(p.t)+', view details"><div class="ph"><img decoding="async" alt="'+esc(p.t)+'"></div><h3></h3><p class="meta"></p><p class="price"></p></button>';
@@ -1737,7 +1794,7 @@ function buildGrid(){if(gridBuilt)return;gridBuilt=true;var box=$('grid'),idx=$(
    li.innerHTML='<div class="ph"><div class="blank" style="width:'+sh.w+';aspect-ratio:'+sh.a+';--dl:'+(ci*1.3+j*.45).toFixed(2)+'s"><span class="lock">'+LOCK+'</span></div></div><h3>Coming soon</h3><p class="meta">A new painting is in the studio</p>';
    ul.appendChild(li)}
   box.appendChild(sec);
-  var bt=document.createElement('button');bt.type='button';bt.innerHTML='<img alt="" decoding="async"><span><span class="cn">Collection '+roman(ci)+'</span><span class="ct"></span></span>';
+  var bt=document.createElement('button');bt.type='button';bt.innerHTML='<img alt="" decoding="async"><span><span class="cn">'+cn+'</span><span class="ct"></span></span>';
   if(c.works.length)bt.querySelector('img').src=thumb(c.works[0]);bt.querySelector('.ct').textContent=c.t;
   bt.addEventListener('click',function(){var top=col.scrollTop+sec.getBoundingClientRect().top-col.getBoundingClientRect().top-(col.querySelector('.top').offsetHeight||0)-18;col.scrollTo({top:top,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'})});idx.appendChild(bt)})}
 /* ---------- prints: each in a choice of sizes, each size with its own price ---------- */
@@ -1762,7 +1819,7 @@ $('navCol').addEventListener('click',function(){CATP.then(openCollection)});$('c
 addEventListener('keydown',function(e){if(e.key==='Escape'&&!col.hidden&&!dlg.open&&!about.open)closeCollection()});
 
 /* structured data so search engines understand the works */
-CATP.then(function(){var ld={"@context":"https://schema.org","@type":"ItemList","name":"Pam’s Gallery — Collections","itemListElement":ART.map(function(p,i){var o={"@type":"VisualArtwork","name":p.t,"artform":"Painting","artMedium":p.m,"creator":{"@type":"Person","name":ARTIST},"size":p.s};if(/^\//.test(p.full||p.img||""))o.image=location.origin+(p.full||p.img);
+CATP.then(function(){var ld={"@context":"https://schema.org","@type":"ItemList","name":"Pam’s Gallery — Collections","itemListElement":ART.map(function(p,i){var o={"@type":"VisualArtwork","name":p.t,"artform":{"digital painting":"Digital art","drawing":"Drawing"}[artKind(p)]||"Painting","artMedium":p.m,"creator":{"@type":"Person","name":ARTIST},"size":p.s};if(/^\//.test(p.wm||""))o.image=location.origin+p.wm;
   var amt=(p.p||'').replace(/[^0-9.]/g,'');if(amt&&!isSold(p))o.offers={"@type":"Offer","price":amt,"priceCurrency":/£/.test(p.p)?"GBP":/€/.test(p.p)?"EUR":"USD","availability":"https://schema.org/InStock"};
   return{"@type":"ListItem","position":i+1,"item":o}})};
  var sc=document.createElement('script');sc.type='application/ld+json';sc.textContent=JSON.stringify(ld);document.head.appendChild(sc)});
