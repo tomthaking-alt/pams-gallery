@@ -86,6 +86,7 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #gBub.on{opacity:1;transform:none;pointer-events:auto}
 #gBub .who{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:600;font-size:1.05rem;color:#8a6a36;margin-bottom:.15rem}
 #gBub i{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.06em}
+#gTxt b{font-weight:600;color:#7a5220}
 #gBub .opts{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.65rem}
 #gBub .opts button,#gBub .opts a{font:inherit;font-size:.8rem;border:1px solid rgba(28,18,12,.22);background:#fff;color:#1c120c;border-radius:99px;padding:.45rem .8rem;min-height:36px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
 #gBub .opts .pri{background:#1c120c;color:#fbf8f2;border-color:#1c120c}
@@ -330,7 +331,46 @@ dialog::backdrop{background:rgba(22,15,11,.7);backdrop-filter:blur(3px)}
 #ways .tx{display:flex;flex-direction:column;min-width:0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:1.22rem;line-height:1.15}
 #ways small{font-family:Jost,Helvetica,Arial,sans-serif;font-style:normal;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--bronze)}
 @media (max-width:700px){#ways{bottom:calc(env(safe-area-inset-bottom,0px) + 100px)}#ways button{padding:.5rem .8rem;gap:.5rem;min-height:52px}#ways .tx{font-size:1.02rem}#ways .ar{width:28px;height:28px;font-size:1.25rem}}
-body.gIntro #ways{opacity:0;pointer-events:none}
+#ways .ls{display:none}
+#pnow,#swipeHint{display:none}
+#wallText{position:fixed;z-index:4;left:50%;top:calc(env(safe-area-inset-top,0px) + 74px);transform:translate(-50%,-6px);width:min(540px,calc(100vw - 32px));box-sizing:border-box;text-align:center;padding:.85rem 1.3rem .9rem;border-radius:14px;background:rgba(251,248,242,.92);border:1px solid rgba(184,154,98,.55);box-shadow:0 12px 34px rgba(20,12,8,.24);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#1c120c;opacity:0;pointer-events:none;transition:opacity .45s ease,transform .45s ease}
+#wallText.on{opacity:1;transform:translate(-50%,0)}
+#wallText p{margin:0}
+#wallText .wk{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:#7a5a26}
+#wallText .wt{margin:.15rem 0 .25rem;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;font-size:1.6rem;line-height:1.1;color:var(--walnut)}
+#wallText .wd{font-size:.86rem;line-height:1.5;color:#4d3d31}
+#wallText .wn{margin-top:.45rem;font-size:.72rem;letter-spacing:.06em;color:#7a5a26}
+@media (min-width:701px){body.gIntro #ways{opacity:0;pointer-events:none}}
+@media (max-width:700px){
+ /* phones: slim arrows at the edges instead of big buttons; words only at the entrance */
+ #ways{top:calc(50% - 104px);bottom:auto;transform:translateY(-50%);align-items:center;padding:0 max(6px,env(safe-area-inset-right,0px)) 0 max(6px,env(safe-area-inset-left,0px))}
+ #ways.on,#ways.walk{opacity:1;transform:translateY(-50%)}
+ #ways.walk button{pointer-events:auto}
+ #ways button,#ways #wayR{flex-direction:column;gap:.4rem;padding:0;min-height:0;max-width:none;width:84px;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;text-align:center;align-items:center}
+ #ways #wayR{flex-direction:column-reverse}
+ #ways button:hover,#ways button:focus-visible{background:none;transform:none}
+ #ways .ar{width:46px;height:46px;font-size:1.7rem;padding-bottom:3px;box-sizing:border-box;background:rgba(250,249,247,.88);color:var(--walnut);border:1px solid rgba(176,141,87,.55);box-shadow:0 6px 18px rgba(20,12,8,.3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+ #ways .tx{font-family:Jost,Helvetica,Arial,sans-serif;font-style:normal;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--walnut);font-weight:500;text-shadow:0 0 8px rgba(255,252,246,.95),0 0 3px rgba(255,252,246,.95);align-items:center;line-height:1.2}
+ #ways small,#ways .lf{display:none}#ways .ls{display:block}
+ #ways.walk .tx{display:none}
+ #ways button.end{visibility:hidden}
+ #ways.on #wayL .ar{animation:nudgeL 2.4s ease-in-out infinite}
+ #ways.on #wayR .ar{animation:nudgeR 2.4s ease-in-out infinite}
+ @keyframes nudgeL{0%,70%,100%{transform:none}80%{transform:translateX(-5px)}90%{transform:translateX(0)}}
+ @keyframes nudgeR{0%,70%,100%{transform:none}80%{transform:translateX(5px)}90%{transform:translateX(0)}}
+ /* where you are, under the menu */
+ #wallText{top:calc(env(safe-area-inset-top,0px) + 64px);padding:.7rem 1rem .75rem}#wallText .wt{font-size:1.35rem}#wallText .wd{font-size:.8rem}
+ #pnow{display:block;position:fixed;z-index:4;top:calc(env(safe-area-inset-top,0px) + 66px);left:50%;transform:translateX(-50%);max-width:calc(100vw - 40px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:inherit;font-size:.76rem;letter-spacing:.03em;color:var(--walnut);background:rgba(250,249,247,.88);border:1px solid rgba(176,141,87,.45);border-radius:99px;padding:.38rem .95rem;box-shadow:0 6px 18px rgba(20,12,8,.18);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer;transition:opacity .35s}
+ #pnow i{font-family:'Cormorant Garamond',Georgia,serif;font-size:.98rem}
+ #pnow[hidden]{display:block;opacity:0;pointer-events:none}
+ /* the first time: how to get about */
+ #swipeHint{display:flex;position:fixed;z-index:4;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);transform:translateX(-50%);align-items:center;gap:.6rem;padding:.55rem 1rem;border-radius:99px;background:rgba(43,30,24,.84);color:#faf6ee;font-size:.78rem;letter-spacing:.08em;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .5s}
+ #swipeHint.on{opacity:1}
+ #swipeHint .trk{position:relative;width:46px;height:2px;background:rgba(250,246,238,.35);border-radius:2px}
+ #swipeHint .trk::after{content:"";position:absolute;top:-4px;left:0;width:10px;height:10px;border-radius:50%;background:#f1d9a6;animation:shSwipe 1.9s ease-in-out infinite}
+ @keyframes shSwipe{0%,100%{left:0}50%{left:36px}}
+}
+@media (max-width:700px) and (prefers-reduced-motion:reduce){#ways .ar,#swipeHint .trk::after{animation:none!important}}
 @media (max-width:700px){#pzoom{position:fixed;z-index:4;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 22px);width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--walnut);background:rgba(250,249,247,.92);border:1px solid rgba(176,141,87,.6);box-shadow:0 8px 24px rgba(20,12,8,.28);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition:opacity .3s,transform .3s;-webkit-tap-highlight-color:transparent}
  #pzoom[hidden]{display:flex;opacity:0;transform:scale(.6);pointer-events:none}
  body.gIntro #pzoom,body:has(#gBub.on) #pzoom{opacity:0;pointer-events:none}}
@@ -433,7 +473,10 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
  <path class="jaw" d="M93 42.6 L103 42.3 C101.5 44.8 98 45.8 94.2 45.6 Z" fill="#d48f8a"/>
 <g class="crown" transform="rotate(-10 80 21)"><path d="M70 22.4 L71.6 11 L76.4 17.2 L80 8.4 L83.6 17.2 L88.4 11 L90 22.4 Z" fill="url(#gG)" stroke="#8f6a22" stroke-width=".8" stroke-linejoin="round"/><rect x="69.4" y="20.2" width="21.2" height="4.4" rx="1.8" fill="url(#gG)" stroke="#8f6a22" stroke-width=".8"/><circle cx="71.6" cy="10.6" r="1.7" fill="#fff4d8" stroke="#c9a24e" stroke-width=".5"/><circle cx="80" cy="7.9" r="1.9" fill="#fff4d8" stroke="#c9a24e" stroke-width=".5"/><circle cx="88.4" cy="10.6" r="1.7" fill="#fff4d8" stroke="#c9a24e" stroke-width=".5"/><circle cx="80" cy="22.4" r="1.6" fill="#b3263a"/><circle cx="74.6" cy="22.4" r="1.05" fill="#2d5fa8"/><circle cx="85.4" cy="22.4" r="1.05" fill="#2d5fa8"/><path d="M71 21.2 L89 21.2" stroke="rgba(255,250,230,.6)" stroke-width=".6"/></g>
 </g></g></svg></button><div id="gBub" role="dialog" aria-label="King George says"><button class="x" id="gX" aria-label="Close">&times;</button><div class="who">King George</div><div id="gTxt"></div><div class="dots" id="gDots" aria-hidden="true"></div><div class="opts" id="gOpts"></div></div></div><button id="gTab" type="button" aria-label="Call King George"><svg viewBox="0 0 24 16" width="22" height="15" aria-hidden="true"><path d="M2 14 L3 3 L8 8 L12 1 L16 8 L21 3 L22 14 Z" fill="#c99a3c" stroke="#8f6a22" stroke-width="1" stroke-linejoin="round"/></svg><span>King George</span></button><div id="wall" hidden><video id="wallV" playsinline muted autoplay></video><img id="wallBg" alt="" hidden><div id="wallArt"><img id="wallImg" alt=""></div><div id="wallMsg" hidden></div><div class="wtop"><span id="wallHint">Point at your wall · drag to move · pinch to resize</span><button id="wallX" type="button">Done</button></div><div class="wbot"><input type="range" id="wallSize" min="15" max="85" value="42" aria-label="Painting size"><label>Use a photo<input type="file" accept="image/*" id="wallFile" hidden></label></div></div><div id="walk" role="group" aria-label="Walk through the gallery"><button id="prev" aria-label="Turn left" class="end">&#8249;</button><span id="now" aria-live="polite">Welcome</span><button id="wzoom" type="button" aria-label="Zoom in on this painting" title="Zoom in on this painting" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></button><button id="next" aria-label="Turn right">&#8250;</button></div>
-<div id="ways" role="group" aria-label="Choose your way"><button id="wayL" type="button"><span class="ar" aria-hidden="true">&#8249;</span><span class="tx"><small>Turn left</small>The Collections</span></button><button id="wayR" type="button"><span class="tx"><small>Turn right</small>This Month’s Favourites</span><span class="ar" aria-hidden="true">&#8250;</span></button></div>
+<div id="ways" role="group" aria-label="Choose your way"><button id="wayL" type="button" aria-label="Go left"><span class="ar" aria-hidden="true">&#8249;</span><span class="tx"><small>Turn left</small><span class="lf">The Collections</span><span class="ls">Collections</span></span></button><button id="wayR" type="button" aria-label="Go right"><span class="tx"><small>Turn right</small><span class="lf">This Month’s Favourites</span><span class="ls">Favourites</span></span><span class="ar" aria-hidden="true">&#8250;</span></button></div>
+<button id="pnow" type="button"></button>
+<div id="wallText" aria-live="polite"><p class="wk"></p><h3 class="wt"></h3><p class="wd"></p><p class="wn"></p></div>
+<div id="swipeHint" aria-hidden="true"><span>Swipe</span><span class="trk"></span><span>to explore</span></div>
 <button id="pzoom" type="button" aria-label="Zoom in on this painting" hidden><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></button>
 <div id="tip"></div>
 <section id="enqPanel" aria-labelledby="enqTitle" aria-hidden="true">
@@ -1572,9 +1615,9 @@ function lockedFrame(o,ry,w,h,f,ct){var b=B(o,ry),fm=Mx.gold24,ow=w/2,oh=h/2,zt=
  var n=bn(b,[0,0,1]),ax=bn(b,[1,0,0]),c=bx(b,[0,0,.0245]);
  LABELS.push(function(){label(lockedCanvas(),c,ax,[0,1,0],w,h,n,{go:function(){},tip:'<i>Coming soon</i> · a new painting for '+esc(ct),far:14},{blend:0,rough:.85})})}
 function wallTitle(ci,t){return textCanvas(2048,300,function(x,W,H){x.textAlign='center';
- x.fillStyle='#6f4f1f';x.font='600 48px Jost,Helvetica,Arial,sans-serif';spaced(x,'COLLECTION '+roman(ci),W/2,62,16);
- var kw=x.measureText('COLLECTION '+roman(ci)).width+16*12;x.fillRect(W/2-kw/2-150,46,110,2.5);x.fillRect(W/2+kw/2+40,46,110,2.5);
- x.fillStyle='#2e1c12';x.font='italic 500 150px "Cormorant Garamond",Georgia,serif';x.fillText(t,W/2,232)})}
+ x.fillStyle='#5a3d14';x.font='600 54px Jost,Helvetica,Arial,sans-serif';spaced(x,'COLLECTION '+roman(ci),W/2,64,18);
+ var kw=x.measureText('COLLECTION '+roman(ci)).width+18*12;x.fillRect(W/2-kw/2-150,46,110,3);x.fillRect(W/2+kw/2+40,46,110,3);
+ x.fillStyle='#24150c';x.font='italic 600 158px "Cormorant Garamond",Georgia,serif';x.fillText(t,W/2,234)})}
 function carved(t,W,H,px,sp){return textCanvas(W,H,function(x){x.textAlign='center';x.textBaseline='middle';x.font='500 '+px+'px "Cormorant Garamond",Georgia,serif';
  x.fillStyle='rgba(70,48,22,.55)';spaced(x,t,W/2+2,H/2+4,sp);
  var g=x.createLinearGradient(0,H*.25,0,H*.75);g.addColorStop(0,'#f6dd96');g.addColorStop(.5,'#c99b45');g.addColorStop(1,'#8d6526');x.fillStyle=g;spaced(x,t,W/2,H/2,sp)})}
@@ -1592,9 +1635,9 @@ COLLECTIONS.forEach(function(c,ci){var W=CWALL[ci];if(!W)return;var b=B(W.c,W.ry
  if(!seq.length)return;var x=-tot/2,hung=[];
  seq.forEach(function(k,j){var cxl=x+widths[j]/2;x+=widths[j]+gap;var o=bx(b,[cxl,0,0]);
   if(k<0)lockedFrame(o,W.ry,LW,LH,LF,c.t);else hung.push(hang(k,o,W.ry,{sc:sc,col:1}))});
- var n=bn(b,[0,0,1]),ax=bn(b,[1,0,0]),center=bx(b,[0,0,0]),tc=bx(b,[0,1.0,.012]);
+ var n=bn(b,[0,0,1]),ax=bn(b,[1,0,0]),center=bx(b,[0,0,0]),tc=bx(b,[0,1.03,.012]);
  COLPOS[ci]={c:center,n:n,ax:ax,w:tot,h:1.95,works:hung};
- LABELS.push(function(){label(wallTitle(ci,c.t),tc,ax,[0,1,0],2.9,.425,n,null,{blend:1})});
+ LABELS.push(function(){label(wallTitle(ci,c.t),tc,ax,[0,1,0],3.6,.527,n,null,{blend:1})});
  spotOn(center,v3.add([center[0],RH-.02,center[2]],v3.sc(n,2.6)),tot,46)});
 
 /* ---------- furnishings ---------- */
@@ -2200,7 +2243,7 @@ function frame(time){
 var SF=[{k:0,label:'Welcome'}];ARTPOS.forEach(function(a,i){SF.push({k:3+2*i+.5,label:'<i>'+esc(ART[a.k].t)+'</i> · '+(i+1)+'/'+ARTPOS.length,art:a.k})});SF.push({k:KF.length-1,label:'The Balcony · Enquiries'});
 var SC=[{k:0,label:'Welcome'}];(function(){var k=4;COLPOS.forEach(function(a,ci){if(!a)return;var c=COLLECTIONS[ci];SC.push({k:k+.5,label:'Collection '+roman(ci)+' · <i>'+esc(c.t)+'</i>',coll:ci});k+=2;
  a.works.forEach(function(q){SC.push({k:k+.5,label:'<i>'+esc(ART[q.k].t)+'</i> · '+esc(c.t),art:q.k,coll:ci});k+=2})})})();SC.push({k:KC.length-1,label:'Welcome',exit:1});
-var STOPS=SF,pend=null;
+var STOPS=SF,pend=null,leftCol=0;
 function setRoute(r){if(r===route)return;route=r;K=r==='col'?KC:KF;STOPS=r==='col'?SC:SF;walkKey='';tgtI=null}
 function atDoor(){var n=Math.max(KF.length,KC.length)-1;return cur*n<=1.0&&progress()*n<=1.0}   // both walks share the entrance
 function stopAt(){var t=cur*(K.length-1),best=0,bd=1e9;STOPS.forEach(function(s,i){var d=Math.abs(s.k-t);if(d<bd){bd=d;best=i}});return{i:best,d:bd}}
@@ -2221,16 +2264,21 @@ function goPlan(q){if(!q)return;
  if(q.r===route){pend=null;goStop(q.i);return}
  if(atDoor()){setRoute(q.r);pend=null;goStop(q.i)}else{pend=q;goStop(0)}}   // the other walk: back to the entrance first, then off the other way
 function updateWalk(){if(pend&&atDoor()){var q0=pend;pend=null;setRoute(q0.r);goStop(q0.i)}
- if(route==='col'&&!heading()&&cur*(K.length-1)>K.length-1.05&&progress()*(K.length-1)>K.length-1.05){setRoute('fav');cur=0;scrollTo(0,0);walkKey='';lastNow=''}   // back out at the entrance: start afresh from there
+ if(route==='col'&&!heading()&&cur*(K.length-1)>K.length-1.05&&progress()*(K.length-1)>K.length-1.05){setRoute('fav');cur=0;scrollTo(0,0);walkKey='';lastNow='';leftCol=leftCol||Date.now()}   // back out at the entrance: start afresh from there
  var a=stopAt(),go=heading(),i=go?tgtI:a.i,near=go||a.d<.6,t=cur*(K.length-1),door=atDoor()&&!go&&!pend,
-  txt=pend?(pend.r==='col'?SC:SF)[pend.i].label:near?STOPS[i].label:(cam.z<ZF+.2?'The Balcony':route==='col'?'The Collections':'This Month’s Favourites');if(txt!==lastNow){lastNow=txt;nowEl.innerHTML=txt}   // names where you're heading as soon as you press
+  txt=pend?(pend.r==='col'?SC:SF)[pend.i].label:near?STOPS[i].label:(cam.z<ZF+.2?'The Balcony':route==='col'?'The Collections':'This Month’s Favourites');if(txt!==lastNow){lastNow=txt;nowEl.innerHTML=txt;$('pnow').innerHTML=txt}   // names where you're heading as soon as you press
  var pr=plan(1),pl=plan(-1),th=there(a.i,t),at=!go&&!pend&&(th||a.d<.35)&&STOPS[a.i].art!=null,intro=document.body.classList.contains('gIntro'),
-  key=(pr?pr.r+pr.i:'-')+'|'+(pl?pl.r+pl.i:'-')+'|'+at+'|'+door+'|'+intro;
+  phone=innerWidth<=700,key=(pr?pr.r+pr.i:'-')+'|'+(pl?pl.r+pl.i:'-')+'|'+at+'|'+door+'|'+intro+'|'+phone+'|'+swipedOnce+'|'+go+'|'+a.i+'|'+(th||a.d<.35)+'|'+!!pend;
  if(key===walkKey)return;walkKey=key;
  var R=pr?'Turn right to '+nameOf(pr):'',L=pl?'Turn left to '+nameOf(pl):'';
  nxEl.title=R;nxEl.setAttribute('aria-label',R||'Turn right');nxEl.classList.toggle('end',!R);$('pzoom').hidden=!at;
  pvEl.title=L;pvEl.setAttribute('aria-label',L||'Turn left');pvEl.classList.toggle('end',!L);wzEl.hidden=!at;
- waysEl.classList.toggle('on',door&&!intro)}
+ waysEl.classList.toggle('on',door&&(!intro||phone));waysEl.classList.toggle('walk',phone&&!door);$('wayL').classList.toggle('end',!pl);$('wayR').classList.toggle('end',!pr);
+ var S=STOPS[a.i],wall=!go&&!pend&&(th||a.d<.35)&&S&&S.coll!=null&&S.art==null,wt=$('wallText');
+ if(wall&&wt.dataset.c!==String(S.coll)){var C=COLLECTIONS[S.coll];wt.dataset.c=S.coll;wt.querySelector('.wk').textContent='Collection '+roman(S.coll);wt.querySelector('.wt').textContent=C.t;wt.querySelector('.wd').textContent=C.d||'';
+  wt.querySelector('.wn').textContent=(phone?'Swipe right':'Press ›')+' to walk up close to each painting';}
+ wt.classList.toggle('on',!!wall);
+ $('pnow').hidden=door||!!wall;$('swipeHint').classList.toggle('on',phone&&door&&!intro&&!swipedOnce)}
 var tgtI=null,tgtT=0;
 function goStop(i){i=Math.max(0,Math.min(STOPS.length-1,i));tgtI=i;tgtT=Date.now();var max=document.documentElement.scrollHeight-innerHeight;scrollTo({top:max*STOPS[i].k/(K.length-1),behavior:reduce?'auto':'smooth'})}
 function step(dir){if(window.__G)window.__G.stopTour();goPlan(plan(dir))}
@@ -2238,8 +2286,11 @@ function step(dir){if(window.__G)window.__G.stopTour();goPlan(plan(dir))}
 function colTap(k){var idx=-1;SC.forEach(function(S,i){if(S.art===k)idx=i});if(idx<0){openArt(k);return}
  if(route==='col'&&!heading()&&there(idx,cur*(K.length-1)))openArt(k);else{if(window.__G)window.__G.stopTour();goPlan({r:'col',i:idx})}}
 $('next').addEventListener('click',function(){step(1);updateWalk()});$('prev').addEventListener('click',function(){step(-1);updateWalk()});
-$('wayL').addEventListener('click',function(){if(window.__G)window.__G.stopTour();goPlan({r:'col',i:1});updateWalk()});
-$('wayR').addEventListener('click',function(){if(window.__G)window.__G.stopTour();goPlan({r:'fav',i:1});updateWalk()});
+$('wayL').addEventListener('click',function(){swiped();step(-1);updateWalk()});
+$('wayR').addEventListener('click',function(){swiped();step(1);updateWalk()});
+$('pnow').addEventListener('click',function(){nowEl.click()});
+var swipedOnce=false;try{swipedOnce=sessionStorage.getItem('pgSwiped')==='1'}catch(e){}
+function swiped(){if(swipedOnce)return;swipedOnce=true;try{sessionStorage.setItem('pgSwiped','1')}catch(e){}walkKey=''}
 wzEl.addEventListener('click',function(){var a=stopAt();if(STOPS[a.i].art!=null)openZoom(STOPS[a.i].art,null)});$('pzoom').addEventListener('click',function(){var a=stopAt();if(STOPS[a.i].art!=null)openZoom(STOPS[a.i].art,null)});
 addEventListener('wheel',function(){tgtI=null},{passive:true});
 /* a trackpad pinch (ctrl + wheel) at a painting opens the close-up viewer instead of zooming the whole page */
@@ -2251,7 +2302,7 @@ addEventListener('keydown',function(e){if(dlg.open||zv.open||about.open||!col.hi
 (function(){var sx=0,sy=0,st=0,on=false;
  addEventListener('touchstart',function(e){if(e.touches.length!==1||dlg.open||about.open||!col.hidden||e.target.closest('#bar,#walk,#ways,#pzoom,#george,#gTab,#wall,dialog,#collection,#prints')){on=false;return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();on=true},{passive:true});
  addEventListener('touchend',function(e){if(!on)return;on=false;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
-  if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4&&Date.now()-st<900){George.stopTour();step(dx>0?1:-1);updateWalk()}},{passive:true});})();
+  if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4&&Date.now()-st<900){George.stopTour();swiped();step(dx>0?1:-1);updateWalk()}},{passive:true});})();
 /* ---------- George the wood pigeon: a friendly guide who offers tours and tips ---------- */
 var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('gTxt'),opts=$('gOpts'),tab=$('gTab'),typing=null,hideT=null,touring=false,tourI=0,tourT=null,seen={},started=false,present=false,leaveT=null,muted=false,bubAt=-1,moving=false,arrived=true,introOn=false,iStep=0,STEPS=null,ringFn=null,ringOn=false;
  function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
@@ -2281,17 +2332,19 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  function speakStop(i,tour){var st=STOPS[i],last=i===STOPS.length-1,next=tour?[{t:last?'Thank you, King George':'Onward',pri:1,go:function(){if(last){stopTour();close()}else tourAt(i+1)}},{t:'End the tour',go:function(){stopTour();close()}}]:null;
   if(st.art==null&&st.coll!=null){say(collLine(st.coll),next||[{t:'See the whole collection',pri:1,go:function(){close();openCollectionAt(st.coll)}},{t:'Thanks',go:close}],!!tour,i);return}
   if(st.art!=null){var b=next||[{t:'Show me details',pri:1,go:function(){close();openArt(st.art)}}];if(TOUCH&&!tour)b.push({t:'See it on my wall',go:function(){close();viewOnWall(st.art)}});say(paintingLine(st.art),b,!!tour,i)}
-  else if(last)say('Out here is the balcony. Keep an eye on the field — my tall friend loves to dance! If a painting has caught your eye, you can write to Pam right here.',next||[{t:'Email Pam',pri:1,href:'mailto:'+EMAIL},{t:'Thanks',go:close}],!!tour,i)
+  else if(last)say('Out here is the balcony. Keep an eye on the field — my tall friend loves to dance! If a painting has caught your eye, you can write to Pam right here.',next||[{t:'Email Pam',pri:1,href:'mailto:'+EMAIL},{t:'See the collections',go:function(){close();goPlan({r:'col',i:1})}},{t:'Thanks',go:close}],!!tour,i)
   else say('Welcome to Pam’s Gallery! '+(TOUCH?'Swipe right':'Go right')+' for this month’s favourites, or '+(TOUCH?'swipe left':'left')+' through the marble portal into Pam’s collections. Every painting is an original.',next||[{t:'Got it',go:close}],!!tour,i)}
  function menu(){var a=stopAt(),here=a.d<.35&&STOPS[a.i].art!=null?STOPS[a.i].art:null,b=[{t:'Tour this month’s favourites',pri:1,go:function(){touring=true;tourAt(0,'fav')}},{t:'Show me the collections',go:function(){touring=true;tourAt(1,'col')}},{t:'How this gallery works',go:function(){intro(1)}},{t:'How do I buy a painting?',go:buy}];
   if(TOUCH)b.push({t:'See a painting on my wall',go:function(){if(here!=null){close();viewOnWall(here)}else say('Walk up to any painting first, then tap me again — or tap the painting and choose “View on your wall”.',[{t:'OK',go:close}])}});
+  b.push({t:'Can I buy a print?',go:function(){if(PRINTS.length)say('Indeed! Prints of Pam’s paintings come in a choice of sizes, each with its own price. Pick a size and send a request — Pam replies personally.',[{t:'See the prints',pri:1,go:function(){close();openPrints()}},{t:'Thanks',go:close}]);else say('Prints are on their way — Pam is preparing them now. In the meantime you are welcome to ask her about a print of any painting.',[{t:'Ask Pam',pri:1,go:function(){close();window.openMsg()}},{t:'Thanks',go:close}])}});
   b.push({t:'Members’ rewards',go:function(){say('Join our collectors’ circle and enjoy 5% off your first painting, loyalty points on every purchase, and a signed print when you complete a collection.',[{t:'Join or sign in',pri:1,go:function(){close();window.openAcct()}},{t:'Not now',go:close}])}});
   b.push({t:'Contact Pam',go:function(){say('You may send Pam a message right here, or email her at <b>'+esc(EMAIL)+'</b>. She replies to every message personally.',[{t:'Send a message',pri:1,go:function(){close();window.openMsg()}},{t:'Thanks',go:close}])}});
   b.push({t:'Only come when I call',go:hide});say('King George, at your service. How may I help?',b,true)}
  function buy(){say('Every painting is an original and available to buy. Tap a painting, then “Request to buy” — Pam will reply personally to arrange payment and delivery. Members also earn rewards.',[{t:'Become a member',pri:1,go:function(){close();window.openAcct()}},{t:'Thanks',go:close}])}
  $('gBtn').addEventListener('click',function(){if(introOn)return;if(bub.classList.contains('on')&&!touring){close()}else{stopTour();menu()}});
  $('gX').addEventListener('click',function(){if(introOn){endIntro('skip');return}stopTour();close()});tab.addEventListener('click',show);
- function onStop(){if(!started||touring||muted||introOn||bub.classList.contains('on'))return;if(pend)return;var a=stopAt();if(a.d>.03)return;if(seen[route+a.i])return;seen[route+a.i]=1;
+ function onStop(){if(!started||touring||muted||introOn||bub.classList.contains('on'))return;if(pend)return;var a=stopAt();if(a.d>.03)return;
+  if(leftCol&&!seen.leftCol&&route==='fav'&&a.i===0){seen.leftCol=1;say('I hope you enjoyed the collections! Now '+(TOUCH?'swipe right':'go right')+' for this month’s favourites.',[{t:'Show me the favourites',pri:1,go:function(){close();goPlan({r:'fav',i:1})}},{t:'Not now',go:close}]);return}if(seen[route+a.i])return;seen[route+a.i]=1;
   if(a.i===STOPS.length-1)speakStop(a.i,false)}
  setInterval(onStop,600);
  setInterval(function(){if(!bub.classList.contains('on')||moving||introOn)return;var a=dest();if(!arrived){if(a.i===bubAt&&a.d<.1)arrived=true;return}if(a.i!==bubAt&&a.d<.45){stopTour();close()}},250);   // moved to another painting: stop talking about the old one
@@ -2307,28 +2360,29 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  function ringLoop(){if(!ringOn)return;var r=ringFn&&ringFn();if(r){var pd=8;ringEl.style.left=(r.x-pd)+'px';ringEl.style.top=(r.y-pd)+'px';ringEl.style.width=(r.w+2*pd)+'px';ringEl.style.height=(r.h+2*pd)+'px';ringEl.classList.add('on')}else ringEl.classList.remove('on');requestAnimationFrame(ringLoop)}
  function ring(fn){ringFn=fn;if(fn&&!ringOn){ringOn=true;requestAnimationFrame(ringLoop)}if(!fn){ringEl.classList.remove('on');setTimeout(function(){if(!ringFn)ringOn=false},400)}}
  function dots(i,n){dotsEl.innerHTML='';dotsEl.classList.toggle('on',i>=0);for(var k=0;k<n&&i>=0;k++){var d=document.createElement('span');if(k<=i)d.className='on';dotsEl.appendChild(d)}}
- function steps(){var tap=TOUCH?'Tap':'Click',s=[];
-  s.push({t:TOUCH?'First, the stroll. Swipe right for this month’s favourites — each swipe takes you to the next painting on your right. Like so…':'First, the stroll. Press the right arrow (or scroll) for this month’s favourites — each press takes you to the next painting on your right. Like so…',
-   ring:TOUCH?null:function(){return rectOf($('walk'))},demo:function(){setTimeout(function(){if(introOn&&iStep===1&&stopAt().i===0)goPlan({r:'fav',i:1})},1500)}});
-  s.push({t:(TOUCH?'Swipe left':'Press the left arrow')+' at the entrance to step through the portal into the Collections hall. Inside, keep '+(TOUCH?'swiping right':'going right')+' to walk round its walls; at the end one more takes you back out — or '+(TOUCH?'swipe left':'go left')+' to retrace your steps.',ring:TOUCH?null:function(){return rectOf($('walk'))}});
-  s.push({t:'Every work here is an original by Pam. '+tap+' a painting to read its story, zoom right in on every brushstroke, and request to buy it.',ring:function(){return route==='fav'?paintRect(0):null},demo:function(){if(stopAt().i===0)goPlan({r:'fav',i:1})}});
-  if(TOUCH)s.push({t:'Wondering how it would look at home? Open any painting and choose “View on your wall” — your camera hangs it right on your own wall.',ring:function(){return route==='fav'?paintRect(0):null}});
-  s.push({t:'Up here, “Collections” shows every collection on one page, “Prints” has prints in a choice of sizes, “About” tells you all about Pam, and “Music” sets the mood.',ring:function(){return union(['music','navCol','navPr','navAbout'])}});
-  s.push({t:'And do join our collectors’ circle: 5% off your first painting, points on every purchase, and a special reward for completing a collection.',ring:function(){return rectOf($('navAcct'))}});
+ function steps(){var s=[],T=TOUCH;
+  s.push({t:T?'Swipe <b>right</b> for <b>This Month’s Favourites</b> — each swipe brings the next painting in from the right. Like so…':'Press the <b>right arrow</b> (or simply scroll) for <b>This Month’s Favourites</b> — each press brings the next painting in from the right. Like so…',
+   ring:function(){return T?rectOf($('wayR').querySelector('.ar')):rectOf($('next'))},demo:function(){setTimeout(function(){if(introOn&&iStep===1&&route==='fav'&&stopAt().i===0)goPlan({r:'fav',i:1})},1400)}});
+  s.push({t:(T?'Tap':'Click')+' any painting to read its story and see the price. The <b>magnifier</b> zooms right in on every brushstroke'+(T?', and “View on your wall” shows it hanging in your own home.':'.'),
+   ring:function(){return route==='fav'?paintRect(0):null},demo:function(){if(route==='fav'&&stopAt().i===0)goPlan({r:'fav',i:1})}});
+  s.push({t:T?'Swipe <b>left</b> from the entrance to step through the marble portal into the <b>Collections hall</b>. Inside, keep swiping <b>right</b> to walk round its walls and up close to each painting; one more swipe at the end brings you back out. Let me show you…':'Press the <b>left arrow</b> from the entrance to step through the marble portal into the <b>Collections hall</b>. Inside, keep pressing <b>right</b> to walk round its walls and up close to each painting; one more at the end brings you back out. Let me show you…',
+   ring:function(){return T?rectOf($('wayL').querySelector('.ar')):rectOf($('prev'))},demo:function(){setTimeout(function(){if(introOn&&iStep===3)goPlan({r:'col',i:1})},1400)}});
+  s.push({t:'Up here, <b>Collections</b> shows every collection on one page, <b>Prints</b> offers prints in a choice of sizes, <b>About</b> tells you all about Pam, and <b>Music</b> sets the mood.',ring:function(){return union(['music','navCol','navPr','navAbout'])}});
+  s.push({t:'And do join our <b>collectors’ circle</b>: 5% off your first painting, points on every purchase, and a special reward for completing a collection.',ring:function(){return rectOf($('navAcct'))}});
   return s}
  function intro(from){if(introOn)return;introOn=true;stopTour();STEPS=steps();hush();clearTimeout(leaveT);
   document.body.classList.add('gIntro');dimEl.classList.add('on');root.style.transition='none';root.classList.add('stage','in');present=true;void root.offsetWidth;root.style.transition='';
   setTimeout(function(){act('peck',700)},700);showStep(from||0)}
  function showStep(i){if(!introOn)return;iStep=i;var n=STEPS.length;ring(null);
   if(i===0){dots(-1,0);say(GREET,[{t:'Show me around',pri:1,go:function(){showStep(1)}},{t:'I’ll explore alone',go:function(){endIntro('alone')}}],true);return}
-  if(i>n){dots(n-1,n);act('hop',500);say('And that is the grand tour! I shall wait right here — '+(TOUCH?'tap':'click')+' me whenever you need me. Shall I show you the paintings one by one?',[{t:'Yes, lead the way',pri:1,go:function(){endIntro('lead')}},{t:'I’ll explore alone',go:function(){endIntro('alone')}}],true);return}
+  if(i>n){dots(n-1,n);act('hop',500);say('That is everything! I shall be in the corner whenever you need me — '+(TOUCH?'tap':'click')+' me any time. Where shall we begin?',[{t:'The Collections',pri:1,go:function(){endIntro('leadc')}},{t:'This Month’s Favourites',pri:1,go:function(){endIntro('lead')}},{t:'I’ll explore alone',go:function(){endIntro('alone')}}],true);return}
   var st=STEPS[i-1];dots(i-1,n);act(i%2?'tilt':'hop',600);
   say(st.t,[{t:i===n?'Finish':'Next',pri:1,go:function(){showStep(i+1)}},{t:'Skip the tour',skip:1,go:function(){endIntro('skip')}}],true);
   if(st.demo)st.demo();ring(st.ring||null)}
  function endIntro(mode){if(!introOn)return;introOn=false;store('georgeIntro','done');ring(null);dimEl.classList.remove('on');hush();dots(-1,0);
   root.classList.add('fly');setTimeout(function(){root.style.transition='none';root.classList.remove('stage','fly','in');present=false;void root.offsetWidth;root.style.transition='';document.body.classList.remove('gIntro');
    setTimeout(function(){enter(function(){
-    if(mode==='lead'){touring=true;var a=stopAt();tourAt(a.i>0&&a.i<STOPS.length-1?a.i:1,route)}
+    if(mode==='lead'||mode==='leadc'){touring=true;var a=stopAt(),r=mode==='leadc'?'col':'fav';tourAt(route===r&&a.i>0&&!STOPS[a.i].exit&&a.i<STOPS.length-1?a.i:1,r)}
     else{say(mode==='alone'?'Very well. I shall be right here in the corner — '+(TOUCH?'tap':'click')+' me whenever you need me.':'As you wish. I am right here if you need me.',[],false);ring(function(){return rectOf($('gBtn'))});setTimeout(function(){if(!introOn)ring(null)},2600)}})},120)},360)}
  /* someone who starts walking straight away would rather explore than listen */
  setInterval(function(){if(introOn&&iStep===0&&progress()>.02)endIntro('alone')},300);
