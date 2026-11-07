@@ -9,6 +9,10 @@ const SITE = 'https://itsamepameo.com';
 // payments and Google sign-in switch on when their keys are added in Vercel (Settings → Environment Variables)
 const STRIPE = process.env.STRIPE_SECRET_KEY || '';
 const GOOGLE_ID = process.env.GOOGLE_CLIENT_ID || '';
+// email: alerts to Pam work as soon as RESEND_API_KEY is added; emails to buyers also need a sender on Pam's own domain (MAIL_FROM)
+const RESEND = process.env.RESEND_API_KEY || '';
+const MAIL_FROM = process.env.MAIL_FROM || 'Pam’s Gallery <onboarding@resend.dev>';
+const BUYER_MAIL = !!(RESEND && process.env.MAIL_FROM);
 // the built-in paintings' photographs (served from /lib/), for link previews when a painting is shared
 const EMB_IMG = {"p1": "/lib/g-c0fafcbf388e.jpg", "p2": "/lib/g-04b6c6b76917.jpg", "p3": "/lib/g-bab2acf08825.jpg", "p4": "/lib/g-f91d640d659d.jpg", "p5": "/lib/g-40cf8b507475.jpg", "p6": "/lib/g-d6fa78aecd0a.jpg"};
 const SECRET = crypto.createHash('sha256').update('pams-gallery-session|' + (DB_TOKEN || '')).digest();
@@ -90,7 +94,7 @@ function cleanCat(c) {
   const S = c.site && typeof c.site === 'object' ? c.site : {}, url = v => { v = str(v, 200); return /^https:\/\/[^\s"<>]+$/.test(v) ? v : '' };
   const social = {}; ['instagram', 'tiktok', 'facebook', 'x', 'pinterest', 'youtube', 'threads', 'linkedin', 'website'].forEach(k => { const u = url(S.social && S.social[k]); if (u) social[k] = u });
   const site = { email: okEmail(str(S.email, 200)) ? str(S.email, 200) : '', phone: str(S.phone, 40), place: str(S.place, 80), social,
-    banner: { on: !!(S.banner && S.banner.on), text: str(S.banner && S.banner.text, 160) }, commissions: !!S.commissions, offers: S.offers !== false,
+    banner: { on: !!(S.banner && S.banner.on), text: str(S.banner && S.banner.text, 160) }, commissions: S.commissions !== false, offers: S.offers !== false,
     share: S.share !== false, likes: S.likes !== false, cur: ['GBP', 'EUR', 'USD'].indexOf(S.cur) >= 0 ? S.cur : 'GBP' };
   return { v: Date.now(), arts, favs, colls, prints, texts, site };
 }
@@ -200,6 +204,35 @@ const actions = {
     const o = { id: id(), ts: Date.now(), kind, artId: aid, title, name, email, phone: clean(b.phone, 40), message: clean(b.message, 2000), member: !!u, offer,
       welcome: !!(u && !u.welcomeUsed && kind === 'art'), useCredit: !!(u && b.useCredit && rewards(u, cat).points.credit > 0), status: 'new' };
     await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id]].concat(u ? [['LPUSH', 'u:' + email + ':orders', o.id]] : []));
+    const cur = cat && cat.site && cat.site.cur;
+    await Promise.all([
+      mail(ownerTo(cat), (offer ? 'New offer: ' + money(offer, cur) + ' for ' : 'New enquiry: ') + title, ['<b>' + esc(name) + '</b> (' + esc(email) + (o.phone ? ', ' + esc(o.phone) : '') + ')' + (u ? ' — a member' : '') + ' ' + (offer ? 'offered <b>' + money(offer, cur) + '</b> for' : 'enquired about') + ' <b>' + esc(title) + '</b>.', o.message ? '“' + esc(o.message) + '”' : '', 'Just reply to this email to answer them. Everything is also in your dashboard under “Enquiries & sales”.'], { url: SITE, label: 'Open your gallery' }, email),
+      BUYER_MAIL && mail(email, 'Thank you for your enquiry — ' + title, ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for your interest in <b>' + esc(title) + '</b>' + (offer ? ' and your offer of <b>' + money(offer, cur) + '</b>' : '') + '. Pam has your enquiry and will reply to you personally, usually within a day.', 'With warm wishes,<br>Pam’s Gallery'], aid ? { url: SITE + '/#art-' + aid, label: 'See the painting again' } : null, ownerTo(cat))]);
+    return { ok: true, id: o.id };
+  },
+
+  // a commission request, with up to three reference photos
+  async commission(req, b) {
+    await limit(req, 'comm', 6, 3600);
+    const u = await auth(req), cat = await getCat();
+    const name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase(), idea = clean(b.idea, 3000);
+    if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
+    if (idea.length < 5) throw err('Please tell Pam a little about the painting you have in mind.', 400);
+    const photos = [];
+    for (const d of (Array.isArray(b.photos) ? b.photos : []).slice(0, 3)) {
+      const data = String(d || '').replace(/^data:image\/(jpeg|png|webp);base64,/, '');
+      if (!/^[A-Za-z0-9+/=]+$/.test(data) || data.length > 1.8e6) continue;
+      const key = id(), CH = 380000, n = Math.ceil(data.length / CH);
+      for (let i = 0; i < n; i++) await db('SET', 'img:' + key + ':' + i, data.slice(i * CH, (i + 1) * CH));
+      await db('SET', 'img:' + key, JSON.stringify({ n, type: 'image/jpeg', ts: Date.now() })); photos.push('/api/app?img=' + key);
+    }
+    const f = { size: clean(b.size, 80), budget: clean(b.budget, 80), when: clean(b.when, 60), where: clean(b.where, 200) };
+    const msg = [idea, f.size && 'Size: ' + f.size, f.budget && 'Budget: ' + f.budget, f.when && 'Needed by: ' + f.when, f.where && 'Where it will hang: ' + f.where].filter(Boolean).join('\n');
+    const o = { id: id(), ts: Date.now(), kind: 'commission', artId: '', title: 'Commission: ' + idea.split(/[.\n!?]/)[0].slice(0, 60), name, email, phone: clean(b.phone, 40), message: msg, photos, member: !!u, offer: 0, welcome: false, useCredit: false, status: 'new' };
+    await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id]].concat(u ? [['LPUSH', 'u:' + email + ':orders', o.id]] : []));
+    await Promise.all([
+      mail(ownerTo(cat), 'New commission request from ' + name, ['<b>' + esc(name) + '</b> (' + esc(email) + (o.phone ? ', ' + esc(o.phone) : '') + ') would like a commission:', esc(msg).replace(/\n/g, '<br>'), photos.length ? 'Reference photos: ' + photos.map((x, i) => '<a href="' + SITE + x + '">photo ' + (i + 1) + '</a>').join(' · ') : '', 'Just reply to this email to answer them.'], { url: SITE, label: 'Open your gallery' }, email),
+      BUYER_MAIL && mail(email, 'Your commission request — Pam’s Gallery', ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for asking Pam to paint something for you. She has your request and will be in touch personally to talk it through, usually within a couple of days.', 'With warm wishes,<br>Pam’s Gallery'], null, ownerTo(cat))]);
     return { ok: true, id: o.id };
   },
 
@@ -221,6 +254,10 @@ const actions = {
     if (amt < min) throw err('The next bid must be at least ' + money(min, cat.site && cat.site.cur) + '.', 400);
     const bidr = { id: id(), ts: Date.now(), email: u.email, name: u.name, amount: amt };
     const [, n] = await pipe([['ZADD', 'bids:' + a.id, String(amt), JSON.stringify(bidr)], ['ZCARD', 'bids:' + a.id], ['LPUSH', 'u:' + u.email + ':bids', a.id]]);
+    const cur = cat.site && cat.site.cur, link = { url: SITE + '/#art-' + a.id, label: 'See the auction' };
+    await Promise.all([
+      mail(ownerTo(cat), 'New bid: ' + money(amt, cur) + ' for ' + a.t, ['<b>' + esc(u.name) + '</b> (' + esc(u.email) + ') bid <b>' + money(amt, cur) + '</b> for <b>' + esc(a.t) + '</b>. That’s ' + (+n || 1) + ' bid' + ((+n || 1) === 1 ? '' : 's') + ' so far; the auction closes ' + new Date(a.auc.ends).toUTCString().replace(/:\d\d GMT/, ' GMT') + '.'], link, u.email),
+      BUYER_MAIL && top && top.email !== u.email && mail(top.email, 'You’ve been outbid on ' + a.t, ['Dear ' + esc(String(top.name || '').split(' ')[0]) + ',', 'Someone has placed a higher bid of <b>' + money(amt, cur) + '</b> on <b>' + esc(a.t) + '</b>. The auction is still open — if you’d like it, there’s still time to bid again.'], link, ownerTo(cat))]);
     return { ok: true, top: amt, n: +n || 1 };
   },
 
@@ -238,6 +275,7 @@ const actions = {
     if (text.length < 2) throw err('Please write a message.', 400);
     const m = { id: id(), ts: Date.now(), name, email, message: text, member: !!u, read: false };
     await pipe([['SET', 'm:' + m.id, JSON.stringify(m)], ['LPUSH', 'msgs', m.id]]);
+    await mail(ownerTo(await getCat()), 'New message from ' + name, ['<b>' + esc(name) + '</b> (' + esc(email) + ') wrote:', '“' + esc(text).replace(/\n/g, '<br>') + '”', 'Just reply to this email to answer them.'], { url: SITE, label: 'Open your gallery' }, email);
     return { ok: true };
   },
 
@@ -267,7 +305,7 @@ const actions = {
       visits: { total: +total || 0, unique: +uniq || 0, days, perDay: vis, uniquePerDay: uv },
       where: { countries: pairs(gcc), week: Object.keys(week).map(k => [k, week[k]]).sort((a, b) => b[1] - a[1]), cities: cities.map((c, i) => { const p = c[0].split('|'), q = String(ll[i] || '').split(','); return { city: p[0], region: p[1], cc: p[2], n: c[1], lat: +q[0] || null, lon: +q[1] || null } }), devices: pairs(gdev), sources: pairs(gref) },
       members: { count: +nMembers || 0, list: members }, orders: await checkPaid(orders), msgs, likes, auctions, subs: { count: +extra[arts.length * 2 + 1] || 0, list: subs },
-      pay: !!STRIPE, google: !!GOOGLE_ID, cur: cat && cat.site ? cat.site.cur : 'GBP'
+      pay: !!STRIPE, google: !!GOOGLE_ID, mail: !!RESEND, buyerMail: BUYER_MAIL, cur: cat && cat.site ? cat.site.cur : 'GBP'
     };
   },
 
@@ -304,6 +342,7 @@ const actions = {
     const link = await stripe('payment_links', form);
     o.pay = { url: link.url + (o.email ? '?prefilled_email=' + encodeURIComponent(o.email) : ''), link: link.id, amount: amt / 100, cur: cur.toUpperCase(), ts: Date.now(), paid: false };
     if (['new', 'contacted'].indexOf(o.status) >= 0) o.status = 'awaiting';
+    if (BUYER_MAIL) { o.pay.mailed = await mail(o.email, 'Your secure payment link — ' + o.title, ['Dear ' + esc(o.name.split(' ')[0]) + ',', 'Thank you so much! Here is your secure payment link for <b>' + esc(o.title) + '</b> (' + money(o.pay.amount, o.pay.cur) + '). You can pay by card, Apple Pay or Google Pay.', 'Once it’s paid, Pam will be in touch about delivery.'], { url: o.pay.url, label: 'Pay securely' }, ownerTo(cat)) }
     await db('SET', 'o:' + o.id, JSON.stringify(o));
     return { ok: true, order: o };
   },
@@ -316,6 +355,7 @@ const actions = {
     const top = topOf(await db('ZREVRANGE', 'bids:' + a.id, '0', '0', 'WITHSCORES')); if (!top) throw err('No bids yet.', 400);
     const o = { id: id(), ts: Date.now(), kind: 'auction', artId: a.id, title: 'Auction: ' + a.t, name: top.name, email: top.email, phone: '', message: 'Winning bid ' + money(top.amount, cat.site && cat.site.cur), member: true, offer: top.amount, welcome: false, useCredit: false, status: 'contacted' };
     await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id], ['LPUSH', 'u:' + top.email + ':orders', o.id], ['SET', 'aucord:' + a.id, o.id]]);
+    if (BUYER_MAIL) await mail(top.email, 'You won ' + a.t + '!', ['Dear ' + esc(String(top.name || '').split(' ')[0]) + ',', 'Congratulations — your bid of <b>' + money(top.amount, cat.site && cat.site.cur) + '</b> won <b>' + esc(a.t) + '</b>! Pam will be in touch very soon with a secure payment link and to arrange delivery.'], { url: SITE + '/#art-' + a.id, label: 'See your painting' }, ownerTo(cat));
     return { ok: true, id: o.id };
   },
 
@@ -365,6 +405,23 @@ const actions = {
   }
 };
 
+function ownerTo(cat) { return cat && cat.site && cat.site.email || OWNER }
+// a short, warm email in the gallery's colours; returns true when it was sent
+async function mail(to, subject, paras, button, replyTo) {
+  if (!RESEND || !to) return false;
+  const html = '<div style="background:#f4ede1;padding:28px 12px;font-family:Helvetica,Arial,sans-serif;color:#2a1c14"><div style="max-width:560px;margin:0 auto;background:#fffdf9;border:1px solid #e3d8c6;border-radius:14px;padding:28px 26px">' +
+    '<div style="font-family:Georgia,serif;font-style:italic;font-size:26px;color:#4b2e22">Pam’s Gallery</div><div style="height:2px;background:#d9b46a;margin:10px 0 22px;width:64px"></div>' +
+    paras.filter(Boolean).map(p => '<p style="font-size:15px;line-height:1.65;margin:0 0 14px">' + p + '</p>').join('') +
+    (button ? '<p style="margin:22px 0 6px"><a href="' + esc(button.url) + '" style="display:inline-block;background:#4b2e22;color:#faf6ee;text-decoration:none;padding:12px 22px;border-radius:99px;font-size:15px">' + esc(button.label) + '</a></p>' : '') +
+    '<p style="font-size:12px;color:#8a7a6c;margin:24px 0 0">Original paintings by Pam · <a href="' + SITE + '" style="color:#8a7a6c">itsamepameo.com</a></p></div></div>';
+  const text = paras.filter(Boolean).map(p => p.replace(/<br>/g, '\n').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")).join('\n\n') + (button ? '\n\n' + button.label + ': ' + button.url : '');
+  try {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 5000);
+    const r = await fetch('https://api.resend.com/emails', { method: 'POST', signal: ctl.signal, headers: { Authorization: 'Bearer ' + RESEND, 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({ from: MAIL_FROM, to: [to], subject: subject.slice(0, 180), html, text }, replyTo && okEmail(replyTo) ? { reply_to: replyTo } : {})) });
+    clearTimeout(t); if (!r.ok) console.error('mail', r.status, (await r.text()).slice(0, 300)); return r.ok;
+  } catch (e) { console.error('mail', e.message); return false }
+}
 const ORDER_ST = ['new', 'contacted', 'awaiting', 'paid', 'sent', 'completed', 'cancelled'];
 const SHIP = ['GB', 'IE', 'US', 'CA', 'AU', 'NZ', 'FR', 'DE', 'ES', 'IT', 'NL', 'BE', 'LU', 'CH', 'AT', 'SE', 'NO', 'DK', 'FI', 'PT', 'PL', 'GR', 'JP', 'SG', 'HK', 'AE'];
 function topOf(L) { if (!L || L.length < 2) return null; const r = J(L[0]); return r ? Object.assign(r, { amount: +L[1] || r.amount }) : null }
