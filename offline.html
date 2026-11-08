@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You’re offline | Pam’s Gallery</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+:root{--paper:#faf7f1;--ink:#2a1c14;--muted:#6b5a4e;--bronze:#b08d57;--walnut:#4b2e22}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--paper);color:var(--ink);font:300 17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;padding:24px max(16px,env(safe-area-inset-right)) 24px max(16px,env(safe-area-inset-left))}
+main{max-width:520px;text-align:center}
+.frame{width:120px;height:150px;margin:0 auto 1.6rem;border:10px solid #c9a35e;box-shadow:0 0 0 2px #8a6a2e,0 14px 30px rgba(42,28,20,.18);background:linear-gradient(160deg,#efe6da,#e3d6c4)}
+.kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--bronze);margin:0 0 .4rem}
+h1{font:italic 400 2.4rem/1.15 Georgia,"Times New Roman",serif;margin:0 0 .8rem;text-wrap:balance}
+p{color:var(--muted);margin:0 0 1.4rem}
+a.btn{display:inline-block;background:var(--walnut);color:#fff;text-decoration:none;border-radius:99px;padding:.8rem 1.4rem;font-weight:500}
+a.btn:focus-visible{outline:2px solid var(--bronze);outline-offset:3px}
+</style>
+</head>
+<body>
+<main>
+  <div class="frame" aria-hidden="true"></div>
+  <p class="kick">Pam’s Gallery</p>
+  <h1>You’re offline for a moment</h1>
+  <p>The gallery needs an internet connection to show Pam’s paintings. Once you’re back online, it will open just where you left off.</p>
+  <a class="btn" href="/">Try again</a>
+</main>
+</body>
+</html>
