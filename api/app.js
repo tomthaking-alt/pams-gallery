@@ -563,7 +563,7 @@ async function getImage(key, res, q) {
 // ---------- public pages that work without JavaScript: one page per painting, the plain gallery, the sitemap ----------
 // They are made on the server from Pam's live catalogue, so search engines and link previews see real content, and anyone on
 // a slow connection, an older phone or with JavaScript off can still browse, read every detail and enquire.
-const FONTS = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap';
+const FONTS = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=optional';
 const FRDEF = { p1: 'ivory', p2: 'gilt', p3: 'silver', p4: 'emerald', p5: 'walnut', p6: 'ebony', p7: 'deco', p8: 'maple', p9: 'jewel', p10: 'teal', p11: 'black', p12: 'oak', p13: 'alu', p14: 'brass', p15: 'white' };
 const RING = { gilt: '0 0 0 2px #8a6a2e,0 0 0 7px #d2ab5f,0 0 0 8px #7a5a22', silver: '0 0 0 2px #6f7278,0 0 0 7px #d3d6da,0 0 0 8px #6f7278', ivory: '0 0 0 2px #b8955a,0 0 0 7px #efe6d2,0 0 0 8px #b8955a',
   deco: '0 0 0 2px #e2c27a,0 0 0 3px #6e4f1c,0 0 0 6px #d9b45f,0 0 0 7px #6e4f1c,0 0 0 9px #e2c27a', walnut: '0 0 0 2px #d2ab5f,0 0 0 9px #573823', ebony: '0 0 0 2px #d2ab5f,0 0 0 9px #161414',
@@ -614,7 +614,7 @@ header.top .wrap{display:flex;align-items:center;justify-content:space-between;g
 nav.links{display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.92rem}nav.links a{text-decoration:none;color:var(--muted)}nav.links a:hover,nav.links a[aria-current]{color:var(--ink)}
 h1,h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;line-height:1.1;text-wrap:balance;margin:0}
 h1{font-style:italic;font-size:clamp(2.3rem,5vw,3.6rem)}h2{font-style:italic;font-size:clamp(1.7rem,3.4vw,2.3rem)}
-.kick{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--bronze);margin:0 0 .6rem}
+.kick{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:#80612c;margin:0 0 .6rem}
 .lede{color:var(--muted);max-width:62ch;font-size:1.06rem}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:46px;padding:.65rem 1.35rem;border-radius:99px;border:1px solid var(--walnut);color:var(--walnut);background:transparent;font:400 .95rem/1.2 Jost,sans-serif;text-decoration:none;cursor:pointer;transition:background .2s,color .2s}
 .btn:hover{background:#efe6da;color:var(--ink)}.btn.main{background:var(--walnut);color:#faf6ee}.btn.main:hover{background:var(--ink);color:#fff}
