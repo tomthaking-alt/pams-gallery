@@ -644,7 +644,7 @@ form.f input,form.f textarea{font:300 1rem/1.4 Jost,sans-serif;color:var(--ink);
 form.f input:focus,form.f textarea:focus{border-color:var(--bronze);outline:2px solid rgba(176,141,87,.35);outline-offset:0}
 form.f textarea{min-height:120px;resize:vertical}.small{font-size:.84rem;color:var(--muted);margin:0}
 .note{border-radius:10px;padding:.85rem 1rem;margin:1rem 0 0;font-size:.95rem}.note.ok{background:#e8f1e8;color:#244a2d}.note.err{background:#fbe9e6;color:#7a2a1f}
-.hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden}
+.hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden}picture{display:contents}
 .perks{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.5rem;margin:0 0 2.5rem}.perks ul{margin:.2rem 0 1rem;padding-left:1.1rem}.perks li{margin:.25rem 0}
 .ph.early{position:relative;overflow:hidden}.ph.early img{width:78%;height:auto;filter:blur(6px) saturate(1.05);box-shadow:0 10px 24px rgba(30,18,12,.25),0 0 0 6px #c9a35e}.ph.early::after{content:'';position:absolute;inset:0;background:radial-gradient(circle,rgba(250,247,241,0) 30%,rgba(250,247,241,.35))}
 .ribbon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;background:rgba(42,28,20,.86);color:#f7f1e8;border-radius:99px;padding:.45rem .9rem;font-size:.78rem;letter-spacing:.08em;white-space:nowrap}
@@ -663,6 +663,9 @@ const PAGE_JS = "(function(){function f(){document.querySelectorAll('[data-count
   "document.querySelectorAll('[data-u]').forEach(function(e){var a=document.createElement('a'),m=e.getAttribute('data-u')+'@'+e.getAttribute('data-d');a.href='mailto:'+m;a.textContent=m;e.replaceWith(a)});" +
   "document.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG'){e.preventDefault();var n=document.getElementById('protN');if(n){n.hidden=false;clearTimeout(window.__pt);window.__pt=setTimeout(function(){n.hidden=true},4500)}}});";
 const PAGE_JS_HASH = "'sha256-" + crypto.createHash('sha256').update(PAGE_JS).digest('base64') + "'";
+// the gallery's own pictures also come as smaller WebP files; browsers that can't use them take the JPEG
+const webp = u => /^\/lib\/[\w-]+\.jpg$/.test(u || '') ? u.replace(/\.jpg$/, '.webp') : '';
+function pic(img, u, set, sizes) { const w = webp(u); return w ? '<picture><source type="image/webp" srcset="' + esc(set ? set(webp) : w) + '"' + (sizes ? ' sizes="' + sizes + '"' : '') + '>' + img + '</picture>' : img }
 function shell(o) {
   const ogImg = o.img ? SITE + o.img : '';
   return '<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">' +
@@ -672,7 +675,7 @@ function shell(o) {
     '<meta property="og:site_name" content="Pam’s Gallery"><meta property="og:type" content="' + (o.ogType || 'website') + '"><meta property="og:title" content="' + esc(o.ogTitle || o.title) + '"><meta property="og:description" content="' + esc(o.desc) + '"><meta property="og:url" content="' + esc(o.canon) + '">' +
     (ogImg ? '<meta property="og:image" content="' + esc(ogImg) + '"><meta property="og:image:alt" content="' + esc(o.imgAlt || o.title) + '">' : '') +
     '<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="' + esc(o.ogTitle || o.title) + '"><meta name="twitter:description" content="' + esc(o.desc) + '">' + (ogImg ? '<meta name="twitter:image" content="' + esc(ogImg) + '">' : '') +
-    '<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="' + FONTS + '" rel="stylesheet">' +
+    '<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name="theme-color" content="#faf7f1"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="' + FONTS + '" rel="stylesheet">' +
     '<style>' + PAGE_CSS + '</style>' + (o.ld ? '<script type="application/ld+json">' + JSON.stringify(o.ld).replace(/</g, '\\u003c') + '</script>' : '') + '</head><body>' +
     '<a class="skip" href="#main">Skip to the content</a><header class="top"><div class="wrap"><a class="brand" href="/">Pam’s Gallery</a><nav class="links" aria-label="Main">' +
     '<a href="/works"' + (o.here === 'works' ? ' aria-current="page"' : '') + '>All works</a><a href="/">3D gallery</a><a href="/#commission">Commissions</a><a href="/#buying">Buying with confidence</a><a href="/works#contact">Contact</a></nav></div></header>' +
@@ -686,7 +689,7 @@ function card(a, slug, cur, eager) {
   const im = imgsOf(a), W = 600, H = Math.round(W * (a.h || .7) / (a.w || .5)), st = a.status || 'Available';
   if (a.ea) return '<li><a href="/art/' + slug + '"><span class="ph early">' + (im.tn ? '<img src="' + esc(im.tn) + '" alt="A blurred preview of a new painting for members" width="' + W + '" height="' + H + '" loading="lazy" decoding="async">' : '') + '<span class="ribbon">Members see this first</span></span>' +
     '<span class="t">' + esc(a.t) + '</span><span class="m">' + esc(a.m || 'New work') + '</span><span class="pr">Public from <span data-until="' + a.ea + '">' + esc(earlyWhen(a.ea)) + '</span></span></a></li>';
-  return '<li><a href="/art/' + slug + '"><span class="ph"><img src="' + esc(im.tn) + '" alt="' + esc(altOf(a)) + '" width="' + W + '" height="' + H + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async" class="fr-' + frameKey(a) + '"></span>' +
+  return '<li><a href="/art/' + slug + '"><span class="ph">' + pic('<img src="' + esc(im.tn) + '" alt="' + esc(altOf(a)) + '" width="' + W + '" height="' + H + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async" class="fr-' + frameKey(a) + '">', im.tn) + '</span>' +
     '<span class="t">' + esc(a.t) + '</span><span class="m">' + esc([a.m, a.s].filter(Boolean).join(' · ') || 'Original artwork') + '</span>' +
     '<span class="pr">' + esc(priceOfA(a, 0, cur)) + (st === 'Sold' ? '' : ' <span class="badge' + (st === 'On hold' ? ' hold' : '') + '">' + esc(st) + '</span>') + '</span></a></li>';
 }
@@ -732,7 +735,7 @@ async function artPage(q, res) {
     offers: { '@type': 'Offer', url, priceCurrency: cur, availability: st === 'Sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock', price: a.mode === 'price' && isFinite(num) && num > 0 ? num : undefined,
       seller: { '@type': 'Person', name: 'Pam' } } };
   const body = '<nav class="crumbs" aria-label="Breadcrumb"><a href="/works">All works</a>' + (coll ? ' › <a href="/works#' + slugify(coll.t) + '">' + esc(coll.t) + '</a>' : '') + '</nav>' +
-    '<article class="art"><figure><img src="' + esc(im.mid) + '" srcset="' + esc(im.tn) + ' 720w, ' + esc(im.mid) + ' 1280w" sizes="(min-width: 820px) 52vw, 90vw" alt="' + esc(alt) + '" class="fr-' + frameKey(a) + '" fetchpriority="high" decoding="async"></figure>' +
+    '<article class="art"><figure>' + pic('<img src="' + esc(im.mid) + '" srcset="' + esc(im.tn) + ' 720w, ' + esc(im.mid) + ' 1280w" sizes="(min-width: 820px) 52vw, 90vw" alt="' + esc(alt) + '" class="fr-' + frameKey(a) + '" fetchpriority="high" decoding="async">', im.mid, w => w(im.tn) + ' 720w, ' + w(im.mid) + ' 1280w', '(min-width: 820px) 52vw, 90vw') + '</figure>' +
     '<div class="info">' + (coll ? '<p class="kick">' + esc(coll.t) + '</p>' : '<p class="kick">Original ' + kind + '</p>') + '<h1>' + esc(a.t) + '</h1><p class="by">An original ' + kind + ' by Pam</p>' +
     '<p class="price">' + esc(price) + (st === 'Sold' ? '' : ' <span class="badge' + (st === 'On hold' ? ' hold' : '') + '">' + esc(st) + '</span>') + '</p>' +
     '<dl class="facts">' + facts.map(f => '<dt>' + f[0] + '</dt><dd>' + esc(f[1]) + '</dd>').join('') + '</dl>' + (a.d ? '<p class="desc">' + esc(a.d) + '</p>' : '') +
