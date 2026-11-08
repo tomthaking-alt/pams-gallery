@@ -24,6 +24,8 @@ const POINTS = { per: 1, every: 500, worth: 50, text: '1 point for every £1 spe
 const SET_REWARD = 'a signed print of your choice';
 // the artworks built into the site; used until Pam saves her own catalogue
 const ARTS = Object.keys(EMB).map(k => EMB[k].t);
+// the frames Pam can choose for a painting (empty = chosen automatically to suit it)
+const FR_OK = ['gilt', 'silver', 'ivory', 'deco', 'walnut', 'ebony', 'emerald', 'teal', 'jewel', 'maple', 'brass', 'white', 'black', 'oak', 'alu'];
 const BASE_SETS = [
   { name: 'The Dreaming Garden', arts: ['p1', 'p2'] },
   { name: 'The Masquerade', arts: ['p3', 'p4'] },
@@ -88,12 +90,12 @@ function cleanCat(c) {
   const arts = (Array.isArray(c.arts) ? c.arts : []).slice(0, 120).filter(a => a && okId(a.id) && okImg(a.img)).map(a => ({
     id: String(a.id), t: str(a.t, 90) || 'Untitled', m: str(a.m, 80), s: str(a.s, 80), year: str(a.year, 12), d: str(a.d, 1200),
     p: str(a.p, 40), mode: ['price', 'auction'].indexOf(a.mode) >= 0 ? a.mode : 'request', status: ['Available', 'On hold', 'Sold'].indexOf(a.status) >= 0 ? a.status : 'Available',
-    w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, ar: !!a.ar && /^emb:p[1-6]$/.test(a.img), wm: okUp(a.wm) && a.wmOf === a.img ? a.wm : undefined, wmOf: okUp(a.wm) && a.wmOf === a.img ? a.img : undefined, bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6',
+    w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, ar: !!a.ar && /^emb:p[1-6]$/.test(a.img), wm: okUp(a.wm) && a.wmOf === a.img ? a.wm : undefined, wmOf: okUp(a.wm) && a.wmOf === a.img ? a.img : undefined, bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6', fr: FR_OK.indexOf(a.fr) >= 0 ? a.fr : undefined,
     auc: a.mode === 'auction' && a.auc ? { start: num(a.auc.start, 1, 1e7, 100), step: num(a.auc.step, 1, 1e6, 10), ends: Math.round(num(a.auc.ends, 0, 4e12, 0)) } : undefined
   }));
   const ids = new Set(arts.map(a => a.id));
   const favs = (Array.isArray(c.favs) ? c.favs : []).map(String).filter(x => ids.has(x)).filter((x, i, A) => A.indexOf(x) === i).slice(0, 6);
-  const colls = (Array.isArray(c.colls) ? c.colls : []).slice(0, 8).map(k => ({ t: str(k.t, 60) || 'Untitled collection', d: str(k.d, 400),
+  const colls = (Array.isArray(c.colls) ? c.colls : []).slice(0, 12).map(k => ({ t: str(k.t, 60) || 'Untitled collection', d: str(k.d, 400),
     works: (Array.isArray(k.works) ? k.works : []).map(String).filter(x => ids.has(x)).filter((x, i, A) => A.indexOf(x) === i).slice(0, 12), soon: Math.round(num(k.soon, 0, 6, 3)) }));
   const prints = (Array.isArray(c.prints) ? c.prints : []).slice(0, 80).filter(p => p && okId(p.id)).map(p => ({
     id: String(p.id), art: ids.has(String(p.art)) ? String(p.art) : '', t: str(p.t, 90), d: str(p.d, 600), img: okImg(p.img) ? p.img : '',
