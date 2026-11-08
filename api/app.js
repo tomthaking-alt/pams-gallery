@@ -19,7 +19,6 @@ const EMB = {"p1": {"t": "Orchid in the Clouds", "m": "Oil on board", "d": "", "
 const SECRET = crypto.createHash('sha256').update(process.env.SESSION_SECRET ? 'pams-gallery-session|' + process.env.SESSION_SECRET : 'pams-gallery-session|' + (DB_TOKEN || '')).digest();
 
 // ---- rewards (easy to change) ----
-const WELCOME = { pct: 5, text: '5% off your first painting' };
 const POINTS = { per: 1, every: 500, worth: 50, text: '1 point for every £1 spent · every 500 points = £50 off' };
 const SET_REWARD = 'a signed print of your choice';
 // the artworks built into the site; used until Pam saves her own catalogue
@@ -73,6 +72,51 @@ async function limit(req, key, max, secs) {
   if (n > max) throw err('Too many attempts — please try again a little later.', 429);
 }
 
+// ---- members' early access: until its date a painting is shown to everyone else only as a blurred teaser ----
+// members-only pictures are locked, so Pam's editor gets short-lived links to show them
+function ownerPv(cat) { const pv = {}; (cat && cat.arts || []).forEach(a => { if (isEarly(a)) [a.img, a.wm].forEach(u => { if (/^\/api\/app\?img=/.test(u || '')) pv[u] = signedImg(u, 1) }) }); return pv }
+const isEarly = a => !!(a && a.early && a.early > Date.now());
+function publicCat(cat) {
+  if (!cat) return cat;
+  return Object.assign({}, cat, { arts: cat.arts.map(a => isEarly(a) ? { id: a.id, t: a.t, m: a.m, s: a.s, year: a.year, mode: a.mode === 'auction' ? 'auction' : 'request', status: a.status, w: a.w, h: a.h, bg: a.bg, fr: a.fr, img: a.tz || '', ea: a.early } : a) });
+}
+function memberArts(cat) {     // the full details, with picture links that only work for a couple of days
+  return (cat && cat.arts || []).filter(isEarly).map(a => Object.assign({}, a, { ea: a.early, img: signedImg(a.img, 2), full: signedImg(a.img, 2), wm: a.wm ? signedImg(a.wm, 2) : undefined, tz: undefined, tzOf: undefined }));
+}
+async function gateImages(prev, next) {     // a painting's own pictures stay private while it is members-only
+  const want = {}; (next.arts || []).forEach(a => { [a.img, a.wm].forEach(u => { const m = /img=([a-z0-9]{6,40})/i.exec(u || ''); if (m) want[m[1]] = isEarly(a) ? a.early : 0 }) });
+  (prev && prev.arts || []).forEach(a => { [a.img, a.wm].forEach(u => { const m = /img=([a-z0-9]{6,40})/i.exec(u || ''); if (m && !(m[1] in want)) want[m[1]] = 0 }) });
+  const keys = Object.keys(want); if (!keys.length) return;
+  const metas = await pipe(keys.map(k => ['GET', 'img:' + k])), set = [];
+  metas.forEach((v, i) => { const m = J(v); if (!m) return; const u = want[keys[i]] || undefined; if ((m.until || undefined) !== u) { if (u) m.until = u; else delete m.until; set.push(['SET', 'img:' + keys[i], JSON.stringify(m)]) } });
+  if (set.length) await pipe(set);
+}
+// tokens in email links: confirm a sign-up, or unsubscribe with one click
+function mailTok(email, why) { const e = b64u(email); return e + '.' + b64u(crypto.createHmac('sha256', SECRET).update(why + '|' + email).digest()).slice(0, 22) }
+function mailTokOk(t, why) { const m = /^([A-Za-z0-9_-]{4,400})\.([A-Za-z0-9_-]{22})$/.exec(String(t || '')); if (!m) return ''; const email = Buffer.from(m[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString();
+  return okEmail(email) && mailTok(email, why) === t ? email : '' }
+const unsubLink = email => SITE + '/api/app?unsub=' + mailTok(email, 'unsub');
+const CONSENT_WORDS = 'Yes, email me about new work and exhibitions. I can unsubscribe at any time.';
+async function dropMail(prev, next) {      // a new members-only painting: tell members who asked for news
+  if (!RESEND || !MAIL_FROM) return 0;
+  const was = new Set((prev && prev.arts || []).filter(isEarly).map(a => a.id)), fresh = (next.arts || []).filter(a => isEarly(a) && !was.has(a.id));
+  if (!fresh.length) return 0;
+  const sent = await pipe(fresh.map(a => ['SET', 'drop:' + a.id + ':' + a.early, '1', 'NX'])), todo = fresh.filter((a, i) => sent[i] === 'OK'); if (!todo.length) return 0;
+  const emails = await db('ZREVRANGE', 'members', '0', '499'), us = emails && emails.length ? await pipe(emails.map(e => ['GET', 'u:' + e])) : [];
+  const to = us.map(J).filter(u => u && u.news && u.email !== OWNER).map(u => u);
+  const when = new Date(Math.min(...todo.map(a => a.early))).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London' });
+  const list = todo.map(a => '<b>' + esc(a.t) + '</b>' + (a.m ? ' — ' + esc(a.m) : '')).join('<br>');
+  let n = 0;
+  for (let i = 0; i < to.length; i += 8) {
+    const r = await Promise.all(to.slice(i, i + 8).map(u => mail(u.email, 'Members first: new work from Pam', ['Dear ' + esc((u.name || '').split(' ')[0] || 'collector') + ',',
+      'As a member, you get to see Pam’s newest work before anyone else:', list, 'It’s open to members only until ' + esc(when) + ' (UK time). Sign in to the gallery to see it, enquire or bid before it goes on public view.',
+      '<span style="font-size:12px;color:#8a7a6c">You’re receiving this because you asked to hear about new paintings. <a href="' + unsubLink(u.email) + '" style="color:#8a7a6c">Unsubscribe</a>.</span>'],
+      { url: SITE + '/#art-' + todo[0].id, label: 'See it first' }, ownerTo(next))));
+    n += r.filter(Boolean).length;
+  }
+  return n;
+}
+
 // ---- the catalogue Pam edits from her dashboard ----
 async function getCat() { return withEmb(J(await db('GET', 'cat'))) }
 // works added to the site itself join Pam's saved catalogue (at the end) until she removes them
@@ -96,7 +140,8 @@ function cleanCat(c) {
   const arts = (Array.isArray(c.arts) ? c.arts : []).slice(0, 120).filter(a => a && okId(a.id) && okImg(a.img)).map(a => ({
     id: String(a.id), t: str(a.t, 90) || 'Untitled', m: str(a.m, 80), s: str(a.s, 80), year: str(a.year, 12), d: str(a.d, 1200),
     p: str(a.p, 40), mode: ['price', 'auction'].indexOf(a.mode) >= 0 ? a.mode : 'request', status: ['Available', 'On hold', 'Sold'].indexOf(a.status) >= 0 ? a.status : 'Available',
-    w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, ar: !!a.ar && /^emb:p[1-6]$/.test(a.img), wm: okUp(a.wm) && a.wmOf === a.img ? a.wm : undefined, wmOf: okUp(a.wm) && a.wmOf === a.img ? a.img : undefined, bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6', fr: FR_OK.indexOf(a.fr) >= 0 ? a.fr : undefined,
+    w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, early: okUp(a.img) && num(a.early, 0, 4e12, 0) > 0 ? Math.round(num(a.early, 0, 4e12, 0)) : undefined,
+    tz: okUp(a.tz) && a.tzOf === a.img ? a.tz : undefined, tzOf: okUp(a.tz) && a.tzOf === a.img ? a.img : undefined, ar: !!a.ar && /^emb:p[1-6]$/.test(a.img), wm: okUp(a.wm) && a.wmOf === a.img ? a.wm : undefined, wmOf: okUp(a.wm) && a.wmOf === a.img ? a.img : undefined, bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6', fr: FR_OK.indexOf(a.fr) >= 0 ? a.fr : undefined,
     auc: a.mode === 'auction' && a.auc ? { start: num(a.auc.start, 1, 1e7, 100), step: num(a.auc.step, 1, 1e6, 10), ends: Math.round(num(a.auc.ends, 0, 4e12, 0)) } : undefined
   }));
   const ids = new Set(arts.map(a => a.id));
@@ -112,7 +157,7 @@ function cleanCat(c) {
   const social = {}; ['instagram', 'tiktok', 'facebook', 'x', 'pinterest', 'youtube', 'threads', 'linkedin', 'website'].forEach(k => { const u = url(S.social && S.social[k]); if (u) social[k] = u });
   const site = { email: okEmail(str(S.email, 200)) ? str(S.email, 200) : '', phone: str(S.phone, 40), place: str(S.place, 80), social,
     banner: { on: !!(S.banner && S.banner.on), text: str(S.banner && S.banner.text, 160) }, commissions: S.commissions !== false, offers: S.offers !== false,
-    share: S.share !== false, likes: S.likes !== false, cur: ['GBP', 'EUR', 'USD'].indexOf(S.cur) >= 0 ? S.cur : 'GBP' };
+    share: S.share !== false, likes: S.likes !== false, earlyHours: [24, 48, 72, 168].indexOf(+S.earlyHours) >= 0 ? +S.earlyHours : 0, cur: ['GBP', 'EUR', 'USD'].indexOf(S.cur) >= 0 ? S.cur : 'GBP' };
   const seen = (Array.isArray(c.seen) ? c.seen : []).map(String).filter(x => /^p\d{1,2}$/.test(x)).slice(0, 99);
   return { v: Date.now(), arts, favs, colls, prints, texts, site, seen };
 }
@@ -120,12 +165,11 @@ function cleanCat(c) {
 function rewards(u, cat) {
   const owned = (u.owned || []).map(artId);
   return {
-    welcome: { text: WELCOME.text, available: !u.welcomeUsed },
     points: { balance: u.points || 0, text: POINTS.text, every: POINTS.every, worth: POINTS.worth, credit: Math.floor((u.points || 0) / POINTS.every) * POINTS.worth },
     sets: setsOf(cat).map(s => ({ name: s.name, reward: SET_REWARD, pieces: s.arts.map(a => ({ title: titleOf(cat, a), owned: owned.indexOf(a) >= 0 })), complete: s.arts.every(a => owned.indexOf(a) >= 0) }))
   };
 }
-function profile(u, cat) { return { name: u.name, email: u.email, joined: u.created, owner: u.email === OWNER, rewards: rewards(u, cat) } }
+function profile(u, cat) { return { name: u.name, email: u.email, joined: u.created, owner: u.email === OWNER, news: !!u.news, rewards: rewards(u, cat) } }
 async function user(email) { return J(await db('GET', 'u:' + email)) }
 async function auth(req) { const e = verify(String(req.headers.authorization || '').replace(/^Bearer\s+/i, '')); if (!e) return null; return await user(e) }
 async function owner(req) { const u = await auth(req); if (!u || u.email !== OWNER) throw err('Owner only.', 403); return u }
@@ -134,6 +178,8 @@ const hdr = (req, k) => { const v = req.headers[k]; if (!v) return ''; try { ret
 
 const actions = {
   async health() { return { ok: true, db: !!(DB_URL && DB_TOKEN) } },
+  async early(req) { const u = await auth(req); if (!u) throw err('Please sign in to see members’ early access.', 401); return { arts: memberArts(await getCat()) } },
+  async news(req, b) { const u = await auth(req); if (!u) throw err('Please sign in.', 401); u.news = !!b.on; if (u.news) u.newsAt = Date.now(); await db('SET', 'u:' + u.email, JSON.stringify(u)); if (!u.news) await db('ZREM', 'subs', u.email); return { ok: true, news: u.news } },
 
   // one count per visit; where from is only the rough area Vercel works out from the connection (no addresses are kept)
   async visit(req, b) {
@@ -159,7 +205,7 @@ const actions = {
     if (pw.length < 8 || pw.length > 200) throw err('Please choose a password of at least 8 characters.', 400);
     if (!b.consent) throw err('Please agree to the privacy note to create an account.', 400);
     const salt = crypto.randomBytes(16).toString('hex');
-    const u = { email, name, salt, hash: hashPw(pw, salt), created: Date.now(), points: 0, owned: [], welcomeUsed: false, news: !!b.news };
+    const u = { email, name, salt, hash: hashPw(pw, salt), created: Date.now(), points: 0, owned: [], welcomeUsed: false, news: !!b.news, newsAt: b.news ? Date.now() : undefined, newsWords: b.news ? CONSENT_WORDS : undefined };
     const set = await db('SET', 'u:' + email, JSON.stringify(u), 'NX');
     if (set !== 'OK') throw err('There is already an account with that email — please sign in.', 409);
     await db('ZADD', 'members', String(u.created), email);
@@ -218,11 +264,12 @@ const actions = {
     } else {
       aid = b.id ? String(b.id) : 'p' + (Math.max(0, Math.min(ARTS.length - 1, parseInt(b.art, 10) || 0)) + 1);
       if (cat && !(cat.arts || []).some(a => a.id === aid)) throw err('That painting is no longer listed.', 404);
+      const ea = cat && (cat.arts || []).find(a => a.id === aid); if (isEarly(ea) && !u) throw err('This painting is for members only until ' + new Date(ea.early).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London' }) + ' (UK time). Join free or sign in to enquire now.', 403);
       title = titleOf(cat, aid);
     }
     const offer = Math.round(Math.max(0, Math.min(1e7, parseFloat(String(b.offer || '').replace(/[^0-9.]/g, '')) || 0)) * 100) / 100;
     const o = { id: id(), ts: Date.now(), kind, artId: aid, title, name, email, phone: clean(b.phone, 40), message: clean(b.message, 2000), member: !!u, offer,
-      welcome: !!(u && !u.welcomeUsed && kind === 'art'), useCredit: !!(u && b.useCredit && rewards(u, cat).points.credit > 0), status: 'new' };
+      welcome: false, useCredit: !!(u && b.useCredit && rewards(u, cat).points.credit > 0), status: 'new' };
     await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id]].concat(u ? [['LPUSH', 'u:' + email + ':orders', o.id]] : []));
     const cur = cat && cat.site && cat.site.cur;
     await Promise.all([
@@ -286,7 +333,15 @@ const actions = {
     await limit(req, 'sub', 10, 3600);
     if (isSpam(b, 900)) return { ok: true };
     const email = clean(b.email, 200).toLowerCase(); if (!okEmail(email)) throw err('Please enter a valid email address.', 400);
-    await pipe([['ZADD', 'subs', String(Date.now()), email]]);
+    if (!b.consent) throw err('Please tick the box to say you’d like these emails.', 400);
+    const rec = { email, ts: Date.now(), words: CONSENT_WORDS, src: clean(b.src, 40) || 'site' };
+    if (RESEND && MAIL_FROM) {          // double opt-in: nothing is sent until they confirm
+      await db('SET', 'subp:' + email, JSON.stringify(rec), 'EX', String(14 * 86400));
+      await mail(email, 'Please confirm: new work from Pam’s Gallery', ['Hello,', 'Please confirm that you’d like occasional emails about Pam’s new paintings and exhibitions. If you didn’t ask for this, just ignore this email and nothing more will be sent.'],
+        { url: SITE + '/api/app?confirm=' + mailTok(email, 'sub'), label: 'Yes, keep me posted' });
+      return { ok: true, confirm: true };
+    }
+    await pipe([['ZADD', 'subs', String(rec.ts), email], ['SET', 'subc:' + email, JSON.stringify(rec)]]);
     return { ok: true };
   },
 
@@ -391,7 +446,7 @@ const actions = {
   },
 
   // ---- the catalogue ----
-  async catGet(req) { await owner(req); return { cat: await getCat() } },
+  async catGet(req) { await owner(req); const cat = await getCat(); return { cat, pv: ownerPv(cat) } },
   async catHist(req) {
     await owner(req);
     const L = (await db('LRANGE', 'cat:hist', '0', '9')).map(J).filter(Boolean);
@@ -414,8 +469,11 @@ const actions = {
     await owner(req);
     if (!b.cat || typeof b.cat !== 'object') throw err('Nothing to save.', 400);
     const c = cleanCat(b.cat); if (!c.arts.length) throw err('Keep at least one painting in the gallery.', 400);
+    const prev = J(await db('GET', 'cat'));
+    await gateImages(prev, c);
     await pipe([['SET', 'cat', JSON.stringify(c)], ['LPUSH', 'cat:hist', JSON.stringify(c)], ['LTRIM', 'cat:hist', '0', '9']]);   // the last ten versions are kept, just in case
-    return { ok: true, cat: c };
+    let emailed = 0; try { emailed = await dropMail(prev, c) } catch (e) { console.error('drop', e.message) }
+    return { ok: true, cat: c, emailed, pv: ownerPv(c) };
   },
   // a photo, already resized in the browser; kept in pieces small enough for the database
   async imgUpload(req, b) {
@@ -423,7 +481,7 @@ const actions = {
     const type = /^image\/(jpeg|png|webp)$/.test(b.type) ? b.type : 'image/jpeg', data = String(b.data || '').replace(/^data:[^,]*,/, '');
     if (!/^[A-Za-z0-9+/=]+$/.test(data)) throw err('That file doesn’t look like a photo.', 400);
     if (data.length > 3.6e6) throw err('That photo is too large — please try a smaller one.', 413);
-    const key = id(), CH = 380000, n = Math.ceil(data.length / CH);
+    const key = crypto.randomBytes(16).toString('hex'), CH = 380000, n = Math.ceil(data.length / CH);
     for (let i = 0; i < n; i++) await db('SET', 'img:' + key + ':' + i, data.slice(i * CH, (i + 1) * CH));
     await db('SET', 'img:' + key, JSON.stringify({ n, type, ts: Date.now() }));
     return { ok: true, url: '/api/app?img=' + key };
@@ -483,13 +541,13 @@ async function privPhotos(orders) {      // one-off: commission photos sent befo
 }
 async function getImage(key, res, q) {
   const meta = J(await db('GET', 'img:' + key)); if (!meta) { res.status(404).end(); return }
-  if (meta.priv) {
+  if (meta.priv || (meta.until && meta.until > Date.now())) {
     const x = +(q && q.x) || 0, sig = String(q && q.sig || '');
     if (!x || x < Date.now() || sig.length !== 32 || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(imgSig(key, x)))) { res.setHeader('Cache-Control', 'no-store'); res.status(404).end(); return }
   }
   const parts = await Promise.all(Array.from({ length: meta.n }, (_, i) => db('GET', 'img:' + key + ':' + i)));   // one piece per request keeps each reply small
   const buf = Buffer.from(parts.join(''), 'base64');
-  res.setHeader('Content-Type', meta.type); res.setHeader('Cache-Control', meta.priv ? 'private, no-store' : 'public, max-age=31536000, s-maxage=31536000, immutable');
+  res.setHeader('Content-Type', meta.type); res.setHeader('Cache-Control', meta.priv || (meta.until && meta.until > Date.now()) ? 'private, no-store' : 'public, max-age=31536000, s-maxage=31536000, immutable');
   res.status(200).end(buf);
 }
 
@@ -511,7 +569,7 @@ function frameKey(a) {
 function slugify(t) { return String(t || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, ' and ').replace(/[’'`]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'painting' }
 function slugMap(arts) { const by = {}, used = {}; arts.forEach(a => { const s = slugify(a.t); let k = s, n = 2; while (used[k]) k = s + '-' + (n++); used[k] = a; by[a.id] = k }); return { used, by } }
 async function pubArts() {
-  const cat = await getCat();
+  const cat = publicCat(await getCat());
   const arts = cat ? cat.arts : Object.keys(EMB).map(id => ({ id, t: EMB[id].t, m: EMB[id].m, d: EMB[id].d, s: '', year: '', p: '', mode: 'request', status: 'Available', img: 'emb:' + id, w: EMB[id].w, h: EMB[id].h }));
   return { cat, arts };
 }
@@ -523,6 +581,13 @@ function priceOfA(a, top, cur) {
   if (a.mode === 'price' && a.p) return a.p; return 'Price on request';
 }
 function altOf(a) { const d = String(a.d || '').split(/(?<=[.!?])\s/)[0]; return '“' + a.t + '”, an original ' + kindOf(a) + ' by Pam' + (a.m ? ' (' + a.m + ')' : '') + (d ? '. ' + d : '') }
+const PERKS_DEF = 'Early access to new paintings and collections, before they’re released to everyone · Loyalty points on every purchase: 500 points = £50 off · A signed print when you complete a collection';
+function windowText(cat) { const h = cat && cat.site && cat.site.earlyHours; return !h ? 'a little while' : h <= 48 || h % 24 ? h + ' hours' : h === 168 ? 'a full week' : h / 24 + ' days' }
+function perksBox(cat) {
+  const items = textOf(cat, 'members.perks', PERKS_DEF).split(/\s*·\s*/).filter(Boolean);
+  return '<aside class="perks" aria-labelledby="pkh"><p class="kick" id="pkh">The collectors’ circle · free to join</p><ul>' + items.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul><p><a class="btn" href="/#join">Join free</a> <a href="/#signin" class="small">Already a member? Sign in</a></p></aside>';
+}
+function earlyWhen(t) { return new Date(t).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'Europe/London' }) }
 function textOf(cat, k, d) { const t = cat && cat.texts && cat.texts[k]; return t && String(t).trim() ? String(t) : d }
 function formTs() { const t = Date.now(); return t + '.' + b64u(crypto.createHmac('sha256', SECRET).update('ts|' + t).digest()).slice(0, 16) }
 function tsAge(v) { const m = /^(\d{10,14})\.([A-Za-z0-9_-]{16})$/.exec(String(v || '')); if (!m) return 0; const good = b64u(crypto.createHmac('sha256', SECRET).update('ts|' + m[1]).digest()).slice(0, 16); return good === m[2] ? Date.now() - +m[1] : 0 }
@@ -571,6 +636,11 @@ form.f input:focus,form.f textarea:focus{border-color:var(--bronze);outline:2px 
 form.f textarea{min-height:120px;resize:vertical}.small{font-size:.84rem;color:var(--muted);margin:0}
 .note{border-radius:10px;padding:.85rem 1rem;margin:1rem 0 0;font-size:.95rem}.note.ok{background:#e8f1e8;color:#244a2d}.note.err{background:#fbe9e6;color:#7a2a1f}
 .hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden}
+.perks{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.5rem;margin:0 0 2.5rem}.perks ul{margin:.2rem 0 1rem;padding-left:1.1rem}.perks li{margin:.25rem 0}
+.ph.early{position:relative;overflow:hidden}.ph.early img{width:78%;height:auto;filter:blur(6px) saturate(1.05);box-shadow:0 10px 24px rgba(30,18,12,.25),0 0 0 6px #c9a35e}.ph.early::after{content:'';position:absolute;inset:0;background:radial-gradient(circle,rgba(250,247,241,0) 30%,rgba(250,247,241,.35))}
+.ribbon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;background:rgba(42,28,20,.86);color:#f7f1e8;border-radius:99px;padding:.45rem .9rem;font-size:.78rem;letter-spacing:.08em;white-space:nowrap}
+.art figure.early{position:relative;overflow:hidden}.art figure.early img{width:min(100%,480px);height:auto;filter:blur(8px) saturate(1.05);box-shadow:0 12px 30px rgba(30,18,12,.25),0 0 0 8px #c9a35e}
+.badge{font-family:Jost,system-ui,sans-serif}
 footer.foot{border-top:1px solid var(--line);padding:2.4rem 0 3rem;color:var(--muted);font-size:.9rem}footer.foot .wrap{display:flex;flex-wrap:wrap;gap:1rem 2rem;justify-content:space-between}
 img{-webkit-touch-callout:none;-webkit-user-drag:none;user-select:none}
 header.top .wrap{padding-top:.55rem;padding-bottom:.55rem}
@@ -580,7 +650,8 @@ header.top .wrap{padding-top:.55rem;padding-bottom:.55rem}
 ` + Object.keys(RING).map(k => '.fr-' + k + '{box-shadow:0 10px 24px rgba(30,18,12,.28),' + RING[k] + '}').join('');
 
 // a little script: turns the written-out email into a link, and asks before anyone saves a painting (the page works without it)
-const PAGE_JS = "document.querySelectorAll('[data-u]').forEach(function(e){var a=document.createElement('a'),m=e.getAttribute('data-u')+'@'+e.getAttribute('data-d');a.href='mailto:'+m;a.textContent=m;e.replaceWith(a)});" +
+const PAGE_JS = "(function(){function f(){document.querySelectorAll('[data-count]').forEach(function(e){var d=+e.getAttribute('data-count')-Date.now();if(d<=0){e.textContent='a moment — refresh to see it';return}var h=Math.floor(d/36e5),m=Math.floor(d%36e5/6e4);e.textContent=h>=48?Math.round(h/24)+' days':h?h+'h '+m+'m':m+' minutes'})}f();setInterval(f,30000)})();" +
+  "document.querySelectorAll('[data-u]').forEach(function(e){var a=document.createElement('a'),m=e.getAttribute('data-u')+'@'+e.getAttribute('data-d');a.href='mailto:'+m;a.textContent=m;e.replaceWith(a)});" +
   "document.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG'){e.preventDefault();var n=document.getElementById('protN');if(n){n.hidden=false;clearTimeout(window.__pt);window.__pt=setTimeout(function(){n.hidden=true},4500)}}});";
 const PAGE_JS_HASH = "'sha256-" + crypto.createHash('sha256').update(PAGE_JS).digest('base64') + "'";
 function shell(o) {
@@ -598,12 +669,14 @@ function shell(o) {
     '<a href="/works"' + (o.here === 'works' ? ' aria-current="page"' : '') + '>All works</a><a href="/">3D gallery</a><a href="/#commission">Commissions</a><a href="/#buying">Buying with confidence</a><a href="/works#contact">Contact</a></nav></div></header>' +
     '<main id="main" class="wrap">' + o.body + '</main>' +
     '<p id="protN" class="note" role="status" hidden style="position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#2a1c14;color:#f7f1e8;max-width:92vw;z-index:9">Pam’s artwork is protected by copyright. For a print or permission to use an image, just ask.</p>' +
-    '<footer class="foot"><div class="wrap"><span>© Pam’s Gallery · Original paintings by Pam</span><span>Email: ' + o.email + '</span><span><a href="/works">All works</a> · <a href="/">The 3D gallery</a> · <a href="/#buying">Buying with confidence</a></span></div></footer>' +
+    '<footer class="foot"><div class="wrap"><span>© Pam’s Gallery · Original paintings by Pam</span><span>Email: ' + o.email + '</span><span><a href="/works">All works</a> · <a href="/">The 3D gallery</a> · <a href="/#buying">Buying with confidence</a> · <a href="/privacy">Privacy</a></span></div></footer>' +
     '<script>' + PAGE_JS + '</script></body></html>';
 }
 function emailSpan(addr) { const i = addr.indexOf('@'); return '<span data-u="' + esc(addr.slice(0, i)) + '" data-d="' + esc(addr.slice(i + 1)) + '">' + esc(addr.slice(0, i)) + ' [at] ' + esc(addr.slice(i + 1)) + '</span>' }
 function card(a, slug, cur, eager) {
   const im = imgsOf(a), W = 600, H = Math.round(W * (a.h || .7) / (a.w || .5)), st = a.status || 'Available';
+  if (a.ea) return '<li><a href="/art/' + slug + '"><span class="ph early">' + (im.tn ? '<img src="' + esc(im.tn) + '" alt="A blurred preview of a new painting for members" width="' + W + '" height="' + H + '" loading="lazy" decoding="async">' : '') + '<span class="ribbon">Members see this first</span></span>' +
+    '<span class="t">' + esc(a.t) + '</span><span class="m">' + esc(a.m || 'New work') + '</span><span class="pr">Public from <span data-until="' + a.ea + '">' + esc(earlyWhen(a.ea)) + '</span></span></a></li>';
   return '<li><a href="/art/' + slug + '"><span class="ph"><img src="' + esc(im.tn) + '" alt="' + esc(altOf(a)) + '" width="' + W + '" height="' + H + '"' + (eager ? '' : ' loading="lazy"') + ' decoding="async" class="fr-' + frameKey(a) + '"></span>' +
     '<span class="t">' + esc(a.t) + '</span><span class="m">' + esc([a.m, a.s].filter(Boolean).join(' · ') || 'Original artwork') + '</span>' +
     '<span class="pr">' + esc(priceOfA(a, 0, cur)) + (st === 'Sold' ? '' : ' <span class="badge' + (st === 'On hold' ? ' hold' : '') + '">' + esc(st) + '</span>') + '</span></a></li>';
@@ -630,6 +703,15 @@ async function artPage(q, res) {
   let a = used[String(q.slug || '')];
   if (!a) { const byId = arts.find(x => x.id === String(q.slug || '')); if (byId) { res.setHeader('Location', '/art/' + by[byId.id]); res.status(301).end(); return } return notFound(res) }
   const slug = by[a.id], url = SITE + '/art/' + slug, im = imgsOf(a), coll = (cat && cat.colls || []).find(c => c.works.indexOf(a.id) >= 0);
+  if (a.ea) {
+    const body = '<nav class="crumbs" aria-label="Breadcrumb"><a href="/works">All works</a></nav><article class="art"><figure class="early">' + (im.mid ? '<img src="' + esc(im.mid) + '" width="480" height="' + Math.round(480 * (a.h || .7) / (a.w || .5)) + '" alt="A blurred preview of ' + esc(a.t) + ', a new painting shown to members first">' : '') + '<span class="ribbon">Members see this first</span></figure>' +
+      '<div class="info"><p class="kick">Members’ early access</p><h1>' + esc(a.t) + '</h1><p class="by">A new ' + kindOf(a) + ' by Pam' + (a.m ? ' · ' + esc(a.m) : '') + '</p>' +
+      '<p class="price">Opens to everyone in <span class="cd" data-count="' + a.ea + '">' + esc(earlyWhen(a.ea)) + '</span></p>' +
+      '<p class="desc">' + esc(textOf(cat, 'members.early', 'When Pam finishes something new, members see it first. For {window} it’s shown only to members, who can enquire about it or bid on it before it’s released to everyone. Joining is free.').replace('{window}', windowText(cat))) + '</p>' +
+      '<p class="actions"><a class="btn main" href="/#join">Join free to see it now</a><a class="btn" href="/#art-' + esc(a.id) + '">Members: sign in to view</a></p><p class="trust">Public from ' + esc(earlyWhen(a.ea)) + ' (UK time).</p></div></article>' + perksBox(cat);
+    html(res, shell({ title: a.t + ' — members see it first | Pam’s Gallery', desc: 'A new ' + kindOf(a) + ' by Pam, shown to members first. Join free to see it now.', canon: url, noindex: true, img: '', body, email: emailSpan(contactEmail(cat)) }), true);
+    return;
+  }
   let top = 0; if (a.mode === 'auction' && a.auc) { const t = topOf(await db('ZREVRANGE', 'bids:' + a.id, '0', '0', 'WITHSCORES')); top = t ? t.amount : 0 }
   const st = a.status || 'Available', price = priceOfA(a, top, cur), kind = kindOf(a), alt = altOf(a), email = contactEmail(cat);
   const facts = [['Medium', a.m], ['Size', a.s || 'On request'], ['Year', a.year], ['Availability', st]].concat(a.mode === 'auction' && a.auc ? [['Auction ends', new Date(a.auc.ends).toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London' }) + ' (UK time)']] : []).filter(f => f[1]);
@@ -648,7 +730,7 @@ async function artPage(q, res) {
     '<a class="btn" href="/#art-' + esc(a.id) + '">See it in the 3D gallery</a></p>' +
     '<p class="trust">' + esc(textOf(cat, 'trust.line', 'Signed certificate of authenticity · Secure payment · Tracked, insured delivery · 14-day returns')) + '. <a href="/#buying">Buying with confidence</a></p></div></article>' +
     '<section id="enquire" class="enquire" aria-labelledby="eqh"><h2 id="eqh">' + (st === 'Sold' ? 'Ask Pam about similar work' : 'Ask Pam about “' + esc(a.t) + '”') + '</h2>' + enquiryForm(a, '/art/' + slug, q, site) + '</section>' +
-    (more.length ? '<section class="coll" aria-labelledby="mh"><h2 id="mh">' + (coll ? 'More from ' + esc(coll.t) : 'More works') + '</h2><ul class="grid">' + more.map(x => card(x, by[x.id], cur)).join('') + '</ul></section>' : '');
+    perksBox(cat) + (more.length ? '<section class="coll" aria-labelledby="mh"><h2 id="mh">' + (coll ? 'More from ' + esc(coll.t) : 'More works') + '</h2><ul class="grid">' + more.map(x => card(x, by[x.id], cur)).join('') + '</ul></section>' : '');
   html(res, shell({ title: a.t + ' — an original ' + kind + ' by Pam | Pam’s Gallery', ogTitle: a.t + ' — an original ' + kind + ' by Pam', desc: (a.d ? a.d.slice(0, 150) : 'An original ' + kind + ' by Pam.') + ' ' + price + '.',
     canon: url, img: im.wm, imgAlt: alt, ogType: 'product', ld, body, email: emailSpan(email) }), q.sent || q.err);
 }
@@ -661,7 +743,7 @@ async function worksPage(q, res) {
   const first = arts[0] && imgsOf(arts[0]).wm;
   const ld = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'All works — Pam’s Gallery', url: SITE + '/works', mainEntity: { '@type': 'ItemList', itemListElement: arts.map((a, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + '/art/' + by[a.id], name: a.t })) } };
   const body = '<section class="intro"><p class="kick">The collection</p><h1>All works</h1><p class="lede">Original paintings and drawings by Pam — every one a single, signed original with a certificate of authenticity. Tap any work for its size, price and story, or to ask Pam about it.</p>' +
-    '<div class="btns"><a class="btn main" href="/">Walk through the 3D gallery</a><a class="btn" href="#contact">Contact Pam</a></div></section>' + secs.map(sec).join('') +
+    '<div class="btns"><a class="btn main" href="/">Walk through the 3D gallery</a><a class="btn" href="#contact">Contact Pam</a></div></section>' + secs.map(sec).join('') + perksBox(cat) +
     '<section id="contact" class="contact" aria-labelledby="ch"><h2 id="ch">Contact Pam</h2><p class="lede">For questions, viewings, commissions or press, write to ' + emailSpan(email) + ' or send a message here.</p>' +
     '<form class="f" method="post" action="/api/app"><input type="hidden" name="a" value="message"><input type="hidden" name="form" value="1"><input type="hidden" name="back" value="/works"><input type="hidden" name="ts" value="' + formTs() + '">' +
     '<label>Your name<input name="name" required maxlength="80" autocomplete="name"></label><label>Email<input type="email" name="email" required maxlength="200" autocomplete="email"></label>' +
@@ -669,11 +751,36 @@ async function worksPage(q, res) {
     '<p class="small wide">Pam replies personally, usually within two working days. Your details are only used to answer you.</p><div class="wide"><button class="btn main" type="submit">Send message</button></div></form>' + notice(q) + '</section>';
   html(res, shell({ title: 'All works — original paintings by Pam | Pam’s Gallery', desc: 'Browse every original painting and drawing by Pam, with sizes, prices and availability, and enquire to buy.', canon: SITE + '/works', img: first, ld, body, here: 'works', email: emailSpan(email) }), q.sent || q.err);
 }
+async function confirmSub(t, res) {
+  const email = mailTokOk(t, 'sub'); let ok = false;
+  if (email) { const rec = J(await db('GET', 'subp:' + email)) || { email, ts: Date.now(), words: CONSENT_WORDS, src: 'site' }; rec.confirmed = Date.now(); await pipe([['ZADD', 'subs', String(Date.now()), email], ['SET', 'subc:' + email, JSON.stringify(rec)], ['DEL', 'subp:' + email]]); ok = true }
+  res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', 'no-store');
+  res.status(ok ? 200 : 400).end(shell({ title: ok ? 'You’re on the list | Pam’s Gallery' : 'That link didn’t work | Pam’s Gallery', desc: 'Email updates from Pam’s Gallery.', canon: SITE + '/', noindex: true, email: emailSpan(OWNER),
+    body: '<section class="intro"><p class="kick">Email updates</p><h1>' + (ok ? 'Thank you — you’re on the list' : 'That link didn’t work') + '</h1><p class="lede">' + (ok ? 'You’ll hear about Pam’s new paintings and exhibitions now and then. Every email has a one-click unsubscribe link.' : 'It may have been copied incompletely. Please sign up again from the gallery.') + '</p><div class="btns"><a class="btn main" href="/works">See the paintings</a></div></section>' }));
+}
+async function unsubPage(t, res) {
+  const email = mailTokOk(t, 'unsub');
+  if (email) { const u = J(await db('GET', 'u:' + email)); const cmds = [['ZREM', 'subs', email], ['DEL', 'subc:' + email]]; if (u && u.news) { u.news = false; cmds.push(['SET', 'u:' + email, JSON.stringify(u)]) } await pipe(cmds) }
+  res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', 'no-store');
+  res.status(email ? 200 : 400).end(shell({ title: 'Unsubscribed | Pam’s Gallery', desc: 'Email updates from Pam’s Gallery.', canon: SITE + '/', noindex: true, email: emailSpan(OWNER),
+    body: '<section class="intro"><p class="kick">Email updates</p><h1>' + (email ? 'You’ve been unsubscribed' : 'That link didn’t work') + '</h1><p class="lede">' + (email ? 'You won’t receive any more emails about new work. If you have an account, it stays just as it was. Changed your mind? You can sign up again from the gallery at any time.' : 'Please email Pam and she’ll remove you straight away.') + '</p><div class="btns"><a class="btn main" href="/works">Back to the paintings</a></div></section>' }));
+}
+async function privacyPage(res) {
+  const cat = await getCat(), email = contactEmail(cat);
+  const P = (h, t) => '<h2 style="font-size:1.6rem;margin-top:2rem">' + h + '</h2><p class="desc">' + t + '</p>';
+  html(res, shell({ title: 'Privacy | Pam’s Gallery', desc: 'How Pam’s Gallery looks after your personal information.', canon: SITE + '/privacy', email: emailSpan(email),
+    body: '<section class="intro" style="max-width:760px"><p class="kick">Privacy</p><h1>Your information</h1><p class="lede">Pam’s Gallery is run by Pam, an independent artist in the UK, who is responsible for the information you share here. If you have any questions, email ' + emailSpan(email) + '.</p>' +
+      P('What is collected, and why', 'When you enquire, make an offer, bid, send a message or request a commission, your name, email address, any phone number and what you write are kept so Pam can reply and arrange a sale. If you create an account, your name, email and a securely scrambled version of your password are kept, along with your purchases and loyalty points. Reference photos sent with a commission request are private and only Pam can open them.') +
+      P('Email updates', 'If you sign up for news of new work and exhibitions (or tick the box when creating an account), your email address and the date and wording of your consent are kept. You’ll only get those emails because you asked for them, and every one has a one-click unsubscribe link. Members who opt in also hear when new work opens early for members.') +
+      P('Visits', 'The site counts visits and notes the rough area a visit comes from (country and town, worked out by the hosting service) so Pam can see where interest comes from. No advertising or tracking cookies are used, and nothing identifies you personally.') +
+      P('Who else is involved', 'The site is hosted by Vercel and its data is stored with Upstash. Emails are sent by Resend, and card payments, if you choose to pay by card, are handled by Stripe. They process information only to provide those services. Your details are never sold or shared for marketing.') +
+      P('How long it is kept, and your rights', 'Enquiries and messages are kept for as long as they’re needed to look after your purchase and for records, and account details until you ask for your account to be deleted. You can ask to see, correct or delete your information, or withdraw consent, at any time by emailing Pam. You also have the right to complain to the Information Commissioner’s Office (ico.org.uk).') + '</section>' }));
+}
 async function sitemap(res) {
   const { cat, arts } = await pubArts(), { by } = slugMap(arts), d = new Date(cat && cat.v || Date.now()).toISOString().slice(0, 10);
   const u = (p, pr) => '<url><loc>' + SITE + p + '</loc><lastmod>' + d + '</lastmod><priority>' + pr + '</priority></url>';
   res.setHeader('Content-Type', 'application/xml; charset=utf-8'); res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=600');
-  res.status(200).end('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + u('/', '1.0') + u('/works', '0.9') + arts.map(a => u('/art/' + by[a.id], '0.8')).join('') + '</urlset>');
+  res.status(200).end('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + u('/', '1.0') + u('/works', '0.9') + arts.filter(a => !a.ea).map(a => u('/art/' + by[a.id], '0.8')).join('') + u('/privacy', '0.2') + '</urlset>');
 }
 function html(res, s, personal) { res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', personal ? 'no-store' : 'public, max-age=0, s-maxage=60, stale-while-revalidate=600'); res.status(200).end(s) }
 function notFound(res) {
@@ -699,7 +806,10 @@ module.exports = async (req, res) => {
       const q = req.query || {};
       if (!(DB_URL && DB_TOKEN)) { res.setHeader('Cache-Control', 'no-store'); res.status(503).json({ error: 'not_configured' }); return }
       if (q.img && /^[a-z0-9]{6,40}$/i.test(String(q.img))) { await getImage(String(q.img), res, q); return }
-      if (q.cat) { res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=5, stale-while-revalidate=30'); res.status(200).json({ cat: await getCat(), cfg: { google: GOOGLE_ID, pay: !!STRIPE } }); return }
+      if (q.cat) { res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=5, stale-while-revalidate=30'); res.status(200).json({ cat: publicCat(await getCat()), cfg: { google: GOOGLE_ID, pay: !!STRIPE } }); return }
+      if (q.confirm) { await confirmSub(String(q.confirm), res); return }
+      if (q.unsub) { await unsubPage(String(q.unsub), res); return }
+      if (q.page === 'privacy') { await privacyPage(res); return }
       if (q.s && /^[a-z0-9]{1,24}$/i.test(String(q.s))) { await sharePage(String(q.s), res); return }
       if (q.page === 'art' && /^[a-z0-9-]{1,80}$/i.test(String(q.slug || ''))) { await artPage(q, res); return }
       if (q.page === 'works') { await worksPage(q, res); return }
