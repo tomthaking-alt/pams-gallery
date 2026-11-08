@@ -132,6 +132,16 @@ function setsOf(cat) {
   if (cat && Array.isArray(cat.colls) && cat.colls.length) return cat.colls.filter(c => c.works && c.works.length).map(c => ({ name: c.t, arts: c.works }));
   return BASE_SETS;
 }
+// what Pam has confirmed about delivery, returns and so on; anything left empty is simply not claimed
+function cleanBuy(B) {
+  B = B && typeof B === 'object' ? B : {}; const t = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, n);
+  const pick = (v, ok) => ok.indexOf(v) >= 0 ? v : '';
+  return { ukCost: t(B.ukCost, 60), ukTime: t(B.ukTime, 60), intl: pick(B.intl, ['quote', 'no']), tracked: pick(B.tracked, ['yes', 'no']), pack: t(B.pack, 300),
+    retDays: [14, 21, 28, 30].indexOf(+B.retDays) >= 0 ? +B.retDays : 14, retPost: pick(B.retPost, ['buyer', 'pam']), cert: pick(B.cert, ['yes', 'no']), frame: t(B.frame, 300), reply: t(B.reply, 60) };
+}
+function buyOf(site) { return (site && site.buy) || {} }
+function replyLine(site) { const r = buyOf(site).reply; return r ? 'Pam replies personally, usually within ' + r + '.' : 'Pam replies personally to every message.' }
+function trustLine(site) { const b = buyOf(site); return [b.cert === 'yes' ? 'Certificate of authenticity' : 'Original works by Pam', STRIPE ? 'Secure card payment' : 'Nothing to pay until you’ve agreed', b.tracked === 'yes' ? 'Tracked, insured delivery' : '', (+b.retDays || 14) + '-day returns'].filter(Boolean).join(' · ') }
 function cleanCat(c) {
   const str = (v, n) => clean(v, n), num = (v, lo, hi, d) => { const x = parseFloat(v); return isFinite(x) ? Math.max(lo, Math.min(hi, x)) : d };
   const okId = v => /^[a-z0-9]{1,24}$/i.test(String(v || ''));
@@ -157,6 +167,7 @@ function cleanCat(c) {
   const social = {}; ['instagram', 'tiktok', 'facebook', 'x', 'pinterest', 'youtube', 'threads', 'linkedin', 'website'].forEach(k => { const u = url(S.social && S.social[k]); if (u) social[k] = u });
   const site = { email: okEmail(str(S.email, 200)) ? str(S.email, 200) : '', phone: str(S.phone, 40), place: str(S.place, 80), social,
     banner: { on: !!(S.banner && S.banner.on), text: str(S.banner && S.banner.text, 160) }, commissions: S.commissions !== false, offers: S.offers !== false,
+    buy: cleanBuy(S.buy),
     share: S.share !== false, likes: S.likes !== false, earlyHours: [24, 48, 72, 168].indexOf(+S.earlyHours) >= 0 ? +S.earlyHours : 0, cur: ['GBP', 'EUR', 'USD'].indexOf(S.cur) >= 0 ? S.cur : 'GBP' };
   const seen = (Array.isArray(c.seen) ? c.seen : []).map(String).filter(x => /^p\d{1,2}$/.test(x)).slice(0, 99);
   return { v: Date.now(), arts, favs, colls, prints, texts, site, seen };
@@ -165,7 +176,6 @@ function cleanCat(c) {
 function rewards(u, cat) {
   const owned = (u.owned || []).map(artId);
   return {
-    points: { balance: u.points || 0, text: POINTS.text, every: POINTS.every, worth: POINTS.worth, credit: Math.floor((u.points || 0) / POINTS.every) * POINTS.worth },
     sets: setsOf(cat).map(s => ({ name: s.name, reward: SET_REWARD, pieces: s.arts.map(a => ({ title: titleOf(cat, a), owned: owned.indexOf(a) >= 0 })), complete: s.arts.every(a => owned.indexOf(a) >= 0) }))
   };
 }
@@ -269,13 +279,13 @@ const actions = {
     }
     const offer = Math.round(Math.max(0, Math.min(1e7, parseFloat(String(b.offer || '').replace(/[^0-9.]/g, '')) || 0)) * 100) / 100;
     const o = { id: id(), ts: Date.now(), kind, artId: aid, title, name, email, phone: clean(b.phone, 40), message: clean(b.message, 2000), member: !!u, offer,
-      welcome: false, useCredit: !!(u && b.useCredit && rewards(u, cat).points.credit > 0), status: 'new' };
+      welcome: false, useCredit: false, status: 'new' };
     await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id]].concat(u ? [['LPUSH', 'u:' + email + ':orders', o.id]] : []));
     const cur = cat && cat.site && cat.site.cur;
     await Promise.all([
       mail(ownerTo(cat), (offer ? 'New offer: ' + money(offer, cur) + ' for ' : 'New enquiry: ') + title, ['<b>' + esc(name) + '</b> (' + esc(email) + (o.phone ? ', ' + esc(o.phone) : '') + ')' + (u ? ' — a member' : '') + ' ' + (offer ? 'offered <b>' + money(offer, cur) + '</b> for' : 'enquired about') + ' <b>' + esc(title) + '</b>.', o.message ? '“' + esc(o.message) + '”' : '', 'Just reply to this email to answer them. Everything is also in your dashboard under “Enquiries & sales”.'], { url: SITE, label: 'Open your gallery' }, email),
-      BUYER_MAIL && mail(email, 'Thank you for your enquiry — ' + title, ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for your interest in <b>' + esc(title) + '</b>' + (offer ? ' and your offer of <b>' + money(offer, cur) + '</b>' : '') + '. Pam has your enquiry and will reply to you personally, usually within a day.', 'With warm wishes,<br>Pam’s Gallery'], aid ? { url: SITE + '/#art-' + aid, label: 'See the painting again' } : null, ownerTo(cat))]);
-    return { ok: true, id: o.id };
+      BUYER_MAIL && mail(email, 'Thank you for your enquiry — ' + title, ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for your interest in <b>' + esc(title) + '</b>' + (offer ? ' and your offer of <b>' + money(offer, cur) + '</b>' : '') + '. ' + replyLine(cat.site).replace('Pam replies personally', 'Pam has your enquiry and will reply personally').replace(' to every message', ''), 'With warm wishes,<br>Pam’s Gallery'], aid ? { url: SITE + '/#art-' + aid, label: 'See the painting again' } : null, ownerTo(cat))]);
+    return { ok: true, id: o.id, mailed: BUYER_MAIL };
   },
 
   // a commission request, with up to three reference photos
@@ -300,8 +310,8 @@ const actions = {
     await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id]].concat(u ? [['LPUSH', 'u:' + email + ':orders', o.id]] : []));
     await Promise.all([
       mail(ownerTo(cat), 'New commission request from ' + name, ['<b>' + esc(name) + '</b> (' + esc(email) + (o.phone ? ', ' + esc(o.phone) : '') + ') would like a commission:', esc(msg).replace(/\n/g, '<br>'), photos.length ? 'Reference photos: ' + photos.map((x, i) => '<a href="' + SITE + signedImg(x, 30) + '">photo ' + (i + 1) + '</a>').join(' · ') : '', 'Just reply to this email to answer them.'], { url: SITE, label: 'Open your gallery' }, email),
-      BUYER_MAIL && mail(email, 'Your commission request — Pam’s Gallery', ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for asking Pam to paint something for you. She has your request and will be in touch personally to talk it through, usually within a couple of days.', 'With warm wishes,<br>Pam’s Gallery'], null, ownerTo(cat))]);
-    return { ok: true, id: o.id };
+      BUYER_MAIL && mail(email, 'Your commission request — Pam’s Gallery', ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for asking Pam to paint something for you. She has your request and will be in touch personally to talk it through' + (buyOf(cat.site).reply ? ', usually within ' + buyOf(cat.site).reply : '') + '.', 'With warm wishes,<br>Pam’s Gallery'], null, ownerTo(cat))]);
+    return { ok: true, id: o.id, mailed: BUYER_MAIL };
   },
 
   async like(req, b) {
@@ -326,7 +336,7 @@ const actions = {
     await Promise.all([
       mail(ownerTo(cat), 'New bid: ' + money(amt, cur) + ' for ' + a.t, ['<b>' + esc(u.name) + '</b> (' + esc(u.email) + ') bid <b>' + money(amt, cur) + '</b> for <b>' + esc(a.t) + '</b>. That’s ' + (+n || 1) + ' bid' + ((+n || 1) === 1 ? '' : 's') + ' so far; the auction closes ' + new Date(a.auc.ends).toUTCString().replace(/:\d\d GMT/, ' GMT') + '.'], link, u.email),
       BUYER_MAIL && top && top.email !== u.email && mail(top.email, 'You’ve been outbid on ' + a.t, ['Dear ' + esc(String(top.name || '').split(' ')[0]) + ',', 'Someone has placed a higher bid of <b>' + money(amt, cur) + '</b> on <b>' + esc(a.t) + '</b>. The auction is still open — if you’d like it, there’s still time to bid again.'], link, ownerTo(cat))]);
-    return { ok: true, top: amt, n: +n || 1 };
+    return { ok: true, top: amt, n: +n || 1, mailed: BUYER_MAIL };
   },
 
   async sub(req, b) {
@@ -355,7 +365,7 @@ const actions = {
     await pipe([['SET', 'm:' + m.id, JSON.stringify(m)], ['LPUSH', 'msgs', m.id]]);
     const cat = await getCat();
     await Promise.all([mail(ownerTo(cat), 'New message from ' + name, ['<b>' + esc(name) + '</b> (' + esc(email) + ') wrote:', '“' + esc(text).replace(/\n/g, '<br>') + '”', 'Just reply to this email to answer them.'], { url: SITE, label: 'Open your gallery' }, email),
-      BUYER_MAIL && mail(email, 'Thank you for your message — Pam’s Gallery', ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for getting in touch. Pam has your message and will reply personally, usually within two working days.', 'Your message:', '“' + esc(text).replace(/\n/g, '<br>') + '”'], { url: SITE, label: 'Back to the gallery' }, ownerTo(cat))]);
+      BUYER_MAIL && mail(email, 'Thank you for your message — Pam’s Gallery', ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for getting in touch. Pam has your message and will reply personally' + (buyOf(cat.site).reply ? ', usually within ' + buyOf(cat.site).reply : '') + '.', 'Your message:', '“' + esc(text).replace(/\n/g, '<br>') + '”'], { url: SITE, label: 'Back to the gallery' }, ownerTo(cat))]);
     return { ok: true };
   },
 
@@ -393,14 +403,13 @@ const actions = {
     await owner(req);
     const o = J(await db('GET', 'o:' + clean(b.id, 40))); if (!o) throw err('Order not found.', 404);
     const st = ORDER_ST.indexOf(b.status) >= 0 ? b.status : o.status;
-    if (st === 'completed' && !o.awarded && o.member) {           // a sale: award points, record the piece for collection rewards, use up the welcome gift
+    if (st === 'completed' && !o.awarded && o.member) {           // a sale: record the piece for the collection reward (a signed print)
       const m = await user(o.email);
       if (m) {
-        const amt = Math.max(0, Math.min(1e6, parseFloat(b.amount) || 0)), spent = Math.max(0, Math.min(m.points || 0, parseInt(b.pointsUsed, 10) || 0));
-        m.points = (m.points || 0) - spent + Math.floor(amt * POINTS.per);
+        const amt = Math.max(0, Math.min(1e6, parseFloat(b.amount) || 0));
         if (o.kind !== 'print') m.owned = Array.from(new Set((m.owned || []).map(artId).concat([o.artId || artId(o.art || 0)])));
         if (o.welcome) m.welcomeUsed = true;
-        await db('SET', 'u:' + m.email, JSON.stringify(m)); o.awarded = true; o.amount = amt; o.pointsUsed = spent;
+        await db('SET', 'u:' + m.email, JSON.stringify(m)); o.awarded = true; o.amount = amt;
       }
     }
     o.status = st; o.note = clean(b.note != null ? b.note : o.note, 500);
@@ -436,7 +445,7 @@ const actions = {
     const o = { id: id(), ts: Date.now(), kind: 'auction', artId: a.id, title: 'Auction: ' + a.t, name: top.name, email: top.email, phone: '', message: 'Winning bid ' + money(top.amount, cat.site && cat.site.cur), member: true, offer: top.amount, welcome: false, useCredit: false, status: 'contacted' };
     await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id], ['LPUSH', 'u:' + top.email + ':orders', o.id], ['SET', 'aucord:' + a.id, o.id]]);
     if (BUYER_MAIL) await mail(top.email, 'You won ' + a.t + '!', ['Dear ' + esc(String(top.name || '').split(' ')[0]) + ',', 'Congratulations — your bid of <b>' + money(top.amount, cat.site && cat.site.cur) + '</b> won <b>' + esc(a.t) + '</b>! Pam will be in touch very soon with a secure payment link and to arrange delivery.'], { url: SITE + '/#art-' + a.id, label: 'See your painting' }, ownerTo(cat));
-    return { ok: true, id: o.id };
+    return { ok: true, id: o.id, mailed: BUYER_MAIL };
   },
 
   async dashMsg(req, b) {
@@ -581,7 +590,7 @@ function priceOfA(a, top, cur) {
   if (a.mode === 'price' && a.p) return a.p; return 'Price on request';
 }
 function altOf(a) { const d = String(a.d || '').split(/(?<=[.!?])\s/)[0]; return '“' + a.t + '”, an original ' + kindOf(a) + ' by Pam' + (a.m ? ' (' + a.m + ')' : '') + (d ? '. ' + d : '') }
-const PERKS_DEF = 'Early access to new paintings and collections, before they’re released to everyone · Loyalty points on every purchase: 500 points = £50 off · A signed print when you complete a collection';
+const PERKS_DEF = 'Early access to new paintings and collections, before they’re released to everyone · A signed print when you complete a collection';
 function windowText(cat) { const h = cat && cat.site && cat.site.earlyHours; return !h ? 'a little while' : h <= 48 || h % 24 ? h + ' hours' : h === 168 ? 'a full week' : h / 24 + ' days' }
 function perksBox(cat) {
   const items = textOf(cat, 'members.perks', PERKS_DEF).split(/\s*·\s*/).filter(Boolean);
@@ -681,9 +690,10 @@ function card(a, slug, cur, eager) {
     '<span class="t">' + esc(a.t) + '</span><span class="m">' + esc([a.m, a.s].filter(Boolean).join(' · ') || 'Original artwork') + '</span>' +
     '<span class="pr">' + esc(priceOfA(a, 0, cur)) + (st === 'Sold' ? '' : ' <span class="badge' + (st === 'On hold' ? ' hold' : '') + '">' + esc(st) + '</span>') + '</span></a></li>';
 }
-function notice(q) {
-  if (q.sent === 'order') return '<p class="note ok" role="status">Thank you — Pam has your enquiry and will reply to you personally, usually within a day.</p>';
-  if (q.sent === 'message') return '<p class="note ok" role="status">Thank you — Pam has your message and will reply personally, usually within two working days.</p>';
+function notice(q, site) {
+  const rl = buyOf(site).reply ? ', usually within ' + buyOf(site).reply : '';
+  if (q.sent === 'order') return '<p class="note ok" role="status">Thank you — Pam has your enquiry and will reply to you personally' + rl + '. Nothing is charged until you’ve agreed the price and delivery.</p>';
+  if (q.sent === 'message') return '<p class="note ok" role="status">Thank you — Pam has your message and will reply personally' + rl + '.</p>';
   if (q.err) return '<p class="note err" role="alert">' + esc(String(q.err).slice(0, 200)) + '</p>'; return '';
 }
 function enquiryForm(a, back, q, site) {
@@ -695,8 +705,8 @@ function enquiryForm(a, back, q, site) {
     (offers ? '<label>Your offer (optional)<input name="offer" inputmode="decimal" maxlength="12" placeholder="e.g. 450"></label>' : '<span></span>') +
     '<label class="wide">' + (sold ? 'Your message (this painting has found a home — ask about similar work)' : 'Your message (optional)') + '<textarea name="message" maxlength="2000" placeholder="Anything you’d like to know: framing, delivery, a viewing…"></textarea></label>' +
     '<label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>' +
-    '<p class="small wide">Pam replies personally, usually within a day. Your details are only used to answer you — nothing is shared.</p>' +
-    '<div class="wide"><button class="btn main" type="submit">' + (sold ? 'Send message' : 'Send enquiry') + '</button></div></form>' + notice(q);
+    '<p class="small wide">' + esc(replyLine(site)) + ' Nothing is charged until you’ve agreed the price and delivery. Your details are only used to answer you — nothing is shared.</p>' +
+    '<div class="wide"><button class="btn main" type="submit">' + (sold ? 'Send message' : 'Send enquiry') + '</button></div></form>' + notice(q, site);
 }
 async function artPage(q, res) {
   const { cat, arts } = await pubArts(), { used, by } = slugMap(arts), cur = cat && cat.site && cat.site.cur || 'GBP', site = cat && cat.site || {};
@@ -728,7 +738,7 @@ async function artPage(q, res) {
     '<dl class="facts">' + facts.map(f => '<dt>' + f[0] + '</dt><dd>' + esc(f[1]) + '</dd>').join('') + '</dl>' + (a.d ? '<p class="desc">' + esc(a.d) + '</p>' : '') +
     '<p class="actions">' + (st === 'Sold' ? '<a class="btn main" href="#enquire">Ask about similar work</a>' : a.mode === 'auction' ? '<a class="btn main" href="/#art-' + esc(a.id) + '">Place a bid in the gallery</a><a class="btn" href="#enquire">Ask a question</a>' : '<a class="btn main" href="#enquire">Enquire to buy</a>') +
     '<a class="btn" href="/#art-' + esc(a.id) + '">See it in the 3D gallery</a></p>' +
-    '<p class="trust">' + esc(textOf(cat, 'trust.line', 'Signed certificate of authenticity · Secure payment · Tracked, insured delivery · 14-day returns')) + '. <a href="/#buying">Buying with confidence</a></p></div></article>' +
+    '<p class="trust">' + esc(textOf(cat, 'trust.line', trustLine(cat && cat.site))) + '. <a href="/#buying">Buying with confidence</a></p></div></article>' +
     '<section id="enquire" class="enquire" aria-labelledby="eqh"><h2 id="eqh">' + (st === 'Sold' ? 'Ask Pam about similar work' : 'Ask Pam about “' + esc(a.t) + '”') + '</h2>' + enquiryForm(a, '/art/' + slug, q, site) + '</section>' +
     perksBox(cat) + (more.length ? '<section class="coll" aria-labelledby="mh"><h2 id="mh">' + (coll ? 'More from ' + esc(coll.t) : 'More works') + '</h2><ul class="grid">' + more.map(x => card(x, by[x.id], cur)).join('') + '</ul></section>' : '');
   html(res, shell({ title: a.t + ' — an original ' + kind + ' by Pam | Pam’s Gallery', ogTitle: a.t + ' — an original ' + kind + ' by Pam', desc: (a.d ? a.d.slice(0, 150) : 'An original ' + kind + ' by Pam.') + ' ' + price + '.',
@@ -742,13 +752,13 @@ async function worksPage(q, res) {
     '<ul class="grid">' + s.works.map(id => arts.find(a => a.id === id)).filter(Boolean).map(a => card(a, by[a.id], cur, n++ < 4)).join('') + '</ul></section>';
   const first = arts[0] && imgsOf(arts[0]).wm;
   const ld = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'All works — Pam’s Gallery', url: SITE + '/works', mainEntity: { '@type': 'ItemList', itemListElement: arts.map((a, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + '/art/' + by[a.id], name: a.t })) } };
-  const body = '<section class="intro"><p class="kick">The collection</p><h1>All works</h1><p class="lede">Original paintings and drawings by Pam — every one a single, signed original with a certificate of authenticity. Tap any work for its size, price and story, or to ask Pam about it.</p>' +
+  const body = '<section class="intro"><p class="kick">The collection</p><h1>All works</h1><p class="lede">Original paintings and drawings by Pam — every one a single original' + (buyOf(cat && cat.site).cert === 'yes' ? ' with a certificate of authenticity' : '') + '. Tap any work for its size, price and story, or to ask Pam about it.</p>' +
     '<div class="btns"><a class="btn main" href="/">Walk through the 3D gallery</a><a class="btn" href="#contact">Contact Pam</a></div></section>' + secs.map(sec).join('') + perksBox(cat) +
     '<section id="contact" class="contact" aria-labelledby="ch"><h2 id="ch">Contact Pam</h2><p class="lede">For questions, viewings, commissions or press, write to ' + emailSpan(email) + ' or send a message here.</p>' +
     '<form class="f" method="post" action="/api/app"><input type="hidden" name="a" value="message"><input type="hidden" name="form" value="1"><input type="hidden" name="back" value="/works"><input type="hidden" name="ts" value="' + formTs() + '">' +
     '<label>Your name<input name="name" required maxlength="80" autocomplete="name"></label><label>Email<input type="email" name="email" required maxlength="200" autocomplete="email"></label>' +
     '<label class="wide">Message<textarea name="message" required maxlength="3000"></textarea></label><label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>' +
-    '<p class="small wide">Pam replies personally, usually within two working days. Your details are only used to answer you.</p><div class="wide"><button class="btn main" type="submit">Send message</button></div></form>' + notice(q) + '</section>';
+    '<p class="small wide">' + esc(replyLine(cat && cat.site)) + ' Your details are only used to answer you.</p><div class="wide"><button class="btn main" type="submit">Send message</button></div></form>' + notice(q, cat && cat.site) + '</section>';
   html(res, shell({ title: 'All works — original paintings by Pam | Pam’s Gallery', desc: 'Browse every original painting and drawing by Pam, with sizes, prices and availability, and enquire to buy.', canon: SITE + '/works', img: first, ld, body, here: 'works', email: emailSpan(email) }), q.sent || q.err);
 }
 async function confirmSub(t, res) {
@@ -770,7 +780,7 @@ async function privacyPage(res) {
   const P = (h, t) => '<h2 style="font-size:1.6rem;margin-top:2rem">' + h + '</h2><p class="desc">' + t + '</p>';
   html(res, shell({ title: 'Privacy | Pam’s Gallery', desc: 'How Pam’s Gallery looks after your personal information.', canon: SITE + '/privacy', email: emailSpan(email),
     body: '<section class="intro" style="max-width:760px"><p class="kick">Privacy</p><h1>Your information</h1><p class="lede">Pam’s Gallery is run by Pam, an independent artist in the UK, who is responsible for the information you share here. If you have any questions, email ' + emailSpan(email) + '.</p>' +
-      P('What is collected, and why', 'When you enquire, make an offer, bid, send a message or request a commission, your name, email address, any phone number and what you write are kept so Pam can reply and arrange a sale. If you create an account, your name, email and a securely scrambled version of your password are kept, along with your purchases and loyalty points. Reference photos sent with a commission request are private and only Pam can open them.') +
+      P('What is collected, and why', 'When you enquire, make an offer, bid, send a message or request a commission, your name, email address, any phone number and what you write are kept so Pam can reply and arrange a sale. If you create an account, your name, email and a securely scrambled version of your password are kept, along with the paintings you’ve bought, so a completed collection can be rewarded. Reference photos sent with a commission request are private and only Pam can open them.') +
       P('Email updates', 'If you sign up for news of new work and exhibitions (or tick the box when creating an account), your email address and the date and wording of your consent are kept. You’ll only get those emails because you asked for them, and every one has a one-click unsubscribe link. Members who opt in also hear when new work opens early for members.') +
       P('Visits', 'The site counts visits and notes the rough area a visit comes from (country and town, worked out by the hosting service) so Pam can see where interest comes from. No advertising or tracking cookies are used, and nothing identifies you personally.') +
       P('Who else is involved', 'The site is hosted by Vercel and its data is stored with Upstash. Emails are sent by Resend, and card payments, if you choose to pay by card, are handled by Stripe. They process information only to provide those services. Your details are never sold or shared for marketing.') +
@@ -806,7 +816,7 @@ module.exports = async (req, res) => {
       const q = req.query || {};
       if (!(DB_URL && DB_TOKEN)) { res.setHeader('Cache-Control', 'no-store'); res.status(503).json({ error: 'not_configured' }); return }
       if (q.img && /^[a-z0-9]{6,40}$/i.test(String(q.img))) { await getImage(String(q.img), res, q); return }
-      if (q.cat) { res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=5, stale-while-revalidate=30'); res.status(200).json({ cat: publicCat(await getCat()), cfg: { google: GOOGLE_ID, pay: !!STRIPE } }); return }
+      if (q.cat) { res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=5, stale-while-revalidate=30'); res.status(200).json({ cat: publicCat(await getCat()), cfg: { google: GOOGLE_ID, pay: !!STRIPE, mail: BUYER_MAIL } }); return }
       if (q.confirm) { await confirmSub(String(q.confirm), res); return }
       if (q.unsub) { await unsubPage(String(q.unsub), res); return }
       if (q.page === 'privacy') { await privacyPage(res); return }
