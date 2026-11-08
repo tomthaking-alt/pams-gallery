@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-76Pmk1Gnekoze2x169Nvbo41bt8ER6FImM3plfgAdJM=' 'sha256-uUaolrk4Orn6lgTM3DEjWAkTycZ0tcr70SaSvL0yQ3g=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-76Pmk1Gnekoze2x169Nvbo41bt8ER6FImM3plfgAdJM=' 'sha256-ewIHJRNfkT1FieTOFjAMcgX+8ernsWDKouKeG4nhZhA=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -286,7 +286,13 @@ section.page .pl{white-space:pre-line;line-height:1.75;color:var(--ink);max-widt
 .pworks img.prt{position:absolute;inset:0;margin:auto;opacity:0;pointer-events:none}
 img,canvas{-webkit-touch-callout:none;-webkit-user-drag:none}
 img{-webkit-user-select:none;user-select:none}
-.dpage{margin:.2rem 0 .9rem;font-size:.9rem}.dpage a{color:var(--muted)}
+.dpage{margin:.2rem 0 .9rem;font-size:.9rem}
+.dperks{border-top:1px solid rgba(75,46,34,.14);margin-top:.4rem;padding-top:.8rem;font-size:.9rem}.dperks .kick{margin:0 0 .3rem}.perkl{margin:.3rem 0 .6rem;padding-left:1.1rem}.perkl li{margin:.15rem 0}
+.perkn b{display:block;margin-bottom:.2rem}.perksc{max-width:640px;margin:2.2rem auto 1rem;background:rgba(255,253,249,.8);border:1px solid rgba(75,46,34,.14);border-radius:14px;padding:1.2rem 1.4rem}.perksc .kick{margin:0 0 .3rem}.perksc .small{font-size:.88rem;opacity:.85}.acearly summary{cursor:pointer;text-decoration:underline;text-underline-offset:3px}.acearly p{margin:.4rem 0 0}#dimg.teaser{width:min(64%,400px);height:auto;filter:blur(5px) saturate(1.05)}#dzoom[hidden]{display:none}
+.card .ph{position:relative}.card .ph.early{overflow:hidden}.card .ph.early img{width:70%;height:auto;filter:blur(4px) saturate(1.05)}
+.ribbon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;background:rgba(42,28,20,.86);color:#f7f1e8;border-radius:99px;padding:.45rem .9rem;font-size:.76rem;letter-spacing:.08em;white-space:nowrap;pointer-events:none}
+.ribbon.mem{top:auto;bottom:6%;transform:translateX(-50%);background:rgba(176,141,87,.94);color:#2a1c14}
+.early-ed{border-top:1px dashed rgba(75,46,34,.2);padding-top:.6rem;margin-top:.2rem;grid-column:1/-1}.dpage a{color:var(--muted)}
 .ldsimple{display:block;margin-top:.7rem;font-size:.85rem;color:inherit;opacity:.78;text-underline-offset:3px}.ldsimple:hover{opacity:1}
 .nos{position:fixed;inset:auto 0 0 0;z-index:99;background:#faf7f1;color:#2a1c14;padding:1rem 1.2rem;font:16px/1.5 Jost,sans-serif;border-top:1px solid #e6ddcf}
 .mailwarn{margin:0 0 1rem;padding:.8rem 1rem;border-radius:10px;background:#fbefd9;border:1px solid #e3c27d;color:#5a3a17;font-size:.92rem;line-height:1.5}
@@ -790,7 +796,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <div class="btns pnoprint"><button class="btn main" type="button" id="psKit">Download the press kit (PDF)</button><button class="btn" type="button" id="psHiRes">Request high-resolution images</button><button class="btn" type="button" id="psMsg">Contact Pam</button></div>
   <p class="note pnoprint" id="psKitNote">Opens your device’s print window — choose “Save as PDF”.</p>
   <div class="follow" data-follow hidden></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a><a href="/privacy">Privacy</a></nav>
  </div>
 </section>
 <section id="commission" class="sheet page" hidden aria-labelledby="cmh">
@@ -800,7 +806,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <p class="lede pl" data-p="comm.lede"></p>
   <ol class="csteps" id="cmSteps"></ol>
   <p class="pl cprice" data-p="comm.prices"></p>
-  <div id="cmClosed" hidden><p class="pl" data-p="comm.closed"></p><form class="subf" data-sub novalidate><label>Hear when commissions reopen<input type="email" autocomplete="email" placeholder="Your email" required></label><button class="btn main" type="submit">Notify me</button><p class="note" role="status"></p></form></div>
+  <div id="cmClosed" hidden><p class="pl" data-p="comm.closed"></p><form class="subf" data-sub data-src="commissions" novalidate><label>Hear when commissions reopen<input type="email" autocomplete="email" placeholder="Your email" required></label><label class="chk"><input type="checkbox" name="consent"> <span>Yes, email me about new work and exhibitions. I can unsubscribe at any time. <a href="/privacy">Privacy</a></span></label><button class="btn main" type="submit">Notify me</button><p class="note" role="status"></p></form></div>
   <form class="fm cform" id="fComm" novalidate>
    <h3>Tell Pam your idea</h3>
    <div id="cmGuest" class="cmgrid"><label>Your name<input name="name" autocomplete="name" maxlength="80"></label><label>Email<input type="email" name="email" autocomplete="email"></label></div>
@@ -815,7 +821,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
    <div class="btns" style="margin-top:.2rem"><button class="btn main" type="submit">Send my commission request</button></div>
   </form>
   <div id="cmDone" hidden><p class="note done pl" data-p="comm.done" style="font-size:1.05rem"></p></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a><a href="/privacy">Privacy</a></nav>
  </div>
 </section>
 <section id="buying" class="sheet page" hidden aria-labelledby="byh">
@@ -826,7 +832,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <div class="bgrid"><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 15.4 7.2 17.9l.9-5.4L4.2 8.7l5.4-.8z"/></svg><h3>Certificate of authenticity</h3><p class="pl" data-p="trust.auth"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg><h3>Packaging &amp; delivery</h3><p class="pl" data-p="trust.deliver"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 10a8 8 0 1 1 2.3 5.7"/><path d="M4 4v6h6"/></svg><h3>Returns</h3><p class="pl" data-p="trust.returns"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="1"/><rect x="8" y="8" width="8" height="8"/></svg><h3>Framing &amp; hanging</h3><p class="pl" data-p="trust.frame"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><h3>Secure payment</h3><p class="pl" data-p="trust.pay"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/></svg><h3>Any questions?</h3><p class="pl" data-p="trust.help"></p></article></div>
   <h3 class="faqh">Questions people often ask</h3><div class="faq" id="byFaq"></div>
   <div class="btns"><button class="btn main" type="button" id="byMsg">Ask Pam a question</button></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a><a href="/privacy">Privacy</a></nav>
  </div>
 </section>
 <section id="prints" class="sheet" hidden aria-labelledby="prh">
@@ -846,9 +852,10 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <nav class="cindex" id="cindex" aria-label="Jump to a collection"></nav>
   <div id="grid"></div>
   <p class="colAbout" id="colAbout"></p>
-  <form class="subf" data-sub novalidate><label>Get first look at new paintings<input type="email" autocomplete="email" placeholder="Your email" required></label><button class="btn main" type="submit">Notify me</button><p class="note" role="status"></p></form>
+  <aside class="perksc" id="colPerks" aria-label="The collectors’ circle" hidden></aside>
+  <form class="subf" data-sub data-src="collections" novalidate><label>New work and exhibitions, by email<input type="email" autocomplete="email" placeholder="Your email" required></label><label class="chk"><input type="checkbox" name="consent"> <span>Yes, email me about new work and exhibitions. I can unsubscribe at any time. <a href="/privacy">Privacy</a></span></label><button class="btn main" type="submit">Keep me posted</button><p class="note" role="status"></p></form>
   <div class="follow" data-follow hidden></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a><a href="/privacy">Privacy</a></nav>
   <div class="foot"><span id="copy"></span><span>Enquiries: <a id="footMail" href="#"></a></span></div>
  </div>
 </section>
@@ -861,6 +868,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
    <p id="dp" class="serif" style="font-size:1.6rem;margin-top:.2rem"></p><p id="dd" class="ddesc" hidden></p>
    <dl><dt>Medium</dt><dd id="dm"></dd><dt>Size</dt><dd id="ds"></dd><dt>Year</dt><dd id="dy"></dd><dt>Availability</dt><dd id="da"></dd></dl>
    <p class="dpage"><a id="dPage" href="/works">This painting’s own page</a></p>
+   <div class="dperks" id="dPerks" hidden></div>
    <div class="btns"><button class="btn main" id="buyBtn" type="button">Enquire to buy</button><a class="btn" id="enq" href="#">Email Pam</a><button class="btn" id="arBtn" type="button" hidden>View on your wall</button><button class="btn" id="dShare" type="button">Share</button><button class="btn" id="close">Close</button></div>
    <div class="pager"><button id="dprev">&#8249; Previous</button><span id="dcount"></span><button id="dnext">Next &#8250;</button></div>
   </div>
@@ -877,13 +885,13 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
 <dialog id="acct" aria-labelledby="acH"><div class="txt">
  <p class="kick">Collectors' circle</p><h2 id="acH">Your account</h2>
  <div id="acOut">
-  <p class="note">Members enjoy <b>5% off their first painting</b>, earn <b>loyalty points</b> on every purchase (every 500 points = £50 off), and receive <b>a signed print</b> for completing a collection.</p>
+  <div class="note perkn" id="acPerks"></div><details class="note small acearly"><summary>How early access works</summary><p id="acEarlyTx"></p></details>
   <div class="gsign" id="gSign" hidden></div><p class="gor" id="gOr" hidden>or use your email</p>
   <div class="tabs" role="tablist"><button type="button" role="tab" id="tIn" aria-selected="true">Sign in</button><button type="button" role="tab" id="tUp" aria-selected="false">Create account</button></div>
   <form class="fm" id="fIn" novalidate><label>Email<input type="email" name="email" autocomplete="email" required></label><label>Password<input type="password" name="password" autocomplete="current-password" required></label><p class="err" role="alert"></p><div class="btns" style="margin-top:.2rem"><button class="btn main" type="submit">Sign in</button></div></form>
   <form class="fm" id="fUp" novalidate hidden><label>Your name<input name="name" autocomplete="name" required maxlength="80"></label><label>Email<input type="email" name="email" autocomplete="email" required></label><label>Password (8+ characters)<input type="password" name="password" autocomplete="new-password" minlength="8" required></label>
-   <label class="chk"><input type="checkbox" name="consent"> <span>I agree that Pam's Gallery keeps my name, email and requests to reply to me and track my rewards. They're never shared, and I can ask for my account to be deleted at any time.</span></label>
-   <label class="chk"><input type="checkbox" name="news"> <span>Tell me about new paintings (optional)</span></label>
+   <label class="chk"><input type="checkbox" name="consent"> <span>I agree that Pam's Gallery keeps my name, email and requests to reply to me and track my rewards. They're never shared, and I can ask for my account to be deleted at any time. <a href="/privacy">Privacy</a></span></label>
+   <label class="chk"><input type="checkbox" name="news"> <span>Yes, email me when new work opens early for members, and about exhibitions (optional). I can unsubscribe at any time.</span></label>
    <p class="err" role="alert"></p><div class="btns" style="margin-top:.2rem"><button class="btn main" type="submit">Create my account</button></div></form>
  </div>
  <div id="acIn" hidden></div>
@@ -946,7 +954,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <p style="margin-top:1.2rem">Email: <a id="aboutMail" href="#" style="color:var(--walnut)"></a></p><p class="note" id="aboutExtra" hidden></p>
   <div class="follow" data-follow hidden></div>
   <div class="btns"><button class="btn main" id="aboutMsg" type="button">Send Pam a message</button><a class="btn" id="aboutEnq" href="#">Email instead</a><button class="btn" id="viewCol">See the collections</button><button class="btn" id="aboutClose">Close</button></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a><a href="/privacy">Privacy</a></nav>
  </div></div>
 </dialog>
 <script>
@@ -1055,8 +1063,8 @@ function embImg(v){return /^emb:/.test(v||'')&&EMB[v.slice(4)]?EMB[v.slice(4)].i
 function withEmb(c){if(!c||!Array.isArray(c.arts))return c;var seen=Array.isArray(c.seen)&&c.seen.length?c.seen:['p1','p2','p3','p4','p5','p6'],have={};c.arts.forEach(function(a){have[a.id]=1});
  Object.keys(EMB).forEach(function(id){var e=EMB[id];if(seen.indexOf(id)<0&&!have[id])c.arts.push({id:id,t:e.t,m:e.m||'',s:'',year:'',d:e.d||'',p:'',mode:'request',status:'Available',w:e.w,h:e.h,bg:e.bg||'#cfc6d6',img:'emb:'+id,ar:false})});return c}
 function applyCat(c){if(!c||!Array.isArray(c.arts)||!c.arts.length)return false;c=withEmb(c);
- var list=c.arts.map(function(a){var e=/^emb:/.test(a.img),im=embImg(a.img);if(!im||/^emb:/.test(im))return null;
-  return{id:a.id,t:a.t,m:a.m||'',s:a.s||'Size on request',year:a.year||'',d:a.d||'',p:priceOf(a),price:a.p||'',mode:a.mode,status:a.status||'Available',w:a.w||.5,h:a.h||.7,bg:a.bg||'#cfc6d6',auc:a.mode==='auction'?a.auc:undefined,img:im,full:e?EMB[a.img.slice(4)].full:im,tn:e?EMB[a.img.slice(4)].tn:im,emb:e?a.img.slice(4):'',fr:a.fr||'',ar:e&&/^emb:p[1-6]$/.test(a.img),wm:e?EMB[a.img.slice(4)].wm:(a.wm&&a.wmOf===a.img?a.wm:'')}}).filter(Boolean);
+ var list=c.arts.map(function(a){var e=/^emb:/.test(a.img),im=embImg(a.img);if(!im&&a.ea&&!a.em)im=teaserPH(a);if(!im||/^emb:/.test(im))return null;
+  return{id:a.id,t:a.t,m:a.m||'',s:a.s||'Size on request',year:a.year||'',d:a.d||'',p:priceOf(a),price:a.p||'',mode:a.mode,status:a.status||'Available',w:a.w||.5,h:a.h||.7,bg:a.bg||'#cfc6d6',auc:a.mode==='auction'?a.auc:undefined,img:im,full:e?EMB[a.img.slice(4)].full:im,tn:e?EMB[a.img.slice(4)].tn:im,emb:e?a.img.slice(4):'',fr:a.fr||'',ea:a.ea||0,em:a.em?1:0,ar:e&&/^emb:p[1-6]$/.test(a.img),wm:e?EMB[a.img.slice(4)].wm:(a.wm&&a.wmOf===a.img?a.wm:'')}}).filter(Boolean);
  if(!list.length)return false;ART.length=0;list.forEach(function(a){ART.push(a)});THUMB={};
  var ix={};ART.forEach(function(a,i){ix[a.id]=i});function map(L){return(L||[]).map(function(x){return ix[x]}).filter(function(i){return i!=null})}
  FAVS=map(c.favs).slice(0,6);
@@ -1065,7 +1073,10 @@ function applyCat(c){if(!c||!Array.isArray(c.arts)||!c.arts.length)return false;
   return{id:q.id,t:q.t||(a!=null?ART[a].t:'Print'),d:q.d||'',art:a==null?-1:a,img:q.img?embImg(q.img):ART[a].img,sizes:q.sizes}});
  gridBuilt=false;prBuilt=false;return true}
 var CATP=new Promise(function(res){var done=false,t=setTimeout(function(){done=true;res()},2500);
- fetch('/api/app?cat=1',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){if(done)return;clearTimeout(t);try{if(j&&j.cfg)CFG=j.cfg;if(j&&j.cat){applySite(j.cat);applyCat(j.cat)}}catch(e){console.error(e)}res()}).catch(function(){if(!done){clearTimeout(t);res()}})});
+ fetch('/api/app?cat=1',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){var tk=null;try{tk=localStorage.getItem('pgTok')}catch(e){}
+  if(!(j&&j.cat&&tk&&j.cat.arts.some(function(a){return a.ea})))return j;
+  return fetch('/api/app',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tk},body:JSON.stringify({a:'early'})}).then(function(r){return r.ok?r.json():null}).then(function(e){if(e&&e.arts){var by={};e.arts.forEach(function(a){a.em=1;by[a.id]=a});j.cat.arts=j.cat.arts.map(function(a){return by[a.id]||a})}return j},function(){return j})})
+ .then(function(j){if(done)return;clearTimeout(t);try{if(j&&j.cfg)CFG=j.cfg;if(j&&j.cat){applySite(j.cat);applyCat(j.cat)}}catch(e){console.error(e)}res()}).catch(function(){if(!done){clearTimeout(t);res()}})});
 function $(id){return document.getElementById(id)}
 /* ---------- the site's words, contact details, links and selling options: all set from Pam's dashboard ---------- */
 var SITE={email:EMAIL,phone:'',place:'',social:{},banner:{on:false,text:''},commissions:true,offers:true,share:true,likes:true,cur:'GBP'},CFG={google:'',pay:false},TXT={},TXD=null;
@@ -1078,7 +1089,7 @@ var GDEF={'george.greet':GREET_DEF,
  'george.tourcp':'Swipe **left** from the entrance to step through the marble portal into the **Collections hall**. Inside, keep swiping **right** to walk round its walls and up close to each painting; one more swipe at the end brings you back out. Let me show you…',
  'george.tourcc':'Press the **left arrow** from the entrance to step through the marble portal into the **Collections hall**. Inside, keep pressing **right** to walk round its walls and up close to each painting; one more at the end brings you back out. Let me show you…',
  'george.tourd':'Up here, **Collections** shows every collection on one page, **Prints** offers prints in a choice of sizes, **About** tells you all about Pam, and **Music** sets the mood.',
- 'george.toure':'And do join our **collectors’ circle**: 5% off your first painting, points on every purchase, and a special reward for completing a collection.',
+ 'george.toure':'And do join our **collectors’ circle**, free: members see new paintings first, earn points on every purchase, and receive a signed print for completing a collection.',
  'george.tourend':'That is everything! I shall be in the corner whenever you need me — {tap} me any time. Where shall we begin?',
  'george.alone':'Very well. I shall be right here in the corner — {tap} me whenever you need me.',
  'george.skip':'As you wish. I am right here if you need me.',
@@ -1099,7 +1110,7 @@ var GDEF={'george.greet':GREET_DEF,
  'george.buy':'Every painting is an original. Stop at any painting, or tap it, and choose “Enquire to buy” — you can make an offer too. Some paintings go to auction: just place a bid before it closes. Pam replies personally to arrange secure payment and delivery. Members also earn rewards.',
  'george.prints':'Indeed! Prints of Pam’s paintings come in a choice of sizes, each with its own price. Pick a size and send a request — Pam replies personally.',
  'george.noprints':'Prints are on their way — Pam is preparing them now. In the meantime you are welcome to ask her about a print of any painting.',
- 'george.members':'Join our collectors’ circle and enjoy 5% off your first painting, loyalty points on every purchase, and a signed print when you complete a collection.',
+ 'george.members':'Join our collectors’ circle, free: see new paintings before anyone else, earn loyalty points on every purchase, and receive a signed print when you complete a collection.',
  'george.contact':'You may send Pam a message right here, or email her at {email}. She replies to every message personally.',
  'george.wall':'Walk up to any painting first, then tap me again — or tap the painting and choose “View on your wall”.'};
 var PDEF={'press.kick':'For galleries, dealers & press','press.title':'Pam — painter',
@@ -1121,6 +1132,8 @@ var PDEF={'press.kick':'For galleries, dealers & press','press.title':'Pam — p
  'trust.help':'Questions about a painting, its size, delivery or anything else? Pam replies personally to every message.',
  'trust.faq':'Can I see a painting in my home before I buy?\nOn a phone, tap a painting and choose “View on your wall” to see it in your own room at its real size.\n\nDo you deliver abroad?\nYes — Pam sends paintings worldwide. Ask for a delivery quote when you enquire.\n\nCan I make an offer?\nYes — add your offer when you enquire, and Pam will reply personally.\n\nAre prints available?\nYes — see Prints for sizes and prices, or ask about a print of any painting.\n\nDo you work with galleries and designers?\nYes — see “For galleries & press”, or send Pam a message.',
  'trust.line':'Signed certificate of authenticity · Secure payment · Tracked, insured delivery · 14-day returns',
+ 'members.perks':'Early access to new paintings and collections, before they’re released to everyone · Loyalty points on every purchase: 500 points = £50 off · A signed print when you complete a collection',
+ 'members.early':'When Pam finishes something new, members see it first. For {window} it’s shown only to members, who can enquire about it or bid on it before it’s released to everyone. Joining is free.',
  'newart.title':'New from the studio','newart.text':'The newest works, fresh from Pam’s studio. Each will find its place in a collection soon.',
  'prot.note':'Pam’s artwork is protected by copyright, so saving images is switched off. Would you like a print, or permission to use an image? Just ask Pam.',
  'george.comm':'Indeed she can! Pam paints original commissions in her own style — tell her your idea, and she will reply personally with thoughts and a quote.',
@@ -1171,6 +1184,7 @@ var TX=[['film.title','Opening film','Title','#loading .lt'],['film.sub','Openin
  ['trust.pay','Delivery, returns & authenticity page','Secure payment',null,1],['trust.help','Delivery, returns & authenticity page','Any questions?',null,1],
  ['trust.faq','Delivery, returns & authenticity page','Questions & answers — a question on one line, its answer on the next, then an empty line',null,1],
  ['trust.line','Delivery, returns & authenticity page','The short reassurance line in the enquiry and bid forms',null,1],
+ ['members.perks','Collectors’ circle','The members’ perks (separate them with a · dot)',null,1],['members.early','Collectors’ circle','How early access works ({window} becomes the length you set in Settings)',null,1],
  ['newart.title','Collections page','Heading for new works that are not in a collection yet',null],['newart.text','Collections page','Introduction for those new works',null,1],
  ['prot.note','Protecting your artwork','The message people see if they try to save or copy a painting',null,1],
  ['george.comm','King George — when visitors tap him','“Can Pam paint something for me?”',null,1],['george.trade','King George — when visitors tap him','“I’m a gallery, dealer or journalist”',null,1],
@@ -1212,6 +1226,14 @@ function aucOf(p){var L=LIVE.bids&&LIVE.bids[p.id]||{};return{top:L.top||0,n:L.n
 function aucLive(p){return p&&p.mode==='auction'&&p.auc&&!isSold(p)&&Date.now()<p.auc.ends}
 function leftTxt(ms){if(ms<=0)return'closed';var m=Math.floor(ms/6e4),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?d+'d '+h+'h':h?h+'h '+(m%60)+'m':(m%60||1)+'m'}
 /* sharing: each painting has its own link, with a proper preview on social media */
+/* ---------- members' early access: visitors see a blurred teaser and a countdown; members see the real thing ---------- */
+function teaserPH(a){try{var c=document.createElement('canvas');c.width=24;c.height=Math.max(8,Math.round(24*(a.h||.7)/(a.w||.5)));var x=c.getContext('2d'),g=x.createLinearGradient(0,0,c.width,c.height);g.addColorStop(0,a.bg||'#cfc6d6');g.addColorStop(1,'#efe6da');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);return c.toDataURL('image/png')}catch(e){return ''}}
+function teaser(p){return !!(p&&p.ea&&p.ea>Date.now()&&!p.em)}
+function earlyWhen(t){return new Date(t).toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'long',hour:'numeric',minute:'2-digit'})}
+function windowText(){var h=+SITE.earlyHours||0;return !h?'a little while':h<=48||h%24?h+' hours':h===168?'a full week':h/24+' days'}
+function earlyText(){return siteT('members.early').replace('{window}',windowText())}
+function perkList(){var ul=el('ul','perkl');siteT('members.perks').split(/\s*·\s*/).filter(Boolean).forEach(function(t){ul.appendChild(el('li',null,t))});return ul}
+function joinNow(signIn){afterSign=function(){location.reload()};showAcct();setTimeout(function(){var b=$(signIn?'tIn':'tUp');if(b)b.click()},60)}
 function slugify(t){return String(t||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' and ').replace(/[’'`]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'painting'}
 function artUrl(p){var used={},by={};ART.forEach(function(a){var s=slugify(a.t),k=s,n=2;while(used[k])k=s+'-'+(n++);used[k]=1;by[a.id]=k});return '/art/'+(by[p.id]||slugify(p.t))}
 function artKind(p){var m=(p&&p.m||'').toLowerCase();return/digital/.test(m)?'digital painting':/ink|pen\b|pencil|drawing|charcoal|graphite/.test(m)?'drawing':'painting'}
@@ -1269,7 +1291,7 @@ $('cmFiles').addEventListener('change',function(){var fs=[].slice.call(this.file
 $('fComm').addEventListener('submit',function(e){e.preventDefault();var f=this,d=new FormData(f);formErr(f);busy(f,true);
  api({a:'commission',name:d.get('name'),email:d.get('email'),phone:d.get('phone'),idea:d.get('idea'),size:d.get('size'),budget:d.get('budget'),when:d.get('when'),where:d.get('where'),photos:cmPhotos}).then(function(j){busy(f,false);if(j.error)return formErr(f,j.error);
   f.reset();cmPhotos=[];cmDraw();f.hidden=true;$('cmDone').hidden=false;$('cmDone').scrollIntoView({block:'center',behavior:'smooth'})})});
-function afterDoors(){var pk=location.hash.slice(1);if(PAGES[pk])setTimeout(function(){openPage(pk)},500);var m=/^#art-([a-z0-9]+)$/i.exec(location.hash||'');if(m){var k=-1;ART.forEach(function(a,i){if(a.id===m[1])k=i});if(k>=0)setTimeout(function(){openArt(k)},700)}
+function afterDoors(){var pk=location.hash.slice(1);if((pk==='join'||pk==='signin')&&!ME)setTimeout(function(){joinNow(pk==='signin')},600);if(PAGES[pk])setTimeout(function(){openPage(pk)},500);var m=/^#art-([a-z0-9]+)$/i.exec(location.hash||'');if(m){var k=-1;ART.forEach(function(a,i){if(a.id===m[1])k=i});if(k>=0)setTimeout(function(){openArt(k)},700)}
  if(/[?&]paid=1/.test(location.search)){setTimeout(function(){notice('Thank you!','Your payment has gone through. Pam will be in touch by email about delivery — thank you for supporting her work.')},700);try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}}}
 function isSold(p){return /sold/i.test(p.status||'')}
 function mailFor(p){var sub='Enquiry: '+p.t,body='Hello '+ARTIST+',\n\nI am interested in “'+p.t+'” ('+p.m+', '+p.s+(isSold(p)?'':', '+p.p)+').\nCould you tell me more about its availability, delivery and payment?\n\nKind regards,\n';
@@ -1326,7 +1348,11 @@ function openArt(k){k=(k+ART.length)%ART.length;curArt=k;var p=ART[k];
  $('dd').textContent=p.d||'';$('dd').hidden=!p.d;$('dm').textContent=p.m;$('ds').textContent=p.s;$('dy').textContent=p.year||'—';$('da').innerHTML=statusTag(p).replace('class="status','style="margin-left:0" class="status');
  var e=$('enq');e.href=mailFor(p);e.textContent='Email Pam';$('buyBtn').textContent=isSold(p)?'Ask about similar work':aucLive(p)?'Place a bid':'Enquire to buy';$('dShare').hidden=SITE.share===false;
  if(p.mode==='auction'&&p.auc&&!isSold(p)){var A=aucOf(p);$('dp').textContent=aucLive(p)?(A.n?'Current bid '+money(A.top):'Starting bid '+money(A.start))+' · closes in '+leftTxt(A.ends-Date.now()):'Auction closed'}
- $('dPage').href=artUrl(p);$('dcount').textContent=(k+1)+' of '+ART.length;if(!dlg.open)dlg.showModal()}
+ $('dPage').href=artUrl(p);var tz=teaser(p);$('dimg').classList.toggle('teaser',tz);$('dzoom').hidden=tz;
+ if(tz){$('dp').textContent='Members see this first';$('dd').textContent=earlyText()+' Opens to everyone '+earlyWhen(p.ea)+'.';$('dd').hidden=false;$('buyBtn').textContent='Join free to see it now';$('enq').hidden=true;$('dShare').hidden=true;$('arBtn').hidden=true;$('ds').textContent=p.s||'—';$('dy').textContent=p.year||'—'}
+ else{$('enq').hidden=false;if(TOUCH)$('arBtn').hidden=false;if(p.em&&p.ea>Date.now())$('dp').textContent='Members’ early access · '+$('dp').textContent}
+ var dk=$('dPerks');dk.textContent='';dk.hidden=!!ME;if(!ME){dk.appendChild(el('p','kick','The collectors’ circle · free to join'));dk.appendChild(perkList());var jb=el('button','link','Join free');jb.type='button';jb.addEventListener('click',function(){dlg.close();joinNow()});dk.appendChild(jb)}
+ $('dcount').textContent=(k+1)+' of '+ART.length;if(!dlg.open)dlg.showModal()}
 $('close').addEventListener('click',function(){dlg.close()});
 $('dprev').addEventListener('click',function(){openArt(curArt-1)});$('dnext').addEventListener('click',function(){openArt(curArt+1)});
 dlg.addEventListener('click',function(e){if(e.target===dlg)dlg.close()});
@@ -1352,7 +1378,7 @@ function zZoomTo(ns,cx,cy,ms){ns=Math.max(Z.fit,Math.min(Z.max,ns));var ix=(cx-Z
 function zAt(ns,cx,cy){ns=Math.max(Z.fit*.92,Math.min(Z.max*1.08,ns));var ix=(cx-Z.x)/Z.s,iy=(cy-Z.y)/Z.s;Z.s=ns;Z.x=cx-ix*ns;Z.y=cy-iy*ns;zLayout()}
 function zSettle(){if(Z.s<Z.fit||Z.s>Z.max){var W=zStage.clientWidth,H=zStage.clientHeight;zZoomTo(Z.s,zPinch?zPinch.mx:W/2,zPinch?zPinch.my:H/2,200)}}   // a pinch may overshoot a little, then eases back
 function zHint(on){clearTimeout(zHintT);var h=$('zvHint');if(on){h.textContent=TOUCH?'Pinch or double-tap to zoom · drag to look around':'Scroll or double-click to zoom · drag to look around';h.classList.remove('off');zHintT=setTimeout(function(){h.classList.add('off')},3200)}else h.classList.add('off')}
-function openZoom(k,fromEl){k=(k+ART.length)%ART.length;var p=ART[k],src=thumb(k),fr=fromEl&&fromEl.getBoundingClientRect();
+function openZoom(k,fromEl){k=(k+ART.length)%ART.length;if(teaser(ART[k]))return;var p=ART[k],src=thumb(k),fr=fromEl&&fromEl.getBoundingClientRect();
  $('zvTitle').textContent=p.t;zImg.alt=p.t+', '+p.m;if(!zv.open)zv.showModal();zPts={};zPinch=zDrag=null;zStop();zHint(1);
  function go(){Z.iw=zImg.naturalWidth||1;Z.ih=zImg.naturalHeight||1;zFit();var e=zClamp({s:Z.fit,x:0,y:0});
   if(fr&&fr.width>4&&!zReduce){var sr=zStage.getBoundingClientRect();Z.s=fr.width/Z.iw;Z.x=fr.left-sr.left;Z.y=fr.top-sr.top;zLayout(true);zImg.classList.add('on');zTo(e.s,e.x,e.y,380,true)}   // grows out of the picture you tapped
@@ -1457,7 +1483,7 @@ function tab(which){$('tIn').setAttribute('aria-selected',which==='in');$('tUp')
 $('tIn').addEventListener('click',function(){tab('in')});$('tUp').addEventListener('click',function(){tab('up')});
 function busy(form,on){var b=form.querySelector('button[type=submit]');b.disabled=on;b.style.opacity=on?.6:1}
 function formErr(form,msg){form.querySelector('.err').textContent=msg||''}
-var afterSign=null;function signedIn(j){TOK=j.token;ls('pgTok',TOK);setMe(j.me);if(afterSign){var f=afterSign;afterSign=null;acct.close();f()}else showAcct()}
+var afterSign=null;function signedIn(j){TOK=j.token;ls('pgTok',TOK);setMe(j.me);if(ART.some(teaser)){notice('Welcome to the collectors’ circle','Opening members’ early access…');setTimeout(function(){location.reload()},900);return}if(afterSign){var f=afterSign;afterSign=null;acct.close();f()}else showAcct()}
 $('fIn').addEventListener('submit',function(e){e.preventDefault();var f=this,d=new FormData(f);formErr(f);busy(f,true);
  api({a:'login',email:d.get('email'),password:d.get('password')}).then(function(j){busy(f,false);if(j.error)return formErr(f,j.error);f.reset();signedIn(j)})});
 $('fUp').addEventListener('submit',function(e){e.preventDefault();var f=this,d=new FormData(f);formErr(f);busy(f,true);
@@ -1465,13 +1491,13 @@ $('fUp').addEventListener('submit',function(e){e.preventDefault();var f=this,d=n
 var gisP=null;function gisRender(){if(!CFG.google)return;if(!gisP)gisP=new Promise(function(res,rej){var sc=document.createElement('script');sc.src='https://accounts.google.com/gsi/client';sc.async=true;sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)}).then(function(){
  google.accounts.id.initialize({client_id:CFG.google,callback:function(r){api({a:'google',credential:r.credential}).then(function(j){if(j.error){formErr($('fIn'),j.error);return}signedIn(j)})}})});
  gisP.then(function(){var b=$('gSign');b.hidden=false;$('gOr').hidden=false;b.textContent='';google.accounts.id.renderButton(b,{theme:'outline',size:'large',shape:'pill',text:'continue_with',width:Math.min(320,(acct.querySelector('.txt')||acct).clientWidth-40||300)})}).catch(function(){})}
-function showAcct(){var out=$('acOut'),inn=$('acIn');
+function showAcct(){var out=$('acOut'),inn=$('acIn');var ap=$('acPerks');if(ap){ap.textContent='';ap.appendChild(el('b',null,'Members of the collectors’ circle get:'));ap.appendChild(perkList())}var ax=$('acEarlyTx');if(ax)ax.textContent=earlyText();
  if(!TOK){out.hidden=false;inn.hidden=true;$('acH').textContent='Your account';if(!acct.open)acct.showModal();gisRender();return}
  out.hidden=true;inn.hidden=false;inn.textContent='';inn.appendChild(el('p','note','Loading your account…'));if(!acct.open)acct.showModal();
  refreshMe().then(function(j){if(!j){if(!TOK)return;inn.textContent='';inn.appendChild(el('p','err','Your account couldn’t be loaded just now — please try again.'));return}
   var me=j.me,r=me.rewards;$('acH').textContent='Welcome, '+me.name.split(' ')[0];inn.textContent='';
   if(me.owner){var ob=el('button','btn main','Open owner dashboard');ob.type='button';ob.style.marginTop='1rem';ob.addEventListener('click',function(){acct.close();openDash()});inn.appendChild(ob)}
-  var c1=el('div','card');c1.appendChild(el('h3',null,'Welcome gift'));c1.appendChild(el('p',null,r.welcome.available?'You have '+r.welcome.text+' — it’s applied automatically when you request a painting.':'Your welcome gift has been used. Thank you!'));inn.appendChild(c1);
+  var c1=el('div','card');c1.appendChild(el('h3',null,'Early access'));c1.appendChild(el('p',null,earlyText().replace(/\s*Joining is free\.?\s*$/,'')+' Look for the “Members’ early access” label in the gallery.'));var ns=el('label','chk');var nc=document.createElement('input');nc.type='checkbox';nc.checked=!!me.news;ns.appendChild(nc);ns.appendChild(el('span',null,' Email me when new work opens early for members, and about exhibitions. I can unsubscribe at any time.'));nc.addEventListener('change',function(){api({a:'news',on:nc.checked}).then(function(x){if(x.error){nc.checked=!nc.checked;notice('Couldn’t save',x.error)}})});c1.appendChild(ns);inn.appendChild(c1);
   var c2=el('div','card');c2.appendChild(el('h3',null,'Loyalty points'));var pts=r.points.balance,into=pts%r.points.every;
   c2.appendChild(el('p',null,pts+' points'+(r.points.credit?' — worth £'+r.points.credit+' off your next painting':'')+'.'));var m=el('div','meter'),mi=el('i');mi.style.width=Math.round(into/r.points.every*100)+'%';m.appendChild(mi);c2.appendChild(m);
   c2.appendChild(el('p','note',(r.points.every-into)+' points to your next £'+r.points.worth+' reward · '+r.points.text));inn.appendChild(c2);
@@ -1487,10 +1513,10 @@ window.openAcct=showAcct;
 $('navAcct').addEventListener('click',showAcct);$('acClose').addEventListener('click',function(){acct.close()});
 /* request to buy */
 var buyArt=0,buyPrint=null;
-function openBuy(k,pr){buyArt=k;buyPrint=pr||null;var p=ART[k]||{t:''};$('buyH').textContent=pr?pr.title:p.t;$('buyKick').textContent=pr?'Enquire about a print':isSold(p)?'Ask about similar work':'Enquire to buy';var f=$('fBuy');f.reset();formErr(f);f.hidden=false;$('buyDone').hidden=true;
+function openBuy(k,pr){if(!pr&&teaser(ART[k])){if(dlg.open)dlg.close();joinNow();return}buyArt=k;buyPrint=pr||null;var p=ART[k]||{t:''};$('buyH').textContent=pr?pr.title:p.t;$('buyKick').textContent=pr?'Enquire about a print':isSold(p)?'Ask about similar work':'Enquire to buy';var f=$('fBuy');f.reset();formErr(f);f.hidden=false;$('buyDone').hidden=true;
  $('buyGuest').hidden=!!ME;$('buyWho').textContent=ME?'Requesting as '+ME.name+' ('+ME.email+'). Pam will reply by email to arrange payment and delivery.':'Pam will reply by email to arrange payment and delivery.';
  var r=ME&&ME.rewards,perk='';$('buyCreditL').hidden=!(r&&r.points.credit>0);if(r&&r.points.credit>0)$('buyCreditT').textContent='Use my £'+r.points.credit+' loyalty reward on this painting';
- if(pr)perk=ME?'Members earn loyalty points on prints too.':'';else if(r&&r.welcome.available)perk='Your welcome gift of '+r.welcome.text+' will be applied.';else if(!ME)perk='Members get 5% off their first painting and earn loyalty points — create a free account from the Account button first if you’d like those.';
+ if(pr)perk=ME?'Members earn loyalty points on prints too.':'';else if(!ME)perk='Members of the collectors’ circle see new work first and earn loyalty points (500 points = £50 off). Joining is free, from the Account button.';
  $('buyPerk').textContent=perk;$('buyOfferL').hidden=!(SITE.offers!==false&&!pr&&!isSold(p)&&p.mode!=='auction');if(dlg.open)dlg.close();buyD.showModal()}
 var bidD=$('bidD'),bidK=null;
 function openBid(k){bidK=k;var p=ART[k],a=aucOf(p),over=!aucLive(p);$('bidH').textContent=p.t;$('bidNow').textContent=a.n?'Current bid '+money(a.top):'Starting bid '+money(a.start);
@@ -1501,7 +1527,7 @@ $('fBid').addEventListener('submit',function(e){e.preventDefault();var f=this,p=
  LIVE.bids[p.id]=Object.assign(LIVE.bids[p.id]||{},{top:j.top,n:j.n});f.hidden=true;$('bidDone').hidden=false;if(window.abRefresh)abRefresh()})});
 $('bidSign').addEventListener('click',function(){afterSign=function(){openBid(bidK)};bidD.close();showAcct()});
 ['bidClose','bidClose2','bidDoneX'].forEach(function(id){$(id).addEventListener('click',function(){bidD.close()})});
-function act(k){var p=ART[k];if(aucLive(p))openBid(k);else openBuy(k)}
+function act(k){var p=ART[k];if(teaser(p)){if(dlg.open)dlg.close();joinNow();return}if(aucLive(p))openBid(k);else openBuy(k)}
 function openBuyPrint(pi,si){var P=PRINTS[pi],z=P&&P.sizes[si];if(!P)return;openBuy(P.art,{id:P.id,size:si,title:P.t+(z?' — '+z.l+(z.p?' · '+z.p:''):'')})}
 $('buyBtn').addEventListener('click',function(){act(curArt)});$('dShare').addEventListener('click',function(){shareArt(curArt)});$('buyClose').addEventListener('click',function(){buyD.close()});$('buyDoneX').addEventListener('click',function(){buyD.close()});
 $('fBuy').addEventListener('submit',function(e){e.preventDefault();var f=this,d=new FormData(f);formErr(f);busy(f,true);
@@ -1513,7 +1539,8 @@ $('fMsg').addEventListener('submit',function(e){e.preventDefault();var f=this,d=
  api({a:'message',name:d.get('name'),email:d.get('email'),message:d.get('message')}).then(function(j){busy(f,false);if(j.error)return formErr(f,j.error);f.hidden=true;$('msgDone').hidden=false})});
 window.openMsg=openMsg;
 [].forEach.call(document.querySelectorAll('form[data-sub]'),function(f){f.addEventListener('submit',function(e){e.preventDefault();var n=f.querySelector('.note'),i=f.querySelector('input');n.textContent='';
- api({a:'sub',email:i.value}).then(function(j){if(j.error){n.textContent=j.error;return}f.reset();n.textContent='Thank you — you’ll be the first to see new paintings.'})})});
+ var cb=f.querySelector('[name=consent]');if(cb&&!cb.checked){n.textContent='Please tick the box to say you’d like these emails.';return}
+ api({a:'sub',email:i.value,consent:!!(cb&&cb.checked),src:f.dataset.src||''}).then(function(j){if(j.error){n.textContent=j.error;return}f.reset();n.textContent=j.confirm?'Nearly there — please check your inbox and tap the link to confirm.':'Thank you — you’re on the list. Every email has an unsubscribe link.'})})});
 CATP.then(function(){siteRefresh();liveLoad()});setInterval(function(){if(!document.hidden&&((window.abOn&&abOn())||bidD.open))liveLoad()},20000);
 /* owner dashboard */
 var DASH=null,dTab='o',STL={new:'New',contacted:'In talks',awaiting:'Awaiting payment',paid:'Paid',sent:'Sent',completed:'Completed',cancelled:'Cancelled'};
@@ -1535,7 +1562,7 @@ function drawOrders(body,j){
  if(!j.pay)body.appendChild(el('p','note','Tip: switch on card, Apple Pay and Google Pay payments (Grow tab, first step) to send buyers a secure payment link from here.'));
  var T=tableOf(['Date','Painting','Buyer','Message','Offer','Status','Payment']);j.orders.forEach(function(o){var tr=el('tr');tr.appendChild(el('td',null,fdate(o.ts)));tr.appendChild(el('td',null,o.title));
   var bu=el('td');bu.appendChild(el('div',null,o.name+(o.member?' (member)':'')));var a=el('a',null,o.email);a.href='mailto:'+o.email+'?subject='+encodeURIComponent('Your enquiry: '+o.title);bu.appendChild(a);if(o.phone)bu.appendChild(el('div',null,o.phone));tr.appendChild(bu);
-  var mc=el('td','msg',o.message||'—');if(o.photos&&o.photos.length){var ph=el('div','cthumbs');o.photos.forEach(function(u,i){var a=el('a');a.href=u;a.target='_blank';a.rel='noopener';var fg=el('figure'),im=el('img');im.src=u;im.alt='Reference photo '+(i+1);fg.appendChild(im);a.appendChild(fg);ph.appendChild(a)});mc.appendChild(ph)}var pk=[o.welcome?'5% welcome gift':'',o.useCredit?'Wants to use points':''].filter(Boolean).join(' · ');if(pk)mc.appendChild(el('div','note',pk));tr.appendChild(mc);
+  var mc=el('td','msg',o.message||'—');if(o.photos&&o.photos.length){var ph=el('div','cthumbs');o.photos.forEach(function(u,i){var a=el('a');a.href=u;a.target='_blank';a.rel='noopener';var fg=el('figure'),im=el('img');im.src=u;im.alt='Reference photo '+(i+1);fg.appendChild(im);a.appendChild(fg);ph.appendChild(a)});mc.appendChild(ph)}var pk=[o.useCredit?'Wants to use points':''].filter(Boolean).join(' · ');if(pk)mc.appendChild(el('div','note',pk));tr.appendChild(mc);
   tr.appendChild(el('td',null,o.offer?money(o.offer):'—'));
   var sc=el('td'),sel=el('select');Object.keys(STL).forEach(function(k){var op=el('option',null,STL[k]);op.value=k;if(o.status===k)op.selected=true;sel.appendChild(op)});sc.appendChild(sel);
   var amt=el('input');amt.type='number';amt.min='0';amt.placeholder='Sale £';amt.setAttribute('aria-label','Sale price, for the buyer’s points');var pu=el('input');pu.type='number';pu.min='0';pu.placeholder='Points used';pu.setAttribute('aria-label','Points used');
@@ -1568,6 +1595,9 @@ function drawSettings(body){pubBar(body);var S=ED.site;
  SOC.forEach(function(x){g2.appendChild(field(x[1],inp(S.social[x[0]],x[0]==='website'?'https://…':'https://www.'+(x[0]==='x'?'x':x[0])+'.com/yourname',function(v){v=v.trim();if(v&&!/^https?:\/\//i.test(v))v='https://'+v.replace(/^\/+/,'');if(v)S.social[x[0]]=v.replace(/^http:/i,'https:');else delete S.social[x[0]]},'url')))});
  var g3=edsec(body,'Announcement banner','A slim strip across the top of the site — for a new collection, an auction, an open studio or a delivery offer.');
  g3.appendChild(chk('Show the banner',S.banner.on,function(v){S.banner.on=v}));g3.appendChild(field('Banner text',inp(S.banner.text,'e.g. New collection “The Masquerade” — now showing',function(v){S.banner.text=v})));
+ var gE=edsec(body,'Members’ early access','How long new paintings are shown only to members before everyone can see them. It’s used as the starting date when you mark a new painting “members only”, and in the wording that explains early access.');
+ var es=el('select');[['','Choose a window — [EARLY ACCESS WINDOW, e.g. 48 hours]'],['24','24 hours'],['48','48 hours'],['72','3 days'],['168','1 week']].forEach(function(o){var op=el('option',null,o[1]);op.value=o[0];if(String(S.earlyHours||'')===o[0])op.selected=true;es.appendChild(op)});
+ es.addEventListener('change',function(){S.earlyHours=+es.value||0;markDirty()});gE.appendChild(field('Early access window',es));
  var g4=edsec(body,'Selling');
  g4.appendChild(chk('Let visitors make an offer when they enquire',S.offers!==false,function(v){S.offers=v}));
  g4.appendChild(chk('Show “Share” buttons on paintings',S.share!==false,function(v){S.share=v}));
@@ -1611,7 +1641,7 @@ var GROW=[
   {id:'tags',t:'Use focused hashtags',d:'Mix big and small tags, and add your town.',tpl:function(){return '#originalart #oilpainting #contemporaryart #artforsale #artcollector #surrealart #emergingartist #artistsoninstagram #paintingoftheday #artforyourhome'}},
   {id:'giveaway',t:'Team up with other artists — or run a giveaway',d:'Swap shout-outs with artists whose followers would like your work. A print giveaway (“follow, like and tag a friend”) grows your following quickly.'}]},
  {t:'4 · Turn visitors into buyers',d:'Everyday art lovers buy when it feels easy, personal and a little bit special.',items:[
-  {id:'circle',t:'Grow your collectors’ circle',d:'Members get 5% off their first painting and earn points on every purchase. Mention it in your posts: “Join my collectors’ circle free at '+'itsamepameo.com”.'},
+  {id:'circle',t:'Grow your collectors’ circle',d:'Members see new paintings first, earn points on every purchase and get a signed print for completing a collection. Mention it in your posts: “Join my collectors’ circle free at '+'itsamepameo.com”.'},
   {id:'mailing',t:'Email your mailing list when there’s news',d:'Visitors leave their email on the Collections and About pages. When a new painting or collection is ready, email them first and give them 48 hours’ early access before you post it publicly — it makes people feel like insiders.',acts:[{t:'Open the mailing list',go:function(){setTab('p')}}]},
   {id:'auction',t:'Run a monthly auction',d:'Choose one painting, set a fair starting bid and a closing date about a week away (Paintings → the painting → Auction). Announce it on social media, in a banner and to your mailing list. A deadline creates excitement.',acts:[{t:'Open Paintings',go:function(){setTab('a')}},{t:'Set a banner',go:function(){setTab('s')}}]},
   {id:'prints',t:'Offer prints at a few price points',d:'Not everyone can buy an original yet. Prints in several sizes let more people own your work — and many print buyers come back for an original later.',acts:[{t:'Open Prints',go:function(){setTab('r')}}]},
@@ -1658,7 +1688,8 @@ var ED=null,EDdirty=false,EDopen={},EDmsg='',vRange='all';
 function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function seedCat(){return{arts:ART.map(function(a){return{id:a.id,t:a.t,m:a.m||'',s:a.s==='Size on request'?'':(a.s||''),year:a.year||'',d:a.d||'',p:a.price||'',mode:a.mode||'request',auc:a.auc,status:a.status||'Available',w:a.w,h:a.h,bg:a.bg||'#cfc6d6',img:a.emb?'emb:'+a.emb:a.img,ar:!!a.ar,fr:a.fr||''}}),seen:Object.keys(EMB),
  favs:FAVS.map(function(i){return ART[i].id}),colls:COLLECTIONS.map(function(c){return{t:c.t,d:c.d||'',works:c.works.map(function(i){return ART[i].id}),soon:c.soon}}),prints:PRINTS.map(function(q){return{id:q.id,art:q.art>=0?ART[q.art].id:'',t:'',d:q.d,img:'',sizes:q.sizes,on:true}})}}
-function loadED(cb){api({a:'catGet'}).then(function(j){if(j.error){$('dErr').textContent=j.error;return}ED=withEmb(j.cat)||seedCat();ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};cb()})}
+var PV={};function edSrc(u){return PV[u]||embImg(u)}
+function loadED(cb){api({a:'catGet'}).then(function(j){if(j.error){$('dErr').textContent=j.error;return}PV=j.pv||{};ED=withEmb(j.cat)||seedCat();ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};cb()})}
 function markDirty(){EDdirty=true;EDmsg='';var b=$('edPub');if(b){b.disabled=false;$('edState').textContent='Unpublished changes'}}
 function artById(id){return ED.arts.filter(function(a){return a.id===id})[0]}
 function field(label,input,cls){var l=el('label','ef'+(cls?' '+cls:''));l.appendChild(el('span',null,label));l.appendChild(input);return l}
@@ -1679,13 +1710,16 @@ function wmCanvas(im,L){var W0=im.naturalWidth,H0=im.naturalHeight,k=Math.min(1,
  x.restore();var bs=Math.max(12,Math.round(Math.min(W,H)*.03)),bt='© Pam’s Gallery · itsamepameo.com';x.font='600 '+bs+'px'+F;var bw=x.measureText(bt).width,p=bs*.6,m=Math.round(bs*.8);
  x.fillStyle='rgba(20,14,10,.62)';x.beginPath();if(x.roundRect)x.roundRect(W-bw-2*p-m,H-bs-2*p-m,bw+2*p,bs+2*p,bs*.4);else x.rect(W-bw-2*p-m,H-bs-2*p-m,bw+2*p,bs+2*p);x.fill();
  x.fillStyle='rgba(255,255,255,.94)';x.textBaseline='middle';x.fillText(bt,W-bw-p-m,H-m-p-bs/2);return c}
+function ensureTZ(cat){var todo=(cat.arts||[]).filter(function(a){return a.early&&a.early>Date.now()&&/^\/api\/app\?img=/.test(a.img||'')&&!(a.tz&&a.tzOf===a.img)});
+ return todo.reduce(function(pr,a){return pr.then(function(){return new Promise(function(res){var im=new Image();im.onload=function(){try{var w=28,h=Math.max(8,Math.round(w*im.naturalHeight/im.naturalWidth)),c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');x.filter='blur(1.2px)';x.drawImage(im,0,0,w,h);
+  api({a:'imgUpload',data:c.toDataURL('image/jpeg',.7),type:'image/jpeg'}).then(function(j){if(j&&j.url){a.tz=j.url;a.tzOf=a.img}res()},function(){res()})}catch(e){res()}};im.onerror=function(){res()};im.src=edSrc(a.img)})})},Promise.resolve())}
 function ensureWM(cat){var todo=(cat.arts||[]).filter(function(a){return/^\/api\/app\?img=/.test(a.img||'')&&!(a.wm&&a.wmOf===a.img)});
  return todo.reduce(function(pr,a){return pr.then(function(){return new Promise(function(res){var im=new Image();
   im.onload=function(){try{var d=wmCanvas(im,1600).toDataURL('image/jpeg',.85);api({a:'imgUpload',data:d,type:'image/jpeg'}).then(function(j){if(j&&j.url){a.wm=j.url;a.wmOf=a.img}res()},function(){res()})}catch(e){res()}};
-  im.onerror=function(){res()};im.src=a.img})})},Promise.resolve())}
+  im.onerror=function(){res()};im.src=edSrc(a.img)})})},Promise.resolve())}
 function publish(){var b=$('edPub');b.disabled=true;$('edState').textContent='Publishing…';$('dErr').textContent='';
- ensureWM(ED).then(function(){return api({a:'catSave',cat:ED})}).then(function(j){if(j.error){$('dErr').textContent=j.error;b.disabled=false;$('edState').textContent='Not published yet';return}
-  ED=withEmb(j.cat);ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Published — visitors will see your changes from their next visit.';applySite(ED);siteRefresh();drawTab()})}
+ ensureWM(ED).then(function(){return ensureTZ(ED)}).then(function(){return api({a:'catSave',cat:ED})}).then(function(j){if(j&&j.emailed)notice('Members emailed','Your new early-access work was announced to '+j.emailed+' member'+(j.emailed>1?'s':'')+' who asked for news.');return j}).then(function(j){if(j.error){$('dErr').textContent=j.error;b.disabled=false;$('edState').textContent='Not published yet';return}
+  PV=j.pv||PV;ED=withEmb(j.cat);ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Published — visitors will see your changes from their next visit.';applySite(ED);siteRefresh();drawTab()})}
 function prepPhoto(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();
  im.onload=function(){var W0=im.naturalWidth,H0=im.naturalHeight,k=Math.min(1,2400/Math.max(W0,H0)),W=Math.round(W0*k),H=Math.round(H0*k),c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').drawImage(im,0,0,W,H);URL.revokeObjectURL(u);
   var q=.9,d=c.toDataURL('image/jpeg',q);while(d.length>3.3e6&&q>.5){q-=.08;d=c.toDataURL('image/jpeg',q)}res({data:d,W:W,H:H})};
@@ -1705,7 +1739,7 @@ function drawArts(body){pubBar(body);var head=el('div','edhead');head.appendChil
  body.appendChild(head);
  body.appendChild(el('p','edhint','Add a photo of a new painting, then fill in its details. To show it in the gallery, add it to This Month’s Favourites or to a collection on the next tab. Remember to press “Publish changes” when you’re happy.'));
  var list=el('div','edlist');ED.arts.forEach(function(a,i){list.appendChild(artRow(a,i))});body.appendChild(list)}
-function artRow(a,i){var row=el('div','edrow'+(EDopen[a.id]?' open':'')),top=el('div','edtop'),th=el('img','edth');th.src=embImg(a.img);th.alt='';top.appendChild(th);
+function artRow(a,i){var row=el('div','edrow'+(EDopen[a.id]?' open':'')),top=el('div','edtop'),th=el('img','edth');th.src=edSrc(a.img);th.alt='';top.appendChild(th);
  var info=el('div','edinfo');info.appendChild(el('b',null,a.t||'Untitled — add a title'));var lk=DASH&&DASH.likes&&DASH.likes.filter(function(x){return x.id===a.id})[0];info.appendChild(el('span',null,a.status+' · '+(a.mode==='auction'?'Auction':a.mode==='price'&&a.p?a.p:'Price on request')+(lk?' · ♥ '+lk.n:'')));top.appendChild(info);
  var acts=el('div','edacts');acts.appendChild(sbtn(EDopen[a.id]?'Done':'Edit',function(){EDopen[a.id]=!EDopen[a.id];drawTab()}));
  acts.appendChild(sbtn('↑',function(){moveIn(ED.arts,i,-1)},'sb ic','Move up'));acts.appendChild(sbtn('↓',function(){moveIn(ED.arts,i,1)},'sb ic','Move down'));
@@ -1714,9 +1748,9 @@ function artRow(a,i){var row=el('div','edrow'+(EDopen[a.id]?' open':'')),top=el(
  cf.appendChild(sbtn('Remove it',function(){ED.arts.splice(i,1);ED.favs=ED.favs.filter(function(x){return x!==a.id});ED.colls.forEach(function(c){c.works=c.works.filter(function(x){return x!==a.id})});ED.prints=ED.prints.filter(function(q){return q.art!==a.id||q.img});markDirty();drawTab()},'sb warn'));
  cf.appendChild(sbtn('Keep it',function(){cf.hidden=true}));row.appendChild(cf);
  if(!EDopen[a.id])return row;
- var f=el('div','edform'),ph=el('div','edphoto'),pim=el('img');pim.src=embImg(a.img);pim.alt='';ph.appendChild(pim);
+ var f=el('div','edform'),ph=el('div','edphoto'),pim=el('img');pim.src=edSrc(a.img);pim.alt='';ph.appendChild(pim);
  ph.appendChild(photoPicker('Replace the photo',function(url,w,h){a.img=url;a.w=w;a.h=h;a.ar=false;markDirty();drawTab()},'sb edup'));
- ph.appendChild(sbtn('Turn the photo ↻',function(){rotatePhoto(embImg(a.img),function(url,w,h){a.img=url;a.w=w;a.h=h;a.ar=false;markDirty();drawTab()})}));
+ ph.appendChild(sbtn('Turn the photo ↻',function(){rotatePhoto(edSrc(a.img),function(url,w,h){a.img=url;a.w=w;a.h=h;a.ar=false;markDirty();drawTab()})}));
  ph.appendChild(el('span','edhint','Tip: crop the photo to just the painting on your phone before adding it.'));f.appendChild(ph);
  f.appendChild(field('Title',inp(a.t,'e.g. Orchid in the Clouds',function(v){a.t=v})));
  f.appendChild(field('Medium',inp(a.m,'e.g. Oil on canvas',function(v){a.m=v})));
@@ -1725,6 +1759,12 @@ function artRow(a,i){var row=el('div','edrow'+(EDopen[a.id]?' open':'')),top=el(
  var st=el('select');['Available','On hold','Sold'].forEach(function(o){var op=el('option',null,o);op.value=o;if(a.status===o)op.selected=true;st.appendChild(op)});st.addEventListener('change',function(){a.status=st.value;markDirty()});f.appendChild(field('Availability',st));
  var frs=el('select'),fa=el('option',null,'Automatic: '+FRAMES[frameAuto(a)]);fa.value='';frs.appendChild(fa);Object.keys(FRAMES).forEach(function(kk){var op=el('option',null,FRAMES[kk]);op.value=kk;if(a.fr===kk)op.selected=true;frs.appendChild(op)});
  frs.addEventListener('change',function(){a.fr=frs.value;markDirty()});f.appendChild(field('Frame',frs));
+ if(/^\/api\/app\?img=/.test(a.img||'')){var eb=el('div','early-ed'),ec=document.createElement('input');ec.type='checkbox';ec.checked=!!(a.early&&a.early>Date.now());var el2=el('label','chk');el2.appendChild(ec);el2.appendChild(el('span',null,' Members see this first (early access)'));
+  var ed=document.createElement('input');ed.type='datetime-local';var dflt=function(){return Date.now()+((+ED.site.earlyHours)||48)*36e5};var tl=function(t){var d=new Date(t);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)};
+  ed.value=tl(a.early&&a.early>Date.now()?a.early:dflt());ed.disabled=!ec.checked;var eh=el('p','note',a.early&&a.early>Date.now()?'Members only until '+earlyWhen(a.early)+'. Visitors see a blurred preview and a countdown; it opens to everyone automatically.':'Tick to show this painting to members only, until the date below. It opens to everyone automatically.');
+  ec.addEventListener('change',function(){ed.disabled=!ec.checked;a.early=ec.checked?new Date(ed.value).getTime():0;markDirty()});ed.addEventListener('change',function(){if(ec.checked){a.early=new Date(ed.value).getTime();markDirty()}});
+  eb.appendChild(el2);eb.appendChild(field('Members only until',ed));eb.appendChild(eh);f.appendChild(eb)}
+ else f.appendChild(el('p','note','Early access (members see it first) is for new paintings you upload; the paintings built into the site are already public.'));
  var pr=el('div','ef efp');pr.appendChild(el('span',null,'Price'));var rad=el('div','rad'),pi=el('input');pi.type='text';pi.value=a.p||'';pi.placeholder='e.g. £450';pi.setAttribute('aria-label','Price');pi.classList.toggle('dim',a.mode!=='price');
  pi.addEventListener('input',function(){a.p=pi.value;if(a.mode!=='price'){var was=a.mode;a.mode='price';r2.querySelector('input').checked=true;pi.classList.remove('dim');if(was==='auction'){markDirty();drawTab();return}}markDirty()});
  rad.appendChild(radio('pm'+a.id,a.mode!=='price'&&a.mode!=='auction',' “Price on request” — visitors enquire to buy',function(){var was=a.mode;a.mode='request';pi.classList.add('dim');markDirty();if(was==='auction')drawTab()}));
@@ -1738,7 +1778,7 @@ function artRow(a,i){var row=el('div','edrow'+(EDopen[a.id]?' open':'')),top=el(
  pr.appendChild(rad);f.appendChild(pr);
  f.appendChild(field('About this painting (optional)',inp(a.d,'A sentence or two visitors will read in the painting’s details…',function(v){a.d=v},'area'),'wide'));
  row.appendChild(f);return row}
-function pickRow(a,btns){var li=el('li','pk'),im=el('img');im.src=embImg(a.img);im.alt='';li.appendChild(im);li.appendChild(el('span',null,a.t||'Untitled'));var d=el('div','edacts');btns.forEach(function(b){d.appendChild(b)});li.appendChild(d);return li}
+function pickRow(a,btns){var li=el('li','pk'),im=el('img');im.src=edSrc(a.img);im.alt='';li.appendChild(im);li.appendChild(el('span',null,a.t||'Untitled'));var d=el('div','edacts');btns.forEach(function(b){d.appendChild(b)});li.appendChild(d);return li}
 function addPicker(opts,cb,ph){var w=el('div','edadd'),sl=el('select');sl.setAttribute('aria-label',ph);var o0=el('option',null,ph);o0.value='';sl.appendChild(o0);opts.forEach(function(a){var o=el('option',null,a.t||'Untitled');o.value=a.id;sl.appendChild(o)});sl.disabled=!opts.length;sl.addEventListener('change',function(){if(sl.value)cb(sl.value)});w.appendChild(sl);return w}
 function drawGallery(body){pubBar(body);
  var s1=el('section','edsec');s1.appendChild(el('h3',null,'This Month’s Favourites'));s1.appendChild(el('p','edhint','Up to six paintings, in the order visitors meet them when they turn right at the entrance.'));
@@ -1827,10 +1867,12 @@ function buildGrid(){if(gridBuilt)return;gridBuilt=true;var box=$('grid'),idx=$(
   sec.querySelector('.ctitle').textContent=c.t;sec.querySelector('.cdesc').textContent=c.d;var ul=sec.querySelector('ul');
   c.works.forEach(function(k){var p=ART[k];if(!p)return;var li=document.createElement('li');li.className='card';
    li.innerHTML='<button aria-label="'+esc(p.t)+', view details"><div class="ph"><img decoding="async" alt="'+esc(p.t)+'"></div><h3></h3><p class="meta"></p><p class="price"></p></button>';
-   li.querySelector('img').src=thumb(k);li.querySelector('img').className='fr-'+frameOf(p);li.querySelector('h3').textContent=p.t;li.querySelector('.meta').textContent=p.m+(p.year?', '+p.year:'');
+   li.querySelector('img').src=thumb(k);li.querySelector('img').className='fr-'+frameOf(p);li.querySelector('h3').textContent=p.t;li.querySelector('.meta').textContent=[p.m,p.s&&!/request/i.test(p.s)?p.s:'',p.year].filter(Boolean).join(' · ');
    li.querySelector('.price').innerHTML=(isSold(p)?'':esc(p.p))+statusTag(p);
+   if(teaser(p)){li.querySelector('.ph').classList.add('early');li.querySelector('.ph').appendChild(el('span','ribbon','Members see this first'));li.querySelector('.price').textContent='Public from '+earlyWhen(p.ea);li.querySelector('img').alt='A blurred preview of a new painting for members'}
+   else if(p.em&&p.ea>Date.now())li.querySelector('.ph').appendChild(el('span','ribbon mem','Members’ early access'));
    li.querySelector('button').addEventListener('click',function(){openArt(k)});
-   if(!isSold(p)){var eb=document.createElement('button');eb.type='button';eb.className='cbuy';eb.textContent=aucLive(p)?'Place a bid':'Enquire to buy';eb.setAttribute('aria-label',eb.textContent+': '+p.t);eb.addEventListener('click',function(){act(k)});li.appendChild(eb)}
+   if(!isSold(p)){var eb=document.createElement('button');eb.type='button';eb.className='cbuy';eb.textContent=teaser(p)?'Join free to see it':aucLive(p)?'Place a bid':'Enquire to buy';eb.setAttribute('aria-label',eb.textContent+': '+p.t);eb.addEventListener('click',function(){act(k)});li.appendChild(eb)}
    ul.appendChild(li)});
   for(var j=0;j<c.soon;j++){var sh=SH[(j+ci)%SH.length],li=document.createElement('li');li.className='card soon';
    li.innerHTML='<div class="ph"><div class="blank" style="width:'+sh.w+';aspect-ratio:'+sh.a+';--dl:'+(ci*1.3+j*.45).toFixed(2)+'s"><span class="lock">'+LOCK+'</span></div></div><h3>Coming soon</h3><p class="meta">A new painting is in the studio</p>';
@@ -1854,14 +1896,15 @@ function closePrints(){prs.hidden=true;document.documentElement.style.overflow='
 $('navPr').addEventListener('click',function(){CATP.then(openPrints)});$('prClose').addEventListener('click',closePrints);
 $('prAsk').addEventListener('click',function(e){e.preventDefault();closePrints();if(window.openMsg)window.openMsg()});
 addEventListener('keydown',function(e){if(e.key==='Escape'&&!prs.hidden&&!dlg.open&&!buyD.open&&!zv.open)closePrints()});
-function openCollection(){if(prs&&!prs.hidden)closePrints();if(window.anyPage&&anyPage())closePage(true);buildGrid();col.hidden=false;col.scrollTop=0;document.documentElement.style.overflow='hidden';$('colClose').focus()}
+function colPerks(){var a=$('colPerks');a.textContent='';a.hidden=!!ME;if(ME)return;a.appendChild(el('p','kick','The collectors’ circle · free to join'));a.appendChild(perkList());a.appendChild(el('p','small',earlyText()));var b=el('button','btn main','Join free');b.type='button';b.addEventListener('click',function(){joinNow()});a.appendChild(b)}
+function openCollection(){if(prs&&!prs.hidden)closePrints();if(window.anyPage&&anyPage())closePage(true);buildGrid();colPerks();col.hidden=false;col.scrollTop=0;document.documentElement.style.overflow='hidden';$('colClose').focus()}
 function openCollectionAt(ci){openCollection();var el=document.getElementById('coll-'+(ci+1));if(el)col.scrollTop=Math.max(0,el.getBoundingClientRect().top-col.getBoundingClientRect().top-(col.querySelector('.top').offsetHeight||0)-18)}
 function closeCollection(){col.hidden=true;document.documentElement.style.overflow=''}
 $('navCol').addEventListener('click',function(){CATP.then(openCollection)});$('colClose').addEventListener('click',closeCollection);
 addEventListener('keydown',function(e){if(e.key==='Escape'&&!col.hidden&&!dlg.open&&!about.open)closeCollection()});
 
 /* structured data so search engines understand the works */
-CATP.then(function(){var ld={"@context":"https://schema.org","@type":"ItemList","name":"Pam’s Gallery — Collections","itemListElement":ART.map(function(p,i){var o={"@type":"VisualArtwork","name":p.t,"artform":{"digital painting":"Digital art","drawing":"Drawing"}[artKind(p)]||"Painting","artMedium":p.m,"creator":{"@type":"Person","name":ARTIST},"size":p.s,"url":location.origin+artUrl(p)};if(/^\//.test(p.wm||""))o.image=location.origin+p.wm;
+CATP.then(function(){var ld={"@context":"https://schema.org","@type":"ItemList","name":"Pam’s Gallery — Collections","itemListElement":ART.filter(function(p){return !(p.ea>Date.now())}).map(function(p,i){var o={"@type":"VisualArtwork","name":p.t,"artform":{"digital painting":"Digital art","drawing":"Drawing"}[artKind(p)]||"Painting","artMedium":p.m,"creator":{"@type":"Person","name":ARTIST},"size":p.s,"url":location.origin+artUrl(p)};if(/^\//.test(p.wm||""))o.image=location.origin+p.wm;
   var amt=(p.p||'').replace(/[^0-9.]/g,'');if(amt&&!isSold(p))o.offers={"@type":"Offer","price":amt,"priceCurrency":/£/.test(p.p)?"GBP":/€/.test(p.p)?"EUR":"USD","availability":"https://schema.org/InStock"};
   return{"@type":"ListItem","position":i+1,"item":o}})};
  var sc=document.createElement('script');sc.type='application/ld+json';sc.textContent=JSON.stringify(ld);document.head.appendChild(sc)});
@@ -3144,6 +3187,7 @@ function artBarSet(k){if(k!=null&&!ART[k])k=null;var p=k!=null?ART[k]:null,au=p&
  if(au){pr.className='abp';pr.textContent=live?money(au.n?au.top:au.start):'Auction closed';if(live)pr.appendChild(el('small',null,(au.n?au.n+' bid'+(au.n>1?'s':''):'Starting bid')+' · closes in '+leftTxt(au.ends-Date.now())))}
  else{pr.className='abp'+(sold?' sold':hasP?'':' req');pr.textContent=sold?'Sold':hasP?p.p:'Price on request'}
  abEl.querySelector('.abg').textContent=sold?'Ask about similar work':live?'Place a bid':'Enquire to buy';
+ if(teaser(p)){pr.className='abp req';pr.textContent='Members first';pr.appendChild(el('small',null,'Public '+earlyWhen(p.ea)));abEl.querySelector('.abg').textContent='Join to see it'}
  var lb=abEl.querySelector('.abl'),n=LIVE.likes[p.id]||0,mine=!!LIKED[p.id];lb.hidden=SITE.likes===false;lb.setAttribute('aria-pressed',mine?'true':'false');lb.querySelector('b').textContent=n?String(n):'';lb.setAttribute('aria-label',(mine?'You like this painting':'Like this painting')+(n?' — '+n+' like'+(n>1?'s':''):''));
  abEl.querySelector('.abs').hidden=SITE.share===false;
  requestAnimationFrame(function(){document.documentElement.style.setProperty('--abh',abEl.offsetHeight+'px')})}

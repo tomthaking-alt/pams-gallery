@@ -77,6 +77,10 @@
     {
       "source": "/sitemap.xml",
       "destination": "/api/app?page=sitemap"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/api/app?page=privacy"
     }
   ],
   "redirects": [
