@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-76Pmk1Gnekoze2x169Nvbo41bt8ER6FImM3plfgAdJM=' 'sha256-wr05tr4tzs4gl6UWizCOQbp2X6pfsjYYG8B2IOl7mB4=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-76Pmk1Gnekoze2x169Nvbo41bt8ER6FImM3plfgAdJM=' 'sha256-uUaolrk4Orn6lgTM3DEjWAkTycZ0tcr70SaSvL0yQ3g=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -10,6 +10,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Pam’s Gallery — Original Paintings">
 <meta property="og:description" content="Unroll the scroll, walk through a marble gallery of original paintings, then step out onto a balcony under a magical sky. Enquire to buy any work.">
+<meta property="og:url" content="https://itsamepameo.com/"><meta property="og:image" content="https://itsamepameo.com/lib/g-6d02c2a04cc1.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Pam’s Gallery: original paintings in gilded frames"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Pam’s Gallery — Original Paintings"><meta name="twitter:description" content="Walk through a 3D gallery of original paintings by Pam, and enquire to buy any work."><meta name="twitter:image" content="https://itsamepameo.com/lib/g-6d02c2a04cc1.jpg"><link rel="canonical" href="https://itsamepameo.com/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23f4ede1'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-style='italic' font-size='38' text-anchor='middle' fill='%23a9813e'%3EP%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -285,6 +286,9 @@ section.page .pl{white-space:pre-line;line-height:1.75;color:var(--ink);max-widt
 .pworks img.prt{position:absolute;inset:0;margin:auto;opacity:0;pointer-events:none}
 img,canvas{-webkit-touch-callout:none;-webkit-user-drag:none}
 img{-webkit-user-select:none;user-select:none}
+.dpage{margin:.2rem 0 .9rem;font-size:.9rem}.dpage a{color:var(--muted)}
+.ldsimple{display:block;margin-top:.7rem;font-size:.85rem;color:inherit;opacity:.78;text-underline-offset:3px}.ldsimple:hover{opacity:1}
+.nos{position:fixed;inset:auto 0 0 0;z-index:99;background:#faf7f1;color:#2a1c14;padding:1rem 1.2rem;font:16px/1.5 Jost,sans-serif;border-top:1px solid #e6ddcf}
 .mailwarn{margin:0 0 1rem;padding:.8rem 1rem;border-radius:10px;background:#fbefd9;border:1px solid #e3c27d;color:#5a3a17;font-size:.92rem;line-height:1.5}
 .hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden;opacity:0}
 .protT{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translateY(12px);z-index:2147483000;max-width:min(92vw,460px);box-sizing:border-box;display:flex;gap:.8rem;align-items:center;
@@ -725,12 +729,13 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
  <p class="note" id="enqNote" role="status"></p>
  <div class="follow" data-follow hidden></div>
 </section>
+<noscript><div class="nos">The 3D gallery needs JavaScript. <a href="/works">See every painting in the simple gallery</a>, or email Pam at pts98 [at] hotmail.co.uk.</div></noscript>
 <div id="loading" role="status" aria-label="Opening Pam’s Gallery">
  <div class="ldust" aria-hidden="true"><i style="left:6%;top:82%;width:2.4px;height:2.4px;animation-duration:19s;animation-delay:-3s"></i><i style="left:14%;top:40%;width:1.6px;height:1.6px;animation-duration:23s;animation-delay:-11s"></i><i style="left:22%;top:68%;width:2.2px;height:2.2px;animation-duration:17s;animation-delay:-6s"></i><i style="left:31%;top:90%;width:1.4px;height:1.4px;animation-duration:25s;animation-delay:-15s"></i><i style="left:39%;top:30%;width:2.0px;height:2.0px;animation-duration:21s;animation-delay:-2s"></i><i style="left:47%;top:75%;width:1.6px;height:1.6px;animation-duration:18s;animation-delay:-9s"></i><i style="left:55%;top:52%;width:2.6px;height:2.6px;animation-duration:24s;animation-delay:-13s"></i><i style="left:63%;top:86%;width:1.5px;height:1.5px;animation-duration:20s;animation-delay:-4s"></i><i style="left:71%;top:36%;width:2.1px;height:2.1px;animation-duration:22s;animation-delay:-16s"></i><i style="left:79%;top:64%;width:1.7px;height:1.7px;animation-duration:19s;animation-delay:-7s"></i><i style="left:87%;top:88%;width:2.4px;height:2.4px;animation-duration:26s;animation-delay:-12s"></i><i style="left:94%;top:46%;width:1.5px;height:1.5px;animation-duration:18s;animation-delay:-1s"></i><i style="left:10%;top:20%;width:1.8px;height:1.8px;animation-duration:24s;animation-delay:-18s"></i><i style="left:58%;top:14%;width:1.6px;height:1.6px;animation-duration:21s;animation-delay:-5s"></i><i style="left:84%;top:22%;width:2.0px;height:2.0px;animation-duration:23s;animation-delay:-10s"></i><i style="left:35%;top:58%;width:1.4px;height:1.4px;animation-duration:20s;animation-delay:-14s"></i></div>
  <div class="lstage" id="ldStage" aria-hidden="true"></div>
  <div class="lbird" aria-hidden="true"><div class="lbb"><div class="lwg far"><svg viewBox="-62 -54 64 60" aria-hidden="true"><path fill="#68718a" d="M-8 0C-6-26-30-48-60-52C-47-36-34-18-26 4Z"/><path fill="#3d4352" d="M-60-52C-52-42-45-31-39-21L-47-26Z"/><path fill="#f4f1ea" d="M-10-14L-27-25L-25-20L-9-10Z"/></svg></div><svg class="lbd" viewBox="-75 -45 140 80" aria-hidden="true"><path fill="#5d6576" d="M-28 1L-66-7L-71 5L-65 14L-28 12Z"/><path fill="#3a3f4c" d="M-60-6L-71 5L-65 14L-57 11Z"/><ellipse cx="0" cy="4" rx="36" ry="19" fill="#8f99ad" transform="rotate(-4.6)"/><ellipse cx="18" cy="8" rx="17" ry="13" fill="#c79cab" transform="rotate(17 18 8)"/><ellipse cx="28" cy="-6" rx="11" ry="13" fill="#93a0b2" transform="rotate(29 28 -6)"/><ellipse cx="26" cy="-4" rx="7" ry="6" fill="rgba(110,160,128,.75)" transform="rotate(29 26 -4)"/><ellipse cx="27" cy="1" rx="5.5" ry="2.6" fill="#fff" transform="rotate(23 27 1)"/><circle cx="37" cy="-15" r="11" fill="#9ba7ba"/><path fill="#e6a07d" d="M46-17.5L57-13L46-10.5Z"/><circle cx="46" cy="-15.5" r="2.2" fill="#f4ece4"/><circle cx="40" cy="-17" r="3.1" fill="#f2c14e"/><circle cx="40.7" cy="-17" r="1.5" fill="#1a1410"/><path fill="#e3b450" d="M29-24L30-37L34-29L37-40L40-29L44-37L45-24Z"/><rect x="29" y="-26.5" width="16" height="3" fill="#b8862e"/><circle cx="37" cy="-28" r="1.7" fill="#c0392b"/></svg><div class="lwg"><svg viewBox="-62 -54 64 60" aria-hidden="true"><path fill="#8891a6" d="M-8 0C-6-26-30-48-60-52C-47-36-34-18-26 4Z"/><path fill="#474d5d" d="M-60-52C-52-42-45-31-39-21L-47-26Z"/><path fill="#f4f1ea" d="M-10-14L-27-25L-25-20L-9-10Z"/></svg></div></div></div>
  <div class="lw"><div class="lt" data-t="film.title">Pam’s Gallery</div><div class="ls" data-t="film.sub">Original paintings</div></div>
- <div class="lfoot"><div class="lb"><i id="ldbar"></i></div><div class="lmsg" id="ldmsg">Opening the doors…</div><button id="ldGo" type="button" hidden>Enter the gallery<span aria-hidden="true"> ›</span></button></div>
+ <div class="lfoot"><div class="lb"><i id="ldbar"></i></div><div class="lmsg" id="ldmsg">Opening the doors…</div><a class="ldsimple" href="/works">Prefer a simple view? See all works</a><button id="ldGo" type="button" hidden>Enter the gallery<span aria-hidden="true"> ›</span></button></div>
 </div>
 <script>
 /* ---------- the opening film: Pam's paintings drift past in gold frames while the gallery loads, and King George flies by.
@@ -785,7 +790,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <div class="btns pnoprint"><button class="btn main" type="button" id="psKit">Download the press kit (PDF)</button><button class="btn" type="button" id="psHiRes">Request high-resolution images</button><button class="btn" type="button" id="psMsg">Contact Pam</button></div>
   <p class="note pnoprint" id="psKitNote">Opens your device’s print window — choose “Save as PDF”.</p>
   <div class="follow" data-follow hidden></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
  </div>
 </section>
 <section id="commission" class="sheet page" hidden aria-labelledby="cmh">
@@ -810,7 +815,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
    <div class="btns" style="margin-top:.2rem"><button class="btn main" type="submit">Send my commission request</button></div>
   </form>
   <div id="cmDone" hidden><p class="note done pl" data-p="comm.done" style="font-size:1.05rem"></p></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
  </div>
 </section>
 <section id="buying" class="sheet page" hidden aria-labelledby="byh">
@@ -821,7 +826,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <div class="bgrid"><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 15.4 7.2 17.9l.9-5.4L4.2 8.7l5.4-.8z"/></svg><h3>Certificate of authenticity</h3><p class="pl" data-p="trust.auth"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg><h3>Packaging &amp; delivery</h3><p class="pl" data-p="trust.deliver"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 10a8 8 0 1 1 2.3 5.7"/><path d="M4 4v6h6"/></svg><h3>Returns</h3><p class="pl" data-p="trust.returns"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="1"/><rect x="8" y="8" width="8" height="8"/></svg><h3>Framing &amp; hanging</h3><p class="pl" data-p="trust.frame"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><h3>Secure payment</h3><p class="pl" data-p="trust.pay"></p></article><article class="bcard"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/></svg><h3>Any questions?</h3><p class="pl" data-p="trust.help"></p></article></div>
   <h3 class="faqh">Questions people often ask</h3><div class="faq" id="byFaq"></div>
   <div class="btns"><button class="btn main" type="button" id="byMsg">Ask Pam a question</button></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
  </div>
 </section>
 <section id="prints" class="sheet" hidden aria-labelledby="prh">
@@ -843,7 +848,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <p class="colAbout" id="colAbout"></p>
   <form class="subf" data-sub novalidate><label>Get first look at new paintings<input type="email" autocomplete="email" placeholder="Your email" required></label><button class="btn main" type="submit">Notify me</button><p class="note" role="status"></p></form>
   <div class="follow" data-follow hidden></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
   <div class="foot"><span id="copy"></span><span>Enquiries: <a id="footMail" href="#"></a></span></div>
  </div>
 </section>
@@ -855,6 +860,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
    <h2 id="dt"></h2>
    <p id="dp" class="serif" style="font-size:1.6rem;margin-top:.2rem"></p><p id="dd" class="ddesc" hidden></p>
    <dl><dt>Medium</dt><dd id="dm"></dd><dt>Size</dt><dd id="ds"></dd><dt>Year</dt><dd id="dy"></dd><dt>Availability</dt><dd id="da"></dd></dl>
+   <p class="dpage"><a id="dPage" href="/works">This painting’s own page</a></p>
    <div class="btns"><button class="btn main" id="buyBtn" type="button">Enquire to buy</button><a class="btn" id="enq" href="#">Email Pam</a><button class="btn" id="arBtn" type="button" hidden>View on your wall</button><button class="btn" id="dShare" type="button">Share</button><button class="btn" id="close">Close</button></div>
    <div class="pager"><button id="dprev">&#8249; Previous</button><span id="dcount"></span><button id="dnext">Next &#8250;</button></div>
   </div>
@@ -940,7 +946,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <p style="margin-top:1.2rem">Email: <a id="aboutMail" href="#" style="color:var(--walnut)"></a></p><p class="note" id="aboutExtra" hidden></p>
   <div class="follow" data-follow hidden></div>
   <div class="btns"><button class="btn main" id="aboutMsg" type="button">Send Pam a message</button><a class="btn" id="aboutEnq" href="#">Email instead</a><button class="btn" id="viewCol">See the collections</button><button class="btn" id="aboutClose">Close</button></div>
-  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a></nav>
+  <nav class="plinks" aria-label="More about buying"><a href="#commission">Commission a painting</a><a href="#press">For galleries &amp; press</a><a href="#buying">Delivery, returns &amp; authenticity</a><a href="/works">All works (simple view)</a></nav>
  </div></div>
 </dialog>
 <script>
@@ -1206,8 +1212,10 @@ function aucOf(p){var L=LIVE.bids&&LIVE.bids[p.id]||{};return{top:L.top||0,n:L.n
 function aucLive(p){return p&&p.mode==='auction'&&p.auc&&!isSold(p)&&Date.now()<p.auc.ends}
 function leftTxt(ms){if(ms<=0)return'closed';var m=Math.floor(ms/6e4),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?d+'d '+h+'h':h?h+'h '+(m%60)+'m':(m%60||1)+'m'}
 /* sharing: each painting has its own link, with a proper preview on social media */
+function slugify(t){return String(t||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' and ').replace(/[’'`]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'painting'}
+function artUrl(p){var used={},by={};ART.forEach(function(a){var s=slugify(a.t),k=s,n=2;while(used[k])k=s+'-'+(n++);used[k]=1;by[a.id]=k});return '/art/'+(by[p.id]||slugify(p.t))}
 function artKind(p){var m=(p&&p.m||'').toLowerCase();return/digital/.test(m)?'digital painting':/ink|pen\b|pencil|drawing|charcoal|graphite/.test(m)?'drawing':'painting'}
-function shareArt(k){var p=ART[k];if(!p)return;var url=location.origin+'/api/app?s='+encodeURIComponent(p.id),title=p.t+' — an original '+artKind(p)+' by '+ARTIST,text='“'+p.t+'”, an original '+artKind(p)+' by '+ARTIST+' — see it in her gallery:';
+function shareArt(k){var p=ART[k];if(!p)return;var url=location.origin+artUrl(p),title=p.t+' — an original '+artKind(p)+' by '+ARTIST,text='“'+p.t+'”, an original '+artKind(p)+' by '+ARTIST+' — see it in her gallery:';
  if(navigator.share&&matchMedia('(pointer:coarse)').matches){navigator.share({title:title,text:text,url:url}).catch(function(){});return}
  $('shH').textContent=p.t;var g=$('shGrid');g.textContent='';var img=/^\//.test(p.wm||'')?location.origin+p.wm:'';
  var cp=el('button',null,'Copy link');cp.type='button';cp.addEventListener('click',function(){var u=$('shUrl');try{navigator.clipboard.writeText(url).then(function(){cp.textContent='Link copied ✓'},function(){u.select()})}catch(e){u.select()}});g.appendChild(cp);
@@ -1318,7 +1326,7 @@ function openArt(k){k=(k+ART.length)%ART.length;curArt=k;var p=ART[k];
  $('dd').textContent=p.d||'';$('dd').hidden=!p.d;$('dm').textContent=p.m;$('ds').textContent=p.s;$('dy').textContent=p.year||'—';$('da').innerHTML=statusTag(p).replace('class="status','style="margin-left:0" class="status');
  var e=$('enq');e.href=mailFor(p);e.textContent='Email Pam';$('buyBtn').textContent=isSold(p)?'Ask about similar work':aucLive(p)?'Place a bid':'Enquire to buy';$('dShare').hidden=SITE.share===false;
  if(p.mode==='auction'&&p.auc&&!isSold(p)){var A=aucOf(p);$('dp').textContent=aucLive(p)?(A.n?'Current bid '+money(A.top):'Starting bid '+money(A.start))+' · closes in '+leftTxt(A.ends-Date.now()):'Auction closed'}
- $('dcount').textContent=(k+1)+' of '+ART.length;if(!dlg.open)dlg.showModal()}
+ $('dPage').href=artUrl(p);$('dcount').textContent=(k+1)+' of '+ART.length;if(!dlg.open)dlg.showModal()}
 $('close').addEventListener('click',function(){dlg.close()});
 $('dprev').addEventListener('click',function(){openArt(curArt-1)});$('dnext').addEventListener('click',function(){openArt(curArt+1)});
 dlg.addEventListener('click',function(e){if(e.target===dlg)dlg.close()});
@@ -1853,7 +1861,7 @@ $('navCol').addEventListener('click',function(){CATP.then(openCollection)});$('c
 addEventListener('keydown',function(e){if(e.key==='Escape'&&!col.hidden&&!dlg.open&&!about.open)closeCollection()});
 
 /* structured data so search engines understand the works */
-CATP.then(function(){var ld={"@context":"https://schema.org","@type":"ItemList","name":"Pam’s Gallery — Collections","itemListElement":ART.map(function(p,i){var o={"@type":"VisualArtwork","name":p.t,"artform":{"digital painting":"Digital art","drawing":"Drawing"}[artKind(p)]||"Painting","artMedium":p.m,"creator":{"@type":"Person","name":ARTIST},"size":p.s};if(/^\//.test(p.wm||""))o.image=location.origin+p.wm;
+CATP.then(function(){var ld={"@context":"https://schema.org","@type":"ItemList","name":"Pam’s Gallery — Collections","itemListElement":ART.map(function(p,i){var o={"@type":"VisualArtwork","name":p.t,"artform":{"digital painting":"Digital art","drawing":"Drawing"}[artKind(p)]||"Painting","artMedium":p.m,"creator":{"@type":"Person","name":ARTIST},"size":p.s,"url":location.origin+artUrl(p)};if(/^\//.test(p.wm||""))o.image=location.origin+p.wm;
   var amt=(p.p||'').replace(/[^0-9.]/g,'');if(amt&&!isSold(p))o.offers={"@type":"Offer","price":amt,"priceCurrency":/£/.test(p.p)?"GBP":/€/.test(p.p)?"EUR":"USD","availability":"https://schema.org/InStock"};
   return{"@type":"ListItem","position":i+1,"item":o}})};
  var sc=document.createElement('script');sc.type='application/ld+json';sc.textContent=JSON.stringify(ld);document.head.appendChild(sc)});
