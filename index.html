@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-76Pmk1Gnekoze2x169Nvbo41bt8ER6FImM3plfgAdJM=' 'sha256-wr05tr4tzs4gl6UWizCOQbp2X6pfsjYYG8B2IOl7mB4=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
 <meta name="theme-color" content="#f4ede1">
@@ -16,7 +17,7 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#2a1c14;--paper:#faf9f7}}
 :root[data-theme="dark"]{--ink:#2a1c14;--paper:#faf9f7}
 *,*::before,*::after{box-sizing:border-box}
-html{touch-action:pan-x pan-y}
+html{touch-action:manipulation}
 html,body{margin:0;background:#16110e;color:var(--ink);font-family:'Jost',Helvetica,Arial,sans-serif;font-weight:300}
 h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;font-weight:400}
 #gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:pan-y}
@@ -284,6 +285,8 @@ section.page .pl{white-space:pre-line;line-height:1.75;color:var(--ink);max-widt
 .pworks img.prt{position:absolute;inset:0;margin:auto;opacity:0;pointer-events:none}
 img,canvas{-webkit-touch-callout:none;-webkit-user-drag:none}
 img{-webkit-user-select:none;user-select:none}
+.mailwarn{margin:0 0 1rem;padding:.8rem 1rem;border-radius:10px;background:#fbefd9;border:1px solid #e3c27d;color:#5a3a17;font-size:.92rem;line-height:1.5}
+.hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden;opacity:0}
 .protT{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translateY(12px);z-index:2147483000;max-width:min(92vw,460px);box-sizing:border-box;display:flex;gap:.8rem;align-items:center;
  padding:.8rem .9rem .8rem 1.1rem;background:rgba(36,24,18,.94);color:#f7f1e8;border-radius:14px;box-shadow:0 14px 34px rgba(20,12,8,.35);font-size:.9rem;line-height:1.45;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
 .protT.on{opacity:1;transform:none;pointer-events:auto}
@@ -1381,8 +1384,8 @@ zStage.addEventListener('pointerup',zUp);zStage.addEventListener('pointercancel'
 zv.addEventListener('keydown',function(e){var W=zStage.clientWidth,H=zStage.clientHeight,k=e.key;
  if(k==='+'||k==='='){zZoomTo(Z.s*1.5,W/2,H/2)}else if(k==='-'||k==='_'){zZoomTo(Z.s/1.5,W/2,H/2)}else if(k==='0'){zZoomTo(Z.fit,W/2,H/2)}
  else if(/^Arrow/.test(k)){var dx=k==='ArrowLeft'?120:k==='ArrowRight'?-120:0,dy=k==='ArrowUp'?120:k==='ArrowDown'?-120:0,c=zClamp({s:Z.s,x:Z.x+dx,y:Z.y+dy});zTo(c.s,c.x,c.y,180)}else return;e.preventDefault()});
-['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});   // Safari's own pinch-zoom of the page
-document.addEventListener('touchmove',function(e){if(e.touches.length>1&&!(e.target.closest&&e.target.closest('#wall')))e.preventDefault()},{passive:false});
+['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){if(e.target&&e.target.closest&&e.target.closest('#zv,#wall'))e.preventDefault()},{passive:false})});   // inside the picture viewer and the wall tool, pinches zoom the painting, not the page
+document.addEventListener('touchmove',function(e){if(e.touches.length>1&&e.target.closest&&e.target.closest('#zv'))e.preventDefault()},{passive:false});
 zStage.addEventListener('touchstart',function(e){e.preventDefault()},{passive:false});   // the viewer owns every gesture on the picture
 addEventListener('resize',function(){if(!zv.open||!Z.iw)return;var rel=Z.s/Z.fit;zFit();Z.s=Math.max(Z.fit,Math.min(Z.max,Z.fit*rel));zLayout()});
 
@@ -1421,7 +1424,16 @@ CATP.then(function(){var m=/^#wall(\d+)$/.exec(location.hash);if(m){var k=-1;ART
 var API='/api/app',TOK=null,ME=null;
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return null}}
 TOK=ls('pgTok');
+/* spam trap: every public form carries a hidden field (people never see it; bots fill it in) and the time it took to fill in */
+var PUBF=['fBuy','fMsg','fComm','fUp'],LASTF=null,PAGE_T0=Date.now();
+function hpOf(f){if(!f||f.querySelector('.hp'))return;var w=document.createElement('label');w.className='hp';w.setAttribute('aria-hidden','true');w.innerHTML='Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off">';f.appendChild(w)}
+function trapForms(){PUBF.forEach(function(id){hpOf(document.getElementById(id))});[].forEach.call(document.querySelectorAll('form[data-sub]'),hpOf)}
+document.addEventListener('focusin',function(e){var f=e.target&&e.target.form;if(f&&!f.dataset.t0)f.dataset.t0=Date.now()});
+document.addEventListener('submit',function(e){LASTF=e.target},true);
+function trapOf(){var f=LASTF,i=f&&f.querySelector('.hp input');return{hp:i?i.value:'',ft:Date.now()-(f&&+f.dataset.t0||PAGE_T0)}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',trapForms);else trapForms();
 function api(body){var h={'Content-Type':'application/json'};if(TOK)h.Authorization='Bearer '+TOK;
+ if(/^(order|message|commission|sub|signup)$/.test(body.a)){var tr=trapOf();body.hp=tr.hp;body.ft=tr.ft;if(LASTF){LASTF.dataset.t0=''}}
  return fetch(API,{method:'POST',headers:h,body:JSON.stringify(body)}).then(function(r){return r.json().catch(function(){return{error:'Accounts aren’t available here yet.'}}).then(function(j){j=j||{};if(!r.ok&&!j.error)j.error='Something went wrong — please try again.';j._s=r.status;return j})})
  .catch(function(){return{error:'The gallery can’t be reached right now — please email Pam at '+EMAIL+'.'}})}
 (function(){var v=ls('pgVid');if(!v){v=Math.random().toString(36).slice(2)+Date.now().toString(36);ls('pgVid',v)}try{if(sessionStorage.getItem('pgSeen'))return;sessionStorage.setItem('pgSeen','1')}catch(e){}api({a:'visit',vid:v,ref:(function(){try{var h=document.referrer?new URL(document.referrer).hostname:'';return h&&h!==location.hostname?h:''}catch(e){return''}})()})})();
@@ -1770,6 +1782,7 @@ function drawTab(){var body=$('dBody'),j=DASH;body.textContent='';
  if(dTab==='w'){drawGrow(body);return}
  if(dTab==='v'){drawVisitors(body);return}
  if(!j)return;
+ if(!j.mail&&(dTab==='o'||dTab==='m')){var wn=el('div','mailwarn');wn.setAttribute('role','status');wn.innerHTML='<b>Email alerts are off.</b> New enquiries and messages are saved here, but nobody is emailed about them yet. Check this tab regularly, or switch email on (Settings → Payments &amp; quick sign-in → Email alerts).';body.appendChild(wn)}
  if(dTab==='o'){drawOrders(body,j);return}
  if(dTab==='m'){if(!j.msgs.length){body.appendChild(el('p','empty','No messages yet.'));return}
   var M=tableOf(['Date','From','Message','']);j.msgs.forEach(function(m){var tr=el('tr',m.read?'':'unread');tr.appendChild(el('td',null,fdate(m.ts)));var fr=el('td');fr.appendChild(el('div',null,m.name+(m.member?' (member)':'')));var a=el('a',null,m.email);a.href='mailto:'+m.email+'?subject='+encodeURIComponent('Re: your message to Pam’s Gallery');fr.appendChild(a);tr.appendChild(fr);
