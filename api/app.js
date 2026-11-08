@@ -16,7 +16,7 @@ const BUYER_MAIL = !!(RESEND && process.env.MAIL_FROM);
 // the artworks built into the site: titles and details, and their image files under /lib/ (wm = the watermarked copy
 // used for link previews, so the clean image never leaves the gallery)
 const EMB = {"p1": {"t": "Orchid in the Clouds", "m": "Oil on board", "d": "", "w": 0.5, "h": 0.706, "img": "/lib/g-e8cca6370e22.jpg", "wm": "/lib/g-ee86cd76b1bc.jpg"}, "p2": {"t": "Violet Garden", "m": "Oil on canvas board", "d": "", "w": 0.66, "h": 0.49, "img": "/lib/g-0c6b5f892136.jpg", "wm": "/lib/g-a9a3bfaef716.jpg"}, "p3": {"t": "Three Masks in Blue", "m": "Oil on board", "d": "", "w": 0.7, "h": 0.507, "img": "/lib/g-5ac75187fe3a.jpg", "wm": "/lib/g-0e6ddd8f947e.jpg"}, "p4": {"t": "Three Masks in Green", "m": "Oil on board", "d": "", "w": 0.55, "h": 0.545, "img": "/lib/g-a969f2953493.jpg", "wm": "/lib/g-b2340e8d7987.jpg"}, "p5": {"t": "The Messenger", "m": "Oil on board", "d": "", "w": 0.5, "h": 0.713, "img": "/lib/g-da433a8146b7.jpg", "wm": "/lib/g-25cfba5fbf73.jpg"}, "p6": {"t": "White Bloom over Ember", "m": "Oil on board", "d": "", "w": 0.5, "h": 0.706, "img": "/lib/g-7aff2fadbb10.jpg", "wm": "/lib/g-3920c65ce810.jpg"}, "p7": {"t": "The Hall of Many Stairs", "m": "Oil on board", "d": "Staircases climb from every direction towards arched doorways and fan out around a stepped temple. An impossible city in teal, violet and gold, with not a soul in sight.", "w": 0.7, "h": 0.522, "img": "/lib/g-55c28051b4d3.jpg", "wm": "/lib/g-78751f52ab15.jpg"}, "p8": {"t": "The Paper Nest", "m": "Oil on board", "d": "A plump violet bird keeps watch over two sleepy little figures, tucked into a nest of folded paper triangles on a calm sea-green ground.", "w": 0.6, "h": 0.596, "img": "/lib/g-47be435a9695.jpg", "wm": "/lib/g-2402ea68c9fb.jpg"}, "p9": {"t": "The Petal Choir", "m": "Oil on board", "d": "A crowd of flower-headed faces, eyes closed and lips pursed as if mid-song, packed tight in bold black outlines. Jewel colours glow between the lines like stained glass.", "w": 0.7, "h": 0.506, "img": "/lib/g-e58107129201.jpg", "wm": "/lib/g-8224abae5b42.jpg"}, "p10": {"t": "The Stair Keepers", "m": "Oil on board", "d": "Two round-faced characters perch on a great teal staircase, one crowned in violet petals, the other in a spotted turquoise bonnet. They look as if they have guarded these steps for a very long time.", "w": 0.7, "h": 0.505, "img": "/lib/g-b076501e59c4.jpg", "wm": "/lib/g-dd93214b250b.jpg"}, "p11": {"t": "Unravelling", "m": "Pen and ink on paper", "d": "A long-limbed figure flings its arms wide as tangled loops spin out around it like thread coming loose. Drawn entirely in fine black ink, it is all motion and release.", "w": 0.66, "h": 0.573, "img": "/lib/g-3b3cbc4ca575.jpg", "wm": "/lib/g-3d3d854c3c20.jpg"}, "p12": {"t": "Three in the Tangle", "m": "Pen and ink on paper", "d": "Three quiet faces drift together in a cloud of looping lines and tiny bubbles, eyes half closed and lips pursed. Every loop is drawn by hand in fine black ink.", "w": 0.7, "h": 0.482, "img": "/lib/g-9bed9b93d225.jpg", "wm": "/lib/g-2df85d7787ef.jpg"}, "p13": {"t": "The Dance of the Petal Folk", "m": "Pen and ink on paper", "d": "Three flower-headed figures stumble, stretch and tumble through a storm of loops, one of them flung right off its feet. A joyful, chaotic little dance in pen and ink.", "w": 0.7, "h": 0.47, "img": "/lib/g-ad43cd45fb1d.jpg", "wm": "/lib/g-d7846d56a03e.jpg"}, "p14": {"t": "Happy Hour in the Gorge", "m": "Digital painting", "d": "One crow lounges in a pink-and-yellow rubber ring with a martini held high, while a second swoops in looking thoroughly unimpressed. They drift on glassy, faceted water between cliffs of red and smoky crystal.", "w": 0.95, "h": 0.398, "img": "/lib/g-747839fd9fed.jpg", "wm": "/lib/g-ae3ebf1a7e4f.jpg"}, "p15": {"t": "The Welcoming Committee", "m": "Digital painting", "d": "Two curious pigeons lean right into the picture to take a good look at you, while a crowd of crows gathers across rippling, melted dunes under a streaked blue sky. Every gallery needs a welcoming committee.", "w": 0.95, "h": 0.398, "img": "/lib/g-038804eca3d8.jpg", "wm": "/lib/g-30cc566730c9.jpg"}};
-const SECRET = crypto.createHash('sha256').update('pams-gallery-session|' + (DB_TOKEN || '')).digest();
+const SECRET = crypto.createHash('sha256').update(process.env.SESSION_SECRET ? 'pams-gallery-session|' + process.env.SESSION_SECRET : 'pams-gallery-session|' + (DB_TOKEN || '')).digest();
 
 // ---- rewards (easy to change) ----
 const WELCOME = { pct: 5, text: '5% off your first painting' };
@@ -61,6 +61,12 @@ const day = (t) => new Date(t || Date.now()).toISOString().slice(0, 10);
 const id = () => Date.now().toString(36) + crypto.randomBytes(4).toString('hex');
 const err = (msg, code) => Object.assign(new Error(msg), { code });
 
+// spam trap: a hidden field people never see (bots fill it in) and the time taken to fill the form in. Caught spam gets a polite
+// "thank you" but nothing is stored or sent. Pages loaded before this change don't send the timing, so a missing time is allowed.
+function isSpam(b, minMs) { if (b && b.hp) return true; const ft = b && b.ft; return typeof ft === 'number' && ft >= 0 && ft < (minMs || 1200) }
+// private pictures (customers' reference photos): only links signed by the server open them, and the links expire
+function imgSig(key, x) { return b64u(crypto.createHmac('sha256', SECRET).update('img|' + key + '|' + x).digest()).slice(0, 32) }
+function signedImg(u, days) { const m = /img=([a-z0-9]{6,40})/i.exec(String(u || '')); if (!m) return u; const x = Date.now() + (days || 1) * 864e5; return '/api/app?img=' + m[1] + '&x=' + x + '&sig=' + imgSig(m[1], x) }
 async function limit(req, key, max, secs) {
   const ip = String(req.headers['x-forwarded-for'] || req.socket && req.socket.remoteAddress || 'x').split(',')[0].trim();
   const k = 'rl:' + key + ':' + ip; const n = await db('INCR', k); if (n === 1) await db('EXPIRE', k, String(secs));
@@ -146,6 +152,7 @@ const actions = {
 
   async signup(req, b) {
     await limit(req, 'signup', 8, 3600);
+    if (b.hp) throw err('Something went wrong — please try again.', 400);
     const email = clean(b.email, 200).toLowerCase(), name = clean(b.name, 80), pw = String(b.password || '');
     if (!name) throw err('Please tell us your name.', 400);
     if (!okEmail(email)) throw err('Please enter a valid email address.', 400);
@@ -199,6 +206,7 @@ const actions = {
   // a request to buy: a painting (by id, or the older painting number) or a print in a chosen size
   async order(req, b) {
     await limit(req, 'order', 10, 3600);
+    if (isSpam(b)) return { ok: true, id: id() };
     const u = await auth(req), cat = await getCat();
     const name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase();
     if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
@@ -226,6 +234,7 @@ const actions = {
   // a commission request, with up to three reference photos
   async commission(req, b) {
     await limit(req, 'comm', 6, 3600);
+    if (isSpam(b)) return { ok: true, id: id() };
     const u = await auth(req), cat = await getCat();
     const name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase(), idea = clean(b.idea, 3000);
     if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
@@ -234,16 +243,16 @@ const actions = {
     for (const d of (Array.isArray(b.photos) ? b.photos : []).slice(0, 3)) {
       const data = String(d || '').replace(/^data:image\/(jpeg|png|webp);base64,/, '');
       if (!/^[A-Za-z0-9+/=]+$/.test(data) || data.length > 1.8e6) continue;
-      const key = id(), CH = 380000, n = Math.ceil(data.length / CH);
+      const key = crypto.randomBytes(16).toString('hex'), CH = 380000, n = Math.ceil(data.length / CH);
       for (let i = 0; i < n; i++) await db('SET', 'img:' + key + ':' + i, data.slice(i * CH, (i + 1) * CH));
-      await db('SET', 'img:' + key, JSON.stringify({ n, type: 'image/jpeg', ts: Date.now() })); photos.push('/api/app?img=' + key);
+      await db('SET', 'img:' + key, JSON.stringify({ n, type: 'image/jpeg', ts: Date.now(), priv: true })); photos.push('/api/app?img=' + key);
     }
     const f = { size: clean(b.size, 80), budget: clean(b.budget, 80), when: clean(b.when, 60), where: clean(b.where, 200) };
     const msg = [idea, f.size && 'Size: ' + f.size, f.budget && 'Budget: ' + f.budget, f.when && 'Needed by: ' + f.when, f.where && 'Where it will hang: ' + f.where].filter(Boolean).join('\n');
     const o = { id: id(), ts: Date.now(), kind: 'commission', artId: '', title: 'Commission: ' + idea.split(/[.\n!?]/)[0].slice(0, 60), name, email, phone: clean(b.phone, 40), message: msg, photos, member: !!u, offer: 0, welcome: false, useCredit: false, status: 'new' };
     await pipe([['SET', 'o:' + o.id, JSON.stringify(o)], ['LPUSH', 'orders', o.id]].concat(u ? [['LPUSH', 'u:' + email + ':orders', o.id]] : []));
     await Promise.all([
-      mail(ownerTo(cat), 'New commission request from ' + name, ['<b>' + esc(name) + '</b> (' + esc(email) + (o.phone ? ', ' + esc(o.phone) : '') + ') would like a commission:', esc(msg).replace(/\n/g, '<br>'), photos.length ? 'Reference photos: ' + photos.map((x, i) => '<a href="' + SITE + x + '">photo ' + (i + 1) + '</a>').join(' · ') : '', 'Just reply to this email to answer them.'], { url: SITE, label: 'Open your gallery' }, email),
+      mail(ownerTo(cat), 'New commission request from ' + name, ['<b>' + esc(name) + '</b> (' + esc(email) + (o.phone ? ', ' + esc(o.phone) : '') + ') would like a commission:', esc(msg).replace(/\n/g, '<br>'), photos.length ? 'Reference photos: ' + photos.map((x, i) => '<a href="' + SITE + signedImg(x, 30) + '">photo ' + (i + 1) + '</a>').join(' · ') : '', 'Just reply to this email to answer them.'], { url: SITE, label: 'Open your gallery' }, email),
       BUYER_MAIL && mail(email, 'Your commission request — Pam’s Gallery', ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for asking Pam to paint something for you. She has your request and will be in touch personally to talk it through, usually within a couple of days.', 'With warm wishes,<br>Pam’s Gallery'], null, ownerTo(cat))]);
     return { ok: true, id: o.id };
   },
@@ -275,6 +284,7 @@ const actions = {
 
   async sub(req, b) {
     await limit(req, 'sub', 10, 3600);
+    if (isSpam(b, 900)) return { ok: true };
     const email = clean(b.email, 200).toLowerCase(); if (!okEmail(email)) throw err('Please enter a valid email address.', 400);
     await pipe([['ZADD', 'subs', String(Date.now()), email]]);
     return { ok: true };
@@ -282,12 +292,15 @@ const actions = {
 
   async message(req, b) {
     await limit(req, 'msg', 10, 3600);
+    if (isSpam(b)) return { ok: true };
     const u = await auth(req), name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase(), text = clean(b.message, 3000);
     if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
     if (text.length < 2) throw err('Please write a message.', 400);
     const m = { id: id(), ts: Date.now(), name, email, message: text, member: !!u, read: false };
     await pipe([['SET', 'm:' + m.id, JSON.stringify(m)], ['LPUSH', 'msgs', m.id]]);
-    await mail(ownerTo(await getCat()), 'New message from ' + name, ['<b>' + esc(name) + '</b> (' + esc(email) + ') wrote:', '“' + esc(text).replace(/\n/g, '<br>') + '”', 'Just reply to this email to answer them.'], { url: SITE, label: 'Open your gallery' }, email);
+    const cat = await getCat();
+    await Promise.all([mail(ownerTo(cat), 'New message from ' + name, ['<b>' + esc(name) + '</b> (' + esc(email) + ') wrote:', '“' + esc(text).replace(/\n/g, '<br>') + '”', 'Just reply to this email to answer them.'], { url: SITE, label: 'Open your gallery' }, email),
+      BUYER_MAIL && mail(email, 'Thank you for your message — Pam’s Gallery', ['Dear ' + esc(name.split(' ')[0]) + ',', 'Thank you for getting in touch. Pam has your message and will reply personally, usually within two working days.', 'Your message:', '“' + esc(text).replace(/\n/g, '<br>') + '”'], { url: SITE, label: 'Back to the gallery' }, ownerTo(cat))]);
     return { ok: true };
   },
 
@@ -316,7 +329,7 @@ const actions = {
     return {
       visits: { total: +total || 0, unique: +uniq || 0, days, perDay: vis, uniquePerDay: uv },
       where: { countries: pairs(gcc), week: Object.keys(week).map(k => [k, week[k]]).sort((a, b) => b[1] - a[1]), cities: cities.map((c, i) => { const p = c[0].split('|'), q = String(ll[i] || '').split(','); return { city: p[0], region: p[1], cc: p[2], n: c[1], lat: +q[0] || null, lon: +q[1] || null } }), devices: pairs(gdev), sources: pairs(gref) },
-      members: { count: +nMembers || 0, list: members }, orders: await checkPaid(orders), msgs, likes, auctions, subs: { count: +extra[arts.length * 2 + 1] || 0, list: subs },
+      members: { count: +nMembers || 0, list: members }, orders: (await checkPaid(await privPhotos(orders))).map(o => o.photos && o.photos.length ? Object.assign({}, o, { photos: o.photos.map(x => signedImg(x, 1)) }) : o), msgs, likes, auctions, subs: { count: +extra[arts.length * 2 + 1] || 0, list: subs },
       pay: !!STRIPE, google: !!GOOGLE_ID, mail: !!RESEND, buyerMail: BUYER_MAIL, cur: cat && cat.site ? cat.site.cur : 'GBP'
     };
   },
@@ -469,11 +482,22 @@ async function sharePage(aid, res) {
     '<meta http-equiv="refresh" content="0;url=' + esc(go) + '"></head><body><p><a href="' + esc(go) + '">Open ' + esc(a ? a.t : 'Pam’s Gallery') + '</a></p><script>location.replace(' + JSON.stringify(go) + ')</script></body></html>');
 }
 
-async function getImage(key, res) {
+async function privPhotos(orders) {      // one-off: commission photos sent before photos became private
+  if (await db('GET', 'mig:privphotos')) return orders;
+  const keys = []; orders.forEach(o => (o.photos || []).forEach(u => { const m = /img=([a-z0-9]{6,40})/i.exec(u); if (m) keys.push(m[1]) }));
+  const metas = keys.length ? await pipe(keys.map(k => ['GET', 'img:' + k])) : [];
+  const fix = []; metas.forEach((v, i) => { const m = J(v); if (m && !m.priv) { m.priv = true; fix.push(['SET', 'img:' + keys[i], JSON.stringify(m)]) } });
+  await pipe(fix.concat([['SET', 'mig:privphotos', '1']])); return orders;
+}
+async function getImage(key, res, q) {
   const meta = J(await db('GET', 'img:' + key)); if (!meta) { res.status(404).end(); return }
+  if (meta.priv) {
+    const x = +(q && q.x) || 0, sig = String(q && q.sig || '');
+    if (!x || x < Date.now() || sig.length !== 32 || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(imgSig(key, x)))) { res.setHeader('Cache-Control', 'no-store'); res.status(404).end(); return }
+  }
   const parts = await Promise.all(Array.from({ length: meta.n }, (_, i) => db('GET', 'img:' + key + ':' + i)));   // one piece per request keeps each reply small
   const buf = Buffer.from(parts.join(''), 'base64');
-  res.setHeader('Content-Type', meta.type); res.setHeader('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
+  res.setHeader('Content-Type', meta.type); res.setHeader('Cache-Control', meta.priv ? 'private, no-store' : 'public, max-age=31536000, s-maxage=31536000, immutable');
   res.status(200).end(buf);
 }
 
@@ -483,7 +507,7 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
       const q = req.query || {};
       if (!(DB_URL && DB_TOKEN)) { res.setHeader('Cache-Control', 'no-store'); res.status(503).json({ error: 'not_configured' }); return }
-      if (q.img && /^[a-z0-9]{6,40}$/i.test(String(q.img))) { await getImage(String(q.img), res); return }
+      if (q.img && /^[a-z0-9]{6,40}$/i.test(String(q.img))) { await getImage(String(q.img), res, q); return }
       if (q.cat) { res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=5, stale-while-revalidate=30'); res.status(200).json({ cat: await getCat(), cfg: { google: GOOGLE_ID, pay: !!STRIPE } }); return }
       if (q.s && /^[a-z0-9]{1,24}$/i.test(String(q.s))) { await sharePage(String(q.s), res); return }
       if (q.live) {           // likes and the current bid on each auction, refreshed every few seconds
