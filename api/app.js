@@ -596,7 +596,7 @@ function perksBox(cat) {
   const items = textOf(cat, 'members.perks', PERKS_DEF).split(/\s*·\s*/).filter(Boolean);
   return '<aside class="perks" aria-labelledby="pkh"><p class="kick" id="pkh">The collectors’ circle · free to join</p><ul>' + items.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul><p><a class="btn" href="/#join">Join free</a> <a href="/#signin" class="small">Already a member? Sign in</a></p></aside>';
 }
-function earlyWhen(t) { return new Date(t).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit', timeZone: 'Europe/London' }) }
+function earlyWhen(t) { return new Date(t).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Europe/London' }) }
 function textOf(cat, k, d) { const t = cat && cat.texts && cat.texts[k]; return t && String(t).trim() ? String(t) : d }
 function formTs() { const t = Date.now(); return t + '.' + b64u(crypto.createHmac('sha256', SECRET).update('ts|' + t).digest()).slice(0, 16) }
 function tsAge(v) { const m = /^(\d{10,14})\.([A-Za-z0-9_-]{16})$/.exec(String(v || '')); if (!m) return 0; const good = b64u(crypto.createHmac('sha256', SECRET).update('ts|' + m[1]).digest()).slice(0, 16); return good === m[2] ? Date.now() - +m[1] : 0 }
@@ -846,7 +846,14 @@ module.exports = async (req, res) => {
     if (b.a !== 'health' && !(DB_URL && DB_TOKEN)) { res.status(503).json({ error: 'Accounts are being set up — please email Pam for now.', code: 'not_configured' }); return }
     res.status(200).json(await fn(req, b));
   } catch (e) {
-    const code = e.code && e.code >= 400 && e.code < 600 ? e.code : 500;
+    const code = e.code && e.code >= 400 && e.code < 600 ? e.code : 500, q = req.query || {};
+    if (code === 500 && (req.method === 'GET' || req.method === 'HEAD') && (q.page || q.s || q.confirm || q.unsub)) {   // a page, not the app: a friendly page rather than an error code
+      res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.setHeader('Cache-Control', 'no-store'); res.setHeader('Retry-After', '60');
+      res.status(503).end('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Back in a moment | Pam’s Gallery</title><link rel="icon" href="/favicon.svg" type="image/svg+xml">' +
+        '<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#faf7f1;color:#2a1c14;font:300 17px/1.6 system-ui,-apple-system,sans-serif;padding:24px 16px}main{max-width:520px;text-align:center}h1{font:italic 400 2.2rem/1.2 Georgia,serif;margin:0 0 .8rem}p{color:#5a4a3f}a{color:#80612c}</style></head>' +
+        '<body><main><h1>Back in a moment</h1><p>This page couldn’t be loaded just now. Please try again in a minute — or <a href="/">walk through the gallery</a>.</p><p>You can always email Pam at ' + esc(OWNER).replace('@', ' [at] ') + '.</p></main></body></html>');
+      console.error(e); return;
+    }
     res.status(code).json({ error: code === 500 ? 'Something went wrong — please try again.' : e.message });
     if (code === 500) console.error(e);
   }
