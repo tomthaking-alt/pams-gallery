@@ -133,6 +133,48 @@ function setsOf(cat) {
   return BASE_SETS;
 }
 // what Pam has confirmed about delivery, returns and so on; anything left empty is simply not claimed
+/* ---------- visitor analytics ----------
+   No cookies and nothing stored on the visitor's device. A visit is recognised by a scrambled code made from the
+   connection and browser (with a secret, so it can't be turned back into either); the code itself is only kept for
+   30 minutes (the visit) and 5 minutes (the "active now" list). Everything else is totals in hourly buckets (UTC),
+   so the dashboard can show any date range in any timezone. Unique visitors use HyperLogLog counts, which de-duplicate
+   across the whole range without keeping anyone's code. */
+const AN_TTL = String(400 * 86400), HOUR = 36e5;
+const BOT_RE = /bot\b|bot\/|crawl|spider|slurp|bingpreview|facebookexternalhit|facebot|embedly|quora link|whatsapp|telegram|discord|slack|twitterbot|linkedin|pinterest\/|headless|phantom|puppeteer|playwright|selenium|lighthouse|pagespeed|gtmetrix|pingdom|uptime|monitor|curl\/|wget|python|axios|node-fetch|go-http|java\/|okhttp|httpclient|preview|scan/i;
+function ipOf(req) { return String(req.headers['x-forwarded-for'] || req.socket && req.socket.remoteAddress || '').split(',')[0].trim() }
+function hourKey(t) { return new Date(t).toISOString().slice(0, 13).replace(/[-T]/g, '') }
+function vHash(req) { return crypto.createHmac('sha256', SECRET).update('an|' + ipOf(req) + '|' + String(req.headers['user-agent'] || '')).digest('base64url').slice(0, 16) }
+function uaInfo(ua) {
+  const dev = /iPad|Tablet|PlayBook|Silk|Kindle/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua)) ? 'Tablet' : /Mobi|iPhone|iPod|Android/i.test(ua) ? 'Phone' : 'Computer';
+  const br = /Edg\//.test(ua) ? 'Edge' : /OPR\/|Opera/.test(ua) ? 'Opera' : /SamsungBrowser/.test(ua) ? 'Samsung Internet' : /Firefox|FxiOS/.test(ua) ? 'Firefox' : /CriOS|Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Other';
+  return { dev, br };
+}
+// where a visit came from: a tidy host name (google.co.uk → google.com, l.instagram.com → instagram.com), a campaign tag, or "direct"
+function refOf(r, utm) {
+  const u = String(utm || '').toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 40); if (u) return u;
+  let h = String(r || '').toLowerCase().replace(/[^a-z0-9.-]/g, '').slice(0, 80).replace(/^(www|m|l|lm|mobile|out)\./, '');
+  if (!h || h === 'itsamepameo.com' || h === 'itsamepameo.co.uk') return 'direct';
+  if (/(^|\.)google\.[a-z.]+$/.test(h)) return 'google.com';
+  if (/(^|\.)bing\.com$/.test(h)) return 'bing.com';
+  if (/(^|\.)(facebook\.com|fb\.me)$/.test(h)) return 'facebook.com';
+  if (/(^|\.)instagram\.com$/.test(h)) return 'instagram.com';
+  if (/(^|\.)pinterest\.[a-z.]+$|^pin\.it$/.test(h)) return 'pinterest.com';
+  if (/^(t\.co|twitter\.com|x\.com)$/.test(h)) return 'x.com';
+  if (/(^|\.)linkedin\.com$|^lnkd\.in$/.test(h)) return 'linkedin.com';
+  if (/(^|\.)yahoo\.[a-z.]+$/.test(h)) return 'yahoo.com';
+  return h;
+}
+async function anExclude(why) { const k = 'an:x:' + hourKey(Date.now()).slice(0, 8); await pipe([['HINCRBY', k, why, '1'], ['EXPIRE', k, AN_TTL]]); return { ok: true } }
+// a visit that led to an enquiry, offer, bid, message, commission request or sign-up
+async function anConvert(req) {
+  try { const sk = 'an:s:' + vHash(req), sess = J(await db('GET', sk)); if (!sess || sess.cv) return; sess.cv = 1;
+    await pipe([['SET', sk, JSON.stringify(sess), 'EX', '1800'], ['HINCRBY', 'an:h:' + sess.h, 'cv', '1'], ['HINCRBY', 'an:h:' + sess.h, 'cr:' + sess.ref, '1']]) } catch (e) { }
+}
+function sumHashes(list) {   // HGETALL replies → one object of totals
+  const t = {}; (list || []).forEach(L => { if (!Array.isArray(L)) return; for (let i = 0; i + 1 < L.length; i += 2) t[L[i]] = (t[L[i]] || 0) + (+L[i + 1] || 0) }); return t;
+}
+function anTop(t, pre, n) { return Object.keys(t).filter(k => k.indexOf(pre) === 0).map(k => [k.slice(pre.length), t[k]]).sort((a, b) => b[1] - a[1]).slice(0, n || 10) }
+function kpiOf(t, uv) { const ses = t.ses || 0; return { uv: uv || 0, pv: t.pv || 0, ses, bounce: ses ? Math.round(1000 * (ses - Math.min(ses, t.nb || 0)) / ses) / 10 : null, avg: ses ? Math.round((t.dms || 0) / 1000 / ses) : null, conv: t.cv || 0 } }
 function cleanBuy(B) {
   B = B && typeof B === 'object' ? B : {}; const t = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, n);
   const pick = (v, ok) => ok.indexOf(v) >= 0 ? v : '';
@@ -204,6 +246,77 @@ const actions = {
     if (ck) { cmds.push(['ZINCRBY', 'g:city', '1', ck]); if (isFinite(lat) && isFinite(lon)) cmds.push(['HSETNX', 'g:ll', ck, lat.toFixed(2) + ',' + lon.toFixed(2)]) }
     await pipe(cmds);
     return { ok: true };
+  },
+
+  // one call per page view (and a light "still here" ping while the page is in use)
+  async hit(req, b) {
+    await limit(req, 'hit', 900, 3600);
+    const ua = String(req.headers['user-agent'] || '');
+    if (!ua || b.wd || BOT_RE.test(ua)) return anExclude('bots');
+    if (+b.o) return anExclude('internal');
+    const ip = ipOf(req), vh = vHash(req), sk = 'an:s:' + vh, now = Date.now(), H = hourKey(now);
+    const [raw, ignored] = await pipe([['GET', sk], ['SISMEMBER', 'an:ignore', ip || '-']]);
+    if (+ignored) return anExclude('internal');
+    const view = b.ev !== 'ping', path = clean(b.p, 100).replace(/[^\w\/.-]/g, '');
+    let sess = J(raw); const cmds = [];
+    if (!sess) {
+      if (!view) return { ok: true };                                   // a ping after the visit ended: nothing to add
+      const { dev, br } = uaInfo(ua), cc = clean(hdr(req, 'x-vercel-ip-country'), 2).toUpperCase() || 'XX', ref = refOf(b.r, b.u);
+      sess = { h: H, st: now, last: now, n: 0, ref, cv: 0 };
+      const hk = 'an:h:' + H;
+      cmds.push(['HINCRBY', hk, 'ses', '1'], ['HINCRBY', hk, 'r:' + ref, '1'], ['HINCRBY', hk, 'c:' + cc, '1'], ['HINCRBY', hk, 'd:' + dev, '1'], ['HINCRBY', hk, 'b:' + br, '1'], ['SETNX', 'an:since', String(now)]);
+      // the long-standing totals and towns list on the Visitors tab
+      const d = day(), city = clean(hdr(req, 'x-vercel-ip-city'), 60), reg = clean(hdr(req, 'x-vercel-ip-country-region'), 10), lat = parseFloat(hdr(req, 'x-vercel-ip-latitude')), lon = parseFloat(hdr(req, 'x-vercel-ip-longitude')), ck = city ? city + '|' + reg + '|' + cc : '';
+      cmds.push(['INCR', 'v:total'], ['INCR', 'v:d:' + d], ['EXPIRE', 'v:d:' + d, AN_TTL], ['PFADD', 'vu:d:' + d, vh], ['EXPIRE', 'vu:d:' + d, AN_TTL], ['PFADD', 'vu:all', vh],
+        ['ZINCRBY', 'g:cc', '1', cc], ['ZINCRBY', 'g:cc:' + d, '1', cc], ['EXPIRE', 'g:cc:' + d, AN_TTL], ['ZINCRBY', 'g:dev', '1', dev], ['ZINCRBY', 'g:ref', '1', ref]);
+      if (ck) { cmds.push(['ZINCRBY', 'g:city', '1', ck]); if (isFinite(lat) && isFinite(lon)) cmds.push(['HSETNX', 'g:ll', ck, lat.toFixed(2) + ',' + lon.toFixed(2)]) }
+    }
+    const hk = 'an:h:' + sess.h;                                        // visit-level numbers belong to the hour the visit began
+    if (view) {
+      sess.n++; cmds.push(['HINCRBY', 'an:h:' + H, 'pv', '1'], ['PFADD', 'an:u:' + H, vh], ['EXPIRE', 'an:u:' + H, AN_TTL], ['EXPIRE', 'an:h:' + H, AN_TTL]);
+      if (sess.n === 2) cmds.push(['HINCRBY', hk, 'nb', '1']);          // a second page: not a bounce
+      if (path) cmds.push(['HINCRBY', 'an:h:' + H, 'p:' + path, '1']);
+    }
+    const gap = Math.min(Math.max(0, now - sess.last), 5 * 60e3);       // time on site, from one sign of life to the next (gaps over 5 minutes count as 5)
+    if (gap > 0) cmds.push(['HINCRBY', hk, 'dms', String(gap)]);
+    sess.last = now;
+    cmds.push(['SET', sk, JSON.stringify(sess), 'EX', '1800'], ['EXPIRE', hk, AN_TTL], ['ZADD', 'an:active', String(now), vh]);
+    await pipe(cmds);
+    return { ok: true };
+  },
+
+  async anActive(req) { await owner(req); const now = Date.now(); const r = await pipe([['ZREMRANGEBYSCORE', 'an:active', '-inf', String(now - 5 * 60e3)], ['ZCARD', 'an:active']]); return { active: +r[1] || 0, at: now } },
+
+  // the owner's report: totals for a range and the one before it, a trend in the buckets the page asks for, and breakdowns
+  async analytics(req, b) {
+    await owner(req);
+    const from = Math.floor(+b.from / HOUR) * HOUR, to = Math.ceil(Math.min(+b.to, Date.now() + HOUR) / HOUR) * HOUR, len = to - from;
+    if (!(len > 0) || len > 93 * 24 * HOUR) throw Object.assign(new Error('Please choose a range of up to 93 days.'), { code: 400 });
+    const hrs = (a, z) => { const o = []; for (let t = a; t < z; t += HOUR) o.push(hourKey(t)); return o };
+    const cur = hrs(from, to), prev = hrs(from - len, from);
+    const buckets = (Array.isArray(b.buckets) ? b.buckets : []).slice(0, 120).map(x => [Math.max(from, Math.floor(+x[0] / HOUR) * HOUR), Math.min(to, Math.ceil(+x[1] / HOUR) * HOUR)]).filter(x => x[1] > x[0]);
+    const days = []; for (let t = from - len; t < to; t += 24 * HOUR) days.push(hourKey(t).slice(0, 8)); days.push(hourKey(to).slice(0, 8));
+    const now = Date.now();
+    const cmds = cur.map(h => ['HGETALL', 'an:h:' + h]).concat(prev.map(h => ['HGETALL', 'an:h:' + h]));
+    cmds.push(['PFCOUNT'].concat(cur.map(h => 'an:u:' + h)), ['PFCOUNT'].concat(prev.map(h => 'an:u:' + h)));
+    buckets.forEach(x => cmds.push(['PFCOUNT'].concat(hrs(x[0], x[1]).map(h => 'an:u:' + h))));
+    [...new Set(days)].forEach(d => cmds.push(['HGETALL', 'an:x:' + d]));
+    cmds.push(['ZREMRANGEBYSCORE', 'an:active', '-inf', String(now - 5 * 60e3)], ['ZCARD', 'an:active'], ['GET', 'an:since'], ['SMEMBERS', 'an:ignore']);
+    const r = await pipe(cmds); let i = 0;
+    const curH = r.slice(i, i += cur.length), prevH = r.slice(i, i += prev.length), uv = +r[i++] || 0, puv = +r[i++] || 0, buv = r.slice(i, i += buckets.length), xs = r.slice(i, i += new Set(days).size);
+    const active = +r[i + 1] || 0, since = +r[i + 2] || 0, ignore = r[i + 3] || [];
+    const T = sumHashes(curH), P = sumHashes(prevH), X = sumHashes(xs), byHour = {}; cur.forEach((h, k) => { byHour[h] = sumHashes([curH[k]]) });
+    const series = buckets.map((x, k) => { const t = sumHashes(hrs(x[0], x[1]).map(h => byHour[h] ? Object.keys(byHour[h]).reduce((a, f) => a.concat([f, byHour[h][f]]), []) : [])); return { t: x[0], end: x[1], uv: +buv[k] || 0, pv: t.pv || 0, ses: t.ses || 0 } });
+    const refs = anTop(T, 'r:', 12).map(([src, visits]) => ({ src, visits, conv: T['cr:' + src] || 0, rate: visits ? Math.round(1000 * (T['cr:' + src] || 0) / visits) / 10 : 0 }));
+    return { from, to, kpi: kpiOf(T, uv), prev: kpiOf(P, puv), series, refs, countries: anTop(T, 'c:', 12), devices: anTop(T, 'd:', 5), browsers: anTop(T, 'b:', 8), pages: anTop(T, 'p:', 10),
+      active, since, excluded: { bots: X.bots || 0, internal: X.internal || 0 }, ignore, yourIp: ipOf(req) };
+  },
+
+  // networks (IP addresses) whose visits shouldn't count, e.g. home or studio wifi
+  async anIgnore(req, b) {
+    await owner(req); const ip = String(b.ip || '').trim();
+    if (!/^[0-9a-f:.]{3,45}$/i.test(ip)) throw Object.assign(new Error('That doesn’t look like an IP address.'), { code: 400 });
+    await db(b.remove ? 'SREM' : 'SADD', 'an:ignore', ip); return { ok: true, ignore: await db('SMEMBERS', 'an:ignore') };
   },
 
   async signup(req, b) {
@@ -659,7 +772,8 @@ header.top .wrap{padding-top:.55rem;padding-bottom:.55rem}
 ` + Object.keys(RING).map(k => '.fr-' + k + '{box-shadow:0 10px 24px rgba(30,18,12,.28),' + RING[k] + '}').join('');
 
 // a little script: turns the written-out email into a link, and asks before anyone saves a painting (the page works without it)
-const PAGE_JS = "(function(){function f(){document.querySelectorAll('[data-count]').forEach(function(e){var d=+e.getAttribute('data-count')-Date.now();if(d<=0){e.textContent='a moment — refresh to see it';return}var h=Math.floor(d/36e5),m=Math.floor(d%36e5/6e4);e.textContent=h>=48?Math.round(h/24)+' days':h?h+'h '+m+'m':m+' minutes'})}f();setInterval(f,30000)})();" +
+const PAGE_JS = "(function(){try{if(navigator.webdriver||localStorage.getItem('pgNoTrack')==='1')return;var r='';try{r=document.referrer?new URL(document.referrer).hostname:''}catch(e){}if(r===location.hostname)r='';var u=new URLSearchParams(location.search).get('utm_source')||'',d=JSON.stringify({a:'hit',ev:'view',p:location.pathname,r:r,u:u});if(!(navigator.sendBeacon&&navigator.sendBeacon('/api/app',new Blob([d],{type:'text/plain'}))))fetch('/api/app',{method:'POST',body:d,keepalive:true})}catch(e){}})();" +
+  "(function(){function f(){document.querySelectorAll('[data-count]').forEach(function(e){var d=+e.getAttribute('data-count')-Date.now();if(d<=0){e.textContent='a moment — refresh to see it';return}var h=Math.floor(d/36e5),m=Math.floor(d%36e5/6e4);e.textContent=h>=48?Math.round(h/24)+' days':h?h+'h '+m+'m':m+' minutes'})}f();setInterval(f,30000)})();" +
   "document.querySelectorAll('[data-u]').forEach(function(e){var a=document.createElement('a'),m=e.getAttribute('data-u')+'@'+e.getAttribute('data-d');a.href='mailto:'+m;a.textContent=m;e.replaceWith(a)});" +
   "document.addEventListener('contextmenu',function(e){if(e.target.tagName==='IMG'){e.preventDefault();var n=document.getElementById('protN');if(n){n.hidden=false;clearTimeout(window.__pt);window.__pt=setTimeout(function(){n.hidden=true},4500)}}});";
 const PAGE_JS_HASH = "'sha256-" + crypto.createHash('sha256').update(PAGE_JS).digest('base64') + "'";
@@ -785,7 +899,7 @@ async function privacyPage(res) {
     body: '<section class="intro" style="max-width:760px"><p class="kick">Privacy</p><h1>Your information</h1><p class="lede">Pam’s Gallery is run by Pam, an independent artist in the UK, who is responsible for the information you share here. If you have any questions, email ' + emailSpan(email) + '.</p>' +
       P('What is collected, and why', 'When you enquire, make an offer, bid, send a message or request a commission, your name, email address, any phone number and what you write are kept so Pam can reply and arrange a sale. If you create an account, your name, email and a securely scrambled version of your password are kept, along with the paintings you’ve bought, so a completed collection can be rewarded. Reference photos sent with a commission request are private and only Pam can open them.') +
       P('Email updates', 'If you sign up for news of new work and exhibitions (or tick the box when creating an account), your email address and the date and wording of your consent are kept. You’ll only get those emails because you asked for them, and every one has a one-click unsubscribe link. Members who opt in also hear when new work opens early for members.') +
-      P('Visits', 'The site counts visits and notes the rough area a visit comes from (country and town, worked out by the hosting service) so Pam can see where interest comes from. No advertising or tracking cookies are used, and nothing identifies you personally.') +
+      P('Visits', 'The site counts visits without cookies and without storing anything on your device. It notes, as totals, the rough area a visit comes from (country and town, worked out by the hosting service), the website that sent you, your type of device and browser, and how long the visit lasted, so Pam can see where interest comes from. To tell one visit from the next, it uses a scrambled code made from your connection and browser that can’t be turned back into either, kept for no longer than 30 minutes. No advertising or tracking cookies are used, and nothing identifies you personally.') +
       P('Who else is involved', 'The site is hosted by Vercel and its data is stored with Upstash. Emails are sent by Resend, and card payments, if you choose to pay by card, are handled by Stripe. They process information only to provide those services. Your details are never sold or shared for marketing.') +
       P('How long it is kept, and your rights', 'Enquiries and messages are kept for as long as they’re needed to look after your purchase and for records, and account details until you ask for your account to be deleted. You can ask to see, correct or delete your information, or withdraw consent, at any time by emailing Pam. You also have the right to complain to the Information Commissioner’s Office (ico.org.uk).') + '</section>' }));
 }
@@ -844,7 +958,9 @@ module.exports = async (req, res) => {
     const fn = actions[b.a];
     if (!fn) { res.status(400).json({ error: 'Unknown request.' }); return }
     if (b.a !== 'health' && !(DB_URL && DB_TOKEN)) { res.status(503).json({ error: 'Accounts are being set up — please email Pam for now.', code: 'not_configured' }); return }
-    res.status(200).json(await fn(req, b));
+    const out = await fn(req, b);
+    if (out && out.ok && /^(order|bid|message|commission|sub|signup)$/.test(b.a)) await anConvert(req);
+    res.status(200).json(out);
   } catch (e) {
     const code = e.code && e.code >= 400 && e.code < 600 ? e.code : 500, q = req.query || {};
     if (code === 500 && (req.method === 'GET' || req.method === 'HEAD') && (q.page || q.s || q.confirm || q.unsub)) {   // a page, not the app: a friendly page rather than an error code
