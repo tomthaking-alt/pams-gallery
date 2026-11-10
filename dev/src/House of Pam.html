@@ -40,7 +40,7 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #lookBtn[aria-pressed="true"]{color:var(--walnut)}@media (max-width:700px){#lookBtn{min-width:40px;min-height:40px;font-size:1.05rem}}
 body.hasBanner .dreampill{top:calc(var(--barh,56px) + 40px)}
 @media (min-width:701px){#where{display:none}body.atDoor:not(.gIntro) #walk,body.atDoor:not(.gIntro) #hint{visibility:hidden;opacity:0;pointer-events:none}body.atDoor #gBub{bottom:136px}}
-.ink #title{padding-bottom:17vh}.ink #title h1{color:#221c18;text-shadow:0 0 18px #f6f2ea,0 0 36px #f6f2ea}.ink #title p{color:#2a221c;font-weight:500;text-shadow:0 0 4px #f6f2ea,0 0 10px #f6f2ea,0 0 18px #f6f2ea;background:rgba(246,242,234,.78);padding:.45em 1.1em;border-radius:99px}   /* the ink look: the title sits in the open paper sky, clear of the drawn railing */
+.ink #title{padding-bottom:11vh}.ink #title h1{color:#221c18;text-shadow:0 0 18px #f6f2ea,0 0 36px #f6f2ea}.ink #title p{color:#2a221c;font-weight:500;text-shadow:0 0 4px #f6f2ea,0 0 10px #f6f2ea,0 0 18px #f6f2ea;background:rgba(246,242,234,.78);padding:.45em 1.1em;border-radius:99px}   /* the ink look: the title sits in the open paper sky, clear of the drawn railing */
 .dream #title h1{text-shadow:0 2px 22px rgba(30,14,70,.9),0 0 64px rgba(120,80,255,.5)}.dream #title p{text-shadow:0 1px 12px rgba(24,10,60,.95)}
 #title p{margin:1rem 0 0;font-size:clamp(.72rem,1.6vw,.85rem);letter-spacing:.42em;text-transform:uppercase;color:#fff6e6;text-shadow:0 1px 12px rgba(40,20,5,.7)}
 #hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 22px);z-index:3;color:#faf9f7;background:rgba(43,30,24,.85);backdrop-filter:blur(6px);padding:.65rem 1.3rem;border-radius:99px;font-size:.85rem;letter-spacing:.08em;pointer-events:none}
@@ -1018,7 +1018,7 @@ var DREAM_DEFAULT=false;
 /* looks to compare in the preview: dream; ink (the clay room drawn in ink on paper, paintings in full colour); paint (the room painted in
    swirling brushstrokes in the colours of Pam's work); clay (today's live look) */
 var LOOKQ=(location.search.match(/[?&]look=(dream|ink|paint|clay)\b/)||[])[1],LOOKS=null;try{LOOKS=localStorage.getItem('pgLook')}catch(e){}
-var LOOK=LOOKQ||(DREAM_DEFAULT?(LOOKS==='paint'?'paint':'ink'):'clay');   // the preview opens on the ink look Pam chose (or the colour version, if this visitor switched to it)
+var LOOK=LOOKQ||(LOOKS==='paint'?'paint':'ink');   // the ink drawing (Pam's choice), or the colour version if this visitor switched to it
 var DREAM=LOOK==='dream',INK=LOOK==='ink',PAINTED=LOOK==='paint';   // (not 'PAINT': that name is the painting-canvas cache further down)
 var LOOKTOG=INK||PAINTED,LOOKNOW=LOOK;   // the ink drawing and the painted colour version share one room, so a button switches between them at any time
 /* the layout Pam asked for (November 2026): every collection in the main gallery hall, this month’s favourites in the side room */
@@ -2290,7 +2290,7 @@ if(!gl||!gl.getExtension('EXT_color_buffer_float')){fallback();return}
 var ANISO=gl.getExtension('EXT_texture_filter_anisotropic');
 
 /* ---------- layout (metres) ---------- */
-var X0=-4,X1=4,ZB=COLMAIN?2.5:0,ZF=-10,RH=3.6,T=0.2,BAL=-13.3;   // with the collections in the main hall it is 2.5 m deeper at the entrance end
+var X0=-4,X1=4,ZB=COLMAIN?3.5:0,ZF=-10,RH=3.6,T=0.2,BAL=-13.3;   // with the collections in the main hall it is 3.5 m deeper at the entrance end, so each collection hangs at full size
 
 var v3={add:function(a,b){return[a[0]+b[0],a[1]+b[1],a[2]+b[2]]},sub:function(a,b){return[a[0]-b[0],a[1]-b[1],a[2]-b[2]]},sc:function(a,s){return[a[0]*s,a[1]*s,a[2]*s]},dot:function(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]},cross:function(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]},norm:function(a){var l=Math.hypot(a[0],a[1],a[2])||1;return[a[0]/l,a[1]/l,a[2]/l]}};
 var M4={
@@ -2724,6 +2724,7 @@ var CT=3.0; // height where the columns meet the frieze
 // grows: each collection gets a wall as long as it needs, along the back wall (on your left as you come in), then the end wall,
 // then along the front wall, finishing on the wall by the portal, the way out. Columns stand between neighbouring walls.
 var CSC=1.4,CGAP=.3,CLW=.65;
+function soonOnly(c){return !c.works.some(function(k){return ART[k]})}   // a collection with no paintings yet: shown as 'coming soon'
 function hangsColl(c){return c.works.some(function(k){return ART[k]})||c.soon>0}
 function cWorks(c){return c.works.filter(function(k){return ART[k]}).slice(0,12)}
 function cWidth(c,soonToo){var ws=cWorks(c),soon=soonToo?Math.min(c.soon||0,ws.length+1):0,t=soon*CLW;ws.forEach(function(k){t+=ART[k].w*CSC+.31});return t+CGAP*Math.max(0,ws.length+soon-1)}
@@ -2762,10 +2763,13 @@ var MAINW=COLMAIN?(function(){var list=[],walls={},over=[];COLLECTIONS.forEach(f
  list.forEach(function(ci){while(wi<Wl.length){var L=Math.abs(Wl[wi].a-Wl[wi].b),g=G[wi].length?.9:0;
    if(used+g+need(ci,.8)<=L||(!G[wi].length&&need(ci,.6)<=L)){G[wi].push(ci);used+=g+need(ci,.8);return}wi++;used=0}over.push(ci)});
  if(!G[3].length&&G[2].length){G[3]=G[2];G[2]=[]}   // a lone collection on the left goes by the statue, so the first view has art on both sides
+ if(G[3].length&&G[3].every(function(ci){return soonOnly(COLLECTIONS[ci])})&&G[2].length&&!G[2].every(function(ci){return soonOnly(COLLECTIONS[ci])})){var tg=G[2];G[2]=G[3];G[3]=tg}   // 'coming soon' walls by the entrance, paintings by the statue
  G.forEach(function(g,i){if(g.length)lay(Wl[i],g)});
+ var order=[];G.forEach(function(g){g.forEach(function(ci){order.push(ci)})});
  if(over.length){lay({x:XW-.025,ry:-Math.PI/2,a:ZF+.6,b:PZ1-.21,st:8.6},over);console.warn('Collections hung in the side room for lack of space:',over)}
- return{walls:walls,over:over}})():null;
+ return{walls:walls,over:over,order:order}})():null;
 function overflowColl(ci){return !!(MAINW&&MAINW.over.indexOf(ci)>=0)}
+function collOrder(){var o=[];if(MAINW)MAINW.order.forEach(function(ci){if(COLPOS[ci])o.push(ci)});COLPOS.forEach(function(a,ci){if(a&&o.indexOf(ci)<0)o.push(ci)});return o}   // the walk's order: wall by wall
 rect(Mx.floor,XL-T,X1+T,-.15,0,ZF-.05,ZB);
 rect(Mx.ceiling,XL-T,X1+T,RH,RH+.3,ZF-.7,ZB+T);
 if(DREAM)quadL(Mx.skyWin,B([0,0,0]),[(X0+X1)/2,RH-.03,(ZB+ZF)/2],[1,0,0],[0,0,1],(X1-X0)/2,(ZB-ZF)/2,[0,-1,0]);   // the dream: the welcome ceiling opens onto the sky
@@ -3040,11 +3044,11 @@ function lockedFrame(o,ry,w,h,f,ct){var b=B(o,ry),fm=DREAM?Mx.goldDark:Mx.gold24
  box(Mx.edge,b,[0,0,.012],[w,h,.024],[4]);
  var n=bn(b,[0,0,1]),ax=bn(b,[1,0,0]),c=bx(b,[0,0,.0245]);
  LABELS.push(function(){label(lockedCanvas(),c,ax,[0,1,0],w,h,n,{go:function(){},tip:'<i>Coming soon</i> · a new painting for '+esc(ct),far:14},{blend:0,rough:.85})})}
-function wallTitle(ci,t){return textCanvas(2048,300,function(x,W,H){x.textAlign='center';
- if(DREAM){x.font='600 54px Jost,Helvetica,Arial,sans-serif';var cw=x.measureText('COLLECTION '+roman(ci)).width+18*12+300;x.font='italic 600 158px "Cormorant Garamond",Georgia,serif';
+function wallTitle(ci,t){var K=soonOnly(COLLECTIONS[ci])?'COMING SOON':'COLLECTION '+roman(ci);return textCanvas(2048,300,function(x,W,H){x.textAlign='center';
+ if(DREAM){x.font='600 54px Jost,Helvetica,Arial,sans-serif';var cw=x.measureText(K).width+18*12+300;x.font='italic 600 158px "Cormorant Garamond",Georgia,serif';
   var pw=Math.min(W-16,Math.max(cw,x.measureText(t).width)+140);x.fillStyle='rgba(20,16,26,.6)';rrect(x,(W-pw)/2,8,pw,H-16,4);x.fill();x.strokeStyle='#b89a6a';x.lineWidth=2;x.stroke()}
- x.fillStyle=DREAM?'#d9bf90':'#3a2030';x.font=(DREAM?'600':'700')+' 54px Jost,Helvetica,Arial,sans-serif';spaced(x,'COLLECTION '+roman(ci),W/2,64,18);
- var kw=x.measureText('COLLECTION '+roman(ci)).width+18*12;x.fillRect(W/2-kw/2-150,46,110,3);x.fillRect(W/2+kw/2+40,46,110,3);
+ x.fillStyle=DREAM?'#d9bf90':'#3a2030';x.font=(DREAM?'600':'700')+' 54px Jost,Helvetica,Arial,sans-serif';spaced(x,K,W/2,64,18);
+ var kw=x.measureText(K).width+18*12;x.fillRect(W/2-kw/2-150,46,110,3);x.fillRect(W/2+kw/2+40,46,110,3);
  x.fillStyle=DREAM?'#efe5d2':'#24150c';x.font='italic 600 '+(DREAM?140:158)+'px "Cormorant Garamond",Georgia,serif';x.fillText(t,W/2,234)})}
 function carved(t,W,H,px,sp){return textCanvas(W,H,function(x){x.textAlign='center';x.textBaseline='middle';x.font='500 '+px+'px "Cormorant Garamond",Georgia,serif';
  if(DREAM){var tw=Math.min(W-96,x.measureText(t).width+sp*(t.length-1));x.fillStyle='rgba(20,16,26,.7)';rrect(x,(W-tw)/2-40,8,tw+80,H-16,4);x.fill();x.strokeStyle='#b89a6a';x.lineWidth=2;x.stroke()}
@@ -3059,7 +3063,7 @@ var COLPOS=[],SCC=CSC,CYC=1.58,CWALL=COLLECTIONS.map(function(c,ci){return (COLM
 COLLECTIONS.forEach(function(c,ci){var W=CWALL[ci];if(!W)return;var b=B(W.c,W.ry),gap=.3,LW=.5,LH=.665,LF=.075,sc=SCC;
  // small locked frames alternate with the works: soon, work, soon, work, soon
  var works=cWorks(c),soon=Math.min(c.soon||0,works.length+1),seq,widths,tot;
- function lay(){seq=[];for(var i=0;i<Math.max(works.length,soon);i++){if(i<soon)seq.push(-1);if(i<works.length)seq.push(works[i])}
+ function lay(){seq=[];for(var i=0;i<Math.max(works.length,soon);i++){if(COLMAIN){if(i<works.length)seq.push(works[i]);if(i<soon)seq.push(-1)}else{if(i<soon)seq.push(-1);if(i<works.length)seq.push(works[i])}}
   widths=seq.map(function(k){return k<0?LW+2*LF:ART[k].w*sc+.31});tot=widths.reduce(function(a,v){return a+v},0)+gap*Math.max(0,seq.length-1)}
  lay();while(tot>W.w&&soon>0){soon--;lay()}if(tot>W.w){sc=SCC*Math.max(.6,(W.w-gap*(seq.length-1))/(tot-gap*(seq.length-1)));lay()}
  if(!seq.length)return;var x=-tot/2,hung=[];
@@ -3333,7 +3337,7 @@ function drawWalker(u){var tt=window.__ct!=null?window.__ct:NOWS,st=crState(tt);
  gl.uniform1f(u.uFog,0);gl.uniformMatrix4fv(u.uM,false,IDM)}
 
 // polished ceiling with recessed brass-trimmed downlights in the coffers
-if(!DREAM)(ZB>1?[1.6,0]:[]).concat([-1.6,-3.2,-4.8,-6.4,-8.0]).forEach(function(z){[-1.6,1.6].concat(Math.abs(z+5.2)>1?[0]:[]).forEach(function(x){
+if(!DREAM)(ZB>1?[3.2,1.6,0]:[]).filter(function(z){return z<ZB-.5}).concat([-1.6,-3.2,-4.8,-6.4,-8.0]).forEach(function(z){[-1.6,1.6].concat(Math.abs(z+5.2)>1?[0]:[]).forEach(function(x){
  lathe(Mx.lens,B([x,RH-.004,z]),[0,0,0],[[0,0],[.05,0]],24);torus(Mx.gold,B([x,RH-.006,z]),[0,0,0],.062,.008,32)})});
 // tiered crystal cascade chandelier with a brass crown, under a plaster ceiling rose (like Pam's living room)
 var ROSE=mat({col:'#f6f3ec',rough:.4});
@@ -3643,7 +3647,7 @@ function buildK(){var as=innerWidth/Math.max(1,innerHeight),vf=fovFor(as),hf=2*M
   a.works.forEach(function(q){var s2=standAt(q,wide?2.2:1.0,1.9,5.5),qx=q.c[0]+q.n[0]*s2,qz=q.c[2]+q.n[2]*s2;L.push([qx,qz,y,pp],[qx,qz,y,pp])})}
  if(COLMAIN){   // the main hall: round every collection, turning right each time, then out to the balcony
   KF.push([0,-.9,0,0],[0,-.9,0,0],[0,-2.2,0,0]);
-  COLPOS.forEach(function(a,ci){if(!a||overflowColl(ci))return;var y=Math.atan2(a.n[0],a.n[2]);while(y>yaw+1e-3)y-=Math.PI*2;yaw=y;collStops(KF,ci,y)});
+  collOrder().forEach(function(ci){var a=COLPOS[ci];if(!a||overflowColl(ci))return;var y=Math.atan2(a.n[0],a.n[2]);while(y>yaw+1e-3)y-=Math.PI*2;yaw=y;collStops(KF,ci,y)});
   var yb=0;while(yb>yaw+1e-3)yb-=Math.PI*2;if(KF[KF.length-1][1]>-5.2)KF.push([0,-5.2,yb,0]);KF.push([0,-8.6,yb,0],[0,-10.0,yb,0],[0,-10.35,yb,0],[0,-10.35,yb,0]);
   // the side room: left through the portal to this month's favourites (and any collection that didn't fit the hall), then back out
   yaw=Math.PI/2;KC.push([0,-.9,0,0],[0,-.9,0,0],[-1.4,PZC,Math.PI/2,0],[-5.7,PZC,Math.PI/2,0]);
@@ -3709,7 +3713,7 @@ function frame(time){
 }
 /* ---------- previous / next: the arrows turn you the way they point; right for the favourites, left for the collections ---------- */
 function favStops(S,k0){ARTPOS.forEach(function(a,i){S.push({k:k0+2*i+.5,label:'<i>'+esc(ART[a.k].t)+'</i> · '+(i+1)+'/'+ARTPOS.length,art:a.k})});return k0+2*ARTPOS.length}
-function collStopsL(S,k,want){COLPOS.forEach(function(a,ci){if(!a||!want(ci))return;var c=COLLECTIONS[ci];S.push({k:k+.5,label:'Collection '+roman(ci)+' · <i>'+esc(c.t)+'</i>',coll:ci});k+=2;
+function collStopsL(S,k,want){(COLMAIN?collOrder():COLPOS.map(function(a,ci){return ci})).forEach(function(ci){var a=COLPOS[ci];if(!a||!want(ci))return;var c=COLLECTIONS[ci];S.push({k:k+.5,label:(soonOnly(c)?'Coming soon':'Collection '+roman(ci))+' · <i>'+esc(c.t)+'</i>',coll:ci});k+=2;
  a.works.forEach(function(q){S.push({k:k+.5,label:'<i>'+esc(ART[q.k].t)+'</i> · '+esc(c.t),art:q.k,coll:ci});k+=2})});return k}
 var SF=[{k:0,label:'Welcome'}],SC=[{k:0,label:'Welcome'}];
 if(COLMAIN){collStopsL(SF,3,function(ci){return !overflowColl(ci)});collStopsL(SC,favStops(SC,4),overflowColl)}
@@ -3749,7 +3753,7 @@ function updateWalk(){if(pend&&atDoor()){var q0=pend;pend=null;setRoute(q0.r);go
  pvEl.title=L;pvEl.setAttribute('aria-label',L||'Turn left');pvEl.classList.toggle('end',!L);wzEl.hidden=!at;abEl.querySelector('.abprev').classList.toggle('end',!L);abEl.querySelector('.abnext').classList.toggle('end',!R);
  waysEl.classList.toggle('on',door&&(!intro||phone));document.body.classList.toggle('atDoor',door);waysEl.classList.toggle('walk',phone&&!door);$('wayL').classList.toggle('end',!pl);$('wayR').classList.toggle('end',!pr);
  var S=STOPS[a.i],wall=!go&&!pend&&(th||a.d<.35)&&S&&S.coll!=null&&S.art==null,wt=$('wallText');
- if(wall&&wt.dataset.c!==String(S.coll)){var C=COLLECTIONS[S.coll];wt.dataset.c=S.coll;wt.querySelector('.wk').textContent='Collection '+roman(S.coll);wt.querySelector('.wt').textContent=C.t;wt.querySelector('.wd').textContent=C.d||'';
+ if(wall&&wt.dataset.c!==String(S.coll)){var C=COLLECTIONS[S.coll];wt.dataset.c=S.coll;wt.querySelector('.wk').textContent=soonOnly(C)?'Coming soon':'Collection '+roman(S.coll);wt.querySelector('.wt').textContent=C.t;wt.querySelector('.wd').textContent=C.d||'';
   wt.querySelector('.wn').textContent=(phone?'Swipe right':'Press ›')+' to walk up close to each painting';}
  wt.classList.toggle('on',!!wall);
  artBarSet(at?STOPS[a.i].art:null);
