@@ -34,7 +34,7 @@ var S3=new THREE.Scene(),C3=new THREE.PerspectiveCamera(50,1,.05,200);S3.matrixW
 var G3={uPass:{value:0},uFar:{value:FAR},uRes:{value:new THREE.Vector2(1,1)},uReflTex:{value:null},uRoom:{value:new THREE.Vector4(X0,X1,ZB,ZF)},uRH:{value:RH},uSecs:{value:0},uCalm:{value:0},uEnvD:{value:.15},uDomeC:{value:new THREE.Vector3(0,1.6,-10)}};
 
 /* the painted sky and land, ported from the original renderer */
-var ENVBAKE=__ENVBAKE__;if(DRM)ENVBAKE=null;   // the dream captures its own room's light at load
+var ENVBAKE=__ENVBAKE__;if(DRM||ZB>1)ENVBAKE=null;   // the dream, and the deeper hall, capture their own room's light at load   // the dream captures its own room's light at load
 var SKYFUNCS=__SKYFUNCS__;
 var SKYBASE=__SKYBASE__;
 var SKYM=new THREE.ShaderMaterial({uniforms:{uSecs:G3.uSecs,uFar:G3.uFar,uDomeC:G3.uDomeC,uPass:G3.uPass},side:THREE.DoubleSide,
@@ -239,7 +239,7 @@ function captureEnv(){var pp=G3.uPass.value;hideDyn();syncBlend();G3.uPass.value
 
 /* the dream: motes of light drifting slowly upwards, high in both rooms (above the paintings) and over the balcony */
 var MOTES=null;
-function dreamMotes(){var N=LOWGPU?90:(mobile?160:320),AT=typeof ARTTOP!=='undefined'?ARTTOP:2.6,CTP=typeof COLTOP!=='undefined'?COLTOP:2.6;
+function dreamMotes(){var N=LOWGPU?90:(mobile?160:320),AT=typeof TOPM!=='undefined'?TOPM:2.6,CTP=typeof TOPS!=='undefined'?TOPS:2.6;
  var bands=[[X0+.9,X1-.9,ZF+.9,ZB-.9,Math.max(2.3,AT+.35),3.4,.45],[XL+.9,XW-.9,ZF+.9,ZB-.9,Math.max(2.95,CTP+.35),3.45,.3],[-6,6,-20,-11,1.2,6,.25]].filter(function(b){return b[4]<b[5]-.08});
  var tot=bands.reduce(function(a,b){return a+b[6]},0),P=[],S=[],BA=[],CO=[],pal=['#ffe2b0','#fff4e6','#e2d6ff','#ffd29a'].map(lin);
  bands.forEach(function(b){var n=Math.round(N*b[6]/tot);for(var i=0;i<n;i++){P.push(b[0]+(b[1]-b[0])*rnd(),b[4]+(b[5]-b[4])*rnd(),b[2]+(b[3]-b[2])*rnd());S.push(rnd()*100);BA.push(b[4],b[5]);var c=pal[(i*7+3)%4];CO.push(c[0],c[1],c[2])}});
