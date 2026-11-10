@@ -2546,22 +2546,22 @@ if(CLAY){[[Mx.floor,'#eccaa9',3.2,.78,.22],[Mx.marble,'#f3dcc6',1.8,.85,.3],[Mx.
  Mx.goldDark.col=lin('#a87a2c');Mx.goldDark.metal=.25;Mx.goldDark.rough=.55}
 /* ---------- the dream look: twilight amethyst walls with a slow oil-on-water sheen, moon-pearl stone, a night-lake floor with rings of
    light, a sky ceiling, glowing seams and bead clusters. dream:[kind,strength,scale] picks the moving light drawn on a surface
-   (backend.js, dreamGlow): 1 sheen, 2 floor rings, 3 ribbon, 4 the collections star chart. dreamC tints the collections room. ---------- */
+   (backend.js, dreamGlow): 1 sheen, 2 floor rings, 3 gold circles on the frieze, 4 the collections star chart, 5 mother-of-pearl. dreamC tints the collections room. ---------- */
 var DPH=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);   // phones (the renderer's own test isn't ready yet here)
 if(DREAM){var dm=function(m,c,r,d,dc){m.col=lin(c);m.rough=r;m.metal=0;m.bump=Math.min(m.bump,.12);m.refl=0;if(d)m.dream=d;if(dc)m.dreamC=dc};
- dm(Mx.wall,'#6f5fa0',.8,[1,.07,.3],[.36,.3,.55]);        // twilight amethyst; the collections room is midnight velvet
- dm(Mx.floor,'#2b2545',.22,[2,.55],[.85,.85,.95]);        // a night lake with rings of light
+ dm(Mx.wall,'#5a5478',.82,[1,.05,.3],[.5,.46,.62]);      // dusky twilight plum; the collections room is deeper still
+ dm(Mx.floor,'#26223a',.22,[2,.28],[.85,.85,.95]);        // a night lake with fine rings of light
  dm(Mx.ceiling,'#17122c',.6,[4,1]);                       // deep vault; a slowly turning gold star chart over the collections
- dm(Mx.coffer,'#3b3160',.45,[1,.16,.5]);                   // a dark pearl lattice under the sky window
- dm(Mx.key,'#120d22',.5,[3,1.0,.5]);                      // a ribbon of aurora light instead of the Greek key
- dm(Mx.marble,'#d9d0e8',.3,[1,.08,.35]);                  // moon pearl
+ dm(Mx.coffer,'#3b3160',.45,[5,.12]);                     // a dark mother-of-pearl lattice under the sky window
+ dm(Mx.key,'#15112a',.5,[3,.55]);                         // large interlocking circles of fine gold that breathe and drift, instead of the Greek key
+ dm(Mx.marble,'#d9d0e8',.3,[5,.1]);                       // moon pearl with a mother-of-pearl shimmer
  dm(Mx.tile,'#b9addb',.35);                               // cloud-glass terrace
  Mx.gold.col=lin('#e7b8a4');Mx.gold.rough=.28;            // rose gold rails and rings (picture frames use other golds)
- Mx.colD=mat({col:'#e4dcf0',tex:TX.marble,rough:.28,uvs:[1.4,1.4],dream:[1,.15,.6]});
+ Mx.colD=mat({col:'#e4dcf0',tex:TX.marble,rough:.28,uvs:[1.4,1.4],dream:[5,.14]});
  Mx.skyWin=mat({isSky:1,unlit:1,win:1});
  Mx.seam=mat({col:'#d9c8ff',emis:[1.6,1.6,1.6],unlit:1});
- Mx.seamT=mat({col:'#63f0dc',emis:[2.6,2.6,2.6],unlit:1});
- Mx.orbA=mat({col:'#63f0dc',emis:[9,9,9],unlit:1,pulse:1});Mx.orbB=mat({col:'#ff6fc2',emis:[9,9,9],unlit:1,pulse:1});Mx.orbC=mat({col:'#ffc977',emis:[10,10,10],unlit:1,pulse:1})}
+ Mx.seamT=mat({col:'#ffdcae',emis:[2.4,2.4,2.4],unlit:1});
+ Mx.orbA=mat({col:'#fff4e6',emis:[7,7,7],unlit:1,pulse:1});Mx.orbB=mat({col:'#ffd29a',emis:[8,8,8],unlit:1,pulse:1});Mx.orbC=mat({col:'#ffc4a8',emis:[7,7,7],unlit:1,pulse:1})}   // pearl, champagne and rose-gold light
 function dreamFinish(){if(!DREAM||typeof COMPM==='undefined')return;var f=COMPM.fragmentShader;
  function r(a,b){if(f.indexOf(a)>=0)f=f.replace(a,b);else console.warn('dreamFinish: grade anchor not found')}
  r('c=mix(vec3(l),c,.88);','c=mix(vec3(l),c,1.06);c+=vec3(.016,.004,.03)*(1.-smoothstep(0.,.45,l));');   // a touch more colour, violet-lifted shadows

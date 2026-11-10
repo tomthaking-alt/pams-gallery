@@ -24,7 +24,7 @@ var SHS=mobile||LOWGPU?2048:4096,RT={w:2,h:2},dirty=2;
 var SUN=v3.norm([-.6,.26,-.76]),SUNCOL=[4.4,3.6,2.7],SKY=lin('#eef0f2').map(function(v){return v*.44}),GROUND=lin('#8a6a52').map(function(v){return v*.2}),FAR=60,SKYSUN=v3.norm([-.6,.06,-.76]);
 var EXPOSURE=.95,BLOOMK=.022,BLOOMT=3.5,RAYK=1.,cam={x:0,y:1.62,z:-2.4,yaw:0,pitch:0,fov:1};
 var DRM=(typeof DREAM!=='undefined'&&DREAM);   // the dream look: a rose sun, lavender sky light, teal light from below, a softer, wider glow
-if(DRM){SUNCOL=[3.0,1.5,1.9];SKY=lin('#b4a2ff').map(function(v){return v*.42});GROUND=lin('#2f6d78').map(function(v){return v*.2});BLOOMK=.085;BLOOMT=2.0;EXPOSURE=1.0}
+if(DRM){SUNCOL=[3.2,2.2,2.0];SKY=lin('#c9c0ea').map(function(v){return v*.4});GROUND=lin('#3a3456').map(function(v){return v*.2});BLOOMK=.07;BLOOMT=2.0;EXPOSURE=1.0}
 function fovFor(as){var deg=as>=1.2?46:as>=.8?54:64;return deg*Math.PI/180}   // vertical field of view, like a 35-50mm film lens
 function camDir(){var cp=Math.cos(cam.pitch);return[-Math.sin(cam.yaw)*cp,Math.sin(cam.pitch),-Math.cos(cam.yaw)*cp]}
 
@@ -47,8 +47,8 @@ var DSKY='vec3 dpal(float t){return .5+.5*cos(6.2832*(t+vec3(0.,.33,.67)));}\n'+
  ' float az=atan(d.x,-d.z)+uSecs*.006;az=abs(mod(az,.7854)-.3927);vec2 p=vec2(cos(az),sin(az))*(1.-e)*2.6;\n'+
  ' float w=fb3(p*1.3+vec2(uSecs*.01,0.))*4.;vec2 q=p+vec2(sin(w),cos(w))*.35;float n1=fb3(q*2.2);\n'+
  '#ifndef DLITE\n n1=n1*.7+fb3(q*4.7+3.)*.3;\n#endif\n'+
- ' vec3 ink=dpal(n1*1.3+uSecs*.0042);float fil=pow(.5+.5*sin(n1*42.),10.);float m=smoothstep(.04,.3,e);\n'+
- ' c+=ink*smoothstep(.38,.74,n1)*.75*m+ink*fil*.3*m;return c;}\n'+
+ ' vec3 ink=mix(vec3(.85,.78,1.),dpal(n1*1.3+uSecs*.0042),.45);float fil=pow(.5+.5*sin(n1*42.),10.);float m=smoothstep(.04,.3,e);\n'+
+ ' c+=ink*smoothstep(.4,.76,n1)*.45*m+ink*fil*.2*m;return c;}\n'+
  'vec3 dreamSea(vec3 d){float e=-d.y;vec2 sp=d.xz/(e+.004);float rp=sin(length(sp-vec2(0.,-30.))*.8-uSecs*.6)*.004*smoothstep(0.,.2,e);\n'+
  ' vec3 c=dreamSky(normalize(vec3(d.x+rp,max(e,.003),d.z)))*.55;return mix(c,skyBase(vec3(d.x,0.,d.z))*.9,smoothstep(.06,0.,e)*.5);}\n';
 var SKYD=null,SKYW=null;
@@ -56,7 +56,13 @@ if(DRM){var skyHead='uniform float uSecs,uFar,uPass;uniform vec3 uDomeC;varying 
  SKYD=new THREE.ShaderMaterial({uniforms:SKYM.uniforms,side:THREE.DoubleSide,defines:mobile||LOWGPU?{DLITE:''}:{},vertexShader:SKYM.vertexShader,
   fragmentShader:skyHead+'void main(){if(uPass>.5&&uPass<1.5&&vW.y<0.)discard;vec3 d=normalize(vW-uDomeC);vec3 c=(d.y>=0.?dreamSky(d):dreamSea(d))*.85;gl_FragColor=vec4(c,length(vW-cameraPosition)/uFar);}'});
  SKYW=new THREE.ShaderMaterial({uniforms:SKYM.uniforms,side:THREE.DoubleSide,defines:mobile||LOWGPU?{DLITE:''}:{},vertexShader:SKYM.vertexShader,
-  fragmentShader:skyHead+'void main(){vec3 r=vW-cameraPosition;vec3 c=dreamSky(normalize(vec3(r.x,abs(r.y)*1.5+.6,r.z)))*.85;gl_FragColor=vec4(c,length(r)/uFar);}'})}
+  fragmentShader:skyHead+'void main(){vec3 r=vW-cameraPosition;vec2 q=vW.xz-vec2(0.,-5.2);float rr=length(q),a=atan(q.y,q.x)+uSecs*.008;\n'+
+   ' vec3 c=mix(vec3(.045,.036,.10),vec3(.014,.011,.04),smoothstep(0.,5.,rr));float nb=fb3(q*.35+vec2(uSecs*.006,0.));c+=vec3(.10,.06,.2)*smoothstep(.45,.85,nb);\n'+
+   ' float sg=.5236,af=abs(mod(a,sg)-sg*.5);vec2 b=vec2(cos(af),sin(af))*rr/.42;float j0=floor(b.y/.866),i0=floor(b.x-.5*j0),R=1.+.04*sin(uSecs*.2),ln=9.;\n'+
+   ' for(int dj=-1;dj<=2;dj++)for(int di=-1;di<=2;di++){float jj=j0+float(dj),ii=i0+float(di);vec2 cc=vec2(ii+.5*jj,.866*jj);ln=min(ln,abs(length(b-cc)-R));}\n'+
+   ' float aw=fwidth(ln)*1.1+.012;c+=vec3(1.,.8,.5)*smoothstep(aw,0.,ln)*.55*smoothstep(4.6,1.,rr);c+=vec3(1.,.82,.55)*.18*exp(-rr*1.4);\n'+
+   ' vec2 g=floor(q*13.),f=fract(q*13.)-.5;float h=hsh(g);float st=step(.86,h)*smoothstep(.07,.0,length(f-(vec2(hsh(g+3.1),hsh(g+7.7))-.5)*.6));\n'+
+   ' c+=vec3(1.,.95,.88)*st*(.55+.45*sin(uSecs*(.4+h)+h*30.));gl_FragColor=vec4(c,length(r)/uFar);}'})}
 
 /* paintings and plaques show their true colours, untouched by the grade */
 var ARTV='varying vec2 vU;varying vec3 vWp;void main(){vU=uv;vec4 w=modelMatrix*vec4(position,1.);vWp=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}';
@@ -81,13 +87,18 @@ var DFLOW='vec3 dpal(float t){return .5+.5*cos(6.2832*(t+vec3(0.,.33,.67)));}\n'
  'vec3 dreamGlow(vec3 p,vec3 n,vec3 v){float k=1.-.6*uCalm;vec3 e=vec3(0.);\n'+
  '#if DREAM_FLOW==1\n'+   // oil-on-water sheen, calmer where the paintings hang
  ' float s=uDS*6.,w=sin(p.x*s+p.z*s*.7+uSecs*.05+2.*sin(p.y*s*.8-uSecs*.04));float fr=1.-abs(dot(n,v));\n'+
- ' e=dpal(w*.22+(p.x+p.z)*.03+p.y*.05+uSecs*.01)*(.55+.45*w)*(.3+fr*fr)*uDK;if(p.y>.55&&p.y<2.95)e*=.35;\n'+
+ ' e=mix(vec3(.8,.76,.95),dpal(w*.22+(p.x+p.z)*.03+p.y*.05+uSecs*.01),.5)*(.55+.45*w)*(.3+fr*fr)*uDK;if(p.y>.55&&p.y<2.95)e*=.35;\n'+
  '#elif DREAM_FLOW==2\n'+   // rings of light spreading slowly across the floor from under each bead cluster
  ' float d1=length(p.xz-vec2(0.,-5.2)),d2=length(p.xz-vec2('+XM.toFixed(3)+',-5.));\n'+
- ' float r=pow(.5+.5*sin(d1*4.-uSecs*.28),10.)*smoothstep(6.,1.,d1)+pow(.5+.5*sin(d2*4.-uSecs*.28),10.)*smoothstep(5.,1.,d2);\n'+
- ' e=mix(vec3(.25,.95,.86),vec3(.6,.48,1.),.5+.5*sin(d1*.7+d2*.5))*r*uDK;\n'+
- '#elif DREAM_FLOW==3\n'+   // a ribbon of aurora light round the frieze
- ' e=dpal((p.x+p.z)*.06+uSecs*.006)*(.55+.45*sin((p.x+p.z)*uDS*4.-uSecs*.3+p.y*9.))*uDK;\n'+
+ ' float r=pow(.5+.5*sin(d1*4.-uSecs*.22),24.)*smoothstep(6.,1.,d1)+pow(.5+.5*sin(d2*4.-uSecs*.22),24.)*smoothstep(5.,1.,d2);\n'+
+ ' e=mix(vec3(1.,.82,.55),vec3(.75,.68,1.),.5+.5*sin(d1*.7+d2*.5))*r*uDK;\n'+
+ '#elif DREAM_FLOW==3\n'+   // the frieze: interlocking circles of fine gold (sacred geometry) that breathe and drift slowly round the room
+ ' vec2 b=vec2(p.x+p.z+uSecs*.015,p.y-'+CT.toFixed(3)+')/.15;float j0=floor(b.y/.866),i0=floor(b.x-.5*j0),R=1.+.06*sin(uSecs*.25),ln=9.;\n'+
+ ' for(int dj=-1;dj<=2;dj++)for(int di=-1;di<=2;di++){float jj=j0+float(dj),ii=i0+float(di);vec2 c=vec2(ii+.5*jj,.866*jj);ln=min(ln,abs(length(b-c)-R));}\n'+
+ ' float aw=fwidth(ln)*1.1+.012,line=smoothstep(aw,0.,ln);vec3 gc=mix(vec3(1.,.8,.5),vec3(1.,.9,.75),.5+.5*sin(uSecs*.07+b.x*.05));\n'+
+ ' e=gc*(line*1.1+.025)*uDK;\n'+
+ '#elif DREAM_FLOW==5\n'+   // mother-of-pearl: a soft, pale shimmer that shifts with the angle you look from
+ ' float fr=1.-abs(dot(n,v));float t=fr*1.6+(p.x+p.y+p.z)*.08+uSecs*.008;e=mix(vec3(.85,.82,.95),dpal(t),.35)*(.25+fr*fr)*uDK;\n'+
  '#elif DREAM_FLOW==4\n'+   // the collections room: a gold star chart turning slowly round Pam's spiral sun
  ' if(p.x<uRoom.x-.1&&p.y>uRH-.05){vec2 q=p.xz-vec2('+XM.toFixed(3)+',-5.);float r=length(q),a=atan(q.y,q.x)+uSecs*.006;\n'+
  '  float ring=smoothstep(.014,.004,abs(fract(r/.9+.5)-.5)*.9)*step(.5,r);float sp=smoothstep(.012,.003,abs(sin(a*8.))*r)*step(.7,r)*.5;\n'+
@@ -213,9 +224,9 @@ function captureEnv(){var pp=G3.uPass.value;hideDyn();syncBlend();G3.uPass.value
 
 /* the dream: motes of light drifting slowly upwards, high in both rooms (above the paintings) and over the balcony */
 var MOTES=null;
-function dreamMotes(){var N=LOWGPU?120:(mobile?220:500),AT=typeof ARTTOP!=='undefined'?ARTTOP:2.6,CTP=typeof COLTOP!=='undefined'?COLTOP:2.6;
+function dreamMotes(){var N=LOWGPU?90:(mobile?160:320),AT=typeof ARTTOP!=='undefined'?ARTTOP:2.6,CTP=typeof COLTOP!=='undefined'?COLTOP:2.6;
  var bands=[[X0+.9,X1-.9,ZF+.9,ZB-.9,Math.max(2.3,AT+.35),3.4,.45],[XL+.9,XW-.9,ZF+.9,ZB-.9,Math.max(2.95,CTP+.35),3.45,.3],[-6,6,-20,-11,1.2,6,.25]].filter(function(b){return b[4]<b[5]-.08});
- var tot=bands.reduce(function(a,b){return a+b[6]},0),P=[],S=[],BA=[],CO=[],pal=['#63f0dc','#ff6fc2','#ffc977','#9b7bff'].map(lin);
+ var tot=bands.reduce(function(a,b){return a+b[6]},0),P=[],S=[],BA=[],CO=[],pal=['#ffe2b0','#fff4e6','#e2d6ff','#ffd29a'].map(lin);
  bands.forEach(function(b){var n=Math.round(N*b[6]/tot);for(var i=0;i<n;i++){P.push(b[0]+(b[1]-b[0])*rnd(),b[4]+(b[5]-b[4])*rnd(),b[2]+(b[3]-b[2])*rnd());S.push(rnd()*100);BA.push(b[4],b[5]);var c=pal[(i*7+3)%4];CO.push(c[0],c[1],c[2])}});
  var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('aSeed',new THREE.Float32BufferAttribute(S,1));g.setAttribute('aBand',new THREE.Float32BufferAttribute(BA,2));g.setAttribute('aCol',new THREE.Float32BufferAttribute(CO,3));
  var M=new THREE.ShaderMaterial({uniforms:{uSecs:G3.uSecs,uCalm:G3.uCalm,uPass:G3.uPass,uScale:{value:600}},transparent:true,depthWrite:false,
@@ -223,7 +234,7 @@ function dreamMotes(){var N=LOWGPU?120:(mobile?220:500),AT=typeof ARTTOP!=='unde
   vertexShader:'attribute float aSeed;attribute vec2 aBand;attribute vec3 aCol;uniform float uSecs,uCalm,uScale;varying vec3 vC;varying float vA;\n'+
    'void main(){float H=aBand.y-aBand.x,sp=.02+.03*fract(aSeed*.37),f=fract((position.y-aBand.x)/H+uSecs*sp/H);vec3 p=position;p.y=aBand.x+f*H;\n'+
    ' p.x+=.25*sin(uSecs*.11+aSeed);p.z+=.25*cos(uSecs*.09+aSeed*1.3);vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;\n'+
-   ' gl_PointSize=clamp(uScale*.035/-mv.z,1.,28.);vC=aCol;vA=smoothstep(0.,.12,f)*smoothstep(1.,.88,f)*(1.-uCalm)*smoothstep(.9,1.8,-mv.z)*(.6+.4*sin(uSecs*.7+aSeed*6.));}',
+   ' gl_PointSize=clamp(uScale*.026/-mv.z,1.,18.);vC=aCol;vA=smoothstep(0.,.12,f)*smoothstep(1.,.88,f)*(1.-uCalm)*smoothstep(.9,1.8,-mv.z)*(.6+.4*sin(uSecs*.7+aSeed*6.));}',
   fragmentShader:'uniform float uPass;varying vec3 vC;varying float vA;void main(){if(uPass>.5||vA<.003)discard;vec2 q=gl_PointCoord-.5;float a=exp(-dot(q,q)*18.)*vA;gl_FragColor=vec4(vC*a*3.,0.);}'});
  MOTES=new THREE.Points(g,M);MOTES.frustumCulled=false;S3.add(MOTES)}
 function upload(){
