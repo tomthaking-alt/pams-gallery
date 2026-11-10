@@ -58,10 +58,10 @@ if(DRM){var skyHead='uniform float uSecs,uFar,uPass;uniform vec3 uDomeC;varying 
  SKYW=new THREE.ShaderMaterial({uniforms:SKYM.uniforms,side:THREE.DoubleSide,defines:mobile||LOWGPU?{DLITE:''}:{},vertexShader:SKYM.vertexShader,
   fragmentShader:skyHead+'void main(){vec3 r=vW-cameraPosition,rd=normalize(r);vec2 q=vW.xz-vec2(0.,-5.2),sq=rd.xz/max(rd.y,.05);float rr=length(q),a=atan(q.y,q.x)+uSecs*.008;\n'+
    ' vec3 c=mix(vec3(.04,.032,.085),vec3(.012,.01,.035),smoothstep(0.,2.5,length(sq)));float nb=fb3(sq*.6+vec2(uSecs*.004,0.)),nb2=fb3(sq*1.3-vec2(0.,uSecs*.003));c+=vec3(.16,.09,.30)*smoothstep(.45,.85,nb)*(.6+.4*nb2);\n'+
-   ' float sg=.5236,af=abs(mod(a,sg)-sg*.5);vec2 b=vec2(cos(af),sin(af))*rr/.42;float j0=floor(b.y/.866),i0=floor(b.x-.5*j0),R=1.+.04*sin(uSecs*.2),ln=9.;\n'+
-   ' for(int dj=-1;dj<=2;dj++)for(int di=-1;di<=2;di++){float jj=j0+float(dj),ii=i0+float(di);vec2 cc=vec2(ii+.5*jj,.866*jj);ln=min(ln,abs(length(b-cc)-R));}\n'+
-   ' float aw=fwidth(ln)*1.1+.012;c+=vec3(.86,.66,.4)*smoothstep(aw,0.,ln)*.3*smoothstep(1.9,.5,rr)*(1.-smoothstep(.18,.5,length(fwidth(b))));c+=vec3(1.,.82,.55)*.12*exp(-rr*1.6);\n'+
-   ' vec2 g=floor(sq*13.),f=fract(sq*13.)-.5;float h=hsh(g);float st=step(.88,h)*smoothstep(.07,.0,length(f-(vec2(hsh(g+3.1),hsh(g+7.7))-.5)*.6));\n'+
+   ' float bd=dot(sq,vec2(.6,.8))+.2,mw=exp(-bd*bd/.35)*(.55*fb3(sq*2.2)+.45*fb3(sq*5.3+3.));c+=vec3(.26,.2,.4)*mw*.55+vec3(.5,.4,.3)*pow(mw,3.)*.5;c+=vec3(1.,.82,.55)*.12*exp(-rr*1.6);\n'+
+   ' float sn=floor(uSecs/23.),sp=fract(uSecs/23.)/.07;if(sp<1.){vec2 s0=(vec2(hsh(vec2(sn,1.3)),hsh(vec2(sn,7.1)))-.5)*1.6,sd=normalize(vec2(hsh(vec2(sn,3.3))-.5,-.6));vec2 hd=s0+sd*sp*.9;\n'+
+   '  vec2 pa=sq-s0,ba=hd-s0;float tt=clamp(dot(pa,ba)/max(dot(ba,ba),1e-4),0.,1.);float dl=length(pa-ba*tt);c+=vec3(1.,.92,.8)*smoothstep(.006,.0,dl)*tt*tt*sin(3.1416*sp)*1.2;}\n'+
+ ' vec2 g=floor(sq*13.),f=fract(sq*13.)-.5;float h=hsh(g);float st=step(.88,h)*smoothstep(.07,.0,length(f-(vec2(hsh(g+3.1),hsh(g+7.7))-.5)*.6));\n'+
    ' vec2 g2=floor(sq*31.),f2=fract(sq*31.)-.5;float h2=hsh(g2+19.);st+=step(.9,h2)*smoothstep(.09,.0,length(f2))*.35;\n'+
    ' c+=vec3(1.,.95,.88)*st*(.55+.45*sin(uSecs*(.4+h)+h*30.));gl_FragColor=vec4(c,length(r)/uFar);}'})}
 
@@ -85,27 +85,38 @@ var ROOMAO='float roomAO(vec3 p,vec3 N){float X0=uRoom.x,X1=uRoom.y,ZB=uRoom.z,Z
  'float sunIn(vec3 p){if(p.x>'+(X1-.04).toFixed(3)+'&&p.z>'+(ZF-.05).toFixed(3)+'&&p.z<'+(ZB+.05).toFixed(3)+'&&p.y<'+(RH+.05).toFixed(3)+')return 0.;\n'+   /* the hall's right-hand wall: no raking sun stripes beside the column (they read as stains) */
  ' return (p.x<-13.15&&p.z>'+(ZF-.05).toFixed(3)+'&&p.z<'+(ZB+.05).toFixed(3)+'&&p.y<'+(RH+.05).toFixed(3)+')?0.:1.;}\n';
 var DFLOW='vec3 dpal(float t){return .5+.5*cos(6.2832*(t+vec3(0.,.33,.67)));}\n'+
+ 'float dh(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}\n'+
+ 'float dn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(dh(i),dh(i+vec2(1.,0.)),f.x),mix(dh(i+vec2(0.,1.)),dh(i+vec2(1.,1.)),f.x),f.y);}\n'+
+ 'float dsg(vec2 p,vec2 a,vec2 b){vec2 pa=p-a,ba=b-a;return length(pa-ba*clamp(dot(pa,ba)/dot(ba,ba),0.,1.));}\n'+
  'vec3 dreamGlow(vec3 p,vec3 n,vec3 v){float k=1.-.6*uCalm;vec3 e=vec3(0.);\n'+
  '#if DREAM_FLOW==1\n'+   // oil-on-water sheen, calmer where the paintings hang
  ' float s=uDS*6.,w=sin(p.x*s+p.z*s*.7+uSecs*.05+2.*sin(p.y*s*.8-uSecs*.04));float fr=1.-abs(dot(n,v));\n'+
  ' e=mix(vec3(.8,.76,.95),dpal(w*.22+(p.x+p.z)*.03+p.y*.05+uSecs*.01),.5)*(.55+.45*w)*(.3+fr*fr)*uDK;if(p.y>.55&&p.y<2.95)e*=.35;\n'+
- '#elif DREAM_FLOW==2\n'+   // rings of light spreading slowly across the floor from under each bead cluster
+ '#elif DREAM_FLOW==2\n'+   // soft warm ripples spreading slowly across the floor from under each light cluster
  ' float d1=length(p.xz-vec2(0.,-5.2)),d2=length(p.xz-vec2('+XM.toFixed(3)+',-5.));\n'+
  ' float r=pow(.5+.5*sin(d1*4.-uSecs*.22),12.)*smoothstep(3.5,.8,d1)+pow(.5+.5*sin(d2*4.-uSecs*.22),12.)*smoothstep(3.,.8,d2);\n'+
  ' e=mix(vec3(1.,.85,.62),vec3(.8,.74,.95),.25)*r*uDK;\n'+
- '#elif DREAM_FLOW==3\n'+   // the frieze: interlocking circles of fine gold (sacred geometry) that breathe and drift slowly round the room
- ' vec2 b=vec2(p.x+p.z+uSecs*.012,p.y-'+CT.toFixed(3)+')/.32;float j0=floor(b.y/.866),i0=floor(b.x-.5*j0),R=1.+.06*sin(uSecs*.25),ln=9.;\n'+
- ' for(int dj=-1;dj<=2;dj++)for(int di=-1;di<=2;di++){float jj=j0+float(dj),ii=i0+float(di);vec2 c=vec2(ii+.5*jj,.866*jj);ln=min(ln,abs(length(b-c)-R));}\n'+
- ' float aw=fwidth(ln)*1.1+.012,line=smoothstep(aw,0.,ln)*(1.-smoothstep(.18,.5,length(fwidth(b))));line*=.12+.88*smoothstep(.35,1.,.5+.5*sin(b.x*.09-uSecs*.07));\n'+
- ' e=vec3(.86,.64,.36)*line*.9*uDK;\n'+
+ '#elif DREAM_FLOW==3\n'+   // the frieze: a band of night clouds drifting slowly round the room, lit at their edges, with a few small stars
+ ' vec2 b=vec2(p.x+p.z,(p.y-'+CT.toFixed(3)+')*3.2);float t=uSecs*.02;\n'+
+ ' float cl=.55*dn(b*vec2(.9,1.)+vec2(t,0.))+.3*dn(b*vec2(2.1,2.3)+vec2(t*1.6,5.))+.15*dn(b*vec2(4.7,5.)+vec2(t*2.3,9.));\n'+
+ ' float edge=smoothstep(.42,.62,cl)*(1.-smoothstep(.62,.9,cl));vec3 cc=mix(vec3(.16,.11,.26),vec3(.42,.32,.55),smoothstep(.35,.75,cl))+vec3(.95,.74,.52)*edge*.7;\n'+
+ ' vec2 g=floor(b*vec2(9.,9.)),f=fract(b*vec2(9.,9.))-.5;float st=step(.93,dh(g))*smoothstep(.16,.0,length(f))*(.6+.4*sin(uSecs*.8+dh(g+2.)*40.));\n'+
+ ' e=(cc*smoothstep(.3,.6,cl)+vec3(1.,.93,.82)*st*(1.-smoothstep(.45,.7,cl)))*uDK;\n'+
  '#elif DREAM_FLOW==5\n'+   // mother-of-pearl: a soft, pale shimmer that shifts with the angle you look from
  ' float fr=1.-abs(dot(n,v));float t=fr*1.6+(p.x+p.y+p.z)*.08+uSecs*.008;e=mix(vec3(.85,.82,.95),dpal(t),.35)*(.25+fr*fr)*uDK;\n'+
- '#elif DREAM_FLOW==4\n'+   // the collections room: a gold star chart turning slowly round Pam's spiral sun
- ' if(p.x<uRoom.x-.1&&p.y>uRH-.05){vec2 q=p.xz-vec2('+XM.toFixed(3)+',-5.);float r=length(q),a=atan(q.y,q.x)+uSecs*.006;\n'+
- '  float ring=smoothstep(.014,.004,abs(fract(r/.9+.5)-.5)*.9)*step(.5,r);float sp=smoothstep(.012,.003,abs(sin(a*8.))*r)*step(.7,r)*.5;\n'+
- '  vec2 g=floor(vec2(a*12.,r*9.));float st=step(.93,fract(sin(dot(g,vec2(12.9898,78.233)))*43758.5453));vec2 gf=fract(vec2(a*12.,r*9.))-.5;st*=smoothstep(.14,.0,length(gf));\n'+
- '  st*=.6+.4*sin(uSecs*1.5+g.x*3.+g.y);float s1=.5+.5*sin(a+log(r+.02)*7.-uSecs*.05);float disc=smoothstep(.6,.1,r);\n'+
- '  e=vec3(1.,.78,.4)*(ring+sp)*1.2+vec3(1.,.95,.85)*st*1.6+mix(vec3(.55,.18,.06),vec3(1.2,.62,.25),s1)*disc*1.4;e*=uDK;}\n'+
+ '#elif DREAM_FLOW==4\n'+   // the collections room: an antique celestial chart (Milky Way, stars, a few fine constellations) turning slowly round Pam's spiral sun
+ ' if(p.x<uRoom.x-.1&&p.y>uRH-.05){vec2 q0=p.xz-vec2('+XM.toFixed(3)+',-5.);float an=uSecs*.004,ca=cos(an),sa=sin(an);vec2 q=vec2(ca*q0.x-sa*q0.y,sa*q0.x+ca*q0.y);float r=length(q);\n'+
+ '  float bd=dot(q,vec2(.8,.6)),band=exp(-bd*bd/1.3);float mw=band*(.5*dn(q*1.3)+.3*dn(q*2.9+4.)+.2*dn(q*6.1+9.));e+=vec3(.30,.24,.46)*mw*.7+vec3(.55,.42,.32)*pow(mw,3.)*.6;\n'+
+ '  vec2 g=floor(q*6.),f=fract(q*6.)-.5,o=vec2(dh(g+3.1),dh(g+7.7))-.5;float h=dh(g);float st=step(.8,h)*smoothstep(.055+.05*h,.0,length(f-o*.6))*(.55+.45*sin(uSecs*(.3+h)+h*40.));\n'+
+ '  vec2 g2=floor(q*15.),f2=fract(q*15.)-.5;st+=step(.86-band*.12,dh(g2+21.))*smoothstep(.1,.0,length(f2))*.45;e+=vec3(1.,.94,.84)*st*1.3;\n'+
+ '  float ln=9.,nd=9.;\n'+
+ '  vec4 S[15];S[0]=vec4(-2.6,1.4,-2.,1.9);S[1]=vec4(-2.,1.9,-1.5,1.6);S[2]=vec4(-1.5,1.6,-1.,2.2);S[3]=vec4(-1.5,1.6,-1.6,.9);\n'+
+ '  S[4]=vec4(1.2,2.4,1.8,2.);S[5]=vec4(1.8,2.,2.5,2.3);S[6]=vec4(2.5,2.3,2.9,1.7);S[7]=vec4(2.9,1.7,2.3,1.3);\n'+
+ '  S[8]=vec4(-2.2,-1.8,-1.6,-1.3);S[9]=vec4(-1.6,-1.3,-.9,-1.7);S[10]=vec4(-.9,-1.7,-.4,-1.1);\n'+
+ '  S[11]=vec4(1.,-2.6,1.6,-1.9);S[12]=vec4(1.6,-1.9,2.4,-2.2);S[13]=vec4(2.4,-2.2,2.,-1.5);S[14]=vec4(2.,-1.5,1.6,-1.9);\n'+
+ '  for(int i=0;i<15;i++){ln=min(ln,dsg(q,S[i].xy,S[i].zw));nd=min(nd,min(length(q-S[i].xy),length(q-S[i].zw)));}\n'+
+ '  e+=vec3(.92,.76,.52)*smoothstep(.011,.004,ln)*smoothstep(.03,.07,nd)*.8+vec3(1.,.9,.72)*(smoothstep(.04,.0,nd)*1.6+exp(-nd*22.)*.35);\n'+
+ '  float a=atan(q.y,q.x),s1=.5+.5*sin(a+log(r+.02)*7.-uSecs*.05);e+=mix(vec3(.45,.16,.06),vec3(1.,.6,.28),s1)*smoothstep(.42,.08,r)*.9;e*=uDK;}\n'+
  '#endif\n'+
  ' return e*k;}\n';
 var HEADF='varying vec3 vWPos;\nuniform float uPass,uFar,uRH,uEnvD;uniform vec4 uRoom;uniform vec2 uRes;\n'+
