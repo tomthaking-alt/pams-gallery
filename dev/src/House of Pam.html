@@ -1015,13 +1015,13 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
 var DREAM_DEFAULT=false;
 /* looks to compare in the preview: dream; ink (the clay room drawn in ink on paper, paintings in full colour); paint (the room painted in
    swirling brushstrokes in the colours of Pam's work); clay (today's live look) */
-var LOOK=(location.search.match(/[?&]look=(dream|ink|paint|clay)\b/)||[])[1]||(DREAM_DEFAULT?'dream':'clay');
+var LOOK=(location.search.match(/[?&]look=(dream|ink|paint|clay)\b/)||[])[1]||(DREAM_DEFAULT?'paint':'clay');   // the preview opens on the painted look Pam chose
 var DREAM=LOOK==='dream',INK=LOOK==='ink',PAINTED=LOOK==='paint';   // (not 'PAINT': that name is the painting-canvas cache further down)
 /* the layout Pam asked for (November 2026): every collection in the main gallery hall, this month’s favourites in the side room */
 var COLMAIN=true;
 if(DREAM)document.documentElement.classList.add('dream');
 if(DREAM_DEFAULT)addEventListener('DOMContentLoaded',function(){var n=document.createElement('nav');n.className='dreampill';n.setAttribute('aria-label','Preview looks');
- [['dream','Dream'],['ink','Ink drawing'],['paint','Painted'],['clay','Today’s clay']].forEach(function(q){var a=document.createElement('a');a.href='?look='+q[0];a.textContent=q[1];
+ [['paint','Painted'],['dream','Dream'],['ink','Ink drawing'],['clay','Today’s clay']].forEach(function(q){var a=document.createElement('a');a.href='?look='+q[0];a.textContent=q[1];
   if(q[0]===LOOK)a.setAttribute('aria-current','page');n.appendChild(a)});document.body.appendChild(n)});
 /* photo-real material maps (generated, seamless): marble, plaster, mahogany, travertine */
 var MATSRC={clay:"/lib/clay-v2.webp",clayH:"/lib/clay-h-v2.webp",frOrchid:"/lib/frame-orchid-v2.webp",frEmber:"/lib/frame-ember-v2.webp",   /* smooth fine-grained clay surface for the clay look (made by dev/build/claytex.py) */
@@ -2578,7 +2578,7 @@ if(CLAY){[[Mx.floor,'#eccaa9',3.2,.78,.22],[Mx.marble,'#f3dcc6',1.8,.85,.3],[Mx.
 var DPH=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);   // phones (the renderer's own test isn't ready yet here)
 /* the painted look: the clay room repainted in the colours of Pam's work (the finishing pass adds the brushwork) */
 if(PAINTED&&CLAY){[[Mx.wall,'#e2a58a'],[Mx.floor,'#4a2a48'],[Mx.marble,'#f1dcc4'],[Mx.ceiling,'#f0c9a4'],[Mx.coffer,'#e9b893'],[Mx.key,'#2f6f74'],[Mx.ivory,'#f3dcc0'],[Mx.ivoryDark,'#8c5a86'],[Mx.tile,'#7b4a6c']]
-  .forEach(function(q){q[0].col=lin(q[1])});[Mx.gold,Mx.gold24,Mx.decoGold,Mx.brass,Mx.steel].forEach(function(m){m.col=lin('#e8a94c')})}
+  .forEach(function(q){q[0].col=lin(q[1])});[Mx.gold,Mx.steel].forEach(function(m){m.col=lin('#e8a94c')});[Mx.gold24,Mx.decoGold,Mx.brass].forEach(function(m){m.col=lin('#b88a46')});Mx.goldDark.col=lin('#6e4a22')}
 if(DREAM){var dm=function(m,c,r,d,dc){m.col=lin(c);m.rough=r;m.metal=0;m.bump=Math.min(m.bump,.12);m.refl=0;m.mist=1;if(d)m.dream=d;if(dc)m.dreamC=dc};
  dm(Mx.wall,'#463f55',.85,[1,.04,.3],[.58,.54,.62]);      // deep, muted aubergine-plum (so the paintings are the richest colour); the collections room is deeper still
  dm(Mx.floor,'#231f30',.22,[2,.1],[.85,.85,.95]);         // a night lake with faint rings of light
@@ -2613,22 +2613,23 @@ var INKF='{float L=dot(c,vec3(.2126,.7152,.0722)),k=max(1.,uRes.y/820.),d0=abs(s
  ' float tone=L*(1.-far*.5)+far*.45;float dark=max(ink,max(h1*.5*smoothstep(.6,.38,tone),max(h2*.55*smoothstep(.4,.22,tone),h3*.6*smoothstep(.22,.08,tone))));\n'+
  ' vec3 paper=vec3(.962,.947,.912)*(.975+.025*fbm(gl_FragCoord.xy*.012))*(.985+.015*vn(gl_FragCoord.xy*.9));\n'+
  ' c=mix(paper,vec3(.16,.14,.15),dark*(.88+.12*vn(sp*.2)));}\n';
-var PAINTFN='vec3 kuwa(vec2 uv){vec2 px=1./uRes;float k=max(1.,uRes.y/720.)*1.35;vec4 c0=texture(uT,uv);vec3 m0=vec3(0.),m1=m0,m2=m0,m3=m0,q0=m0,q1=m0,q2=m0,q3=m0;\n'+   // paint dabs: the calmest of four neighbourhoods (Kuwahara)
+var PAINTFN='vec3 kuwa(vec2 uv){vec2 px=1./uRes;float k=max(1.,uRes.y/720.)*1.35;vec4 c0=texture(uT,uv);vec3 na=texture(uT,uv+vec2(px.x*k,0.)).rgb,nb=texture(uT,uv-vec2(px.x*k,0.)).rgb,nc=texture(uT,uv+vec2(0.,px.y*k)).rgb,nd=texture(uT,uv-vec2(0.,px.y*k)).rgb;c0.rgb=clamp(c0.rgb,min(min(na,nb),min(nc,nd)),max(max(na,nb),max(nc,nd)));vec3 m0=vec3(0.),m1=m0,m2=m0,m3=m0,q0=m0,q1=m0,q2=m0,q3=m0;\n'+   // paint dabs: the calmest of four neighbourhoods (Kuwahara)
  ' const int R='+(DPH?2:3)+';for(int j=-R;j<=R;j++)for(int i=-R;i<=R;i++){vec4 t=texture(uT,uv+vec2(float(i),float(j))*px*k);vec3 v=(t.a<0.?c0.rgb:t.rgb);v=v/(1.+v);vec3 v2=v*v;\n'+
  '  if(i<=0&&j<=0){m0+=v;q0+=v2;}if(i>=0&&j<=0){m1+=v;q1+=v2;}if(i<=0&&j>=0){m2+=v;q2+=v2;}if(i>=0&&j>=0){m3+=v;q3+=v2;}}\n'+
  ' float n=float((R+1)*(R+1));m0/=n;m1/=n;m2/=n;m3/=n;float s0=dot(q0/n-m0*m0,vec3(1.)),s1=dot(q1/n-m1*m1,vec3(1.)),s2=dot(q2/n-m2*m2,vec3(1.)),s3=dot(q3/n-m3*m3,vec3(1.));\n'+
  ' vec3 r=m0;float b=s0;if(s1<b){b=s1;r=m1;}if(s2<b){b=s2;r=m2;}if(s3<b){b=s3;r=m3;}r=r/max(1.-r,.02);return mix(r,c0.rgb,smoothstep(.003,.014,b));}\n';
 var PAINTF='{float L=dot(c,vec3(.2126,.7152,.0722)),k=max(1.,uRes.y/720.),d0=abs(s0.a);vec2 sp=gl_FragCoord.xy/k,e=px*k;\n'+
- ' c=mix(vec3(L),c,1.22);c=mix(c,c*vec3(.62,.48,.86)+vec3(.04,.01,.07),smoothstep(.5,.12,L)*.55);c=mix(c,c*vec3(1.08,.98,.82)+vec3(.04,.025,0.),smoothstep(.55,.95,L)*.5);\n'+   // violet shadows, golden light
+ ' c=mix(vec3(L),c,1.08);c=mix(c,c*vec3(.62,.48,.86)+vec3(.04,.01,.07),smoothstep(.5,.12,L)*.55);c=mix(c,c*vec3(1.08,.98,.82)+vec3(.04,.025,0.),smoothstep(.72,1.,L)*.3);\n'+   // violet shadows, golden light
  ' float a1=abs(texture(uT,vU+vec2(-e.x,e.y)).a),a2=abs(texture(uT,vU+vec2(0.,e.y)).a),a3=abs(texture(uT,vU+e).a),a4=abs(texture(uT,vU-vec2(e.x,0.)).a),\n'+
  '  a6=abs(texture(uT,vU+vec2(e.x,0.)).a),a7=abs(texture(uT,vU-e).a),a8=abs(texture(uT,vU-vec2(0.,e.y)).a),a9=abs(texture(uT,vU+vec2(e.x,-e.y)).a);\n'+
  ' float gx=(a3+2.*a6+a9)-(a1+2.*a4+a7),gy=(a1+2.*a2+a3)-(a7+2.*a8+a9),dz=length(vec2(gx,gy))/max(d0,1e-4);float far=smoothstep(30.,55.,d0*60.);\n'+
  ' float ol=smoothstep(.07,.22,dz)*(1.-far)*(.65+.35*vn(sp*.08));c=mix(c,vec3(.17,.08,.22),ol*.8);\n'+   // painted outlines in deep violet
  ' float l1=dot(texture(uT,vU+vec2(e.x*2.,0.)).rgb,vec3(.3,.5,.2)),l2=dot(texture(uT,vU+vec2(0.,e.y*2.)).rgb,vec3(.3,.5,.2)),l0=dot(texture(uT,vU).rgb,vec3(.3,.5,.2));\n'+
- ' vec2 gr=vec2(l1-l0,l2-l0);float gm=length(gr)/max(l0,.02);float sw=vn(sp*.006)*9.4+vn(sp*.002+3.)*4.;vec2 td=normalize(mix(vec2(cos(sw),sin(sw)),vec2(-gr.y,gr.x)/max(length(gr),1e-5),smoothstep(.02,.12,gm)));\n'+
- ' vec2 nd=vec2(-td.y,td.x);float br=vn(vec2(dot(sp,td)*.02,dot(sp,nd)*.16)),br2=vn(vec2(dot(sp+nd*3.,td)*.02,dot(sp+nd*3.,nd)*.16)),dab=smoothstep(.25,.75,vn(vec2(dot(sp,td)*.006,dot(sp,nd)*.03)+7.));\n'+   // brushstrokes that follow the forms, and swirl where the surface is plain
- ' c*=.94+.11*mix(.5,br,.6+.4*dab);c+=vec3(1.,.93,.82)*max(br2-br,0.)*.18*(1.-far)*dab;c*=1.+(sin(sp.x*1.6)*sin(sp.y*1.6))*.012;}\n';
-function lookFinish(){if(!(INK||PAINTED)||typeof COMPM==='undefined')return;var f=COMPM.fragmentShader,a='c+=(hsh(gl_FragCoord.xy+fract(uTime*7.3)*97.)-.5)*.014;';
+ ' vec2 gr=vec2(l1-l0,l2-l0);float gm=length(gr)/max(l0,.02);float sw=vn(sp*.004)*2.2+vn(sp*.0015+3.)*1.;vec2 td=normalize(mix(vec2(cos(sw),sin(sw)),vec2(-gr.y,gr.x)/max(length(gr),1e-5),smoothstep(.02,.12,gm)));\n'+
+ ' vec2 nd=vec2(-td.y,td.x);float br=vn(vec2(dot(sp,td)*.035,dot(sp,nd)*.09)),br2=vn(vec2(dot(sp+nd*3.,td)*.035,dot(sp+nd*3.,nd)*.09)),dab=smoothstep(.4,.6,vn(vec2(dot(sp,td)*.006,dot(sp,nd)*.03)+7.));\n'+   // brushstrokes that follow the forms, and swirl where the surface is plain
+ ' c*=mix(vec3(.93,.9,1.04),vec3(1.05,1.,.9),mix(.5,br,.6+.4*dab));c+=vec3(1.,.93,.82)*max(br2-br,0.)*.18*(1.-far)*dab;c*=1.+(sin(sp.x*1.6)*sin(sp.y*1.6))*.012;}\n';
+function lookFinish(){if(!(INK||PAINTED)||typeof COMPM==='undefined')return;
+ if(PAINTED&&typeof SKYM!=='undefined'){var sf=SKYM.fragmentShader;sf=sf.replace('mix(vec3(.10,.2,.05),vec3(.5,.6,.13),band)','mix(vec3(.05,.12,.14),vec3(.2,.4,.38),band)').replace('vec3(.5,.22,.08)','vec3(.34,.13,.28)').replace('vec3(.8,.78,.4)','vec3(.85,.6,.45)');SKYM.fragmentShader=sf;SKYM.needsUpdate=true}var f=COMPM.fragmentShader,a='c+=(hsh(gl_FragCoord.xy+fract(uTime*7.3)*97.)-.5)*.014;';
  if(f.indexOf(a)<0){console.warn('lookFinish: anchor not found');return}f=f.replace(a,(INK?INKF:PAINTF)+a);
  if(PAINTED){f=f.replace('void main(){vec4 s0=',PAINTFN+'void main(){vec4 s0=').replace('vec3 c0=s0.rgb,','vec3 c0=kuwa(vU),')}
  COMPM.fragmentShader=f;COMPM.needsUpdate=true}

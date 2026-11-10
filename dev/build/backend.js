@@ -26,6 +26,7 @@ var EXPOSURE=.95,BLOOMK=.022,BLOOMT=3.5,RAYK=1.,cam={x:0,y:1.62,z:-2.4,yaw:0,pit
 var DRM=(typeof DREAM!=='undefined'&&DREAM);
 if(typeof INK!=='undefined'&&INK){RAYK=0;BLOOMK=0}   // ink drawing: no glow or light shafts on paper   // the dream look: a rose sun, lavender sky light, teal light from below, a softer, wider glow
 if(DRM){SUNCOL=[3.0,2.4,2.1];SKY=lin('#d0cbdc').map(function(v){return v*.26});GROUND=lin('#2c2830').map(function(v){return v*.18});BLOOMK=.035;BLOOMT=2.8;EXPOSURE=1.08}
+if(typeof PAINTED!=='undefined'&&PAINTED)EXPOSURE=.83;   // the painted room sits a step below the paintings, which keep their own light
 function fovFor(as){var deg=as>=1.2?46:as>=.8?54:64;return deg*Math.PI/180}   // vertical field of view, like a 35-50mm film lens
 function camDir(){var cp=Math.cos(cam.pitch);return[-Math.sin(cam.yaw)*cp,Math.sin(cam.pitch),-Math.cos(cam.yaw)*cp]}
 
@@ -200,7 +201,7 @@ function upgradeMats(){
  if(DRM){Mx.floor.refl=.55;Mx.floor.rough=.22;Mx.floor.x3={clearcoat:.5,clearcoatRoughness:.04};   // the dream: a dark, glassy lake floor; iridescent rose gold and pearl
   if(!mobile&&!LOWGPU){Mx.gold.x3={iridescence:.6,iridescenceIOR:1.35,iridescenceThicknessRange:[200,600]};Mx.colD.x3={iridescence:.35,iridescenceIOR:1.3,iridescenceThicknessRange:[150,500]}}}
  else if(typeof CLAY!=='undefined'&&CLAY){var sh=function(c){return{sheen:.45,sheenRoughness:.8,sheenColor:c3(c)}};   // clay: a soft, velvety sheen instead of a glaze
-  Mx.floor.x3=sh([1,.93,.82]);Mx.marble.x3=sh([1,.95,.88]);Mx.wall.x3=sh([1,.94,.84]);Mx.ceiling.x3=sh([1,.95,.88]);Mx.coffer.x3=sh([1,.95,.88])}
+  Mx.floor.x3=typeof PAINTED!=='undefined'&&PAINTED?{sheen:.15,sheenRoughness:.5,sheenColor:c3([.6,.4,.65])}:sh([1,.93,.82]);   /* the painted look: a deep plum satin, not a cream sheen */Mx.marble.x3=sh([1,.95,.88]);Mx.wall.x3=sh([1,.94,.84]);Mx.ceiling.x3=sh([1,.95,.88]);Mx.coffer.x3=sh([1,.95,.88])}
  else{
  Mx.floor.x3={clearcoat:.65,clearcoatRoughness:.035};Mx.floor.rough=.3;Mx.floor.refl=.9;            // honed marble under a polished glaze
  Mx.marble.x3={clearcoat:.3,clearcoatRoughness:.12};                                                  // polished columns and balustrade
