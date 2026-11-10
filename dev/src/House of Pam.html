@@ -37,6 +37,8 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 .dreampill a{color:inherit;text-decoration:none;min-height:34px;display:inline-flex;align-items:center;padding:0 .75rem;border-radius:99px;opacity:.85}
 .dreampill a[aria-current]{background:#fff7fb;color:#1e1234;opacity:1}
 .dreampill a:focus-visible{outline:2px solid #ffdcae;outline-offset:1px}
+body.hasBanner .dreampill{top:calc(var(--barh,56px) + 40px)}
+@media (min-width:701px){#where{display:none}body.atDoor:not(.gIntro) #walk,body.atDoor:not(.gIntro) #hint{visibility:hidden;opacity:0;pointer-events:none}body.atDoor #gBub{bottom:136px}}
 .dream #title h1{text-shadow:0 2px 22px rgba(30,14,70,.9),0 0 64px rgba(120,80,255,.5)}.dream #title p{text-shadow:0 1px 12px rgba(24,10,60,.95)}
 #title p{margin:1rem 0 0;font-size:clamp(.72rem,1.6vw,.85rem);letter-spacing:.42em;text-transform:uppercase;color:#fff6e6;text-shadow:0 1px 12px rgba(40,20,5,.7)}
 #hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 22px);z-index:3;color:#faf9f7;background:rgba(43,30,24,.85);backdrop-filter:blur(6px);padding:.65rem 1.3rem;border-radius:99px;font-size:.85rem;letter-spacing:.08em;pointer-events:none}
@@ -144,8 +146,8 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 @keyframes gBob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.012,.99)}}
 @keyframes gTalkF{0%{opacity:1}50%{opacity:0}}
 @keyframes gHop{0%{transform:translateY(0)}40%{transform:translateY(-14px)}100%{transform:translateY(0)}}
-#gBub{position:absolute;left:62px;bottom:72px;width:min(320px,calc(100vw - 92px));background:rgba(252,250,246,.97);color:#1f1610;border:1px solid rgba(184,154,98,.55);border-radius:16px 16px 16px 4px;padding:.85rem .95rem .8rem;box-shadow:0 14px 36px rgba(20,12,8,.3);font-size:.93rem;line-height:1.5;opacity:0;transform:translateY(8px) scale(.97);transform-origin:0 100%;pointer-events:none;transition:opacity .25s ease,transform .25s ease}
-#gBub.on{opacity:1;transform:none;pointer-events:auto}
+#gBub{position:absolute;left:62px;bottom:72px;width:min(320px,calc(100vw - 92px));background:rgba(252,250,246,.97);color:#1f1610;border:1px solid rgba(184,154,98,.55);border-radius:16px 16px 16px 4px;padding:.85rem .95rem .8rem;box-shadow:0 14px 36px rgba(20,12,8,.3);font-size:.93rem;line-height:1.5;opacity:0;transform:translateY(8px) scale(.97);transform-origin:0 100%;pointer-events:none;transition:opacity .25s ease,transform .25s ease,visibility 0s linear .25s;visibility:hidden}
+#gBub.on{opacity:1;transform:none;pointer-events:auto;visibility:visible;transition-delay:0s}#george.stage #gBub{visibility:visible}
 #gBub .who{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:600;font-size:1.05rem;color:#8a6a36;margin-bottom:.15rem}
 #gBub i{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.06em}
 #gTxt b{font-weight:600;color:#7a5220}
@@ -496,6 +498,7 @@ img{-webkit-user-select:none;user-select:none}
 .link{font:inherit;color:var(--walnut);background:none;border:0;border-bottom:1px solid var(--bronze);padding:0;cursor:pointer;font-size:.85rem}
 dialog{border:0;border-radius:2px;padding:0;max-width:min(94vw,880px);width:100%;max-height:92vh;background:var(--paper);color:var(--ink)}
 #dlg .wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+#dlg .dxbar{position:sticky;top:0;height:0;z-index:3;display:flex;justify-content:flex-end}#dlg .dxbar button{margin:8px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(250,249,247,.92);color:var(--walnut);font-size:1.6rem;line-height:1;cursor:pointer;box-shadow:0 2px 10px rgba(20,12,8,.18)}#dlg .dxbar button:focus-visible{outline:2px solid var(--walnut);outline-offset:2px}#dlg .dpage a,#dlg .dpage .linkb{margin-right:1.1rem}#dlg .linkb{font:inherit;color:inherit;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}#dlg dl [hidden]{display:none}#dlg .pager button{min-height:44px;min-width:44px}
 #dlg .pic{background:#efe9df;display:flex;align-items:center;justify-content:center;padding:clamp(1.4rem,4vw,2.8rem);min-height:280px}
 #dlg .pic img{max-width:100%;max-height:60vh;box-shadow:0 14px 34px rgba(30,18,12,.3),0 0 0 7px #c9a35e;display:block}
 #dlg .txt{padding:clamp(1.4rem,3.5vw,2.4rem);display:flex;flex-direction:column}
@@ -511,7 +514,7 @@ dialog{border:0;border-radius:2px;padding:0;max-width:min(94vw,880px);width:100%
 #about .txt{padding:clamp(1.6rem,4vw,2.6rem);min-width:0}
 #about .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 @media (max-width:700px){#about .abw{grid-template-columns:1fr}#about figure img{max-height:52vh;height:auto}}
-@media (max-width:700px){#dlg .wrap{grid-template-columns:1fr}#dlg .pic{min-height:0}#dlg .pic img{max-height:36vh}#bar .name{font-size:1.2rem;white-space:nowrap}#where{display:none}#bar nav{gap:.85rem}#bar nav button{white-space:nowrap;font-size:.8rem}#bar .name{font-size:1.08rem!important}#music .mw{display:none}#bar .wide{display:none}}
+@media (max-width:700px){#dlg .btns{position:sticky;bottom:0;background:var(--paper);padding:.6rem 0;z-index:2}#dlg .wrap{grid-template-columns:1fr}#dlg .pic{min-height:0}#dlg .pic img{max-height:36vh}#bar .name{font-size:1.2rem;white-space:nowrap}#where{display:none}#bar nav{gap:.85rem}#bar nav button{white-space:nowrap;font-size:.8rem}#bar .name{font-size:1.08rem!important}#music .mw{display:none}#bar .wide{display:none}}
 dialog::backdrop{background:rgba(22,15,11,.7);backdrop-filter:blur(3px)}
 /* ---------- the arrows and the zoom button on the walk bar ---------- */
 #walk button.end{opacity:.28;cursor:default}
@@ -529,7 +532,8 @@ dialog::backdrop{background:rgba(22,15,11,.7);backdrop-filter:blur(3px)}
 #artBar .abp.sold{font-family:inherit;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#9a3b2c}
 #artBar .aba{grid-area:a;display:flex;gap:.5rem;min-width:0}
 #artBar .aba button{font:inherit;min-height:46px;border-radius:99px;cursor:pointer;font-size:.9rem;padding:0 1.05rem;border:1px solid rgba(75,46,34,.28);background:#fff;color:var(--ink);white-space:nowrap}
-#artBar .aba button:focus-visible{outline:2px solid var(--walnut);outline-offset:2px}
+#artBar .aba .abz,.aba .abl,.aba .abs{border-color:transparent!important;background:transparent!important}.aba .abz:hover,.aba .abl:hover,.aba .abs:hover{background:rgba(75,46,34,.08)!important}
+.aba button:focus-visible{outline:2px solid var(--walnut);outline-offset:2px}
 #artBar .abz{width:46px;padding:0!important;display:flex;align-items:center;justify-content:center;flex:none;color:var(--walnut)}
 #artBar .abg{flex:1;background:var(--walnut)!important;border-color:var(--walnut)!important;color:#faf6ee!important;font-weight:500;letter-spacing:.03em}
 #artBar .abg:hover{background:#3b2219!important}
@@ -620,7 +624,7 @@ body.hasBanner #pnow,body.hasBanner #wallText{margin-top:34px}
 #ways.on{opacity:1;transform:none}
 #ways button{pointer-events:none;font:inherit;display:flex;align-items:center;gap:.7rem;padding:.6rem 1.05rem;min-height:56px;max-width:46vw;border-radius:99px;border:1px solid rgba(176,141,87,.6);background:rgba(250,249,247,.9);color:var(--walnut);cursor:pointer;box-shadow:0 10px 30px rgba(20,12,8,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);text-align:left;-webkit-tap-highlight-color:transparent;transition:background .2s,transform .2s}
 #ways.on button{pointer-events:auto}
-#ways button:hover,#ways button:focus-visible{background:#fff;transform:translateY(-1px);outline:none}
+#ways button:hover,#ways button:focus-visible{background:#fff;transform:translateY(-1px);outline:2px solid var(--walnut);outline-offset:3px}
 #ways #wayR{text-align:right}
 #ways .ar{font-size:1.5rem;line-height:1;width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--walnut);color:#faf6ee}
 #ways .tx{display:flex;flex-direction:column;min-width:0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:1.22rem;line-height:1.15}
@@ -643,7 +647,7 @@ body.hasBanner #pnow,body.hasBanner #wallText{margin-top:34px}
  #ways.walk button{pointer-events:auto}
  #ways button,#ways #wayR{flex-direction:column;gap:.4rem;padding:0;min-height:0;max-width:none;width:84px;background:none;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;text-align:center;align-items:center}
  #ways #wayR{flex-direction:column-reverse}
- #ways button:hover,#ways button:focus-visible{background:none;transform:none}
+ #ways button:hover,#ways button:focus-visible{background:none;transform:none;outline:none}#ways button:focus-visible .ar{outline:2px solid #f3d999;outline-offset:3px}
  #ways .ar{width:46px;height:46px;font-size:1.7rem;padding-bottom:3px;box-sizing:border-box;background:rgba(250,249,247,.88);color:var(--walnut);border:1px solid rgba(176,141,87,.55);box-shadow:0 6px 18px rgba(20,12,8,.3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
  #ways .tx{font-family:Jost,Helvetica,Arial,sans-serif;font-style:normal;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--walnut);font-weight:500;text-shadow:0 0 8px rgba(255,252,246,.95),0 0 3px rgba(255,252,246,.95);align-items:center;line-height:1.2}
  #ways small,#ways .lf{display:none}#ways .ls{display:block}
@@ -657,7 +661,7 @@ body.hasBanner #pnow,body.hasBanner #wallText{margin-top:34px}
  #wallText{top:calc(env(safe-area-inset-top,0px) + 64px);padding:.7rem 1rem .75rem}#wallText .wt{font-size:1.35rem}#wallText .wd{font-size:.8rem}
  #pnow{display:block;position:fixed;z-index:4;top:calc(env(safe-area-inset-top,0px) + 66px);left:50%;transform:translateX(-50%);max-width:calc(100vw - 40px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:inherit;font-size:.76rem;letter-spacing:.03em;color:var(--walnut);background:rgba(250,249,247,.88);border:1px solid rgba(176,141,87,.45);border-radius:99px;padding:.38rem .95rem;box-shadow:0 6px 18px rgba(20,12,8,.18);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);cursor:pointer;transition:opacity .35s}
  #pnow i{font-family:'Cormorant Garamond',Georgia,serif;font-size:.98rem}
- #pnow[hidden]{display:block;opacity:0;pointer-events:none}
+ #pnow[hidden]{display:block;opacity:0;pointer-events:none;visibility:hidden}
  /* the first time: how to get about */
  #swipeHint{display:flex;position:fixed;z-index:4;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);transform:translateX(-50%);align-items:center;gap:.6rem;padding:.55rem 1rem;border-radius:99px;background:rgba(43,30,24,.84);color:#faf6ee;font-size:.78rem;letter-spacing:.08em;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .5s}
  #swipeHint.on{opacity:1}
@@ -822,7 +826,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
    var dp=doors.play();if(dp&&dp.catch)dp.catch(pass);return}
   reveal()}
  function reveal(){INTRO.up=false;L.style.opacity=0;L.style.pointerEvents='none';setTimeout(function(){L.style.display='none';stop()},800);if(readyFn)try{readyFn()}catch(e){console.error(e)}}
- function ready(fn){readyFn=fn;setP(1);L.classList.add('done');var el=now(),min=RM?1:seen?1.2:3.6;
+ function ready(fn){readyFn=fn;setP(1);L.classList.add('done');var el=now(),min=RM||location.hash.length>1?1:seen?1.2:3.6;
   if(el>=min){enter();return}if(min-el>.6){go.hidden=false}autoT=setTimeout(enter,(min-el)*1000)}
  go.addEventListener('click',enter);
  window.INTRO={up:true,entered:false,art:setArt,progress:setP,ready:ready,stop:function(){stop();INTRO.up=false;L.style.display='none'}};
@@ -887,7 +891,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <h2 id="prh">Prints</h2>
   <p class="lede">Fine-art prints of Pam’s paintings, made to order in a choice of sizes. Choose a size, then send your request — Pam replies personally to arrange payment and delivery.</p>
   <div class="pgrid" id="pgrid"></div>
-  <p class="empty" id="prEmpty" hidden>New prints are on their way — please check back soon, or <a href="#" id="prAsk">ask Pam</a> about a print of a particular painting.</p>
+  <p class="empty" id="prEmpty" hidden>Interested in a print of a particular painting? <a href="#" id="prAsk">Ask Pam</a>.</p>
  </div>
 </section>
 <section id="collection" hidden aria-labelledby="colh">
@@ -907,15 +911,17 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
 </section>
 <div id="track"></div>
 <dialog id="dlg" aria-labelledby="dt">
+ <div class="dxbar"><button id="close" type="button" aria-label="Close">&times;</button></div>
  <div class="wrap">
   <div class="pic"><img id="dimg" alt="" title="Zoom in"><button id="dzoom" type="button" aria-label="Zoom in on this painting"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg>Zoom</button></div>
   <div class="txt">
    <h2 id="dt"></h2>
-   <p id="dp" class="serif" style="font-size:1.6rem;margin-top:.2rem"></p><p id="dd" class="ddesc" hidden></p>
+   <p id="dp" class="serif" style="font-size:1.6rem;margin-top:.2rem"></p>
+   <div class="btns"><button class="btn main" id="buyBtn" type="button">Enquire to buy</button><button class="btn" id="arBtn" type="button" hidden>View on your wall</button></div>
+   <p id="dd" class="ddesc" hidden></p>
    <dl><dt>Medium</dt><dd id="dm"></dd><dt>Size</dt><dd id="ds"></dd><dt>Year</dt><dd id="dy"></dd><dt>Availability</dt><dd id="da"></dd></dl>
-   <p class="dpage"><a id="dPage" href="/works">This painting’s own page</a></p>
+   <p class="dpage"><a id="dPage" href="/works">This painting’s own page</a><button class="linkb" id="dShare" type="button">Share</button><a id="enq" href="#">Email Pam</a></p>
    <div class="dperks" id="dPerks" hidden></div>
-   <div class="btns"><button class="btn main" id="buyBtn" type="button">Enquire to buy</button><a class="btn" id="enq" href="#">Email Pam</a><button class="btn" id="arBtn" type="button" hidden>View on your wall</button><button class="btn" id="dShare" type="button">Share</button><button class="btn" id="close">Close</button></div>
    <div class="pager"><button id="dprev">&#8249; Previous</button><span id="dcount"></span><button id="dnext">Next &#8250;</button></div>
   </div>
  </div>
@@ -951,7 +957,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
  <div id="bidDone" hidden><div id="bidNext" class="nextsteps" role="status" tabindex="-1"></div><div class="btns"><button class="btn main" type="button" id="bidDoneX">Back to the gallery</button></div></div>
 </div></dialog>
 <dialog id="shareD" aria-labelledby="shH"><div class="txt">
- <p class="kick">Share</p><h2 id="shH"></h2><p class="note">The link shows the painting as a preview and opens the gallery right at it.</p>
+ <p class="kick">Share</p><h2 id="shH"></h2><p class="note">The link shows the painting as a preview and opens its own page.</p>
  <div class="sgrid" id="shGrid"></div>
  <label class="shurl">Link<input id="shUrl" readonly></label>
  <div class="btns"><button class="btn" type="button" id="shClose">Close</button></div>
@@ -963,7 +969,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
   <p class="note" id="buyWho"></p>
   <div id="buyGuest"><label>Your name<input name="name" autocomplete="name" maxlength="80"></label><label>Email<input type="email" name="email" autocomplete="email"></label></div>
   <label>Phone (optional)<input type="tel" name="phone" autocomplete="tel" maxlength="40"></label>
-  <label id="buyOfferL">Make an offer (optional)<input name="offer" inputmode="decimal" maxlength="12" placeholder="Your offer, e.g. 450"></label><p class="note small" id="offerHow">Pam will reply by email to accept your offer, suggest a price, or let you know if it isn’t possible. Nothing is charged until you’ve agreed a price.</p>
+  <label id="buyOfferL">Make an offer (optional)<input name="offer" inputmode="decimal" maxlength="12" placeholder="Your offer"></label><p class="note small" id="offerHow">Pam will reply by email to accept your offer, suggest a price, or let you know if it isn’t possible. Nothing is charged until you’ve agreed a price.</p>
   <label>Message for Pam (optional)<textarea name="message" maxlength="2000" placeholder="Anything Pam should know — delivery, framing, questions…"></textarea></label>
   <p class="note" id="buyPerk"></p>
   <p class="trustl"><span data-p="trust.line"></span> <a href="#buying" class="trustlnk">Buying with confidence ›</a></p>
@@ -1010,7 +1016,7 @@ var DREAM_DEFAULT=false;
 /* looks to compare in the preview: dream; ink (the clay room drawn in ink on paper, paintings in full colour); paint (the room painted in
    swirling brushstrokes in the colours of Pam's work); clay (today's live look) */
 var LOOK=(location.search.match(/[?&]look=(dream|ink|paint|clay)\b/)||[])[1]||(DREAM_DEFAULT?'dream':'clay');
-var DREAM=LOOK==='dream',INK=LOOK==='ink',PAINT=LOOK==='paint';
+var DREAM=LOOK==='dream',INK=LOOK==='ink',PAINTED=LOOK==='paint';   // (not 'PAINT': that name is the painting-canvas cache further down)
 /* the layout Pam asked for (November 2026): every collection in the main gallery hall, this month’s favourites in the side room */
 var COLMAIN=true;
 if(DREAM)document.documentElement.classList.add('dream');
@@ -1128,7 +1134,7 @@ function applyCat(c){if(!c||!Array.isArray(c.arts)||!c.arts.length)return false;
  if(!list.length)return false;ART.length=0;list.forEach(function(a){ART.push(a)});THUMB={};
  var ix={};ART.forEach(function(a,i){ix[a.id]=i});function map(L){return(L||[]).map(function(x){return ix[x]}).filter(function(i){return i!=null})}
  FAVS=map(c.favs).slice(0,6);
- COLLECTIONS.length=0;(c.colls||[]).forEach(function(k){COLLECTIONS.push({t:k.t,d:k.d||'',works:map(k.works),soon:k.soon==null?3:k.soon})});
+ COLLECTIONS.length=0;(c.colls||[]).forEach(function(k){COLLECTIONS.push({t:k.t,d:k.d||'',works:map(k.works),soon:k.soon==null?0:k.soon})});
  PRINTS=(c.prints||[]).filter(function(q){return q.on!==false&&(q.img||ix[q.art]!=null)&&(q.sizes||[]).length}).map(function(q){var a=ix[q.art];
   return{id:q.id,t:q.t||(a!=null?ART[a].t:'Print'),d:q.d||'',art:a==null?-1:a,img:q.img?embImg(q.img):ART[a].img,sizes:q.sizes}});
  gridBuilt=false;prBuilt=false;return true}
@@ -1145,8 +1151,8 @@ if(COLMAIN)GREET_DEF='Greetings, I am King George II, guardian of the gallery. W
 var GDEF={'george.greet':GREET_DEF,
  'george.tourap':'Swipe **right** for **This Month’s Favourites** — each swipe brings the next painting in from the right. Like so…',
  'george.tourac':'Press the **right arrow** (or simply scroll) for **This Month’s Favourites** — each press brings the next painting in from the right. Like so…',
- 'george.tourbp':'Stop at any painting and its price appears below it, with **Enquire to buy** — Pam replies to every enquiry personally. Tap a painting for its story; the **magnifier** zooms right in on every brushstroke, and “View on your wall” shows it hanging in your own home.',
- 'george.tourbc':'Stop at any painting and its price appears below it, with **Enquire to buy** — Pam replies to every enquiry personally. Click a painting for its story; the **magnifier** zooms right in on every brushstroke.',
+ 'george.tourbp':'Stop at any painting and its price appears below it, with **Enquire to buy** — Pam replies to every enquiry personally. Tap a painting for its details; the **magnifier** zooms right in on every brushstroke, and “View on your wall” shows it hanging in your own home.',
+ 'george.tourbc':'Stop at any painting and its price appears below it, with **Enquire to buy** — Pam replies to every enquiry personally. Click a painting for its details; the **magnifier** zooms right in on every brushstroke.',
  'george.tourcp':'Swipe **left** from the entrance to step through the marble portal into the **Collections hall**. Inside, keep swiping **right** to walk round its walls and up close to each painting; one more swipe at the end brings you back out. Let me show you…',
  'george.tourcc':'Press the **left arrow** from the entrance to step through the marble portal into the **Collections hall**. Inside, keep pressing **right** to walk round its walls and up close to each painting; one more at the end brings you back out. Let me show you…',
  'george.tourd':'Up here, **Collections** shows every collection on one page, **Prints** offers prints in a choice of sizes, **About** tells you all about Pam, and **Music** sets the mood.',
@@ -1162,15 +1168,15 @@ var GDEF={'george.greet':GREET_DEF,
  'george.artc':'Ah, {painting}. One of my favourites. {Tap} it for the details.',
  'george.artd':'And this is {painting}. {Tap} the painting to enquire about it.',
  'george.artwall':'You can even see it on your own wall!',
- 'george.coll':'Collection {number}: {collection}. {description} Walk on and I shall take you up close to each painting — the locked frames are new works still in Pam’s studio.',
+ 'george.coll':'Collection {number}: {collection}. {description} Walk on and I shall take you up close to each painting — the frames marked “in the studio” are new works still in Pam’s studio.',
  'george.collend':'And that is the collections — new works join them as they leave Pam’s studio. From the entrance, swipe right whenever you like for this month’s favourites.',
  'george.leftp':'I hope you enjoyed the collections! Now swipe right for this month’s favourites.',
  'george.leftc':'I hope you enjoyed the collections! Now go right for this month’s favourites.',
  'george.balcony':'Out here is the balcony. If a painting has caught your eye, you can write to Pam right here.',
  'george.menu':'King George, at your service. How may I help?',
- 'george.buy':'Every painting is an original. Stop at any painting, or tap it, and choose “Enquire to buy” — you can make an offer too. Some paintings go to auction: just place a bid before it closes. Pam replies personally to arrange secure payment and delivery. Members also earn rewards.',
+ 'george.buy':'Every painting is an original. Stop at any painting, or tap it, and choose “Enquire to buy” — you can make an offer too. Some paintings go to auction: just place a bid before it closes. Pam replies personally to arrange secure payment and delivery.',
  'george.prints':'Indeed! Prints of Pam’s paintings come in a choice of sizes, each with its own price. Pick a size and send a request — Pam replies personally.',
- 'george.noprints':'Prints are on their way — Pam is preparing them now. In the meantime you are welcome to ask her about a print of any painting.',
+ 'george.noprints':'You are very welcome to ask Pam about a print of any painting.',
  'george.members':'Join our collectors’ circle, free: see new paintings before anyone else, and receive a signed print when you complete a collection.',
  'george.contact':'You may send Pam a message right here, or email her at {email}. She replies to every message personally.',
  'george.wall':'Walk up to any painting first, then tap me again — or tap the painting and choose “View on your wall”.'};
@@ -1244,7 +1250,7 @@ var TX=[['film.title','Opening film','Title','#loading .lt'],['film.sub','Openin
  ['george.balcony','King George — around the gallery','On the balcony',null,1],
  ['george.menu','King George — when visitors tap him','His question',null],['george.buy','King George — when visitors tap him','“How do I buy a painting?”',null,1],
  ['george.prints','King George — when visitors tap him','“Can I buy a print?” (when you have prints)',null,1],['george.noprints','King George — when visitors tap him','“Can I buy a print?” (before you have prints)',null,1],
- ['george.members','King George — when visitors tap him','“Members’ rewards”',null,1],['george.contact','King George — when visitors tap him','“Contact Pam”',null,1],
+ ['george.members','King George — when visitors tap him','“The collectors’ circle”',null,1],['george.contact','King George — when visitors tap him','“Contact Pam”',null,1],
  ['george.wall','King George — when visitors tap him','“See a painting on my wall” (when not at a painting)',null,1],
  ['press.kick','Galleries & press page','Small heading',null],['press.title','Galleries & press page','Heading',null],['press.lede','Galleries & press page','Introduction',null,1],
  ['press.statement','Galleries & press page','Artist statement — a DRAFT written from your paintings; please rewrite it in your own words',null,1],['press.bio','Galleries & press page','Background (leave empty to use your About text)',null,1],
@@ -1391,7 +1397,7 @@ $('fComm').addEventListener('submit',function(e){e.preventDefault();var f=this,d
  api({a:'commission',name:d.get('name'),email:d.get('email'),phone:d.get('phone'),idea:d.get('idea'),size:d.get('size'),budget:d.get('budget'),when:d.get('when'),where:d.get('where'),photos:cmPhotos}).then(function(j){busy(f,false);if(j.error)return formErr(f,j.error);
   f.reset();cmPhotos=[];cmDraw();f.hidden=true;$('cmDone').hidden=false;$('cmDone').scrollIntoView({block:'center',behavior:'smooth'})})});
 function afterDoors(){var pk=location.hash.slice(1);if((pk==='join'||pk==='signin')&&!ME)setTimeout(function(){joinNow(pk==='signin')},600);if(PAGES[pk])setTimeout(function(){openPage(pk)},500);var wm=/^#wall(\d+)$/.exec(location.hash||'');if(wm){var wk=-1;ART.forEach(function(a,i){if(a.emb==='p'+wm[1])wk=i});if(wk>=0)setTimeout(function(){viewOnWall(wk);wallCam(wk)},700)}   // back from Android's AR viewer when it isn't installed: the in-browser camera instead
- var m=/^#art-([a-z0-9]+)$/i.exec(location.hash||'');if(m){var k=-1;ART.forEach(function(a,i){if(a.id===m[1])k=i});if(k>=0)setTimeout(function(){openArt(k)},700)}
+ var m=/^#art-([a-z0-9]+)$/i.exec(location.hash||'');if(m){var k=-1;ART.forEach(function(a,i){if(a.id===m[1])k=i});if(k>=0)setTimeout(function(){if(!(window.goArt&&!teaser(ART[k])&&!aucLive(ART[k])&&window.goArt(k)))openArt(k)},900)}   // walk to it in the gallery (auctions and members' previews open their window)
  if(/[?&]paid=1/.test(location.search)){setTimeout(function(){notice('Thank you!','Your payment has gone through. Pam will be in touch by email about delivery — thank you for supporting her work.')},700);try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}}}
 function isSold(p){return /sold/i.test(p.status||'')}
 function mailFor(p){var sub='Enquiry: '+p.t,body='Hello '+ARTIST+',\n\nI am interested in “'+p.t+'” ('+p.m+', '+p.s+(isSold(p)?'':', '+p.p)+').\nCould you tell me more about its availability, delivery and payment?\n\nKind regards,\n';
@@ -1437,7 +1443,7 @@ var MUSIC=(function(){var AC=null,master,bus,choir,playing=false,timer=null,next
 
 /* ---------- enquiries panel ---------- */
 var enqP=$('enqPanel');$('enqMail').textContent=EMAIL;$('enqWrite').href='mailto:'+EMAIL+'?subject='+encodeURIComponent('Enquiry for Pam’s Gallery');
-$('enqCol').addEventListener('click',function(){openCollection()});
+if(COLMAIN)$('enqCol').textContent='See this month’s favourites';$('enqCol').addEventListener('click',function(){if(COLMAIN&&window.goSide)window.goSide();else openCollection()});
 $('enqCopy').addEventListener('click',function(){var note=$('enqNote');function sel(){var r=document.createRange();r.selectNodeContents($('enqMail'));var s=getSelection();s.removeAllRanges();s.addRange(r);note.textContent='Email selected — copy it from here'}
  try{navigator.clipboard.writeText(EMAIL).then(function(){note.textContent='Email copied'},sel)}catch(e){sel()}});
 function showEnq(f){enqP.style.opacity=f;enqP.style.visibility=f>.02?'visible':'hidden';var live=f>.5;enqP.classList.toggle('live',live);enqP.setAttribute('aria-hidden',live?'false':'true')}
@@ -1452,7 +1458,8 @@ function openArt(k){k=(k+ART.length)%ART.length;curArt=k;var p=ART[k];if(window.
  $('dPage').href=artUrl(p);var tz=teaser(p);$('dimg').classList.toggle('teaser',tz);$('dzoom').hidden=tz;
  if(tz){$('dp').textContent='Members see this first';$('dd').textContent=earlyText()+' Opens to everyone '+earlyWhen(p.ea)+'.';$('dd').hidden=false;$('buyBtn').textContent='Join free to see it now';$('enq').hidden=true;$('dShare').hidden=true;$('arBtn').hidden=true;$('ds').textContent=p.s||'—';$('dy').textContent=p.year||'—'}
  else{$('enq').hidden=false;$('arBtn').hidden=false;if(p.em&&p.ea>Date.now())$('dp').textContent='Members’ early access · '+$('dp').textContent}
- var dk=$('dPerks');dk.textContent='';dk.hidden=!!ME;if(!ME){dk.appendChild(el('p','kick','The collectors’ circle · free to join'));dk.appendChild(perkList());var jb=el('button','link','Join free');jb.type='button';jb.addEventListener('click',function(){dlg.close();joinNow()});dk.appendChild(jb)}
+ var hs=!!p.s&&!/on request/i.test(p.s),hy=!!p.year;$('ds').hidden=$('ds').previousElementSibling.hidden=!hs&&!tz;$('dy').hidden=$('dy').previousElementSibling.hidden=!hy&&!tz;   // no empty 'on request' or '—' rows
+ var dk=$('dPerks');dk.textContent='';dk.hidden=!!ME;if(!ME){dk.appendChild(el('span',null,'Members see new paintings first · '));var jb=el('button','link','Join free');jb.type='button';jb.addEventListener('click',function(){dlg.close();joinNow()});dk.appendChild(jb)}
  $('dcount').textContent=(k+1)+' of '+ART.length;if(!dlg.open)dlg.showModal()}
 $('close').addEventListener('click',function(){dlg.close()});
 $('dprev').addEventListener('click',function(){openArt(curArt-1)});$('dnext').addEventListener('click',function(){openArt(curArt+1)});
@@ -1642,7 +1649,7 @@ TOK=ls('pgTok');
 var PUBF=['fBuy','fMsg','fComm','fUp'],LASTF=null,PAGE_T0=Date.now();
 function hpOf(f){if(!f||f.querySelector('.hp'))return;var w=document.createElement('label');w.className='hp';w.setAttribute('aria-hidden','true');w.innerHTML='Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off">';f.appendChild(w)}
 function trapForms(){PUBF.forEach(function(id){hpOf(document.getElementById(id))});[].forEach.call(document.querySelectorAll('form[data-sub]'),hpOf)}
-document.addEventListener('focusin',function(e){var f=e.target&&e.target.form;if(f&&!f.dataset.t0)f.dataset.t0=Date.now()});
+document.addEventListener('focusin',function(e){var t=e.target,f=t&&t.form;if(f&&!f.dataset.t0&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)&&!/^(submit|button|image|reset)$/.test(t.type))f.dataset.t0=Date.now()});   // the robot timer starts when someone first goes into a field, never on the Send button (a form filled by the phone's autofill and sent at once is a real visitor)
 document.addEventListener('submit',function(e){LASTF=e.target},true);
 function trapOf(){var f=LASTF,i=f&&f.querySelector('.hp input');return{hp:i?i.value:'',ft:Date.now()-(f&&+f.dataset.t0||PAGE_T0)}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',trapForms);else trapForms();
@@ -2203,7 +2210,7 @@ about.addEventListener('click',function(e){if(e.target===about)about.close()});
 
 /* ---------- collection view (also the page shown when 3D isn't available) ---------- */
 var col=$('collection'),gridBuilt=false;
-$('colLede').textContent='Pam’s paintings, gathered into collections — each one a world of its own. New works join every collection as they leave the studio; the locked frames show what’s on its way.';$('colAbout').textContent=ABOUT;$('copy').textContent='© '+new Date().getFullYear()+' Pam’s Gallery. All works are originals.';$('footMail').textContent=EMAIL;$('footMail').href='mailto:'+EMAIL;
+$('colLede').textContent='Pam’s paintings, gathered into collections — each one a world of its own. New works join every collection as they leave the studio; the frames marked “in the studio” show what’s on its way.';$('colAbout').textContent=ABOUT;$('copy').textContent='© '+new Date().getFullYear()+' Pam’s Gallery. All works are originals.';$('footMail').textContent=EMAIL;$('footMail').href='mailto:'+EMAIL;
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 /* Pam's collections: each lists its paintings (numbers in ART, counting from 0) and how many locked "coming soon" frames to show */
 var COLLECTIONS=[
@@ -2385,11 +2392,10 @@ function scrollCanvas(){
  return c}
 function textCanvas(W,H,draw){var c=cnv(W,H),x=c.getContext('2d');draw(x,W,H);return c}
 function wrap(x,t,X,Y,mw,lh){var w=t.split(' '),line='',yy=Y;w.forEach(function(s){var tt=line?line+' '+s:s;if(x.measureText(tt).width>mw&&line){x.fillText(line,X,yy);line=s;yy+=lh}else line=tt});x.fillText(line,X,yy)}
-function plaqueCanvas(p){var D=DREAM;return textCanvas(2048,1152,function(x){x.scale(3.2,3.2);var W=640,H=360;x.fillStyle=D?'#1d1828':'#fbf8f2';x.fillRect(0,0,W,H);x.strokeStyle='#b89a62';x.lineWidth=6;x.strokeRect(9,9,W-18,H-18);x.fillStyle=D?'#f3ecfb':'#1c120c';
+function plaqueCanvas(p){var D=DREAM;return textCanvas(2048,1152,function(x){x.scale(3.2,3.2);var W=640,H=360;x.fillStyle=D?'#2b2536':'#fbf8f2';x.fillRect(0,0,W,H);x.strokeStyle=D?'rgba(217,191,144,.55)':'#b89a62';x.lineWidth=D?2:6;x.strokeRect(9,9,W-18,H-18);x.fillStyle=D?'#f3ecfb':'#1c120c';
  x.font='italic 600 76px "Cormorant Garamond",Georgia,serif';wrap(x,p.t,38,96,W-70,70);
- x.font='400 '+(D?42:38)+'px Jost,Helvetica,Arial,sans-serif';x.fillStyle=D?'#d9cfe8':'#2e221a';x.fillText(p.m,40,H-(D?126:122));
- x.font='600 '+(D?47:44)+'px Jost,Helvetica,Arial,sans-serif';x.fillStyle=D?'#f3ecfb':'#1c120c';x.fillText(p.p,40,H-70);
- x.font='600 '+(D?31:27)+'px Jost,Helvetica,Arial,sans-serif';x.fillStyle=D?'#e2c48e':'#7a5a26';x.fillText('TAP TO ENQUIRE  →',40,H-26)})}
+ x.font='400 '+(D?42:38)+'px Jost,Helvetica,Arial,sans-serif';x.fillStyle=D?'#d9cfe8':'#2e221a';x.fillText(p.m,40,H-(D?104:100));
+ x.font='600 '+(D?47:44)+'px Jost,Helvetica,Arial,sans-serif';x.fillStyle=D?'#f3ecfb':'#1c120c';x.fillText(isSold(p)?'Sold':aucLive(p)?'Auction · bidding open':p.p,40,H-48)})}
 
 /* ---------- GL helpers ---------- */
 function texFrom(c,o){o=o||{};var t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
@@ -2571,7 +2577,7 @@ if(CLAY){[[Mx.floor,'#eccaa9',3.2,.78,.22],[Mx.marble,'#f3dcc6',1.8,.85,.3],[Mx.
    (backend.js, dreamGlow): 1 sheen, 2 floor rings, 3 gold circles on the frieze, 4 the collections star chart, 5 mother-of-pearl. dreamC tints the collections room. ---------- */
 var DPH=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);   // phones (the renderer's own test isn't ready yet here)
 /* the painted look: the clay room repainted in the colours of Pam's work (the finishing pass adds the brushwork) */
-if(PAINT&&CLAY){[[Mx.wall,'#e2a58a'],[Mx.floor,'#4a2a48'],[Mx.marble,'#f1dcc4'],[Mx.ceiling,'#f0c9a4'],[Mx.coffer,'#e9b893'],[Mx.key,'#2f6f74'],[Mx.ivory,'#f3dcc0'],[Mx.ivoryDark,'#8c5a86'],[Mx.tile,'#7b4a6c']]
+if(PAINTED&&CLAY){[[Mx.wall,'#e2a58a'],[Mx.floor,'#4a2a48'],[Mx.marble,'#f1dcc4'],[Mx.ceiling,'#f0c9a4'],[Mx.coffer,'#e9b893'],[Mx.key,'#2f6f74'],[Mx.ivory,'#f3dcc0'],[Mx.ivoryDark,'#8c5a86'],[Mx.tile,'#7b4a6c']]
   .forEach(function(q){q[0].col=lin(q[1])});[Mx.gold,Mx.gold24,Mx.decoGold,Mx.brass,Mx.steel].forEach(function(m){m.col=lin('#e8a94c')})}
 if(DREAM){var dm=function(m,c,r,d,dc){m.col=lin(c);m.rough=r;m.metal=0;m.bump=Math.min(m.bump,.12);m.refl=0;m.mist=1;if(d)m.dream=d;if(dc)m.dreamC=dc};
  dm(Mx.wall,'#463f55',.85,[1,.04,.3],[.58,.54,.62]);      // deep, muted aubergine-plum (so the paintings are the richest colour); the collections room is deeper still
@@ -2622,9 +2628,9 @@ var PAINTF='{float L=dot(c,vec3(.2126,.7152,.0722)),k=max(1.,uRes.y/720.),d0=abs
  ' vec2 gr=vec2(l1-l0,l2-l0);float gm=length(gr)/max(l0,.02);float sw=vn(sp*.006)*9.4+vn(sp*.002+3.)*4.;vec2 td=normalize(mix(vec2(cos(sw),sin(sw)),vec2(-gr.y,gr.x)/max(length(gr),1e-5),smoothstep(.02,.12,gm)));\n'+
  ' vec2 nd=vec2(-td.y,td.x);float br=vn(vec2(dot(sp,td)*.02,dot(sp,nd)*.16)),br2=vn(vec2(dot(sp+nd*3.,td)*.02,dot(sp+nd*3.,nd)*.16)),dab=smoothstep(.25,.75,vn(vec2(dot(sp,td)*.006,dot(sp,nd)*.03)+7.));\n'+   // brushstrokes that follow the forms, and swirl where the surface is plain
  ' c*=.94+.11*mix(.5,br,.6+.4*dab);c+=vec3(1.,.93,.82)*max(br2-br,0.)*.18*(1.-far)*dab;c*=1.+(sin(sp.x*1.6)*sin(sp.y*1.6))*.012;}\n';
-function lookFinish(){if(!(INK||PAINT)||typeof COMPM==='undefined')return;var f=COMPM.fragmentShader,a='c+=(hsh(gl_FragCoord.xy+fract(uTime*7.3)*97.)-.5)*.014;';
+function lookFinish(){if(!(INK||PAINTED)||typeof COMPM==='undefined')return;var f=COMPM.fragmentShader,a='c+=(hsh(gl_FragCoord.xy+fract(uTime*7.3)*97.)-.5)*.014;';
  if(f.indexOf(a)<0){console.warn('lookFinish: anchor not found');return}f=f.replace(a,(INK?INKF:PAINTF)+a);
- if(PAINT){f=f.replace('void main(){vec4 s0=',PAINTFN+'void main(){vec4 s0=').replace('vec3 c0=s0.rgb,','vec3 c0=kuwa(vU),')}
+ if(PAINTED){f=f.replace('void main(){vec4 s0=',PAINTFN+'void main(){vec4 s0=').replace('vec3 c0=s0.rgb,','vec3 c0=kuwa(vU),')}
  COMPM.fragmentShader=f;COMPM.needsUpdate=true}
 // once the room is built: everything else gets a soft clay finish (no glaze, no mirror shine). Paintings, labels, lights and the sky keep theirs.
 function clayFinish(){if(!CLAY)return;var art=[];for(var k in ARTM)art.push(ARTM[k]);
@@ -3711,7 +3717,7 @@ function updateWalk(){if(pend&&atDoor()){var q0=pend;pend=null;setRoute(q0.r);go
  var R=pr?'Turn right to '+nameOf(pr):'',L=pl?'Turn left to '+nameOf(pl):'';
  nxEl.title=R;nxEl.setAttribute('aria-label',R||'Turn right');nxEl.classList.toggle('end',!R);$('pzoom').hidden=!at;
  pvEl.title=L;pvEl.setAttribute('aria-label',L||'Turn left');pvEl.classList.toggle('end',!L);wzEl.hidden=!at;abEl.querySelector('.abprev').classList.toggle('end',!L);abEl.querySelector('.abnext').classList.toggle('end',!R);
- waysEl.classList.toggle('on',door&&(!intro||phone));waysEl.classList.toggle('walk',phone&&!door);$('wayL').classList.toggle('end',!pl);$('wayR').classList.toggle('end',!pr);
+ waysEl.classList.toggle('on',door&&(!intro||phone));document.body.classList.toggle('atDoor',door);waysEl.classList.toggle('walk',phone&&!door);$('wayL').classList.toggle('end',!pl);$('wayR').classList.toggle('end',!pr);
  var S=STOPS[a.i],wall=!go&&!pend&&(th||a.d<.35)&&S&&S.coll!=null&&S.art==null,wt=$('wallText');
  if(wall&&wt.dataset.c!==String(S.coll)){var C=COLLECTIONS[S.coll];wt.dataset.c=S.coll;wt.querySelector('.wk').textContent='Collection '+roman(S.coll);wt.querySelector('.wt').textContent=C.t;wt.querySelector('.wd').textContent=C.d||'';
   wt.querySelector('.wn').textContent=(phone?'Swipe right':'Press ›')+' to walk up close to each painting';}
@@ -3800,7 +3806,7 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
   b.push({t:'Can I buy a print?',go:function(){if(PRINTS.length)say(GL('george.prints'),[{t:'See the prints',pri:1,go:function(){close();openPrints()}},{t:'Thanks',go:close}]);else say(GL('george.noprints'),[{t:'Ask Pam',pri:1,go:function(){close();window.openMsg()}},{t:'Thanks',go:close}])}});
   b.push({t:'Can Pam paint something for me?',go:function(){say(GL('george.comm'),[{t:'Commission a painting',pri:1,go:function(){close();openPage('commission')}},{t:'Thanks',go:close}])}});
   b.push({t:'I’m a gallery, dealer or journalist',go:function(){say(GL('george.trade'),[{t:'For galleries & press',pri:1,go:function(){close();openPage('press')}},{t:'Thanks',go:close}])}});
-  b.push({t:'Members’ rewards',go:function(){say(GL('george.members'),[{t:'Join or sign in',pri:1,go:function(){close();window.openAcct()}},{t:'Not now',go:close}])}});
+  b.push({t:'The collectors’ circle',go:function(){say(GL('george.members'),[{t:'Join or sign in',pri:1,go:function(){close();window.openAcct()}},{t:'Not now',go:close}])}});
   b.push({t:'Contact Pam',go:function(){say(GL('george.contact'),[{t:'Send a message',pri:1,go:function(){close();window.openMsg()}},{t:'Thanks',go:close}])}});
   b.push({t:'Only come when I call',go:hide});say(GL('george.menu'),b,true)}
  function buy(){say(GL('george.buy'),[{t:'Become a member',pri:1,go:function(){close();window.openAcct()}},{t:'Thanks',go:close}])}
@@ -3852,10 +3858,14 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  /* someone who starts walking straight away would rather explore than listen */
  setInterval(function(){if(introOn&&iStep===0&&progress()>.02)endIntro('alone')},300);
  function start(){if(started)return;started=true;seen.fav0=seen.col0=1;if(store('georgeAway')==='1'){muted=true;tab.classList.add('on');return}
-  if(store('georgeIntro')==='done'){setTimeout(function(){say(GL('george.back'),[{t:'Show me around',go:function(){close();setTimeout(function(){intro(1)},300)}}],false)},300);return}
-  setTimeout(function(){intro(0)},250)}
+  if(/^#art-/.test(location.hash)||store('georgeIntro')==='done'){tab.classList.add('on');return}   // returning visitors and shared links: he waits quietly on his tab
+  setTimeout(function(){store('georgeIntro','done');if(progress()>.02){tab.classList.add('on');return}
+   var d=GDEF['george.greet'],hi=siteT('george.greet')===d?d.split('. ').slice(0,2).join('. ')+'.':GREET;   // a short hello (if Pam has written her own greeting, all of it)
+   say(hi,[{t:'Show me the paintings',pri:1,go:function(){touring=true;tourAt(0,'fav')}},{t:'I’ll explore',go:close}],false)},2500)}
  return{start:start,stopTour:stopTour,intro:intro}})();window.__G=George;
 addEventListener('wheel',function(){George.stopTour()},{passive:true});
+window.goArt=function(k){var q=null;[['fav',SF],['col',SC]].forEach(function(w){w[1].forEach(function(S,i){if(!q&&S.art===k)q={r:w[0],i:i}})});if(q)goPlan(q);return !!q};   // a shared link: walk to the painting
+window.goSide=function(){goPlan({r:'col',i:1})};
 window.__house={state:function(){var a=stopAt();return{route:route,t:+(cur*(K.length-1)).toFixed(2),n:K.length-1,i:a.i,d:+a.d.toFixed(2),pend:pend?pend.r+pend.i:null,head:heading(),tgt:tgtI,label:STOPS[a.i].label}},route:function(r){setRoute(r);return K.length},cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());render(0)},K:K,cam:cam};
 
 var fontReady=document.fonts&&document.fonts.load?Promise.race([Promise.all([document.fonts.load('italic 400 80px "Cormorant Garamond"'),document.fonts.load('italic 500 50px "Cormorant Garamond"'),document.fonts.load('300 27px Jost')]),new Promise(function(r){setTimeout(r,2500)})]).catch(function(){}):Promise.resolve();

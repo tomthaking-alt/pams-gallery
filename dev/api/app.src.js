@@ -375,10 +375,10 @@ const actions = {
   // a request to buy: a painting (by id, or the older painting number) or a print in a chosen size
   async order(req, b) {
     await limit(req, 'order', 10, 3600);
-    if (isSpam(b)) return { ok: true, id: id() };
     const u = await auth(req), cat = await getCat();
     const name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase();
     if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
+    if (isSpam(b)) return { ok: true, id: id() };   // after the checks above, so a real visitor with an incomplete form is told what's missing
     let kind = 'art', aid = '', title = '';
     if (b.print) {
       const pr = cat && (cat.prints || []).find(x => x.id === String(b.print)); if (!pr) throw err('That print is no longer available.', 404);
@@ -404,11 +404,11 @@ const actions = {
   // a commission request, with up to three reference photos
   async commission(req, b) {
     await limit(req, 'comm', 6, 3600);
-    if (isSpam(b)) return { ok: true, id: id() };
     const u = await auth(req), cat = await getCat();
     const name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase(), idea = clean(b.idea, 3000);
     if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
     if (idea.length < 5) throw err('Please tell Pam a little about the painting you have in mind.', 400);
+    if (isSpam(b)) return { ok: true, id: id() };
     const photos = [];
     for (const d of (Array.isArray(b.photos) ? b.photos : []).slice(0, 3)) {
       const data = String(d || '').replace(/^data:image\/(jpeg|png|webp);base64,/, '');
@@ -454,9 +454,9 @@ const actions = {
 
   async sub(req, b) {
     await limit(req, 'sub', 10, 3600);
-    if (isSpam(b, 900)) return { ok: true };
     const email = clean(b.email, 200).toLowerCase(); if (!okEmail(email)) throw err('Please enter a valid email address.', 400);
     if (!b.consent) throw err('Please tick the box to say you’d like these emails.', 400);
+    if (isSpam(b, 900)) return { ok: true };
     const rec = { email, ts: Date.now(), words: CONSENT_WORDS, src: clean(b.src, 40) || 'site' };
     if (RESEND && MAIL_FROM) {          // double opt-in: nothing is sent until they confirm
       await db('SET', 'subp:' + email, JSON.stringify(rec), 'EX', String(14 * 86400));
@@ -470,10 +470,10 @@ const actions = {
 
   async message(req, b) {
     await limit(req, 'msg', 10, 3600);
-    if (isSpam(b)) return { ok: true };
     const u = await auth(req), name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase(), text = clean(b.message, 3000);
     if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
     if (text.length < 2) throw err('Please write a message.', 400);
+    if (isSpam(b)) return { ok: true };
     const m = { id: id(), ts: Date.now(), name, email, message: text, member: !!u, read: false };
     await pipe([['SET', 'm:' + m.id, JSON.stringify(m)], ['LPUSH', 'msgs', m.id]]);
     const cat = await getCat();
@@ -819,7 +819,7 @@ function enquiryForm(a, back, q, site) {
     '<input type="hidden" name="id" value="' + esc(a.id) + '"><input type="hidden" name="ts" value="' + formTs() + '">' +
     '<label>Your name<input name="name" required maxlength="80" autocomplete="name"></label><label>Email<input type="email" name="email" required maxlength="200" autocomplete="email"></label>' +
     '<label>Phone (optional)<input type="tel" name="phone" maxlength="40" autocomplete="tel"></label>' +
-    (offers ? '<label>Your offer (optional)<input name="offer" inputmode="decimal" maxlength="12" placeholder="e.g. 450"></label>' : '<span></span>') +
+    (offers ? '<label>Your offer (optional)<input name="offer" inputmode="decimal" maxlength="12" placeholder="Your offer"></label>' : '<span></span>') +
     '<label class="wide">' + (sold ? 'Your message (this painting has found a home — ask about similar work)' : 'Your message (optional)') + '<textarea name="message" maxlength="2000" placeholder="Anything you’d like to know: framing, delivery, a viewing…"></textarea></label>' +
     '<label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>' +
     '<p class="small wide">' + esc(replyLine(site)) + ' Nothing is charged until you’ve agreed the price and delivery. Your details are only used to answer you — nothing is shared.</p>' +
@@ -869,7 +869,7 @@ async function worksPage(q, res) {
     '<ul class="grid">' + s.works.map(id => arts.find(a => a.id === id)).filter(Boolean).map(a => card(a, by[a.id], cur, n++ < 4)).join('') + '</ul></section>';
   const first = arts[0] && imgsOf(arts[0]).wm;
   const ld = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'All works — Pam’s Gallery', url: SITE + '/works', mainEntity: { '@type': 'ItemList', itemListElement: arts.map((a, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + '/art/' + by[a.id], name: a.t })) } };
-  const body = '<section class="intro"><p class="kick">The collection</p><h1>All works</h1><p class="lede">Original paintings and drawings by Pam — every one a single original' + (buyOf(cat && cat.site).cert === 'yes' ? ' with a certificate of authenticity' : '') + '. Tap any work for its size, price and story, or to ask Pam about it.</p>' +
+  const body = '<section class="intro"><p class="kick">The collection</p><h1>All works</h1><p class="lede">Original paintings and drawings by Pam — every one a single original' + (buyOf(cat && cat.site).cert === 'yes' ? ' with a certificate of authenticity' : '') + '. Tap any work for its details, or to ask Pam about it.</p>' +
     '<div class="btns"><a class="btn main" href="/">Walk through the 3D gallery</a><a class="btn" href="#contact">Contact Pam</a></div></section>' + secs.map(sec).join('') + perksBox(cat) +
     '<section id="contact" class="contact" aria-labelledby="ch"><h2 id="ch">Contact Pam</h2><p class="lede">For questions, viewings, commissions or press, write to ' + emailSpan(email) + ' or send a message here.</p>' +
     '<form class="f" method="post" action="/api/app"><input type="hidden" name="a" value="message"><input type="hidden" name="form" value="1"><input type="hidden" name="back" value="/works"><input type="hidden" name="ts" value="' + formTs() + '">' +
@@ -900,6 +900,7 @@ async function privacyPage(res) {
       P('What is collected, and why', 'When you enquire, make an offer, bid, send a message or request a commission, your name, email address, any phone number and what you write are kept so Pam can reply and arrange a sale. If you create an account, your name, email and a securely scrambled version of your password are kept, along with the paintings you’ve bought, so a completed collection can be rewarded. Reference photos sent with a commission request are private and only Pam can open them.') +
       P('Email updates', 'If you sign up for news of new work and exhibitions (or tick the box when creating an account), your email address and the date and wording of your consent are kept. You’ll only get those emails because you asked for them, and every one has a one-click unsubscribe link. Members who opt in also hear when new work opens early for members.') +
       P('Visits', 'The site counts visits without cookies and without storing anything on your device. It notes, as totals, the rough area a visit comes from (country and town, worked out by the hosting service), the website that sent you, your type of device and browser, and how long the visit lasted, so Pam can see where interest comes from. To tell one visit from the next, it uses a scrambled code made from your connection and browser that can’t be turned back into either, kept for no longer than 30 minutes. No advertising or tracking cookies are used, and nothing identifies you personally.') +
+      P('On your device', 'Separately from the visit counts, your browser keeps a few of your choices on this device only, such as paintings you’ve liked, your music setting, whether you’ve already seen the opening and King George’s welcome, and, if you sign in, that you’re signed in. Clearing this site’s data in your browser removes them.') +
       P('Who else is involved', 'The site is hosted by Vercel and its data is stored with Upstash. Emails are sent by Resend, and card payments, if you choose to pay by card, are handled by Stripe. They process information only to provide those services. Your details are never sold or shared for marketing.') +
       P('How long it is kept, and your rights', 'Enquiries and messages are kept for as long as they’re needed to look after your purchase and for records, and account details until you ask for your account to be deleted. You can ask to see, correct or delete your information, or withdraw consent, at any time by emailing Pam. You also have the right to complain to the Information Commissioner’s Office (ico.org.uk).') + '</section>' }));
 }
