@@ -151,7 +151,7 @@ function patchShader(sh,extra){var U=sh.uniforms;U.uPass=G3.uPass;U.uFar=G3.uFar
   .replace('#include <lights_fragment_end>',REFLF+'#include <lights_fragment_end>')
   .replace('#include <aomap_fragment>','#include <aomap_fragment>\n'+AOF)
   .replace('#include <opaque_fragment>','#include <opaque_fragment>\n#ifdef OPAQUE\ngl_FragColor.a=length(vWPos-cameraPosition)/uFar;\n#endif\n')
-  .replace('#include <dithering_fragment>','#include <dithering_fragment>\n#ifdef DREAM_PULSE\ngl_FragColor.rgb*=.8+.2*sin(uSecs*.8+vWPos.y*7.+vWPos.x*3.);\n#endif\n'+MISTF+FOGF+'if(uPass>1.5)gl_FragColor.rgb=min(gl_FragColor.rgb,vec3(4.));\n')}
+  .replace('#include <dithering_fragment>','#include <dithering_fragment>\n#ifdef DREAM_PULSE\ngl_FragColor.rgb*=.8+.2*sin(uSecs*.8+vWPos.y*7.+vWPos.x*3.);\n#endif\n'+MISTF+FOGF+'if(uPass>1.5)gl_FragColor.rgb=min(gl_FragColor.rgb,vec3(4.));\n#ifdef KEEP_COLOUR\nif(uPass<.5){vec3 kc=gl_FragColor.rgb;float lm=dot(kc,vec3(.2126,.7152,.0722));kc=clamp(mix(vec3(lm),kc,1.3)/(1.+lm*.75)*1.2,0.,1.);gl_FragColor=vec4(kc,-max(length(vWPos-cameraPosition)/uFar,.0005));}\n#endif\n')}
 function mkBC(extra){return function(sh){patchShader(sh,extra)}}
 function blendOpts(m,o){if(!m.blend)return;o.transparent=true;o.opacity=m.alpha;o.depthWrite=false;o.polygonOffset=true;o.polygonOffsetFactor=-1;o.polygonOffsetUnits=-4;
  o.blending=THREE.CustomBlending;o.blendSrc=THREE.SrcAlphaFactor;o.blendDst=THREE.OneMinusSrcAlphaFactor;o.blendSrcAlpha=THREE.ZeroFactor;o.blendDstAlpha=THREE.OneFactor}
@@ -162,7 +162,7 @@ function mat3(m,env){
  var e=m.emis,em=Math.max(e[0],e[1],e[2]),M,o;
  if(m.unlit||m.flat){o={color:m.flat?c3([0,0,0]):c3([m.col[0]*e[0],m.col[1]*e[1],m.col[2]*e[2]]),side:THREE.DoubleSide};if(m.tex)o.map=m.tex;blendOpts(m,o);M=new THREE.MeshBasicMaterial(o);if(m.pulse){M.defines=M.defines||{};M.defines.DREAM_PULSE=''}M.onBeforeCompile=mkBC({});return M}
  o={color:c3(m.col),roughness:Math.max(.035,m.rough),metalness:m.metal,side:THREE.DoubleSide,envMap:env,envMapIntensity:m.envK||1};
- if(m.tex)o.map=m.tex;if(m.cut)o.alphaTest=m.cut;   /* cut-out pictures (clay frames): see-through where the picture is clear */
+ if(m.tex)o.map=m.tex;if(m.cut)o.alphaTest=m.cut;   /* (not alpha-to-coverage: this renderer keeps depth in the alpha channel) */   /* cut-out pictures (clay frames): see-through where the picture is clear */
  if(m.bump>0){o.bumpMap=m.htex||m.tex;o.bumpScale=m.bump*.02}
  if(em>0){o.emissive=c3([e[0]/em,e[1]/em,e[2]/em]);o.emissiveIntensity=em}
  blendOpts(m,o);
@@ -171,6 +171,7 @@ function mat3(m,env){
  if(m.refl){M.defines.PLANAR_REFL='';ex.uReflAmt={value:m.refl};REFLU.push([m,ex.uReflAmt])}
  if(m.fog){M.defines.WALK_FOG='';ex.uFog={value:m.fog}}
  if(m.mist&&DRM)M.defines.DREAM_MIST='';
+ if(m.keep)M.defines.KEEP_COLOUR='';   /* Pam's statues in the ink look: shaded here and passed through the ink finish untouched, like the paintings */
  if(m.dream){M.defines.DREAM_FLOW=m.dream[0];ex.uDK={value:m.dream[1]};ex.uDS={value:m.dream[2]||.35};ex.uDC={value:new THREE.Vector3().fromArray(m.dreamC||[1,1,1])}}
  M.onBeforeCompile=mkBC(ex);return M}
 
@@ -201,13 +202,13 @@ function upgradeMats(){
  if(DRM){Mx.floor.refl=.55;Mx.floor.rough=.22;Mx.floor.x3={clearcoat:.5,clearcoatRoughness:.04};   // the dream: a dark, glassy lake floor; iridescent rose gold and pearl
   if(!mobile&&!LOWGPU){Mx.gold.x3={iridescence:.6,iridescenceIOR:1.35,iridescenceThicknessRange:[200,600]};Mx.colD.x3={iridescence:.35,iridescenceIOR:1.3,iridescenceThicknessRange:[150,500]}}}
  else if(typeof CLAY!=='undefined'&&CLAY){var sh=function(c){return{sheen:.45,sheenRoughness:.8,sheenColor:c3(c)}};   // clay: a soft, velvety sheen instead of a glaze
-  Mx.floor.x3=typeof PAINTED!=='undefined'&&PAINTED?{sheen:.15,sheenRoughness:.5,sheenColor:c3([.6,.4,.65])}:sh([1,.93,.82]);   /* the painted look: a deep plum satin, not a cream sheen */Mx.marble.x3=sh([1,.95,.88]);Mx.wall.x3=sh([1,.94,.84]);Mx.ceiling.x3=sh([1,.95,.88]);Mx.coffer.x3=sh([1,.95,.88])}
+  Mx.floor.x3=typeof PAINTED!=='undefined'&&PAINTED?{sheen:.15,sheenRoughness:.5,sheenColor:c3([.6,.4,.65])}:sh([1,.93,.82]);   /* the painted look: a deep plum satin, not a cream sheen */Mx.marble.x3=sh([1,.95,.88]);Mx.wall.x3=sh([1,.94,.84]);Mx.ceiling.x3=sh([1,.95,.88]);Mx.coffer.x3=sh([1,.95,.88]);if(Mx.dado)Mx.dado.x3=sh([.8,.68,.78])}
  else{
  Mx.floor.x3={clearcoat:.65,clearcoatRoughness:.035};Mx.floor.rough=.3;Mx.floor.refl=.9;            // honed marble under a polished glaze
  Mx.marble.x3={clearcoat:.3,clearcoatRoughness:.12};                                                  // polished columns and balustrade
  }
  Mx.crystal.x3={ior:2.1,specularIntensity:1,iridescence:.22,iridescenceIOR:1.5,iridescenceThicknessRange:[180,520]};Mx.crystal.rough=.07;Mx.crystal.metal=0;Mx.crystal.envK=2.;Mx.crystal.col=[.32,.32,.35];Mx.crystal.emis=[.28,.26,.22];   // clear glass: almost no diffuse, all sparkle and reflection
- [Mx.gold,Mx.gold24,Mx.steel].forEach(function(m){m.envK=1.25});
+ [Mx.gold,Mx.gold24,Mx.steel].forEach(function(m){m.envK=typeof PAINTED!=='undefined'&&PAINTED?.7:1.25});
  Mx.blob.flat=1;
  [Mx.candle,Mx.lantern,Mx.flame,Mx.lens,Mx.ring].forEach(function(m){m.unlit=1});   // light sources glow; they are not lit by themselves
  ['torso','neck','head','uarm','farm','hand','handG','thigh','shin','foot'].forEach(function(k){CR[k].forEach(function(m){m.fog=.2;m.x3={sheen:.35,sheenRoughness:.55,sheenColor:c3([.95,.82,.62])}})});
@@ -218,7 +219,7 @@ function buildLights(){
  var sun=new THREE.DirectionalLight(0xffffff,4.4);sun.color.setRGB(SUNCOL[0]/4.4,SUNCOL[1]/4.4,SUNCOL[2]/4.4,LINEAR);
  var tg=[-4.6,1.5,-6.5];sun.position.set(tg[0]+SUN[0]*35,tg[1]+SUN[1]*35,tg[2]+SUN[2]*35);sun.target.position.set(tg[0],tg[1],tg[2]);S3.add(sun,sun.target);
  sun.castShadow=true;var S=sun.shadow;S.mapSize.set(SHS,SHS);S.camera.left=-17;S.camera.right=17;S.camera.top=17;S.camera.bottom=-17;S.camera.near=1;S.camera.far=80;S.bias=-.00035;S.normalBias=.012;S.radius=mobile?1.5:2.2;
- LIGHTS.spot.forEach(function(l,i){var pk=Math.max(l.c[0],l.c[1],l.c[2]),out=Math.acos(l.cos[1]),inn=Math.acos(l.cos[0]),tg=ARTPOS[i]?ARTPOS[i].c:v3.add(l.p,l.d),lp=[l.p[0],RH-.3,l.p[2]];   // hung just below the ceiling beams so they light the wall cleanly
+ LIGHTS.spot.forEach(function(l,i){var pk=Math.max(l.c[0],l.c[1],l.c[2]),out=Math.acos(l.cos[1]),inn=Math.acos(l.cos[0]),tg=l.t||(ARTPOS[i]?ARTPOS[i].c:v3.add(l.p,l.d)),lp=[l.p[0],RH-.3,l.p[2]];   // hung just below the ceiling beams so they light the wall cleanly
   var s=new THREE.SpotLight(0xffffff,pk,0,out,1-inn/out,2);s.color.setRGB(l.c[0]/pk,l.c[1]/pk,l.c[2]/pk,LINEAR);s.position.set(lp[0],lp[1],lp[2]);s.target.position.set(tg[0],tg[1],tg[2]);S3.add(s,s.target);
   if(Q.spotSh&&l.sh!==false){s.castShadow=true;s.shadow.mapSize.set(1024,1024);s.shadow.camera.near=.25;s.shadow.camera.far=9;s.shadow.bias=-.0006;s.shadow.normalBias=.015;s.shadow.radius=3.2}});
  LIGHTS.point.forEach(function(l){var pk=Math.max(l.c[0],l.c[1],l.c[2]),p=new THREE.PointLight(0xffffff,pk,8,2);p.color.setRGB(l.c[0]/pk,l.c[1]/pk,l.c[2]/pk,LINEAR);p.position.set(l.p[0],l.p[1],l.p[2]);S3.add(p)});
@@ -345,7 +346,7 @@ function render(time){
  G3.uReflTex.value=reflRT?reflRT.texture:null;REFLU.forEach(function(q){q[1].value=(Q.refl&&reflRT)?q[0].refl:0});
  G3.uRes.value.set(RT.w,RT.h);
  R3.setRenderTarget(sceneRT);R3.clear(true,true,false);R3.render(S3,C3);
- var finalTex=sceneRT.texture,cu=COMPM.uniforms;
+ var finalTex=sceneRT.texture,cu=COMPM.uniforms;if(cu.uDraw)cu.uDraw.value=typeof drawAmt==='function'?drawAmt():1;
  if(Q.bloom&&BL.length){bloomPass();cu.uB.value=BL[0].texture;cu.uBK.value=BLOOMK}else{cu.uB.value=BLACK;cu.uBK.value=0}
  if(Q.ao){var au=AOM.uniforms,ty=Math.tan(cam.fov/2);au.uT.value=sceneRT.texture;au.uTan.value.set(ty*as,ty);au.uPx.value.set(1/RT.w,1/RT.h);au.uAsp.value=as;pass(AOM,aoRT);cu.uA.value=aoRT.texture;cu.uAOK.value=.85}else{cu.uA.value=BLACK;cu.uAOK.value=0}
  SUNV.set(eye[0]+SKYSD[0]*120,eye[1]+SKYSD[1]*120,eye[2]+SKYSD[2]*120).project(C3);var front=v3.dot(dd,SKYSD)>.05;
