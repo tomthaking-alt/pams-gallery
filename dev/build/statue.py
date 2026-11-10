@@ -1,6 +1,7 @@
 """Turn a 3D model (.glb, e.g. from Higgsfield's image-to-3D) into the gallery's compact statue files.
-usage: python3 statue.py <model.glb> <out_dir> <name> [colour boost, e.g. 1.3]      e.g. statue.py dev/media/clay/statue-yellow.glb dev/src/clay statue-yellow-v1
-writes <name>.bin (the shape) and <name>.webp (its colours, 1024px). Needs: pip install pygltflib numpy pillow
+usage: python3 statue.py <model.glb> <out_dir> <name> [colour boost, e.g. 1.3] [texture size, default 1024]
+  e.g. statue.py dev/media/clay/statue-blue.glb dev/src/clay statue-blue-v2 2.1 2048
+writes <name>.bin (the shape) and <name>.webp (its colours). Needs: pip install pygltflib numpy pillow
 .bin layout, little-endian: 'PGM1', uint32 vertices, uint32 indices, float32 min[3], float32 max[3],
   int16 positions (quantised inside min..max), int8 normals (x127), padding to 2 bytes, uint16 texture coordinates (x65535),
   uint16 triangle indices. The page expands it (statueLoad in House of Pam.html)."""
@@ -9,7 +10,7 @@ import numpy as np
 from pygltflib import GLTF2
 from PIL import Image, ImageEnhance
 
-src, out, name = sys.argv[1:4]; sat = float(sys.argv[4]) if len(sys.argv) > 4 else 1.0
+src, out, name = sys.argv[1:4]; sat = float(sys.argv[4]) if len(sys.argv) > 4 else 1.0; tsz = int(sys.argv[5]) if len(sys.argv) > 5 else 1024
 g = GLTF2().load(src)
 assert len(g.meshes) == 1 and len(g.meshes[0].primitives) == 1, 'expects one mesh with one part'
 p = g.meshes[0].primitives[0]
@@ -41,11 +42,11 @@ b.write(qp.tobytes()); b.write(qn.tobytes())
 if b.tell() % 2: b.write(b'\0')
 b.write(quv.tobytes()); b.write(idx.astype('<u2').tobytes())
 open(f'{out}/{name}.bin', 'wb').write(b.getvalue())
-# colours: the model's own texture, 1024px WebP
+# colours: the model's own texture as WebP (1024px by default; 2048px for the statues, so they stay crisp up close)
 img = g.images[g.textures[g.materials[p.material].pbrMetallicRoughness.baseColorTexture.index].source]
 bv = g.bufferViews[img.bufferView]
 im = Image.open(io.BytesIO(blob[(bv.byteOffset or 0):(bv.byteOffset or 0) + bv.byteLength])).convert('RGB')
 im = ImageEnhance.Color(im).enhance(sat) if sat != 1 else im   # image-to-3D can mute colours: bring them back towards the photo
-im.resize((1024, 1024), Image.LANCZOS).save(f'{out}/{name}.webp', quality=84, method=6)
+im.resize((tsz, tsz), Image.LANCZOS).save(f'{out}/{name}.webp', quality=86 if tsz > 1024 else 84, method=6)
 print(f'{name}: {nv} points, {ni // 3} triangles, size {np.round(hi - lo, 3).tolist()}, '
       f'{len(b.getvalue()) // 1024} KB shape')

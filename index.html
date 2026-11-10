@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-ank8TY7lyEXohLp62Hml9fe7+Vnmm08wXebHTG3E3ZM=' 'sha256-veRc24X1l9V24Bi+uFTx3ZSYzqA6GGmxU6Bz4qP8j80=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-ank8TY7lyEXohLp62Hml9fe7+Vnmm08wXebHTG3E3ZM=' 'sha256-U7YZi6OXlJgMJv5y3ETF3XlrWg2SCIle0vestCsMww0=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -38,6 +38,7 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 .dreampill a{color:inherit;text-decoration:none;min-height:34px;display:inline-flex;align-items:center;padding:0 .75rem;border-radius:99px;opacity:.85}
 .dreampill a[aria-current]{background:#fff7fb;color:#1e1234;opacity:1}
 .dreampill a:focus-visible{outline:2px solid #ffdcae;outline-offset:1px}
+#lookBtn[aria-pressed="true"]{color:var(--walnut)}@media (max-width:700px){#lookBtn{min-width:40px;min-height:40px;font-size:1.05rem}}
 body.hasBanner .dreampill{top:calc(var(--barh,56px) + 40px)}
 @media (min-width:701px){#where{display:none}body.atDoor:not(.gIntro) #walk,body.atDoor:not(.gIntro) #hint{visibility:hidden;opacity:0;pointer-events:none}body.atDoor #gBub{bottom:136px}}
 .ink #title{padding-bottom:17vh}.ink #title h1{color:#221c18;text-shadow:0 0 18px #f6f2ea,0 0 36px #f6f2ea}.ink #title p{color:#2a221c;font-weight:500;text-shadow:0 0 4px #f6f2ea,0 0 10px #f6f2ea,0 0 18px #f6f2ea;background:rgba(246,242,234,.78);padding:.45em 1.1em;border-radius:99px}   /* the ink look: the title sits in the open paper sky, clear of the drawn railing */
@@ -1018,8 +1019,10 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
 var DREAM_DEFAULT=true;
 /* looks to compare in the preview: dream; ink (the clay room drawn in ink on paper, paintings in full colour); paint (the room painted in
    swirling brushstrokes in the colours of Pam's work); clay (today's live look) */
-var LOOK=(location.search.match(/[?&]look=(dream|ink|paint|clay)\b/)||[])[1]||(DREAM_DEFAULT?'ink':'clay');   // the preview opens on the ink look Pam chose
+var LOOKQ=(location.search.match(/[?&]look=(dream|ink|paint|clay)\b/)||[])[1],LOOKS=null;try{LOOKS=localStorage.getItem('pgLook')}catch(e){}
+var LOOK=LOOKQ||(DREAM_DEFAULT?(LOOKS==='paint'?'paint':'ink'):'clay');   // the preview opens on the ink look Pam chose (or the colour version, if this visitor switched to it)
 var DREAM=LOOK==='dream',INK=LOOK==='ink',PAINTED=LOOK==='paint';   // (not 'PAINT': that name is the painting-canvas cache further down)
+var LOOKTOG=INK||PAINTED,LOOKNOW=LOOK;   // the ink drawing and the painted colour version share one room, so a button switches between them at any time
 /* the layout Pam asked for (November 2026): every collection in the main gallery hall, this month’s favourites in the side room */
 var COLMAIN=true;
 if(DREAM)document.documentElement.classList.add('dream');if(INK)document.documentElement.classList.add('ink');
@@ -1125,7 +1128,7 @@ FAVS=ART.slice(0,6).map(function(p,i){return i});
 /* frames: each painting has one that suits it (Pam can choose another in her dashboard) */
 var FRAMES={"gilt": "Gilded baroque", "silver": "Silver baroque", "ivory": "Ivory & gold baroque", "deco": "Art deco gold", "walnut": "Walnut with a gold slip", "ebony": "Ebony with a gold slip", "emerald": "Emerald lacquer with gold", "teal": "Teal lacquer with gold", "jewel": "Black with jewel colours", "maple": "Pale maple float", "brass": "Slim brass float", "white": "Slim white float", "black": "Slim black with a white mount", "oak": "Natural oak with a white mount", "alu": "Brushed silver with a white mount"},FRDEF={"p1": "ivory", "p2": "gilt", "p3": "silver", "p4": "emerald", "p5": "walnut", "p6": "ebony", "p7": "deco", "p8": "maple", "p9": "jewel", "p10": "teal", "p11": "black", "p12": "oak", "p13": "alu", "p14": "brass", "p15": "white"};
 function frameAuto(p){var id=p.emb||(/^emb:/.test(p.img||'')?p.img.slice(4):'');return FRDEF[id]||(/ink|pen\b|pencil|drawing|charcoal|graphite|etching|linocut|print/i.test(p.m||'')?'black':/digital/i.test(p.m||'')?'brass':/watercolou?r|gouache|pastel/i.test(p.m||'')?'oak':'gilt')}
-function frameOf(p){if(p&&p.fr&&FRAMES[p.fr])return p.fr;var a=frameAuto(p||{});return PAINTED&&a!=='black'?'ebony':a}
+function frameOf(p){return p&&p.fr&&FRAMES[p.fr]?p.fr:frameAuto(p||{})}
 function priceOf(a){return a.mode==='auction'?'Auction':a.mode==='price'&&a.p?a.p:'Price on request'}
 function embImg(v){return /^emb:/.test(v||'')&&EMB[v.slice(4)]?EMB[v.slice(4)].img:v}
 /* works added to the site itself appear in Pam's catalogue until she removes them */
@@ -1183,6 +1186,9 @@ var GDEF={'george.greet':GREET_DEF,
  'george.members':'Join our collectors’ circle, free: see new paintings before anyone else, and receive a signed print when you complete a collection.',
  'george.contact':'You may send Pam a message right here, or email her at {email}. She replies to every message personally.',
  'george.wall':'Walk up to any painting first, then tap me again — or tap the painting and choose “View on your wall”.'};
+if(LOOKTOG)(function(){var mu=$('music');if(!mu)return;var b=document.createElement('button');b.id='lookBtn';b.type='button';
+ function lab(){var on=LOOKNOW==='paint';b.setAttribute('aria-pressed',on?'true':'false');b.title=on?'Back to the ink drawing':'See the room in colour';b.setAttribute('aria-label',b.title);b.innerHTML='<span aria-hidden="true">◐</span><span class="mw"> '+(on?'Ink':'Colour')+'</span>'}
+ lab();b.addEventListener('click',function(){if(window.__setLook){window.__setLook(LOOKNOW==='paint'?'ink':'paint');lab()}});mu.parentNode.insertBefore(b,mu.nextSibling)})();
 if(COLMAIN){var GD2={   // the layout with every collection in the main hall
  'george.tourap':'Swipe **right** to walk round **Pam’s collections** in this hall — each swipe brings the next collection or painting in from the right. Like so…',
  'george.tourac':'Press the **right arrow** (or simply scroll) to walk round **Pam’s collections** in this hall — each press brings the next collection or painting in from the right. Like so…',
@@ -2575,10 +2581,12 @@ if(CLAY){[[Mx.floor,'#eccaa9',3.2,.78,.22],[Mx.marble,'#f3dcc6',1.8,.85,.3],[Mx.
    (backend.js, dreamGlow): 1 sheen, 2 floor rings, 3 gold circles on the frieze, 4 the collections star chart, 5 mother-of-pearl. dreamC tints the collections room. ---------- */
 var DPH=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);   // phones (the renderer's own test isn't ready yet here)
 /* the painted look: the clay room repainted in the colours of Pam's work (the finishing pass adds the brushwork) */
-if(PAINTED&&CLAY){[[Mx.wall,'#d4a8a4'],[Mx.floor,'#4a2a48'],[Mx.marble,'#efe2d6'],[Mx.ceiling,'#f3e2d2'],[Mx.coffer,'#ead2bd'],[Mx.key,'#2f6f74'],[Mx.ivory,'#f3dcc0'],[Mx.ivoryDark,'#8c5a86'],[Mx.tile,'#6e5866'],
-  [Mx.jewelA,'#3d7a76'],[Mx.jewelB,'#94506c'],[Mx.jewelC,'#a88a5a'],[Mx.jewelD,'#4d5a8c']].forEach(function(q){q[0].col=lin(q[1])});   // dusty rose (the warm light adds the apricot)
- [Mx.gold,Mx.steel].forEach(function(m){m.col=lin('#9c8058');m.metal=.15});[Mx.gold24,Mx.decoGold,Mx.brass].forEach(function(m){m.col=lin('#a88a5a')});Mx.goldDark.col=lin('#4e3520');   // antique gilt, dark in the recesses
- Mx.dado=mat({col:lin('#9e8a96'),tex:CLAYT,htex:CLAYH,bump:.3,rough:.85,uvs:[1.8,1.8]})}   // a mauve band along the foot of the walls
+var LOOKMATS=[];   // for the colour switch: each material's settings in the ink drawing and in the painted colour version
+if(LOOKTOG&&CLAY){var lk=function(m,pc,pm){LOOKMATS.push({m:m,ink:{col:m.col.slice(),metal:m.metal},paint:{col:lin(pc),metal:pm==null?m.metal:pm}})};
+ [[Mx.wall,'#d4a8a4'],[Mx.floor,'#4a2a48'],[Mx.marble,'#efe2d6'],[Mx.ceiling,'#f3e2d2'],[Mx.coffer,'#ead2bd'],[Mx.key,'#2f6f74'],[Mx.ivory,'#f3dcc0'],[Mx.ivoryDark,'#8c5a86'],[Mx.tile,'#6e5866'],
+  [Mx.jewelA,'#3d7a76'],[Mx.jewelB,'#94506c'],[Mx.jewelC,'#a88a5a'],[Mx.jewelD,'#4d5a8c'],[Mx.gold24,'#a88a5a'],[Mx.decoGold,'#a88a5a'],[Mx.brass,'#a88a5a'],[Mx.goldDark,'#4e3520']].forEach(function(q){lk(q[0],q[1])});   // dusty rose, antique gilt
+ lk(Mx.gold,'#9c8058',.15);lk(Mx.steel,'#9c8058',.15);
+ Mx.dado=mat({col:Mx.marble.col.slice(),tex:CLAYT,htex:CLAYH,bump:.3,rough:.85,uvs:[1.8,1.8]});lk(Mx.dado,'#9e8a96')}   // the band along the foot of the walls: mauve in colour
 if(DREAM){var dm=function(m,c,r,d,dc){m.col=lin(c);m.rough=r;m.metal=0;m.bump=Math.min(m.bump,.12);m.refl=0;m.mist=1;if(d)m.dream=d;if(dc)m.dreamC=dc};
  dm(Mx.wall,'#463f55',.85,[1,.04,.3],[.58,.54,.62]);      // deep, muted aubergine-plum (so the paintings are the richest colour); the collections room is deeper still
  dm(Mx.floor,'#231f30',.22,[2,.1],[.85,.85,.95]);         // a night lake with faint rings of light
@@ -2629,17 +2637,26 @@ var PAINTF='{float L=dot(c,vec3(.2126,.7152,.0722)),k=max(1.,uRes.y/720.),d0=abs
  ' float ol=smoothstep(.10,.30,dz)*(1.-far)*(.85+.15*vn(sp*.02));c=mix(c,vec3(.17,.08,.22),ol*.8);\n'+   // painted outlines in deep violet
  ' float bk=1.-step(1.15,d0);c*=1.+(dabs(sp)+(vn(sp*.004)-.5)*.05)*bk*(1.-far*.6);c*=1.+(sin(sp.x*1.6)*sin(sp.y*1.6))*.012;}\n';
 /* the ink look's opening: when the gallery appears, it draws itself in over about three seconds, then the paintings and Pam's statues bloom into colour */
-function drawAmt(){if(reduce||!INK)return 1;if(!window.DRAW_T0){var ld=document.getElementById('loading');if(ld&&ld.style.display==='none')window.DRAW_T0=performance.now();else return 0}return Math.min(1,(performance.now()-window.DRAW_T0)/3200)}
-function lookFinish(){if(!(INK||PAINTED)||typeof COMPM==='undefined')return;
- if(INK){var fi=COMPM.fragmentShader,ea='if(s0.a<-.00001){o=vec4(toSRGB(s0.rgb),1.);return;}';
-  if(fi.indexOf(ea)>=0&&fi.indexOf('uniform float uBK,')>=0){COMPM.uniforms.uDraw={value:1};
-   COMPM.fragmentShader=fi.replace('uniform float uBK,','uniform float uDraw,uBK,').replace(ea,'if(s0.a<-.00001){o=vec4(mix(vec3(.962,.947,.912),toSRGB(s0.rgb),smoothstep(.62,1.,uDraw)),1.);return;}').replace('void main(){vec4 s0=',INKFN+'void main(){vec4 s0=');COMPM.needsUpdate=true}
-  else console.warn('lookFinish: ink anchors not found')}
- if(PAINTED){var cf=COMPM.fragmentShader;if(cf.indexOf('c*=vec3(1.015,.985,.975)*1.2;')>=0){COMPM.fragmentShader=cf.replace('c*=vec3(1.015,.985,.975)*1.2;','c*=vec3(1.,.99,.99)*1.1;');COMPM.needsUpdate=true}}
- if(PAINTED&&typeof SKYM!=='undefined'){var sf=SKYM.fragmentShader.replace('vec3(.3,.6,.9)*pow(1.-nn.z,3.)*.6','vec3(.3,.6,.9)*pow(1.-nn.z,3.)*.2');sf=sf.replace('mix(vec3(.10,.2,.05),vec3(.5,.6,.13),band)','mix(vec3(.05,.12,.14),vec3(.2,.4,.38),band)').replace('vec3(.5,.22,.08)','vec3(.34,.13,.28)').replace('vec3(.8,.78,.4)','vec3(.85,.6,.45)');SKYM.fragmentShader=sf;SKYM.needsUpdate=true}var f=COMPM.fragmentShader,a='c+=(hsh(gl_FragCoord.xy+fract(uTime*7.3)*97.)-.5)*.014;';
- if(f.indexOf(a)<0){console.warn('lookFinish: anchor not found');return}f=f.replace(a,(INK?INKF:PAINTF)+a);
- if(PAINTED){f=f.replace('void main(){vec4 s0=',PAINTFN+'void main(){vec4 s0=').replace('vec3 c0=s0.rgb,','vec3 c0=kuwa(vU),')}
- COMPM.fragmentShader=f;COMPM.needsUpdate=true}
+function drawAmt(){if(reduce||LOOKNOW!=='ink')return 1;if(!window.DRAW_T0){var ld=document.getElementById('loading');if(ld&&ld.style.display==='none')window.DRAW_T0=performance.now();else return 0}return Math.min(1,(performance.now()-window.DRAW_T0)/3200)}
+var COMP_INK=null,COMP_PAINT=null,SKY_INK=null,SKY_PAINT=null;
+function lookFinish(){if(!LOOKTOG||typeof COMPM==='undefined')return;
+ var base=COMPM.fragmentShader,grain='c+=(hsh(gl_FragCoord.xy+fract(uTime*7.3)*97.)-.5)*.014;',ea='if(s0.a<-.00001){o=vec4(toSRGB(s0.rgb),1.);return;}',mn='void main(){vec4 s0=';
+ if(base.indexOf(grain)<0||base.indexOf(ea)<0||base.indexOf('uniform float uBK,')<0||base.indexOf(mn)<0){console.warn('lookFinish: anchors not found');return}
+ base=base.replace('uniform float uBK,','uniform float uDraw,uBK,');COMPM.uniforms.uDraw={value:1};
+ COMP_INK=base.replace(ea,'if(s0.a<-.00001){o=vec4(mix(vec3(.962,.947,.912),toSRGB(s0.rgb),smoothstep(.62,1.,uDraw)),1.);return;}').replace(grain,INKF+grain).replace(mn,INKFN+mn);
+ COMP_PAINT=base.replace('c*=vec3(1.015,.985,.975)*1.2;','c*=vec3(1.,.99,.99)*1.1;').replace(grain,PAINTF+grain).replace(mn,PAINTFN+mn).replace('vec3 c0=s0.rgb,','vec3 c0=kuwa(vU),');
+ if(typeof SKYM!=='undefined'){SKY_INK=SKYM.fragmentShader;SKY_PAINT=SKY_INK.replace('vec3(.3,.6,.9)*pow(1.-nn.z,3.)*.6','vec3(.3,.6,.9)*pow(1.-nn.z,3.)*.2').replace('mix(vec3(.10,.2,.05),vec3(.5,.6,.13),band)','mix(vec3(.05,.12,.14),vec3(.2,.4,.38),band)').replace('vec3(.5,.22,.08)','vec3(.34,.13,.28)').replace('vec3(.8,.78,.4)','vec3(.85,.6,.45)')}}
+/* the colour switch: the same room, drawn in ink or painted in colour (the button in the top bar; the choice is remembered on this device) */
+function setLook(lk,first){if(!LOOKTOG)return;LOOKNOW=lk;var P=lk==='paint';document.documentElement.classList.toggle('ink',!P);
+ LOOKMATS.forEach(function(q){var v=P?q.paint:q.ink;q.m.col=v.col;q.m.metal=v.metal;(q.m._3||[]).forEach(function(x){var M=x.material;if(M.color)M.color.setRGB(v.col[0],v.col[1],v.col[2],LINEAR);if(M.metalness!=null)M.metalness=v.metal})});
+ [Mx.gold,Mx.gold24,Mx.steel].forEach(function(m){(m._3||[]).forEach(function(x){if(x.material.envMapIntensity!=null)x.material.envMapIntensity=P?.7:1.25})});
+ (Mx.floor._3||[]).forEach(function(x){var M=x.material;if(M.sheenColor){M.sheen=P?.15:.45;M.sheenRoughness=P?.5:.8;M.sheenColor.setRGB(P?.6:1,P?.4:.93,P?.65:.82,LINEAR)}});   // a plum satin floor in colour
+ EXPOSURE=P?.83:LK0.exp;RAYK=P?LK0.ray:0;BLOOMK=P?LK0.bloom:0;   // the painted room sits a step below the paintings; no glow or light shafts on paper
+ if(COMP_INK&&COMP_PAINT){COMPM.fragmentShader=P?COMP_PAINT:COMP_INK;COMPM.needsUpdate=true}
+ if(SKY_INK&&SKY_PAINT){SKYM.fragmentShader=P?SKY_PAINT:SKY_INK;SKYM.needsUpdate=true}
+ if(!first){if(!P)window.DRAW_T0=performance.now();envAt=Date.now()+300;try{localStorage.setItem('pgLook',lk)}catch(e){}}   // back to ink: the drawing draws itself in again
+ dirty=2}
+window.__setLook=setLook;
 // once the room is built: everything else gets a soft clay finish (no glaze, no mirror shine). Paintings, labels, lights and the sky keep theirs.
 function clayFinish(){if(!CLAY)return;var art=[];for(var k in ARTM)art.push(ARTM[k]);
  // the colour of the whole picture: warm and natural, like sunlit fired clay (not an over-saturated stop-motion set)
@@ -3222,8 +3239,8 @@ function clayModel(name,place,o){o=o||{};
  .catch(function(){})}   // without it, that piece is simply missing
 function clayCentre(lo,hi,top){return mT(-(lo[0]+hi[0])/2,top?-hi[1]:-lo[1],-(lo[2]+hi[2])/2)}
 // centre it, stand it on the pedestal top (1.0), face the visitor (the model faces +x), size it, then turn it towards the middle
-function statueLoad(name,x,z,ry,tall){clayModel(name,function(lo,hi){return mm(mT(x,1.0,z),mRy(ry),mS(tall/(hi[1]-lo[1])),mRy(-Math.PI/2),clayCentre(lo,hi))},{keep:INK})}   // in the ink look they stay in colour, like the paintings
-statueLoad('statue-yellow-v1',-3.4,-9.2,.45,.64);statueLoad('statue-blue-v1',3.4,-9.2,-.5,1.15);   // heights in metres; the pedestals are 1 m
+function statueLoad(name,x,z,ry,tall){clayModel(name,function(lo,hi){return mm(mT(x,1.0,z),mRy(ry),mS(tall/(hi[1]-lo[1])),mRy(-Math.PI/2),clayCentre(lo,hi))},{keep:LOOKTOG})}   // in the ink and painted looks they stay in their own colours, like the paintings
+statueLoad('statue-yellow-v2',-3.4,-9.2,.45,.64);statueLoad('statue-blue-v2',3.4,-9.2,-.5,1.15);   // v2: sharper 2048px colours   // heights in metres; the pedestals are 1 m
 var WALKM=[];['torso','neck','head','uarm','farm','hand','handG','thigh','shin','foot'].forEach(function(k){WALKM=WALKM.concat(CR[k])});WALKM=WALKM.concat(PIGALL);
 /* the living figure: rises from beneath the balcony, peeks over the rail, then walks off into the distance and dances */
 var CRS=9,CRX=0,CRZ=-15.8,CRT0=80;   // he rises in the middle of the balcony, behind the title
@@ -3359,6 +3376,7 @@ var mobile=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.tes
 var GPU='';try{var dri=gl.getExtension('WEBGL_debug_renderer_info');GPU=dri?String(gl.getParameter(dri.UNMASKED_RENDERER_WEBGL)):''}catch(e){}
 var LOWGPU=/[?&]q=high/.test(location.search)?false:/[?&]q=low/.test(location.search)||/Intel|Mali-(T\d+|G[1-6]\d\b)|Adreno[^\d]*[3-5]\d\d|PowerVR|SwiftShader|llvmpipe|Software/i.test(GPU)&&!/Iris\(R\) Xe|Arc/i.test(GPU);
 var Q=LOWGPU?{dpr:mobile?1.3:1.25,samples:2,refl:false,bloom:true,dof:false,ao:true,rays:true,level:2,spotSh:false}:{dpr:mobile?1.7:2,samples:4,refl:!mobile,bloom:true,dof:!mobile,ao:true,rays:true,level:0,spotSh:!mobile};
+if(typeof LOOKTOG!=='undefined'&&LOOKTOG)Q.dof=false;   // the ink and painted looks: everything in focus (a drawing has no depth of field), so Pam's statues stay sharp
 var T3T={boot:performance.now()};
 var DG={prev:0,stuck:0,snaps:[]};
 function degrade(e){
@@ -3379,9 +3397,9 @@ var SHS=mobile||LOWGPU?2048:4096,RT={w:2,h:2},dirty=2;
 var SUN=v3.norm([-.6,.26,-.76]),SUNCOL=[4.4,3.6,2.7],SKY=lin('#eef0f2').map(function(v){return v*.44}),GROUND=lin('#8a6a52').map(function(v){return v*.2}),FAR=60,SKYSUN=v3.norm([-.6,.06,-.76]);
 var EXPOSURE=.95,BLOOMK=.022,BLOOMT=3.5,RAYK=1.,cam={x:0,y:1.62,z:-2.4,yaw:0,pitch:0,fov:1};
 var DRM=(typeof DREAM!=='undefined'&&DREAM);
-if(typeof INK!=='undefined'&&INK){RAYK=0;BLOOMK=0}   // ink drawing: no glow or light shafts on paper   // the dream look: a rose sun, lavender sky light, teal light from below, a softer, wider glow
+   // the dream look: a rose sun, lavender sky light, teal light from below, a softer, wider glow
 if(DRM){SUNCOL=[3.0,2.4,2.1];SKY=lin('#d0cbdc').map(function(v){return v*.26});GROUND=lin('#2c2830').map(function(v){return v*.18});BLOOMK=.035;BLOOMT=2.8;EXPOSURE=1.08}
-if(typeof PAINTED!=='undefined'&&PAINTED)EXPOSURE=.83;   // the painted room sits a step below the paintings, which keep their own light
+var LK0={exp:EXPOSURE,ray:RAYK,bloom:BLOOMK};   // the colour switch (setLook) sets these for the ink drawing or the painted colour version
 function fovFor(as){var deg=as>=1.2?46:as>=.8?54:64;return deg*Math.PI/180}   // vertical field of view, like a 35-50mm film lens
 function camDir(){var cp=Math.cos(cam.pitch);return[-Math.sin(cam.yaw)*cp,Math.sin(cam.pitch),-Math.cos(cam.yaw)*cp]}
 
@@ -3557,13 +3575,13 @@ function upgradeMats(){
  if(DRM){Mx.floor.refl=.55;Mx.floor.rough=.22;Mx.floor.x3={clearcoat:.5,clearcoatRoughness:.04};   // the dream: a dark, glassy lake floor; iridescent rose gold and pearl
   if(!mobile&&!LOWGPU){Mx.gold.x3={iridescence:.6,iridescenceIOR:1.35,iridescenceThicknessRange:[200,600]};Mx.colD.x3={iridescence:.35,iridescenceIOR:1.3,iridescenceThicknessRange:[150,500]}}}
  else if(typeof CLAY!=='undefined'&&CLAY){var sh=function(c){return{sheen:.45,sheenRoughness:.8,sheenColor:c3(c)}};   // clay: a soft, velvety sheen instead of a glaze
-  Mx.floor.x3=typeof PAINTED!=='undefined'&&PAINTED?{sheen:.15,sheenRoughness:.5,sheenColor:c3([.6,.4,.65])}:sh([1,.93,.82]);   /* the painted look: a deep plum satin, not a cream sheen */Mx.marble.x3=sh([1,.95,.88]);Mx.wall.x3=sh([1,.94,.84]);Mx.ceiling.x3=sh([1,.95,.88]);Mx.coffer.x3=sh([1,.95,.88]);if(Mx.dado)Mx.dado.x3=sh([.8,.68,.78])}
+  Mx.floor.x3=sh([1,.93,.82]);   /* (the colour switch turns it to a plum satin in the painted version) */Mx.marble.x3=sh([1,.95,.88]);Mx.wall.x3=sh([1,.94,.84]);Mx.ceiling.x3=sh([1,.95,.88]);Mx.coffer.x3=sh([1,.95,.88]);if(Mx.dado)Mx.dado.x3=sh([.8,.68,.78])}
  else{
  Mx.floor.x3={clearcoat:.65,clearcoatRoughness:.035};Mx.floor.rough=.3;Mx.floor.refl=.9;            // honed marble under a polished glaze
  Mx.marble.x3={clearcoat:.3,clearcoatRoughness:.12};                                                  // polished columns and balustrade
  }
  Mx.crystal.x3={ior:2.1,specularIntensity:1,iridescence:.22,iridescenceIOR:1.5,iridescenceThicknessRange:[180,520]};Mx.crystal.rough=.07;Mx.crystal.metal=0;Mx.crystal.envK=2.;Mx.crystal.col=[.32,.32,.35];Mx.crystal.emis=[.28,.26,.22];   // clear glass: almost no diffuse, all sparkle and reflection
- [Mx.gold,Mx.gold24,Mx.steel].forEach(function(m){m.envK=typeof PAINTED!=='undefined'&&PAINTED?.7:1.25});
+ [Mx.gold,Mx.gold24,Mx.steel].forEach(function(m){m.envK=1.25});
  Mx.blob.flat=1;
  [Mx.candle,Mx.lantern,Mx.flame,Mx.lens,Mx.ring].forEach(function(m){m.unlit=1});   // light sources glow; they are not lit by themselves
  ['torso','neck','head','uarm','farm','hand','handG','thigh','shin','foot'].forEach(function(k){CR[k].forEach(function(m){m.fog=.2;m.x3={sheen:.35,sheenRoughness:.55,sheenColor:c3([.95,.82,.62])}})});
@@ -4039,7 +4057,7 @@ fontReady.then(function(){
   x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=22;x.fillStyle='#ffffff';x.font='italic 500 132px "Cormorant Garamond",Georgia,serif';x.fillText('Pam\u2019s Gallery',W/2,860);x.fillStyle='#ffd27a';var mw=x.measureText('Pam\u2019s Gallery').width;x.fillRect(W/2-mw/2,890,mw,5);x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=18;x.fillStyle='#ffffff';x.font='400 62px Jost,Helvetica,Arial,sans-serif';x.fillText(EMAIL,W/2,985)}),
   sc,ax,ay,19,10.2,nrm,{go:function(){location.href='mailto:'+EMAIL},tip:'Write to '+EMAIL,far:120,on:function(){return false}},{unlit:1,emis:[2.2,2.15,2.1]});SKYTEXT.m=MATS[MATS.length-1];
  LABELS.forEach(function(f){f()});
-clayFinish();dreamFinish();lookFinish(); upload();resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;buildK();camAt(cur*(K.length-1));resize()});
+clayFinish();dreamFinish();lookFinish(); upload();if(LOOKTOG)setLook(LOOKNOW,true);resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;buildK();camAt(cur*(K.length-1));resize()});
  prep3(function(){scrollTo(0,0);cur=0;camAt(0);render(0);dirty=0;openDoors(George.start);
  requestAnimationFrame(frame)});
 });
