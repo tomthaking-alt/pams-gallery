@@ -55,7 +55,8 @@ var ROOMAO='float roomAO(vec3 p,vec3 N){float X0=uRoom.x,X1=uRoom.y,ZB=uRoom.z,Z
  ' a*=mix(1.,mix(.6,1.,smoothstep(0.,.6,X1-p.x)),1.-abs(N.x));\n'+
  ' a*=mix(1.,mix(.62,1.,smoothstep(0.,.6,ZB-p.z)),1.-abs(N.z));\n'+
  ' a*=mix(1.,mix(.85,1.,smoothstep(0.,.6,p.z-ZF)),1.-abs(N.z));return a;}\n'+
- 'float sunIn(vec3 p){return (p.x<-13.15&&p.z>'+(ZF-.05).toFixed(3)+'&&p.z<'+(ZB+.05).toFixed(3)+'&&p.y<'+(RH+.05).toFixed(3)+')?0.:1.;}\n';
+ 'float sunIn(vec3 p){if(p.x>'+(X1-.04).toFixed(3)+'&&p.z>'+(ZF-.05).toFixed(3)+'&&p.z<'+(ZB+.05).toFixed(3)+'&&p.y<'+(RH+.05).toFixed(3)+')return 0.;\n'+   /* the hall's right-hand wall: no raking sun stripes beside the column (they read as stains) */
+ ' return (p.x<-13.15&&p.z>'+(ZF-.05).toFixed(3)+'&&p.z<'+(ZB+.05).toFixed(3)+'&&p.y<'+(RH+.05).toFixed(3)+')?0.:1.;}\n';
 var HEADF='varying vec3 vWPos;\nuniform float uPass,uFar,uRH,uEnvD;uniform vec4 uRoom;uniform vec2 uRes;\n'+
  '#ifdef PLANAR_REFL\nuniform sampler2D uReflTex;uniform float uReflAmt;\n#endif\n'+
  '#ifdef WALK_FOG\nuniform float uFog;\n'+SKYBASE+'\n#endif\n'+ROOMAO;
