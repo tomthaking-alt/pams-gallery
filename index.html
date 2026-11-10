@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-qYAr2TLZYmGaxMAgon8phIOj8MHoyBdy+ufvzJ4Gex8=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-6i83LA5IoXrBzAJXHRBD/1eXYuwdt1zHRa6xkW6aAUs=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -33,6 +33,7 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #where{opacity:.7;letter-spacing:.06em;text-transform:uppercase;font-size:.72rem}
 #title{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:0 6vw;transition:opacity .2s}
 #title h1{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(3rem,9vw,6.8rem);line-height:1;color:#fffaf0;letter-spacing:.01em;text-shadow:0 2px 30px rgba(40,20,5,.55),0 1px 3px rgba(40,20,5,.5)}
+#title .tsl,#title .tsr{display:inline-block;will-change:transform}
 #title p{margin:1rem 0 0;font-size:clamp(.72rem,1.6vw,.85rem);letter-spacing:.42em;text-transform:uppercase;color:#fff6e6;text-shadow:0 1px 12px rgba(40,20,5,.7)}
 #hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 22px);z-index:3;color:#faf9f7;background:rgba(43,30,24,.85);backdrop-filter:blur(6px);padding:.65rem 1.3rem;border-radius:99px;font-size:.85rem;letter-spacing:.08em;pointer-events:none}
 #enqPanel{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:4;width:min(560px,calc(100vw - 32px));box-sizing:border-box;padding:clamp(1.5rem,4vw,2.4rem) clamp(1.25rem,4vw,2.4rem);text-align:center;color:#fffaf2;
@@ -1001,7 +1002,8 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
 <script>
 "use strict";
 /* photo-real material maps (generated, seamless): marble, plaster, mahogany, travertine */
-var MATSRC={crSk:"/lib/g-cfdc0ff8f22e.jpg",crSkH:"/lib/g-9940bf64a504.jpg",crLf:"/lib/g-4a714519abc5.jpg",crLfH:"/lib/g-d08bc612d4f8.jpg",crSt:"/lib/g-41330875d7df.jpg",crStH:"/lib/g-8f94bedf5f8f.jpg",floor:"/lib/g-b9ab7c65d0bd.jpg",
+var MATSRC={clay:"/lib/clay-v1.webp",clayH:"/lib/clay-h-v1.webp",   /* hand-pressed clay surface (made with Higgsfield) for the clay look */
+crSk:"/lib/g-cfdc0ff8f22e.jpg",crSkH:"/lib/g-9940bf64a504.jpg",crLf:"/lib/g-4a714519abc5.jpg",crLfH:"/lib/g-d08bc612d4f8.jpg",crSt:"/lib/g-41330875d7df.jpg",crStH:"/lib/g-8f94bedf5f8f.jpg",floor:"/lib/g-b9ab7c65d0bd.jpg",
 marble:"/lib/g-f54d14ab06e4.jpg",
 plaster:"/lib/g-af8bc3bbd0f8.jpg",
 wood:"/lib/g-ba037b3075eb.jpg",
@@ -2517,35 +2519,57 @@ var Mx={
  sky:mat({isSky:1,unlit:1}),seaPlane:mat({isSky:1,unlit:1}),
  blob:mat({tex:TX.blob,unit:1,col:[0,0,0],blend:1,rough:1})
 };
+/* ---------- the clay look: the room is modelled in clay. One hand-pressed clay surface (colour + depth, made with Higgsfield) is tinted
+   for each part of the room; gold becomes gold-painted clay. Pam's paintings stay exactly as they are. Set before the room is built,
+   because the texture scale is fixed when the walls and floor are made. ---------- */
+var CLAY=!!MATIMG.clay,CLAYT=CLAY?texFrom(MATIMG.clay):null,CLAYH=CLAY&&MATIMG.clayH?texFrom(MATIMG.clayH,{lin:1}):null;
+if(CLAY){[[Mx.floor,'#eecbad',3.2,.8,.45],[Mx.marble,'#f3dcc6',1.8,.85,.5],[Mx.wall,'#efccb0',3,.9,.55],[Mx.ceiling,'#f1d9c2',2.8,.88,.4],[Mx.coffer,'#ebcdb2',2.2,.88,.4],
+  [Mx.key,'#e6cba8',1.6,.85,.4],[Mx.ivory,'#efdcbe',1.6,.8,.4],[Mx.ivoryDark,'#d2b38a',1.6,.82,.4],[Mx.tile,'#d9b48f',3.2,.8,.45],[Mx.whiteLac,'#f1e0c6',1.6,.8,.35]]
+  .forEach(function(q){var m=q[0];m.tex=CLAYT;m.htex=CLAYH;m.col=lin(q[1]);m.uvs=[q[2],q[2]];m.rough=q[3];m.bump=q[4];m.refl=0;m.metal=0;m.unit=0});
+ [Mx.gold,Mx.gold24,Mx.decoGold,Mx.brass,Mx.steel].forEach(function(m){m.col=lin('#e8b54c');m.rough=.42;m.metal=.3;m.tex=CLAYT;m.htex=CLAYH;m.bump=.35;m.unit=0;m.uvs=[.6,.6]});   // gold-painted clay
+ Mx.goldDark.col=lin('#a87a2c');Mx.goldDark.metal=.25;Mx.goldDark.rough=.55}
+// once the room is built: everything else gets a soft clay finish (no glaze, no mirror shine). Paintings, labels, lights and the sky keep theirs.
+function clayFinish(){if(!CLAY)return;var art=[];for(var k in ARTM)art.push(ARTM[k]);
+ // the colour of the whole picture: warm and rich, like a stop-motion set under studio lamps (instead of the cool, softened marble look)
+ if(typeof COMPM!=='undefined'&&COMPM.fragmentShader.indexOf('c=mix(vec3(l),c,.88);')>=0){COMPM.fragmentShader=COMPM.fragmentShader.replace('c=mix(vec3(l),c,.88);','c=mix(vec3(l),c,1.2);c*=vec3(1.03,.985,.94)*1.16;c=mix(c,c*c*(3.-2.*c),.18);');COMPM.fragmentShader=COMPM.fragmentShader.replace('c*=1.-dot(q,q)*.7;','c*=1.-dot(q,q)*.32;');COMPM.needsUpdate=true}
+ // the leaf-headed figure on the balcony: warm beige clay with the veins pressed in, as in Pam's sculpture photo (body, leaves and cloth alike)
+ ['torso','neck','head','uarm','farm','hand','handG','thigh','shin','foot'].forEach(function(k){CR[k].forEach(function(m){if(m.clay)return;m.clay=1;
+  m.col=lin(m.tex===CRT.lf?'#fbe6c4':'#f0dcbc');m.rough=.82;m.bump=Math.max(m.bump,.6)*1.3;m.emis=[.02,.015,.01]})});
+ MATS.concat(WALKM).forEach(function(m){if(art.indexOf(m)>=0||m.art||m.isSky||m.unlit||m.blend||m.flat)return;var e=m.emis||[0,0,0];if(e[0]+e[1]+e[2]>0)return;
+  m.refl=0;m.rough=Math.max(m.rough,m.metal>.5?.48:.7);m.metal=Math.min(m.metal,.35);
+  if(!m.unit&&!m.htex&&m.bump<.3&&CLAYH){m.htex=CLAYH;m.bump=.3}})}
 var NOSHADOW=[Mx.seaPlane,Mx.ring,Mx.flame,Mx.lens,Mx.sky,Mx.candle,Mx.lantern,Mx.crystal];
 var LIGHTS={spot:[],point:[]},PICK=[],LABELS=[],LIGHTS_CANDLES=[];
 function blob(x,z,sx,sz){quadL(Mx.blob,B([x,0.004,z]),[0,0,0],[1,0,0],[0,0,-1],sx/2,sz/2,[0,1,0])}
-function rect(m,x0,x1,y0,y1,z0,z1,skip){box(m,B([0,0,0]),[(x0+x1)/2,(y0+y1)/2,(z0+z1)/2],[x1-x0,y1-y0,z1-z0],skip)}
+function rect(m,x0,x1,y0,y1,z0,z1,skip){var c=[(x0+x1)/2,(y0+y1)/2,(z0+z1)/2],sz=[x1-x0,y1-y0,z1-z0],r=Math.min(.07,Math.min(sz[0],sz[1],sz[2])*.45);
+ if(CLAY&&r>.008&&!m.blend&&!m.isSky)rbox(m,B([0,0,0]),c,sz,r);else box(m,B([0,0,0]),c,sz,skip)}   // clay: every block of the room has soft, rounded edges
 function label(c,center,ax,ay,w,h,n,pick,extra){var m=mat(Object.assign({tex:texFrom(c,{clamp:1}),unit:1,rough:.9,blend:1},extra||{}));quadL(m,B([0,0,0]),center,ax,ay,w/2,h/2,n);if(pick)PICK.push({c:center,ax:ax,ay:ay,hw:w/2,hh:h/2,n:n,go:pick.go,tip:pick.tip,far:pick.far,on:pick.on})}
 
 /* ---------- classical pieces ---------- */
 // fluted Doric column standing on the floor at (x,z), shaft up to height h
-function column(x,z,h,R){
+function column(x,z,h,R){if(CLAY)R*=1.12;   // clay: a chunkier, hand-rolled column
  var b=B([x,0,z]),PL=R*2.9;
- box(Mx.marble,b,[0,.05,0],[PL,.1,PL]);
+ if(CLAY)rbox(Mx.marble,b,[0,.05,0],[PL,.1,PL],.045);else box(Mx.marble,b,[0,.05,0],[PL,.1,PL]);
  lathe(Mx.marble,b,[0,.1,0],[[R*1.32,0],[R*1.36,.02],[R*1.36,.07],[R*1.22,.1],[R*1.16,.12],[R*1.2,.15],[R*1.2,.17],[R*1.08,.2],[R*1.02,.22],[0,.22]],48);
- var y0=.32,y1=h-.34,FL=20,SEG=160,ROWS=8;
+ var y0=.32,y1=h-.34,FL=CLAY?12:20,SEG=160,ROWS=8,FD=CLAY?.11:.06;
  function rad(t){return R*(1-.13*t+.03*Math.sin(Math.PI*t))}
  for(var r=0;r<ROWS;r++){var ta=r/ROWS,tb=(r+1)/ROWS;
-  for(var k=0;k<SEG;k++){var P=function(t,K){var th=K/SEG*Math.PI*2,ph=(K*FL/SEG)%1,f=Math.sin(Math.PI*ph),df=Math.cos(Math.PI*ph)*Math.PI*FL/(Math.PI*2),rr=rad(t)*(1-.06*f),dr=-rad(t)*.06*df,
+  for(var k=0;k<SEG;k++){var P=function(t,K){var th=K/SEG*Math.PI*2,ph=(K*FL/SEG)%1,f=Math.sin(Math.PI*ph),df=Math.cos(Math.PI*ph)*Math.PI*FL/(Math.PI*2),rr=rad(t)*(1-FD*f),dr=-rad(t)*FD*df,
     er=[Math.cos(th),0,Math.sin(th)],et=[-Math.sin(th),0,Math.cos(th)],n=v3.norm(v3.sub(v3.sc(er,rr),v3.sc(et,dr)));
     return{p:bx(b,[er[0]*rr,y0+(y1-y0)*t,er[2]*rr]),n:bn(b,n),u:[0,0]}};
    var A=P(ta,k),Bq=P(ta,k+1),C=P(tb,k+1),D=P(tb,k);tri(Mx.marble,A,Bq,C);tri(Mx.marble,A,C,D)}}
  var Rt=rad(1)*.98;
  lathe(Mx.marble,b,[0,y1,0],[[Rt,0],[Rt,.04],[Rt*1.04,.05],[Rt*1.04,.07],[Rt,.08],[Rt*1.06,.12],[Rt*1.3,.2],[Rt*1.42,.24],[0,.24]],48);
  torus(Mx.gold,b,[0,y1+.06,0],Rt*1.03,.008,48);
- box(Mx.marble,b,[0,h-.05,0],[R*3.0,.1,R*3.0]);
+ if(CLAY)rbox(Mx.marble,b,[0,h-.05,0],[R*3.0,.1,R*3.0],.045);else box(Mx.marble,b,[0,h-.05,0],[R*3.0,.1,R*3.0]);
  blob(x,z,PL*1.6,PL*1.6)}
 function amphora(x,y,z,s){var b=B([x,y,z]),pr=[[0,0],[.06,0],[.07,.02],[.05,.06],[.1,.12],[.17,.22],[.19,.3],[.17,.4],[.11,.5],[.06,.56],[.055,.66],[.075,.7],[.075,.72],[0,.72]].map(function(p){return[p[0]*s,p[1]*s]});
  lathe(Mx.amph,b,[0,0,0],pr,48);
  [-1,1].forEach(function(sd){torus(Mx.amph,{o:bx(b,[sd*.1*s,.6*s,0]),x:[1,0,0],y:[0,0,1],z:[0,-1,0]},[0,0,0],.075*s,.012*s,24)});
  blob(x,z,.5*s,.5*s)}
-function pedestal(x,z,h){lathe(Mx.marble,B([x,0,z]),[0,0,0],[[.3,0],[.3,.06],[.24,.1],[.2,.16],[.2,h-.14],[.24,h-.1],[.3,h-.06],[.3,h],[0,h]],48);blob(x,z,.9,.9)}
+function pedestal(x,z,h){if(CLAY){clayModel('pedestal-v1',function(lo,hi){return mm(mT(x,0,z),mS(h/(hi[1]-lo[1])),clayCentre(lo,hi))},{rough:.85});blob(x,z,.9,.9);return}
+ lathe(Mx.marble,B([x,0,z]),[0,0,0],CLAY?[[.33,0],[.36,.03],[.37,.07],[.35,.11],[.29,.15],[.27,.2],[.27,h-.2],[.29,h-.15],[.35,h-.11],[.37,h-.07],[.36,h-.03],[.33,h],[0,h]]
+ :[[.3,0],[.3,.06],[.24,.1],[.2,.16],[.2,h-.14],[.24,h-.1],[.3,h-.06],[.3,h],[0,h]],48);blob(x,z,.9,.9)}
 function olive(x,z,s){s=s||1;lathe(Mx.terracotta,B([x,0,z]),[0,0,0],[[0,0],[.22*s,0],[.3*s,.55*s],[.31*s,.58*s],[0,.58*s]],32);blob(x,z,.9*s,.9*s);
  cyl(Mx.bark,B([x,.55*s,z]),[0,0,0],.035*s,1.0*s,10);
  for(var i=0;i<26;i++){var a=rnd()*6.28,r=Math.sqrt(rnd())*.42*s;ell(Mx.leaf,B([x+Math.cos(a)*r,(1.4+rnd()*.7)*s,z+Math.sin(a)*r]),[0,0,0],[(.13+rnd()*.1)*s,(.09+rnd()*.06)*s,(.13+rnd()*.1)*s],10)}}
@@ -2626,7 +2650,7 @@ rect(Mx.tile,BX0,BX1,-.3,0,BAL-.1,ZF-.05);
 (function(){var yr=.98,bal=[[0,0],[.05,0],[.05,.04],[.034,.06],[.04,.1],[.068,.2],[.078,.32],[.06,.46],[.034,.58],[.03,.64],[.044,.7],[.058,.76],[.058,.82],[.044,.84],[0,.86]];
  function run(x0,x1,z0,z1){rect(Mx.marble,x0,x1,0,.12,z0,z1);rect(Mx.marble,x0,x1,yr,yr+.09,z0+.01,z1-.01);
   var cx=(x0+x1)/2,cz=(z0+z1)/2,ex=(x1-x0)>(z1-z0);rect(Mx.marble,ex?x0:cx-(x1-x0)/2-.03,ex?x1:cx+(x1-x0)/2+.03,yr+.09,yr+.13,ex?cz-(z1-z0)/2-.03:z0,ex?cz+(z1-z0)/2+.03:z1)}
- function baluster(x,z){lathe(Mx.marble,B([x,.12,z]),[0,0,0],bal,20)}
+ function baluster(x,z){lathe(Mx.marble,B([x,.12,z]),[0,0,0],CLAY?bal.map(function(q){return[q[0]*1.35,q[1]]}):bal,20)}
  function pier(x,z,urnTop){rect(Mx.marble,x-.17,x+.17,0,yr+.16,z-.17,z+.17);rect(Mx.marble,x-.2,x+.2,yr+.16,yr+.21,z-.2,z+.2);if(urnTop)amphora(x,yr+.21,z,.85)}
  run(BX0,BX1,BAL-.12,BAL+.12);
  [BX0,BX1].forEach(function(x){run(x-.12,x+.12,BAL,ZF-.1)});
@@ -2787,7 +2811,7 @@ function frameBuild(F,b,w,h){if(!F)F=frameStyle('gilt');var fw=F.fw,gap=F.gap,ow
  return .036}
 // opt: sc = scale, col = hung in the collections hall (no plaque or own spotlight; tapping walks up close)
 function hang(k,o,ry,opt){opt=opt||{};
- var p=ART[k],SC=opt.sc||SCALE,w=p.w*SC,h=p.h*SC,b=B(o,ry),F=frameStyle(frameOf(p)),fw=F.fw,gap=F.gap,artZ=frameBuild(F,b,w,h);
+ var p=ART[k],SC=opt.sc||SCALE,w=p.w*SC,h=p.h*SC,b=B(o,ry),F=frameStyle(CLAY?'gilt':frameOf(p)),fw=F.fw,gap=F.gap,artZ=frameBuild(F,b,w,h);
  var pm=paintMat(k);quadL(pm,b,[0,0,artZ],[1,0,0],[0,1,0],w/2,h/2,[0,0,1]);
  var ax=bn(b,[1,0,0]),ay=[0,1,0],n=bn(b,[0,0,1]),tipT='<i>'+p.t+'</i> · '+p.p,center=bx(b,[0,0,0]),go=opt.col?function(){colTap(k)}:function(){openArt(k)};
  PICK.push({c:bx(b,[0,0,.05]),ax:ax,ay:ay,hw:w/2+fw,hh:h/2+fw,n:n,go:go,tip:tipT,far:opt.col?14:0});
@@ -3001,29 +3025,32 @@ function crPose(P){P=P||{};function g(k,d){return P[k]==null?d:P[k]}
 function crBake(P,W,dst){var tmp=dmat({unit:1});crPose(P).forEach(function(q){CR[q[0]].forEach(function(m){bake(m,q[1],tmp)})});
  var mn=9;for(var i=1;i<tmp.v.length;i+=8)mn=Math.min(mn,tmp.v[i]);bake(tmp,mm(W,mT(0,-mn,0)),dst)}
 // two statues of Pam's own clay figures beside the balcony opening (3D models made with Higgsfield from her photo; files made by
-// dev/build/statue.py). Both stand exactly as tall as the marble figures that used to be here: those two poses are still baked,
-// only to be measured. The statues load after the gallery has started, so they never hold up the opening.
-var STATH=(function(){var hs=[function(d){crBake({hy:.48,ln:-.12,sd:.22,tl:.06,nx:-.1,nz:.35,hz:.45,hyw:.5,la:[3.0,.35,.6],le:1.5,lw:.6,ra:[.4,1.45,.4],re:1.1,rw:.9,rh:[1.25,.15],rk:1.75,rf:.5,lh:[-.05,.04],lk:.05},mm(mT(-3.4,1.0,-9.2),mRy(.45),mS(.86)),d)},function(d){crBake({hy:.36,ln:.55,tw:-.35,sd:-.15,nx:-.35,hx:-.4,hyw:-.75,hz:-.3,la:[1.25,.65,-.4],le:.35,lw:-.4,ra:[.25,-.15,0],re:1.9,rw:.6,lh:[1.25,.18],lk:1.65,lf:-.3,rh:[-.55,.12],rk:.75,rf:.4},mm(mT(3.4,1.0,-9.2),mRy(-.5),mS(.86)),d)}].map(function(f){
- var d=dmat({unit:1}),lo=1e9,hi=-1e9;f(d);for(var i=1;i<d.v.length;i+=8){lo=Math.min(lo,d.v[i]);hi=Math.max(hi,d.v[i])}return hi-lo});return (hs[0]+hs[1])/2})();
-function statueLoad(name,x,z,ry){var im=new Image(),buf=null;
+// dev/build/statue.py), sized as in the mock-up Pam chose: the squat yellow one about two-thirds the pedestal's height, the blue one
+// a little taller than it. They load after the gallery has started, so they never hold up the opening.
+// Higgsfield 3D models (files made by dev/build/statue.py), loaded once the gallery has started: place(lo,hi) gives the model's
+// position from its bounding box, o sets its finish
+function clayModel(name,place,o){var im=new Image(),buf=null;o=o||{};
  function go(){if(!buf||!im.complete||!im.naturalWidth)return;var d=new DataView(buf);if(d.getUint32(0,true)!==0x314d4750)return;   // "PGM1"
   var nv=d.getUint32(4,true),ni=d.getUint32(8,true),lo=[0,1,2].map(function(k){return d.getFloat32(12+4*k,true)}),hi=[0,1,2].map(function(k){return d.getFloat32(24+4*k,true)}),
-   o=36,P=new Int16Array(buf,o,nv*3);o+=nv*6;var N=new Int8Array(buf,o,nv*3);o+=nv*3;o+=o%2;var U=new Uint16Array(buf,o,nv*2);o+=nv*4;var I=new Uint16Array(buf,o,ni),v=new Float32Array(ni*8);
+   q0=36,P=new Int16Array(buf,q0,nv*3);q0+=nv*6;var N=new Int8Array(buf,q0,nv*3);q0+=nv*3;q0+=q0%2;var U=new Uint16Array(buf,q0,nv*2);q0+=nv*4;var I=new Uint16Array(buf,q0,ni),v=new Float32Array(ni*8);
   for(var t=0;t<ni;t++){var j=I[t],q=t*8;for(var k=0;k<3;k++){v[q+k]=lo[k]+(P[j*3+k]+32768)/65535*(hi[k]-lo[k]);v[q+3+k]=N[j*3+k]/127}v[q+6]=U[j*2]/65535;v[q+7]=U[j*2+1]/65535}
   var c=cnv(im.naturalWidth,im.naturalHeight);c.getContext('2d').drawImage(im,0,0);
-  var m=mat({unit:1,tex:texFrom(c),col:[1,1,1],rough:.75});m.x3=typeof c3==='function'?{sheen:.5,sheenRoughness:.7,sheenColor:c3([1,.95,.85])}:null;   // soft clay sheen catches the light from behind
-  // centre it, stand it on the pedestal top (1.0), face the visitor (the model faces +x), size it, then turn it towards the middle
-  bake({v:v},mm(mT(x,1.0,z),mRy(ry),mS(STATH/(hi[1]-lo[1])),mRy(-Math.PI/2),mT(-(lo[0]+hi[0])/2,-lo[1],-(lo[2]+hi[2])/2)),m);upload();dirty=2}
- fetch('/lib/'+name+'.bin').then(function(r){if(!r.ok)throw new Error(r.status);return r.arrayBuffer()}).then(function(b){buf=b;go()}).catch(function(){});   // without it the pedestal simply stands empty
+  var m=mat({unit:1,tex:texFrom(c),col:o.col||[1,1,1],rough:o.rough==null?.75:o.rough,emis:o.emis||[0,0,0]});
+  if(o.sheen!==false)m.x3=typeof c3==='function'?{sheen:.5,sheenRoughness:.7,sheenColor:c3([1,.95,.85])}:null;   // soft clay sheen
+  bake({v:v},place(lo,hi),m);upload();dirty=2}
+ fetch('/lib/'+name+'.bin').then(function(r){if(!r.ok)throw new Error(r.status);return r.arrayBuffer()}).then(function(b){buf=b;go()}).catch(function(){});   // without it, that piece is simply missing
  im.onload=go;im.src='/lib/'+name+'.webp'}
-statueLoad('statue-yellow-v1',-3.4,-9.2,.45);statueLoad('statue-blue-v1',3.4,-9.2,-.5);
+function clayCentre(lo,hi,top){return mT(-(lo[0]+hi[0])/2,top?-hi[1]:-lo[1],-(lo[2]+hi[2])/2)}
+// centre it, stand it on the pedestal top (1.0), face the visitor (the model faces +x), size it, then turn it towards the middle
+function statueLoad(name,x,z,ry,tall){clayModel(name,function(lo,hi){return mm(mT(x,1.0,z),mRy(ry),mS(tall/(hi[1]-lo[1])),mRy(-Math.PI/2),clayCentre(lo,hi))})}
+statueLoad('statue-yellow-v1',-3.4,-9.2,.45,.64);statueLoad('statue-blue-v1',3.4,-9.2,-.5,1.15);   // heights in metres; the pedestals are 1 m
 var WALKM=[];['torso','neck','head','uarm','farm','hand','handG','thigh','shin','foot'].forEach(function(k){WALKM=WALKM.concat(CR[k])});WALKM=WALKM.concat(PIGALL);
 /* the living figure: rises from beneath the balcony, peeks over the rail, then walks off into the distance and dances */
-var CRS=9,CRX=2.0,CRZ=-15.8,CRT0=80;
+var CRS=9,CRX=0,CRZ=-15.8,CRT0=80;   // he rises in the middle of the balcony, behind the title
 function walkPose(ph,hunch){var s=Math.sin(ph),c=Math.cos(ph);return{hy:.48-.012*Math.abs(c),ln:.12+(hunch||0),nx:.22,hx:.05,tw:.08*s,sd:.03*s,
  lh:[.42*s,.03],rh:[-.42*s,.03],lk:.12+.55*Math.max(0,Math.sin(ph-1.3)),rk:.12+.55*Math.max(0,Math.sin(ph+Math.PI-1.3)),lf:-.25*s,rf:.25*s,
  la:[-.38*s,.14],ra:[.38*s,.14],le:.35+.15*s,re:.35-.15*s,lw:.2,rw:.2}}
-function crState(t){t=((t%CRT0)+CRT0)%CRT0;var S=CRS,peakB=1.5-.955*S,lowB=-6-1.15*S,P,x=CRX,z=CRZ,ry=0,base;
+function crState(t){t=((t%CRT0)+CRT0)%CRT0;var S=CRS,peakB=1.5-.955*S+(CLAY?2.6:0),lowB=-6-1.15*S,P,x=CRX,z=CRZ,ry=0,base;
  if(t<15){                                                  // rising and peeking over the rail, looking around
   var r=sm(0,7,t);base=lowB+(peakB-lowB)*r+.12*Math.sin(t*1.3)*sm(7,8,t);
   P={hy:.48,ln:.32,nx:.05,hx:-.12,hyw:.55*Math.sin((t-7)*.8)*sm(7,8.5,t),hz:.12*Math.sin(t*.9),la:[2.85,.22],ra:[2.85,.22],le:.15,re:.15,lw:.9,rw:.9,lh:[.3,.05],rh:[.3,.05],lk:.5,rk:.5}}
@@ -3057,6 +3084,29 @@ function gripRail(st,t){var g=sm(4.2,6.4,t)*(1-sm(17.8,18.9,t)),lift=sm(3.2,4.6,
  [-1,1].forEach(function(s){var k=s<0?'l':'r',hx=st.x+s*1.05,wrist=xf(it,[hx,top+.16+1.3*lift,BAL-.5-.5*lift]),knk=xf(it,[hx,top+.1+1.3*lift,BAL+.2-.6*lift]);
   var q0=IKQ[k],qn=q0?armIK(s,wrist,knk,q0):ikSeed(s,wrist,knk),q=IKQ[k]=q0?q0.map(function(v,i){return v+(qn[i]-v)*.6}):qn,A=P[k+'a']||[.12,.1,0];
   P[k+'a']=[A[0]+(q[0]-A[0])*g,A[1]+(q[1]-A[1])*g,0];P[k+'e']=v(k+'e',.25)+(q[2]-v(k+'e',.25))*g;P[k+'w']=v(k+'w',.1)+(q[3]-v(k+'w',.1))*g;P[k+'wy']=v(k+'wy',.9)*(1-g)+Math.PI*g;P[k+'grip']=g>.6})}
+/* the welcome title makes room for the leaf-headed figure: while his head and shoulders are up behind it, the words part to either side,
+   and they close up again as he sinks back or walks away. Works for any title text (it splits at the word break nearest the middle). */
+var TSP=[{l:0,r:0},{l:0,r:0}];
+function tsSplit(el){var t=el.textContent.trim(),w=t.split(/\s+/),best=0,bd=1e9;if(w.length<2)return;
+ for(var k=1;k<w.length;k++){var d=Math.abs(w.slice(0,k).join(' ').length-w.slice(k).join(' ').length);if(d<bd){bd=d;best=k}}
+ el.textContent='';var a=document.createElement('span'),c=document.createElement('span');a.className='tsl';c.className='tsr';
+ a.textContent=w.slice(0,best).join(' ');c.textContent=w.slice(best).join(' ');el.appendChild(a);el.appendChild(document.createTextNode(' '));el.appendChild(c)}
+function titleSplit(VPm){var els=[titleEl.querySelector('h1'),titleEl.querySelector('p')].filter(Boolean);if(!els.length)return;
+ els.forEach(function(e){if(!e.querySelector('.tsl'))tsSplit(e)});
+ var W=innerWidth,H=innerHeight;function scr(p){var w=VPm[3]*p[0]+VPm[7]*p[1]+VPm[11]*p[2]+VPm[15];if(w<=.01)return null;
+  return[((VPm[0]*p[0]+VPm[4]*p[1]+VPm[8]*p[2]+VPm[12])/w*.5+.5)*W,(1-((VPm[1]*p[0]+VPm[5]*p[1]+VPm[9]*p[2]+VPm[13])/w*.5+.5))*H]}
+ var want=els.map(function(){return{l:0,r:0}}),st=crState(window.__ct!=null?window.__ct:NOWS),hd=null;crPose(st.P).forEach(function(q){if(q[0]==='head')hd=q[1]});
+ if(hd){var Wm=mm(mT(st.x,st.b,st.z),mRy(st.ry),mS(CRS),hd),c=[Wm[12]+Wm[4]*.05,Wm[13]+Wm[5]*.05,Wm[14]+Wm[6]*.05],r=CRS*.17,
+   a=scr([c[0]-r,c[1],c[2]]),z=scr([c[0]+r,c[1],c[2]]),top=scr([c[0],c[1]+r,c[2]]),sh=scr([c[0],c[1]-r*1.7,c[2]]),rail=scr([st.x,1.11,BAL+.12]),m=W*.025;
+  if(a&&z&&top&&sh&&rail&&top[1]<rail[1]){var x0=Math.min(a[0],z[0])-m,x1=Math.max(a[0],z[0])+m,y0=top[1],y1=Math.min(sh[1],rail[1]);
+   els.forEach(function(e,i){var L=e.querySelector('.tsl'),R=e.querySelector('.tsr');if(!L||!R)return;var rl=L.getBoundingClientRect(),rr=R.getBoundingClientRect(),
+     nl=rl.right-TSP[i].l,nr=rr.left-TSP[i].r;   // where the words sit when the title is closed
+    if(rl.bottom<y0||rl.top>y1||(nl<=x0&&nr>=x1))return;   // he is not level with this line, or already fits between the words
+    want[i]={l:x0-nl,r:x1-nr}})}}   // the words close in either side of his head
+ var k=reduce?1:.14,moving=false;
+ els.forEach(function(e,i){var T=TSP[i];T.l+=(want[i].l-T.l)*k;T.r+=(want[i].r-T.r)*k;if(Math.abs(want[i].l-T.l)+Math.abs(want[i].r-T.r)>.5)moving=true;
+  var L=e.querySelector('.tsl'),R=e.querySelector('.tsr');if(L)L.style.transform=Math.abs(T.l)>.5?'translateX('+T.l.toFixed(1)+'px)':'';if(R)R.style.transform=Math.abs(T.r)>.5?'translateX('+T.r.toFixed(1)+'px)':''});
+ if(moving)dirty=Math.max(dirty,1)}
 var CRV=null;function crVisible(VPm){var st=crState(window.__ct!=null?window.__ct:NOWS),c=[st.x,st.b+CRS*.6,st.z],r=CRS*.75,v=0;
  for(var i=-1;i<=1;i+=2)for(var j=-1;j<=1;j+=2)for(var k=-1;k<=1;k+=2){var p=[c[0]+i*r,c[1]+j*r,c[2]+k*r],w=VPm[3]*p[0]+VPm[7]*p[1]+VPm[11]*p[2]+VPm[15];if(w<=0)continue;
   var x=(VPm[0]*p[0]+VPm[4]*p[1]+VPm[8]*p[2]+VPm[12])/w,y=(VPm[1]*p[0]+VPm[5]*p[1]+VPm[9]*p[2]+VPm[13])/w;if(x>-1.6&&x<1.6&&y>-1.6&&y<1.6)v=1}
@@ -3070,6 +3120,8 @@ function drawWalker(){var tt=window.__ct!=null?window.__ct:NOWS,st=crState(tt);g
 // tiered crystal cascade chandelier with a brass crown, under a plaster ceiling rose (like Pam's living room)
 var ROSE=mat({col:'#f6f3ec',rough:.4});
 (function(){var cx=0,cz=-5.2,O=B([cx,0,cz]);
+ if(CLAY){ell(Mx.candle,O,[0,RH-.4,0],[.05,.08,.05],14);LIGHTS.point.push({p:[cx,RH-.4,cz],c:[60,48,34]});
+  clayModel('chandelier-v1',function(lo,hi){return mm(mT(cx,RH+.01,cz),mS(1.0/(hi[1]-lo[1])),clayCentre(lo,hi,1))},{rough:.35,emis:[.22,.18,.13]});return}
  lathe(ROSE,B([cx,RH,cz]),[0,0,0],[[0,-.09],[.12,-.09],[.2,-.07],[.3,-.07],[.38,-.05],[.45,-.05],[.5,-.03],[.55,-.03],[.62,-.012],[.62,0],[0,0]],48);
  lathe(Mx.gold,O,[0,RH-.36,0],[[0,0],[.05,0],[.03,.05],[.035,.12],[.06,.18],[.03,.22],[0,.27]],24);
  var y0=RH-.55;torus(Mx.gold,O,[0,y0,0],.3,.014,48);
@@ -3228,8 +3280,12 @@ function hideDyn(){DYNL.forEach(function(d){d.pool.forEach(function(x){x.visible
 
 /* physical upgrades for particular surfaces */
 function upgradeMats(){
+ if(typeof CLAY!=='undefined'&&CLAY){var sh=function(c){return{sheen:.45,sheenRoughness:.8,sheenColor:c3(c)}};   // clay: a soft, velvety sheen instead of a glaze
+  Mx.floor.x3=sh([1,.93,.82]);Mx.marble.x3=sh([1,.95,.88]);Mx.wall.x3=sh([1,.94,.84]);Mx.ceiling.x3=sh([1,.95,.88]);Mx.coffer.x3=sh([1,.95,.88])}
+ else{
  Mx.floor.x3={clearcoat:.65,clearcoatRoughness:.035};Mx.floor.rough=.3;Mx.floor.refl=.9;            // honed marble under a polished glaze
  Mx.marble.x3={clearcoat:.3,clearcoatRoughness:.12};                                                  // polished columns and balustrade
+ }
  Mx.crystal.x3={ior:2.1,specularIntensity:1,iridescence:.22,iridescenceIOR:1.5,iridescenceThicknessRange:[180,520]};Mx.crystal.rough=.07;Mx.crystal.metal=0;Mx.crystal.envK=2.;Mx.crystal.col=[.32,.32,.35];Mx.crystal.emis=[.28,.26,.22];   // clear glass: almost no diffuse, all sparkle and reflection
  [Mx.gold,Mx.gold24,Mx.steel].forEach(function(m){m.envK=1.25});
  Mx.blob.flat=1;
@@ -3246,7 +3302,9 @@ function buildLights(){
   var s=new THREE.SpotLight(0xffffff,pk,0,out,1-inn/out,2);s.color.setRGB(l.c[0]/pk,l.c[1]/pk,l.c[2]/pk,LINEAR);s.position.set(lp[0],lp[1],lp[2]);s.target.position.set(tg[0],tg[1],tg[2]);S3.add(s,s.target);
   if(Q.spotSh&&l.sh!==false){s.castShadow=true;s.shadow.mapSize.set(1024,1024);s.shadow.camera.near=.25;s.shadow.camera.far=9;s.shadow.bias=-.0006;s.shadow.normalBias=.015;s.shadow.radius=3.2}});
  LIGHTS.point.forEach(function(l){var pk=Math.max(l.c[0],l.c[1],l.c[2]),p=new THREE.PointLight(0xffffff,pk,8,2);p.color.setRGB(l.c[0]/pk,l.c[1]/pk,l.c[2]/pk,LINEAR);p.position.set(l.p[0],l.p[1],l.p[2]);S3.add(p)});
- var h=HEMI=new THREE.HemisphereLight(0xffffff,0xffffff,1);h.color.setRGB(SKY[0]*Math.PI,SKY[1]*Math.PI,SKY[2]*Math.PI,LINEAR);h.groundColor.setRGB(GROUND[0]*Math.PI,GROUND[1]*Math.PI,GROUND[2]*Math.PI,LINEAR);S3.add(h)}
+ var h=HEMI=new THREE.HemisphereLight(0xffffff,0xffffff,1);h.color.setRGB(SKY[0]*Math.PI,SKY[1]*Math.PI,SKY[2]*Math.PI,LINEAR);
+ if(typeof CLAY!=='undefined'&&CLAY){var wk=lin('#ffe6c8');h.color.setRGB(wk[0]*.36*Math.PI,wk[1]*.36*Math.PI,wk[2]*.36*Math.PI,LINEAR)}   /* clay: warm studio fill light */
+h.groundColor.setRGB(GROUND[0]*Math.PI,GROUND[1]*Math.PI,GROUND[2]*Math.PI,LINEAR);S3.add(h)}
 
 /* ---------- image-based lighting: the room itself, captured into a cube map and prefiltered ---------- */
 function initEnv(){PM=new THREE.PMREMGenerator(R3);var res=ENVBAKE||mobile||LOWGPU?128:256,W=res*4,H=res*2,d=new Uint8Array(W*H*4);
@@ -3263,7 +3321,8 @@ function captureEnv(){var pp=G3.uPass.value;hideDyn();syncBlend();G3.uPass.value
 function upload(){
  if(!LIT){LIT=true;upgradeMats();initEnv();buildLights()}
  MATS.forEach(function(m){if(m._3||!m.v||!m.v.length)return;build3(m)});
- WALKM.forEach(function(m){if(m._dyn||!m.v||!m.v.length)return;var M=mat3(m,ENVPH);if(M.isMeshStandardMaterial)ENVOUTM.push(M);m._dyn={g:geoFrom(new Float32Array(m.v)),M:M,pool:[],n:0};DYNL.push(m._dyn);m.v=null})}
+ R3.localClippingEnabled=true;
+ WALKM.forEach(function(m){if(m._dyn||!m.v||!m.v.length)return;var M=mat3(m,ENVPH);if(PIGALL.indexOf(m)<0)M.clippingPlanes=[CRCLIP];if(M.isMeshStandardMaterial)ENVOUTM.push(M);m._dyn={g:geoFrom(new Float32Array(m.v)),M:M,pool:[],n:0};DYNL.push(m._dyn);m.v=null})}
 function loadBakedEnv(cb){var left=2,ok=true;
  ['in','out'].forEach(function(k){fetch(ENVBAKE[k]).then(function(r){return r.blob()}).then(function(b){return createImageBitmap(b,{premultiplyAlpha:'none',colorSpaceConversion:'none'})}).then(function(bm){
   var t=new THREE.Texture(bm);t.colorSpace=THREE.NoColorSpace;t.premultiplyAlpha=false;t.flipY=false;t.generateMipmaps=false;t.minFilter=THREE.LinearFilter;t.magFilter=THREE.LinearFilter;t.needsUpdate=true;
@@ -3379,6 +3438,8 @@ function bloomPass(){var n=BL.length,u=BDM.uniforms,i;
  for(i=1;i<n;i++){u.uT.value=BL[i-1].texture;u.uPx.value.set(1/BL[i-1].width,1/BL[i-1].height);u.uFirst.value=0;pass(BDM,BL[i])}
  for(i=n-2;i>=0;i--){BUM.uniforms.uT.value=BL[i+1].texture;BUM.uniforms.uPx.value.set(1/BL[i+1].width,1/BL[i+1].height);pass(BUM,BL[i])}}
 
+// the balcony figure is only seen above the rail: whatever of him a solid rail would hide stays hidden (his legs showed between the balusters)
+var CRCLIP=new THREE.Plane(new THREE.Vector3(0,1,0),1e4);
 var VC=new THREE.PerspectiveCamera();VC.matrixAutoUpdate=false;var SYM=new THREE.Matrix4().makeScale(1,-1,1),CLR=new THREE.Color().setRGB(.02,.015,.012,LINEAR);
 function render(time){
  var as=RT.w/RT.h;cam.fov=fovFor(as);
@@ -3387,7 +3448,9 @@ function render(time){
  C3.fov=cam.fov*180/Math.PI;C3.aspect=as;C3.near=.05;C3.far=200;C3.updateProjectionMatrix();C3.position.set(eye[0],eye[1],eye[2]);C3.up.set(0,1,0);C3.lookAt(eye[0]+dd[0],eye[1]+dd[1],eye[2]+dd[2]);C3.updateMatrixWorld();
  G3.uSecs.value=NOWS%3600;
  if(envAt&&Date.now()>envAt){envAt=0;captureEnv()}
+ var rz=BAL+.12,vy=eye[1]-1.11,vz=eye[2]-rz;if(vz>.05){var nl=Math.hypot(vy,vz);CRCLIP.normal.set(0,vz/nl,-vy/nl);CRCLIP.constant=-(CRCLIP.normal.y*1.11+CRCLIP.normal.z*rz)}else CRCLIP.constant=1e4;
  DYNL.forEach(function(d){d.n=0});drawPigeon();if(crVisible(VP))drawWalker();
+ if(typeof titleSplit==='function')titleSplit(VP);
  DYNL.forEach(function(d){for(var i=d.n;i<d.pool.length;i++)d.pool[i].visible=false});
  syncBlend();
  R3.setClearColor(CLR,1);
@@ -3661,7 +3724,7 @@ fontReady.then(function(){
   x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=22;x.fillStyle='#ffffff';x.font='italic 500 132px "Cormorant Garamond",Georgia,serif';x.fillText('Pam\u2019s Gallery',W/2,860);x.fillStyle='#ffd27a';var mw=x.measureText('Pam\u2019s Gallery').width;x.fillRect(W/2-mw/2,890,mw,5);x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=18;x.fillStyle='#ffffff';x.font='400 62px Jost,Helvetica,Arial,sans-serif';x.fillText(EMAIL,W/2,985)}),
   sc,ax,ay,19,10.2,nrm,{go:function(){location.href='mailto:'+EMAIL},tip:'Write to '+EMAIL,far:120,on:function(){return false}},{unlit:1,emis:[2.2,2.15,2.1]});SKYTEXT.m=MATS[MATS.length-1];
  LABELS.forEach(function(f){f()});
- upload();resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;buildK();camAt(cur*(K.length-1));resize()});
+clayFinish(); upload();resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;buildK();camAt(cur*(K.length-1));resize()});
  prep3(function(){scrollTo(0,0);cur=0;camAt(0);render(0);dirty=0;openDoors(George.start);
  requestAnimationFrame(frame)});
 });

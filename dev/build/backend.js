@@ -127,8 +127,12 @@ function hideDyn(){DYNL.forEach(function(d){d.pool.forEach(function(x){x.visible
 
 /* physical upgrades for particular surfaces */
 function upgradeMats(){
+ if(typeof CLAY!=='undefined'&&CLAY){var sh=function(c){return{sheen:.45,sheenRoughness:.8,sheenColor:c3(c)}};   // clay: a soft, velvety sheen instead of a glaze
+  Mx.floor.x3=sh([1,.93,.82]);Mx.marble.x3=sh([1,.95,.88]);Mx.wall.x3=sh([1,.94,.84]);Mx.ceiling.x3=sh([1,.95,.88]);Mx.coffer.x3=sh([1,.95,.88])}
+ else{
  Mx.floor.x3={clearcoat:.65,clearcoatRoughness:.035};Mx.floor.rough=.3;Mx.floor.refl=.9;            // honed marble under a polished glaze
  Mx.marble.x3={clearcoat:.3,clearcoatRoughness:.12};                                                  // polished columns and balustrade
+ }
  Mx.crystal.x3={ior:2.1,specularIntensity:1,iridescence:.22,iridescenceIOR:1.5,iridescenceThicknessRange:[180,520]};Mx.crystal.rough=.07;Mx.crystal.metal=0;Mx.crystal.envK=2.;Mx.crystal.col=[.32,.32,.35];Mx.crystal.emis=[.28,.26,.22];   // clear glass: almost no diffuse, all sparkle and reflection
  [Mx.gold,Mx.gold24,Mx.steel].forEach(function(m){m.envK=1.25});
  Mx.blob.flat=1;
@@ -145,7 +149,9 @@ function buildLights(){
   var s=new THREE.SpotLight(0xffffff,pk,0,out,1-inn/out,2);s.color.setRGB(l.c[0]/pk,l.c[1]/pk,l.c[2]/pk,LINEAR);s.position.set(lp[0],lp[1],lp[2]);s.target.position.set(tg[0],tg[1],tg[2]);S3.add(s,s.target);
   if(Q.spotSh&&l.sh!==false){s.castShadow=true;s.shadow.mapSize.set(1024,1024);s.shadow.camera.near=.25;s.shadow.camera.far=9;s.shadow.bias=-.0006;s.shadow.normalBias=.015;s.shadow.radius=3.2}});
  LIGHTS.point.forEach(function(l){var pk=Math.max(l.c[0],l.c[1],l.c[2]),p=new THREE.PointLight(0xffffff,pk,8,2);p.color.setRGB(l.c[0]/pk,l.c[1]/pk,l.c[2]/pk,LINEAR);p.position.set(l.p[0],l.p[1],l.p[2]);S3.add(p)});
- var h=HEMI=new THREE.HemisphereLight(0xffffff,0xffffff,1);h.color.setRGB(SKY[0]*Math.PI,SKY[1]*Math.PI,SKY[2]*Math.PI,LINEAR);h.groundColor.setRGB(GROUND[0]*Math.PI,GROUND[1]*Math.PI,GROUND[2]*Math.PI,LINEAR);S3.add(h)}
+ var h=HEMI=new THREE.HemisphereLight(0xffffff,0xffffff,1);h.color.setRGB(SKY[0]*Math.PI,SKY[1]*Math.PI,SKY[2]*Math.PI,LINEAR);
+ if(typeof CLAY!=='undefined'&&CLAY){var wk=lin('#ffe6c8');h.color.setRGB(wk[0]*.36*Math.PI,wk[1]*.36*Math.PI,wk[2]*.36*Math.PI,LINEAR)}   /* clay: warm studio fill light */
+h.groundColor.setRGB(GROUND[0]*Math.PI,GROUND[1]*Math.PI,GROUND[2]*Math.PI,LINEAR);S3.add(h)}
 
 /* ---------- image-based lighting: the room itself, captured into a cube map and prefiltered ---------- */
 function initEnv(){PM=new THREE.PMREMGenerator(R3);var res=ENVBAKE||mobile||LOWGPU?128:256,W=res*4,H=res*2,d=new Uint8Array(W*H*4);
@@ -162,7 +168,8 @@ function captureEnv(){var pp=G3.uPass.value;hideDyn();syncBlend();G3.uPass.value
 function upload(){
  if(!LIT){LIT=true;upgradeMats();initEnv();buildLights()}
  MATS.forEach(function(m){if(m._3||!m.v||!m.v.length)return;build3(m)});
- WALKM.forEach(function(m){if(m._dyn||!m.v||!m.v.length)return;var M=mat3(m,ENVPH);if(M.isMeshStandardMaterial)ENVOUTM.push(M);m._dyn={g:geoFrom(new Float32Array(m.v)),M:M,pool:[],n:0};DYNL.push(m._dyn);m.v=null})}
+ R3.localClippingEnabled=true;
+ WALKM.forEach(function(m){if(m._dyn||!m.v||!m.v.length)return;var M=mat3(m,ENVPH);if(PIGALL.indexOf(m)<0)M.clippingPlanes=[CRCLIP];if(M.isMeshStandardMaterial)ENVOUTM.push(M);m._dyn={g:geoFrom(new Float32Array(m.v)),M:M,pool:[],n:0};DYNL.push(m._dyn);m.v=null})}
 function loadBakedEnv(cb){var left=2,ok=true;
  ['in','out'].forEach(function(k){fetch(ENVBAKE[k]).then(function(r){return r.blob()}).then(function(b){return createImageBitmap(b,{premultiplyAlpha:'none',colorSpaceConversion:'none'})}).then(function(bm){
   var t=new THREE.Texture(bm);t.colorSpace=THREE.NoColorSpace;t.premultiplyAlpha=false;t.flipY=false;t.generateMipmaps=false;t.minFilter=THREE.LinearFilter;t.magFilter=THREE.LinearFilter;t.needsUpdate=true;
@@ -227,6 +234,8 @@ function bloomPass(){var n=BL.length,u=BDM.uniforms,i;
  for(i=1;i<n;i++){u.uT.value=BL[i-1].texture;u.uPx.value.set(1/BL[i-1].width,1/BL[i-1].height);u.uFirst.value=0;pass(BDM,BL[i])}
  for(i=n-2;i>=0;i--){BUM.uniforms.uT.value=BL[i+1].texture;BUM.uniforms.uPx.value.set(1/BL[i+1].width,1/BL[i+1].height);pass(BUM,BL[i])}}
 
+// the balcony figure is only seen above the rail: whatever of him a solid rail would hide stays hidden (his legs showed between the balusters)
+var CRCLIP=new THREE.Plane(new THREE.Vector3(0,1,0),1e4);
 var VC=new THREE.PerspectiveCamera();VC.matrixAutoUpdate=false;var SYM=new THREE.Matrix4().makeScale(1,-1,1),CLR=new THREE.Color().setRGB(.02,.015,.012,LINEAR);
 function render(time){
  var as=RT.w/RT.h;cam.fov=fovFor(as);
@@ -235,7 +244,9 @@ function render(time){
  C3.fov=cam.fov*180/Math.PI;C3.aspect=as;C3.near=.05;C3.far=200;C3.updateProjectionMatrix();C3.position.set(eye[0],eye[1],eye[2]);C3.up.set(0,1,0);C3.lookAt(eye[0]+dd[0],eye[1]+dd[1],eye[2]+dd[2]);C3.updateMatrixWorld();
  G3.uSecs.value=NOWS%3600;
  if(envAt&&Date.now()>envAt){envAt=0;captureEnv()}
+ var rz=BAL+.12,vy=eye[1]-1.11,vz=eye[2]-rz;if(vz>.05){var nl=Math.hypot(vy,vz);CRCLIP.normal.set(0,vz/nl,-vy/nl);CRCLIP.constant=-(CRCLIP.normal.y*1.11+CRCLIP.normal.z*rz)}else CRCLIP.constant=1e4;
  DYNL.forEach(function(d){d.n=0});drawPigeon();if(crVisible(VP))drawWalker();
+ if(typeof titleSplit==='function')titleSplit(VP);
  DYNL.forEach(function(d){for(var i=d.n;i<d.pool.length;i++)d.pool[i].visible=false});
  syncBlend();
  R3.setClearColor(CLR,1);
