@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-tX3xTtN+vbF05pveKZM7ugeIbbbXhMc+ucj7H+mu78g=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-iiKvDyfBdLiXYksLOLwRoXKooqc8Raa/Hla9MnJ/KXY=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -1002,7 +1002,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
 <script>
 "use strict";
 /* photo-real material maps (generated, seamless): marble, plaster, mahogany, travertine */
-var MATSRC={clay:"/lib/clay-v1.webp",clayH:"/lib/clay-h-v1.webp",frOrchid:"/lib/frame-orchid-v2.webp",frEmber:"/lib/frame-ember-v2.webp",   /* hand-pressed clay surface (made with Higgsfield) for the clay look */
+var MATSRC={clay:"/lib/clay-v2.webp",clayH:"/lib/clay-h-v2.webp",frOrchid:"/lib/frame-orchid-v2.webp",frEmber:"/lib/frame-ember-v2.webp",   /* smooth fine-grained clay surface for the clay look (made by dev/build/claytex.py) */
 crSk:"/lib/g-cfdc0ff8f22e.jpg",crSkH:"/lib/g-9940bf64a504.jpg",crLf:"/lib/g-4a714519abc5.jpg",crLfH:"/lib/g-d08bc612d4f8.jpg",crSt:"/lib/g-41330875d7df.jpg",crStH:"/lib/g-8f94bedf5f8f.jpg",floor:"/lib/g-b9ab7c65d0bd.jpg",
 marble:"/lib/g-f54d14ab06e4.jpg",
 plaster:"/lib/g-af8bc3bbd0f8.jpg",
@@ -2519,16 +2519,16 @@ var Mx={
  sky:mat({isSky:1,unlit:1}),seaPlane:mat({isSky:1,unlit:1}),
  blob:mat({tex:TX.blob,unit:1,col:[0,0,0],blend:1,rough:1})
 };
-/* ---------- the clay look: the room is modelled in clay. One hand-pressed clay surface (colour + depth, made with Higgsfield) is tinted
+/* ---------- the clay look: the room is modelled in clay. One smooth, fine-grained clay surface (colour + depth, made by dev/build/claytex.py; real fired clay, not claymation) is tinted
    for each part of the room; gold becomes gold-painted clay. Pam's paintings stay exactly as they are. Set before the room is built,
    because the texture scale is fixed when the walls and floor are made. ---------- */
 var CLAY=!!MATIMG.clay,CLAYT=CLAY?texFrom(MATIMG.clay):null,CLAYH=CLAY&&MATIMG.clayH?texFrom(MATIMG.clayH,{lin:1}):null;
 /* the leaf-headed figure on the balcony: Pam asked for him to be removed (November 2026). Set to true to bring him back. */
 var CREATURE=false;
-if(CLAY){[[Mx.floor,'#f5d6bf',3.2,.8,.45],[Mx.marble,'#f3dcc6',1.8,.85,.5],[Mx.wall,'#efccb0',3,.9,.55],[Mx.ceiling,'#f1d9c2',2.8,.88,.4],[Mx.coffer,'#ebcdb2',2.2,.88,.4],
-  [Mx.key,'#e6cba8',1.6,.85,.4],[Mx.ivory,'#efdcbe',1.6,.8,.4],[Mx.ivoryDark,'#d2b38a',1.6,.82,.4],[Mx.tile,'#d9b48f',3.2,.8,.45],[Mx.whiteLac,'#f1e0c6',1.6,.8,.35]]
+if(CLAY){[[Mx.floor,'#f5d6bf',3.2,.8,.27],[Mx.marble,'#f3dcc6',1.8,.85,.3],[Mx.wall,'#efccb0',3,.9,.33],[Mx.ceiling,'#f1d9c2',2.8,.88,.24],[Mx.coffer,'#ebcdb2',2.2,.88,.24],
+  [Mx.key,'#e6cba8',1.6,.85,.24],[Mx.ivory,'#efdcbe',1.6,.8,.24],[Mx.ivoryDark,'#d2b38a',1.6,.82,.24],[Mx.tile,'#d9b48f',3.2,.8,.27],[Mx.whiteLac,'#f1e0c6',1.6,.8,.2]]
   .forEach(function(q){var m=q[0];m.tex=CLAYT;m.htex=CLAYH;m.col=lin(q[1]);m.uvs=[q[2],q[2]];m.rough=q[3];m.bump=q[4];m.refl=0;m.metal=0;m.unit=0});
- [Mx.gold,Mx.gold24,Mx.decoGold,Mx.brass,Mx.steel].forEach(function(m){m.col=lin('#e8b54c');m.rough=.55;m.metal=.15;m.tex=CLAYT;m.htex=CLAYH;m.bump=.8;m.unit=0;m.uvs=[.35,.35]});   // gold-painted clay, thumbprints and all
+ [Mx.gold,Mx.gold24,Mx.decoGold,Mx.brass,Mx.steel].forEach(function(m){m.col=lin('#e8b54c');m.rough=.55;m.metal=.15;m.tex=CLAYT;m.htex=CLAYH;m.bump=.35;m.unit=0;m.uvs=[.35,.35]});   // gold-painted clay, smooth like fired and painted clay
  Mx.goldDark.col=lin('#a87a2c');Mx.goldDark.metal=.25;Mx.goldDark.rough=.55}
 // once the room is built: everything else gets a soft clay finish (no glaze, no mirror shine). Paintings, labels, lights and the sky keep theirs.
 function clayFinish(){if(!CLAY)return;var art=[];for(var k in ARTM)art.push(ARTM[k]);
@@ -2570,7 +2570,12 @@ function amphora(x,y,z,s){var b=B([x,y,z]),pr=[[0,0],[.06,0],[.07,.02],[.05,.06]
  lathe(Mx.amph,b,[0,0,0],pr,48);
  [-1,1].forEach(function(sd){torus(Mx.amph,{o:bx(b,[sd*.1*s,.6*s,0]),x:[1,0,0],y:[0,0,1],z:[0,-1,0]},[0,0,0],.075*s,.012*s,24)});
  blob(x,z,.5*s,.5*s)}
-function pedestal(x,z,h){if(CLAY){clayModel('pedestal-v1',function(lo,hi){return mm(mT(x,0,z),mS(h/(hi[1]-lo[1])),clayCentre(lo,hi))},{rough:.85,col:[1.3,1.18,1.1]});blob(x,z,.9,.9);return}
+/* in clay mode: a smooth drum with a rolled rim at the top and the foot, like a pot thrown on a wheel (real clay, not claymation) */
+var PEDM=null;function pedRoll(cr,cy,r,a0,a1,n){var o=[];for(var i=0;i<=n;i++){var a=a0+(a1-a0)*i/n;o.push([cr+r*Math.cos(a),cy+r*Math.sin(a)])}return o}
+function pedestal(x,z,h){if(CLAY){PEDM=PEDM||mat({col:lin('#e4bd8c'),tex:CLAYT,htex:CLAYH,bump:.3,rough:.85,uvs:[1.4,1.4]});
+  var R=.068,P=[[.3,0]].concat(pedRoll(.3,R,R,-Math.PI/2,Math.PI/2,10),[[.282,2*R+.012],[.272,2*R+.04],[.268,h/2],[.272,h-2*R-.04],[.282,h-2*R-.012]],
+   pedRoll(.3,h-R,R,-Math.PI/2,Math.PI/2,10),[[.27,h],[.12,h+.004],[0,h+.004]]);
+  lathe(PEDM,B([x,0,z]),[0,0,0],P,64);blob(x,z,.9,.9);return}
  lathe(Mx.marble,B([x,0,z]),[0,0,0],CLAY?[[.33,0],[.36,.03],[.37,.07],[.35,.11],[.29,.15],[.27,.2],[.27,h-.2],[.29,h-.15],[.35,h-.11],[.37,h-.07],[.36,h-.03],[.33,h],[0,h]]
  :[[.3,0],[.3,.06],[.24,.1],[.2,.16],[.2,h-.14],[.24,h-.1],[.3,h-.06],[.3,h],[0,h]],48);blob(x,z,.9,.9)}
 function olive(x,z,s){s=s||1;lathe(Mx.terracotta,B([x,0,z]),[0,0,0],[[0,0],[.22*s,0],[.3*s,.55*s],[.31*s,.58*s],[0,.58*s]],32);blob(x,z,.9*s,.9*s);
@@ -3070,7 +3075,7 @@ function clayGeo(name){CMC=CMC||{};if(CMC[name])return CMC[name];   /* frames ca
  return C}
 // Higgsfield 3D models (files made by dev/build/statue.py), placed once the gallery has started: place(lo,hi) gives one matrix or several, o sets the finish
 function clayModel(name,place,o){o=o||{};
- clayGeo(name).then(function(G){var m=mat({unit:1,tex:G.tex,col:o.col||[1,1,1],rough:o.rough==null?.75:o.rough,emis:o.emis||[0,0,0]});
+ clayGeo(name).then(function(G){var m=mat({unit:1,tex:o.tex||G.tex,htex:o.htex||null,bump:o.bump||0,col:o.col||[1,1,1],rough:o.rough==null?.75:o.rough,emis:o.emis||[0,0,0]});
   if(o.sheen!==false)m.x3=typeof c3==='function'?{sheen:.5,sheenRoughness:.7,sheenColor:c3([1,.95,.85])}:null;   // soft clay sheen
   var Ms=place(G.lo,G.hi);(Array.isArray(Ms)?Ms:[Ms]).forEach(function(M){bake({v:G.v},M,m)});
   if(typeof LIT==='undefined'||LIT){upload();dirty=2;   // before the first upload, the gallery's own start-up builds it (after the clay finish)
