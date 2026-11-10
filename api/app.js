@@ -375,10 +375,10 @@ const actions = {
   // a request to buy: a painting (by id, or the older painting number) or a print in a chosen size
   async order(req, b) {
     await limit(req, 'order', 10, 3600);
-    if (isSpam(b)) return { ok: true, id: id() };
     const u = await auth(req), cat = await getCat();
     const name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase();
     if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
+    if (isSpam(b)) return { ok: true, id: id() };   // after the checks above, so a real visitor with an incomplete form is told what's missing
     let kind = 'art', aid = '', title = '';
     if (b.print) {
       const pr = cat && (cat.prints || []).find(x => x.id === String(b.print)); if (!pr) throw err('That print is no longer available.', 404);
@@ -404,11 +404,11 @@ const actions = {
   // a commission request, with up to three reference photos
   async commission(req, b) {
     await limit(req, 'comm', 6, 3600);
-    if (isSpam(b)) return { ok: true, id: id() };
     const u = await auth(req), cat = await getCat();
     const name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase(), idea = clean(b.idea, 3000);
     if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
     if (idea.length < 5) throw err('Please tell Pam a little about the painting you have in mind.', 400);
+    if (isSpam(b)) return { ok: true, id: id() };
     const photos = [];
     for (const d of (Array.isArray(b.photos) ? b.photos : []).slice(0, 3)) {
       const data = String(d || '').replace(/^data:image\/(jpeg|png|webp);base64,/, '');
@@ -454,9 +454,9 @@ const actions = {
 
   async sub(req, b) {
     await limit(req, 'sub', 10, 3600);
-    if (isSpam(b, 900)) return { ok: true };
     const email = clean(b.email, 200).toLowerCase(); if (!okEmail(email)) throw err('Please enter a valid email address.', 400);
     if (!b.consent) throw err('Please tick the box to say you’d like these emails.', 400);
+    if (isSpam(b, 900)) return { ok: true };
     const rec = { email, ts: Date.now(), words: CONSENT_WORDS, src: clean(b.src, 40) || 'site' };
     if (RESEND && MAIL_FROM) {          // double opt-in: nothing is sent until they confirm
       await db('SET', 'subp:' + email, JSON.stringify(rec), 'EX', String(14 * 86400));
@@ -470,10 +470,10 @@ const actions = {
 
   async message(req, b) {
     await limit(req, 'msg', 10, 3600);
-    if (isSpam(b)) return { ok: true };
     const u = await auth(req), name = u ? u.name : clean(b.name, 80), email = u ? u.email : clean(b.email, 200).toLowerCase(), text = clean(b.message, 3000);
     if (!name || !okEmail(email)) throw err('Please add your name and a valid email so Pam can reply.', 400);
     if (text.length < 2) throw err('Please write a message.', 400);
+    if (isSpam(b)) return { ok: true };
     const m = { id: id(), ts: Date.now(), name, email, message: text, member: !!u, read: false };
     await pipe([['SET', 'm:' + m.id, JSON.stringify(m)], ['LPUSH', 'msgs', m.id]]);
     const cat = await getCat();

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-cKA+I5laDYDRu2qB1OdYbKP0A3F2VAHkQMK8Iyp7ktY=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-lpSbPYaE/nbxGMUCztZuHJGjrdcTBJE+pla7Q0sMIHU=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -1611,7 +1611,7 @@ TOK=ls('pgTok');
 var PUBF=['fBuy','fMsg','fComm','fUp'],LASTF=null,PAGE_T0=Date.now();
 function hpOf(f){if(!f||f.querySelector('.hp'))return;var w=document.createElement('label');w.className='hp';w.setAttribute('aria-hidden','true');w.innerHTML='Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off">';f.appendChild(w)}
 function trapForms(){PUBF.forEach(function(id){hpOf(document.getElementById(id))});[].forEach.call(document.querySelectorAll('form[data-sub]'),hpOf)}
-document.addEventListener('focusin',function(e){var f=e.target&&e.target.form;if(f&&!f.dataset.t0)f.dataset.t0=Date.now()});
+document.addEventListener('focusin',function(e){var t=e.target,f=t&&t.form;if(f&&!f.dataset.t0&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)&&!/^(submit|button|image|reset)$/.test(t.type))f.dataset.t0=Date.now()});   // the robot timer starts when someone first goes into a field, never on the Send button (a form filled by the phone's autofill and sent at once is a real visitor)
 document.addEventListener('submit',function(e){LASTF=e.target},true);
 function trapOf(){var f=LASTF,i=f&&f.querySelector('.hp input');return{hp:i?i.value:'',ft:Date.now()-(f&&+f.dataset.t0||PAGE_T0)}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',trapForms);else trapForms();

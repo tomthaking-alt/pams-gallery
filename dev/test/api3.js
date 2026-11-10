@@ -18,7 +18,7 @@ function ok(c,m){console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1}
  r=await P({a:'bid',id:'p1',amount:'260'},BT);ok(r._s===400,'non-auction bid rejected');
  const live=await G('live=1');ok(live.likes.p1===1&&live.bids.p3.top===250&&live.bids.p3.n===1,'live endpoint '+JSON.stringify(live));
  r=await P({a:'order',id:'p2',name:'Cara',email:'cara@example.com',offer:'£400',message:'Hi'});ok(r.ok,'enquiry with offer');
- r=await P({a:'sub',email:'fan@example.com'});ok(r.ok,'subscribe');r=await P({a:'sub',email:'nope'});ok(r._s===400,'bad email rejected');
+ r=await P({a:'sub',email:'fan@example.com',consent:true});ok(r.ok,'subscribe');r=await P({a:'sub',email:'nope'});ok(r._s===400,'bad email rejected');
  const me=await P({a:'me'},BT);ok(me.bids&&me.bids[0]&&me.bids[0].state==='leading','member sees leading bid');
  let d=await P({a:'dash'},OT);const o=d.orders.find(x=>x.name==='Cara');ok(o&&o.offer===400,'dash order offer '+(o&&o.offer));
  ok(d.auctions[0]&&d.auctions[0].bids[0].amount===250,'dash auctions');ok(d.likes[0]&&d.likes[0].n===1,'dash likes');ok(d.subs.count===1,'dash subs');ok(d.pay===false&&d.google===false,'flags off');
