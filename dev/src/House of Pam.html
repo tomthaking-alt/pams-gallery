@@ -50,6 +50,16 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #tip i{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.1rem}
 #loading{position:fixed;inset:0;z-index:6;background:#140f0c;color:#e9dcc6;transition:opacity .75s ease;overflow:hidden}
 #loading{background:radial-gradient(ellipse 80% 70% at 50% 52%,#2d2118 0%,#1a130f 58%,#0d0907 100%)}
+/* the sunlit hall (a film made with Higgsfield) behind the paintings, darkened so every line of text keeps a contrast of at least 4.5:1 */
+#loading .lbg{position:absolute;inset:0;overflow:hidden;pointer-events:none;opacity:0;transition:opacity 1.6s ease}
+#loading .lbg.on{opacity:1}
+#loading .lbg img,#loading .lbg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+#loading .lbg video{opacity:0;transition:opacity 1.2s ease}
+#loading .lbg video.on{opacity:1}
+#loading .lbg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,9,7,.84) 0%,rgba(13,9,7,.74) 24%,rgba(13,9,7,.62) 42%,rgba(13,9,7,.62) 62%,rgba(13,9,7,.76) 78%,rgba(13,9,7,.88) 100%);transition:opacity .9s ease}
+#loading .lbg .ldoors{transition:opacity .8s ease}
+#loading.doors .lw,#loading.doors .lstage,#loading.doors .lfoot,#loading.doors .lbird,#loading.doors .ldust{opacity:0;transition:opacity .6s ease}
+#loading.doors .lbg::after{opacity:0}
 #loading .ldust{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 #loading .ldust i{position:absolute;border-radius:50%;background:#f3d999;opacity:0;animation:ldDust 20s linear infinite;will-change:transform,opacity}
 @keyframes ldDust{0%{transform:translate3d(0,0,0);opacity:0}15%{opacity:.55}50%{opacity:.25}85%{opacity:.5}100%{transform:translate3d(14px,-38vh,0);opacity:0}}
@@ -769,6 +779,7 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
 </section>
 <noscript><div class="nos">The 3D gallery needs JavaScript. <a href="/works">See every painting in the simple gallery</a>, or email Pam at pts98 [at] hotmail.co.uk.</div></noscript>
 <div id="loading" role="status" aria-label="Opening Pam’s Gallery">
+ <div class="lbg" id="ldBg" aria-hidden="true"><img id="ldPoster" alt="" decoding="async"></div>
  <div class="ldust" aria-hidden="true"><i style="left:6%;top:82%;width:2.4px;height:2.4px;animation-duration:19s;animation-delay:-3s"></i><i style="left:14%;top:40%;width:1.6px;height:1.6px;animation-duration:23s;animation-delay:-11s"></i><i style="left:22%;top:68%;width:2.2px;height:2.2px;animation-duration:17s;animation-delay:-6s"></i><i style="left:31%;top:90%;width:1.4px;height:1.4px;animation-duration:25s;animation-delay:-15s"></i><i style="left:39%;top:30%;width:2.0px;height:2.0px;animation-duration:21s;animation-delay:-2s"></i><i style="left:47%;top:75%;width:1.6px;height:1.6px;animation-duration:18s;animation-delay:-9s"></i><i style="left:55%;top:52%;width:2.6px;height:2.6px;animation-duration:24s;animation-delay:-13s"></i><i style="left:63%;top:86%;width:1.5px;height:1.5px;animation-duration:20s;animation-delay:-4s"></i><i style="left:71%;top:36%;width:2.1px;height:2.1px;animation-duration:22s;animation-delay:-16s"></i><i style="left:79%;top:64%;width:1.7px;height:1.7px;animation-duration:19s;animation-delay:-7s"></i><i style="left:87%;top:88%;width:2.4px;height:2.4px;animation-duration:26s;animation-delay:-12s"></i><i style="left:94%;top:46%;width:1.5px;height:1.5px;animation-duration:18s;animation-delay:-1s"></i><i style="left:10%;top:20%;width:1.8px;height:1.8px;animation-duration:24s;animation-delay:-18s"></i><i style="left:58%;top:14%;width:1.6px;height:1.6px;animation-duration:21s;animation-delay:-5s"></i><i style="left:84%;top:22%;width:2.0px;height:2.0px;animation-duration:23s;animation-delay:-10s"></i><i style="left:35%;top:58%;width:1.4px;height:1.4px;animation-duration:20s;animation-delay:-14s"></i></div>
  <div class="lstage" id="ldStage" aria-hidden="true"></div>
  <div class="lbird" aria-hidden="true"><div class="lbb"><div class="lwg far"><svg viewBox="-62 -54 64 60" aria-hidden="true"><path fill="#68718a" d="M-8 0C-6-26-30-48-60-52C-47-36-34-18-26 4Z"/><path fill="#3d4352" d="M-60-52C-52-42-45-31-39-21L-47-26Z"/><path fill="#f4f1ea" d="M-10-14L-27-25L-25-20L-9-10Z"/></svg></div><svg class="lbd" viewBox="-75 -45 140 80" aria-hidden="true"><path fill="#5d6576" d="M-28 1L-66-7L-71 5L-65 14L-28 12Z"/><path fill="#3a3f4c" d="M-60-6L-71 5L-65 14L-57 11Z"/><ellipse cx="0" cy="4" rx="36" ry="19" fill="#8f99ad" transform="rotate(-4.6)"/><ellipse cx="18" cy="8" rx="17" ry="13" fill="#c79cab" transform="rotate(17 18 8)"/><ellipse cx="28" cy="-6" rx="11" ry="13" fill="#93a0b2" transform="rotate(29 28 -6)"/><ellipse cx="26" cy="-4" rx="7" ry="6" fill="rgba(110,160,128,.75)" transform="rotate(29 26 -4)"/><ellipse cx="27" cy="1" rx="5.5" ry="2.6" fill="#fff" transform="rotate(23 27 1)"/><circle cx="37" cy="-15" r="11" fill="#9ba7ba"/><path fill="#e6a07d" d="M46-17.5L57-13L46-10.5Z"/><circle cx="46" cy="-15.5" r="2.2" fill="#f4ece4"/><circle cx="40" cy="-17" r="3.1" fill="#f2c14e"/><circle cx="40.7" cy="-17" r="1.5" fill="#1a1410"/><path fill="#e3b450" d="M29-24L30-37L34-29L37-40L40-29L44-37L45-24Z"/><rect x="29" y="-26.5" width="16" height="3" fill="#b8862e"/><circle cx="37" cy="-28" r="1.7" fill="#c0392b"/></svg><div class="lwg"><svg viewBox="-62 -54 64 60" aria-hidden="true"><path fill="#8891a6" d="M-8 0C-6-26-30-48-60-52C-47-36-34-18-26 4Z"/><path fill="#474d5d" d="M-60-52C-52-42-45-31-39-21L-47-26Z"/><path fill="#f4f1ea" d="M-10-14L-27-25L-25-20L-9-10Z"/></svg></div></div></div>
@@ -783,6 +794,19 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
  var RM=matchMedia('(prefers-reduced-motion:reduce)').matches,T0=performance.now(),target=0,readyFn=null,autoT=0,upT=0,seen=false,slides=[],built=false;
  try{seen=localStorage.getItem('pgFilm')==='1'}catch(e){}
  var SLOT=RM?3.6:3.2,FADE=RM?1.2:1.0;
+ // the hall film behind the paintings (a still picture for reduced motion, data saver or slow connections) and, on a first
+ // visit, the bronze doors opening as visitors step in. The doors film only loads once the hall is playing, and entry never waits for it.
+ var BG=document.getElementById('ldBg'),PO=document.getElementById('ldPoster'),hall=null,doors=null,FV='-v1',
+  shape=innerHeight>innerWidth*1.1?'tall':'wide',cn=navigator.connection||{},vt=document.createElement('video'),
+  ext=vt.canPlayType('video/mp4; codecs="avc1.640028"')==='probably'?'mp4':vt.canPlayType('video/webm; codecs="vp9"')?'webm':'',
+  film=!!ext&&!RM&&!cn.saveData&&!/(^|-)[23]g$/.test(cn.effectiveType||'')&&!(navigator.deviceMemory&&navigator.deviceMemory<2);
+ PO.onload=function(){BG.classList.add('on')};PO.src='/lib/hall-'+shape+FV+'.jpg';
+ function clip(name,loop){var v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.setAttribute('muted','');v.playsInline=true;v.setAttribute('playsinline','');
+  v.loop=!!loop;v.preload='auto';v.disablePictureInPicture=true;v.setAttribute('aria-hidden','true');v.tabIndex=-1;v.src='/lib/'+name+FV+'.'+ext;return v}
+ if(film){hall=clip('hall-'+shape,1);BG.insertBefore(hall,PO.nextSibling);
+  hall.addEventListener('playing',function(){hall.classList.add('on');
+   if(!seen&&!doors){doors=clip('doors');doors.className='ldoors';BG.appendChild(doors);doors.load()}},{once:true});
+  var hp=hall.play();if(hp&&hp.catch)hp.catch(function(){})}   // a phone in low-power mode may refuse to play: the still picture stays
  function now(){return(performance.now()-T0)/1000}
  // the title waits for its typeface, so it never jumps from one font to another
  var fontP=document.fonts&&document.fonts.load?Promise.race([document.fonts.load('italic 400 48px "Cormorant Garamond"'),new Promise(function(r){setTimeout(r,900)})]):Promise.resolve();
@@ -811,9 +835,17 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
  (function(){var sl=L.querySelector('.ldsimple'),cx=navigator.connection||{},gl=null;try{var c=document.createElement('canvas');gl=c.getContext('webgl2')||c.getContext('webgl');var x=gl&&gl.getExtension('WEBGL_lose_context');if(x)x.loseContext()}catch(e){}
   if(!gl){hold=true;msg.textContent='This browser can’t show the 3D gallery, so here’s the simple view…';sl.classList.add('hot');setTimeout(function(){location.replace('/works')},2600);return}
   var slow=cx.saveData||/(^|-)2g$/.test(cx.effectiveType||'');if(slow||RM){sl.classList.add('hot');sl.textContent=slow?'On a slow connection? See all works in the simple view':'Prefer less movement? See all works in the simple view'}})();
- function stop(){removeEventListener('resize',fit);clearTimeout(autoT);clearTimeout(upT);L.classList.add('off')}
- function enter(){if(INTRO.entered)return;INTRO.entered=true;INTRO.up=false;clearTimeout(autoT);clearTimeout(upT);try{localStorage.setItem('pgFilm','1')}catch(e){}
-  L.style.opacity=0;L.style.pointerEvents='none';setTimeout(function(){L.style.display='none';stop()},800);if(readyFn)try{readyFn()}catch(e){console.error(e)}}
+ function stop(){removeEventListener('resize',fit);clearTimeout(autoT);clearTimeout(upT);L.classList.add('off');
+  [hall,doors].forEach(function(v){if(v)try{v.pause();v.removeAttribute('src');v.load()}catch(e){}})}
+ function enter(){if(INTRO.entered)return;INTRO.entered=true;clearTimeout(autoT);clearTimeout(upT);try{localStorage.setItem('pgFilm','1')}catch(e){}
+  if(doors&&doors.readyState>=3){var through=false,pass=function(){if(through)return;through=true;reveal()};
+   L.classList.add('doors');go.hidden=true;doors.playbackRate=1.15;
+   doors.addEventListener('playing',function(){doors.classList.add('on');setTimeout(function(){if(hall)hall.pause()},900)},{once:true});
+   doors.addEventListener('timeupdate',function(){if(doors.duration&&doors.currentTime>doors.duration-.9)pass()});
+   doors.addEventListener('ended',pass);doors.addEventListener('error',pass);setTimeout(pass,6500);   // never keep anyone waiting
+   var dp=doors.play();if(dp&&dp.catch)dp.catch(pass);return}
+  reveal()}
+ function reveal(){INTRO.up=false;L.style.opacity=0;L.style.pointerEvents='none';setTimeout(function(){L.style.display='none';stop()},800);if(readyFn)try{readyFn()}catch(e){console.error(e)}}
  function ready(fn){readyFn=fn;setP(1);L.classList.add('done');var el=now(),min=RM?1:seen?1.2:3.6;
   if(el>=min){enter();return}if(min-el>.6){go.hidden=false}autoT=setTimeout(enter,(min-el)*1000)}
  go.addEventListener('click',enter);

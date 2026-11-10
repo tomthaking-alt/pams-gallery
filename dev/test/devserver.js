@@ -3,7 +3,7 @@
 process.env.KV_REST_API_URL='http://127.0.0.1:8793';process.env.KV_REST_API_TOKEN='testtoken';
 const http=require('http'),fs=require('fs'),path=require('path'),url=require('url');
 const DEV=path.resolve(__dirname,'..'),REPO=path.resolve(DEV,'..'),app=require(path.join(DEV,'out','app.js'));
-const TYPES={'.js':'text/javascript','.html':'text/html','.svg':'image/svg+xml','.txt':'text/plain','.jpg':'image/jpeg','.png':'image/png','.webp':'image/webp','.json':'application/json','.webmanifest':'application/manifest+json','.glb':'model/gltf-binary','.usdz':'model/vnd.usdz+zip'};
+const TYPES={'.js':'text/javascript','.html':'text/html','.svg':'image/svg+xml','.txt':'text/plain','.jpg':'image/jpeg','.png':'image/png','.webp':'image/webp','.json':'application/json','.webmanifest':'application/manifest+json','.glb':'model/gltf-binary','.usdz':'model/vnd.usdz+zip','.mp4':'video/mp4','.webm':'video/webm'};
 http.createServer((req,res)=>{
  const u=url.parse(req.url,true);let m;
  if((m=/^\/art\/([^/?#]+)$/.exec(u.pathname))){u.pathname='/api/app';u.query=Object.assign({},u.query,{page:'art',slug:m[1]})}
