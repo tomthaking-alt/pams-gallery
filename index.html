@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-Qc1ooyetdg0JhTP1/fJtp5OY6LV5mLEakFb0zytVFiU=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-EouiVDHHA0O1ROauNQAh6e2zteiW4E7gw31uj33vcuk=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -2706,18 +2706,6 @@ if(CLAY&&CREATURE)rect(Mx.tile,BX0-7,BX1+7,-.3,0,BAL-2.4,BAL-.1);   // clay: a l
  [BX0,BX1].forEach(function(xx){for(var z=BAL+.26;z<ZF-.3;z+=.26)baluster(xx,z)});
  pier(BX0,BAL,0);pier(BX1,BAL,0);pier(-1.5,BAL,0);pier(1.5,BAL,0);
 })();
-/* the dream: a door standing open in the sky beyond the balcony, warm light pouring through it, and flat stones floating up to it.
-   It is wholly outside the hall (z < -14), so it can never stand in front of a painting. */
-var DHALO=null;function haloCanvas(){if(DHALO)return DHALO;DHALO=textCanvas(256,256,function(x,W,H){var g=x.createRadialGradient(W/2,H/2,0,W/2,H/2,W/2);
- g.addColorStop(0,'rgba(255,226,180,.55)');g.addColorStop(.35,'rgba(255,210,160,.22)');g.addColorStop(1,'rgba(255,200,150,0)');x.fillStyle=g;x.fillRect(0,0,W,H)});return DHALO}
-if(DREAM)(function(){var st=mat({col:'#e6ded4',tex:TX.marble,rough:.42,uvs:[1.2,1.2],emis:[.05,.045,.04],mist:1}),DLm=mat({col:'#ffdcb8',emis:[9,9,9],unlit:1});NOSHADOW.push(st);
- var ry=-.15,b=B([3.4,3.5,-22],ry);
- box(st,b,[-.56,0,0],[.12,2.22,.18]);box(st,b,[.56,0,0],[.12,2.22,.18]);box(st,b,[0,1.17,0],[1.36,.12,.2]);box(st,b,[0,-1.14,.03],[1.32,.06,.3]);   // posts, lintel and sill
- quadL(DLm,b,[0,0,-.03],[1,0,0],[0,1,0],.5,1.08,[0,0,1]);                                                                              // the light beyond the door
- box(st,B(bx(b,[-.5,0,.04]),ry-1.25),[.49,0,0],[.98,2.1,.05]);                                                                          // the door, swung open towards us
- for(var i=0;i<6;i++){var t=i/5,x=1.2+(3.15-1.2)*t+Math.sin(t*3.1416)*.55,y=.72+(2.3-.72)*Math.pow(t,1.15),z=-14.4+(-21.05+14.4)*t,sc=1-.25*t;
-  ell(st,B([x,y,z]),[0,0,0],[.42*sc,.06,.34*sc],18)}                                                                                   // stepping stones curving up to its sill
- var n=bn(b,[0,0,1]),ax=bn(b,[1,0,0]);LABELS.push(function(){label(haloCanvas(),bx(b,[0,.1,-.08]),ax,[0,1,0],4.6,4.6,n,null,{blend:1,unlit:1,emis:[1.5,1.35,1.2]})})})();
 var IDM=new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
 // a wood pigeon perched on the balcony rail: feathered body, white neck patch with a green-violet sheen, rosy breast, pale eye
 var PIG=(function(){function feathers(W,top,edge,bar){var c=cnv(W,W),x=c.getContext('2d');x.fillStyle=top;x.fillRect(0,0,W,W);
