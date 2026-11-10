@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-EouiVDHHA0O1ROauNQAh6e2zteiW4E7gw31uj33vcuk=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-TEyLqeSoDWGnyEueIuLg9mCW4nB09vHEBtlOjNgnwKM=' 'sha256-OTogTSpmqjIp2sPFpSw1sAMs+RsRoAJr/0HBkpMMTHo=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -34,8 +34,10 @@ h1,h2,.serif{font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;fo
 #title{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;padding:0 6vw;transition:opacity .2s}
 #title h1{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(3rem,9vw,6.8rem);line-height:1;color:#fffaf0;letter-spacing:.01em;text-shadow:0 2px 30px rgba(40,20,5,.55),0 1px 3px rgba(40,20,5,.5)}
 #title .tsl,#title .tsr{display:inline-block;will-change:transform}
-.dreampill{position:fixed;left:12px;top:calc(env(safe-area-inset-top,0px) + 64px);z-index:6;display:inline-flex;align-items:center;min-height:40px;box-sizing:border-box;padding:.5rem .9rem;border-radius:99px;background:#1e1234;color:#fff7fb;font-size:.75rem;letter-spacing:.06em;text-decoration:none;box-shadow:0 4px 18px rgba(30,18,52,.35)}
-.dreampill:focus-visible{outline:2px solid #63f0dc;outline-offset:2px}
+.dreampill{position:fixed;left:12px;top:calc(env(safe-area-inset-top,0px) + 64px);z-index:6;display:inline-flex;flex-wrap:wrap;gap:2px;align-items:center;box-sizing:border-box;padding:3px;border-radius:22px;background:#1e1234;color:#fff7fb;font-size:.75rem;letter-spacing:.04em;box-shadow:0 4px 18px rgba(30,18,52,.35);max-width:calc(100vw - 24px)}
+.dreampill a{color:inherit;text-decoration:none;min-height:34px;display:inline-flex;align-items:center;padding:0 .75rem;border-radius:99px;opacity:.85}
+.dreampill a[aria-current]{background:#fff7fb;color:#1e1234;opacity:1}
+.dreampill a:focus-visible{outline:2px solid #ffdcae;outline-offset:1px}
 .dream #title h1{text-shadow:0 2px 22px rgba(30,14,70,.9),0 0 64px rgba(120,80,255,.5)}.dream #title p{text-shadow:0 1px 12px rgba(24,10,60,.95)}
 #title p{margin:1rem 0 0;font-size:clamp(.72rem,1.6vw,.85rem);letter-spacing:.42em;text-transform:uppercase;color:#fff6e6;text-shadow:0 1px 12px rgba(40,20,5,.7)}
 #hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 22px);z-index:3;color:#faf9f7;background:rgba(43,30,24,.85);backdrop-filter:blur(6px);padding:.65rem 1.3rem;border-radius:99px;font-size:.85rem;letter-spacing:.08em;pointer-events:none}
@@ -1007,10 +1009,14 @@ body.gIntro #hint,body.gIntro #gTab{visibility:hidden}
 /* the dream look (a preview Pam asked for, November 2026): the welcome hall and the collections room as a gallery inside a dream.
    Off on the live site; the preview build (DREAM=1 bash dev/build.sh) switches it on. ?look=clay or ?look=dream override it. */
 var DREAM_DEFAULT=true;
-var DREAM=/[?&]look=clay\b/.test(location.search)?false:(DREAM_DEFAULT||/[?&]look=dream\b/.test(location.search));
+/* looks to compare in the preview: dream; ink (the clay room drawn in ink on paper, paintings in full colour); paint (the room painted in
+   swirling brushstrokes in the colours of Pam's work); clay (today's live look) */
+var LOOK=(location.search.match(/[?&]look=(dream|ink|paint|clay)\b/)||[])[1]||(DREAM_DEFAULT?'dream':'clay');
+var DREAM=LOOK==='dream',INK=LOOK==='ink',PAINT=LOOK==='paint';
 if(DREAM)document.documentElement.classList.add('dream');
-if(DREAM_DEFAULT)addEventListener('DOMContentLoaded',function(){var a=document.createElement('a');a.className='dreampill';
- a.href=DREAM?'?look=clay':location.pathname;a.textContent=DREAM?'Dream preview · see today’s clay look':'Today’s clay look · back to the dream';document.body.appendChild(a)});
+if(DREAM_DEFAULT)addEventListener('DOMContentLoaded',function(){var n=document.createElement('nav');n.className='dreampill';n.setAttribute('aria-label','Preview looks');
+ [['dream','Dream'],['ink','Ink drawing'],['paint','Painted'],['clay','Today’s clay']].forEach(function(q){var a=document.createElement('a');a.href='?look='+q[0];a.textContent=q[1];
+  if(q[0]===LOOK)a.setAttribute('aria-current','page');n.appendChild(a)});document.body.appendChild(n)});
 /* photo-real material maps (generated, seamless): marble, plaster, mahogany, travertine */
 var MATSRC={clay:"/lib/clay-v2.webp",clayH:"/lib/clay-h-v2.webp",frOrchid:"/lib/frame-orchid-v2.webp",frEmber:"/lib/frame-ember-v2.webp",   /* smooth fine-grained clay surface for the clay look (made by dev/build/claytex.py) */
 crSk:"/lib/g-cfdc0ff8f22e.jpg",crSkH:"/lib/g-9940bf64a504.jpg",crLf:"/lib/g-4a714519abc5.jpg",crLfH:"/lib/g-d08bc612d4f8.jpg",crSt:"/lib/g-41330875d7df.jpg",crStH:"/lib/g-8f94bedf5f8f.jpg",floor:"/lib/g-b9ab7c65d0bd.jpg",
@@ -2564,6 +2570,35 @@ function dreamFinish(){if(!DREAM||typeof COMPM==='undefined')return;var f=COMPM.
  r('c=mix(vec3(l),c,.88);','c=mix(vec3(l),c,.96);c+=vec3(.006,.003,.010)*(1.-smoothstep(0.,.45,l));');   // natural colour, faintly violet shadows
  r('c*=1.-dot(q,q)*.7;','c=mix(c,c*vec3(.6,.56,.68),min(1.,dot(q,q)*1.));');                          // a soft, near-neutral vignette
  COMPM.fragmentShader=f;COMPM.needsUpdate=true}
+/* ink: every surface becomes pen lines and hatching on warm paper; outlines come from changes in depth and brightness.
+   paint: the room is smeared along swirling brushstrokes and pushed towards the violets, teals and golds of Pam's work, on canvas.
+   Paintings and plaques are drawn separately and never pass through here, so they keep their true colours. */
+var INKF='{float L=dot(c,vec3(.2126,.7152,.0722)),k=max(1.,uRes.y/820.),d0=abs(s0.a);vec2 e=px*k;\n'+
+ ' float a1=abs(texture(uT,vU+vec2(-e.x,e.y)).a),a2=abs(texture(uT,vU+vec2(0.,e.y)).a),a3=abs(texture(uT,vU+e).a),a4=abs(texture(uT,vU-vec2(e.x,0.)).a),\n'+
+ '  a6=abs(texture(uT,vU+vec2(e.x,0.)).a),a7=abs(texture(uT,vU-e).a),a8=abs(texture(uT,vU-vec2(0.,e.y)).a),a9=abs(texture(uT,vU+vec2(e.x,-e.y)).a);\n'+
+ ' float gx=(a3+2.*a6+a9)-(a1+2.*a4+a7),gy=(a1+2.*a2+a3)-(a7+2.*a8+a9),dz=length(vec2(gx,gy))/max(d0,1e-4);\n'+
+ ' float lc=dot(texture(uT,vU).rgb,vec3(.3,.5,.2)),l1=dot(texture(uT,vU+vec2(e.x,0.)).rgb,vec3(.3,.5,.2)),l2=dot(texture(uT,vU+vec2(0.,e.y)).rgb,vec3(.3,.5,.2));\n'+
+ ' float le=length(vec2(l1-lc,l2-lc))/max(lc+.05,.05);float far=smoothstep(30.,55.,d0*60.);\n'+
+ ' float ink=max(smoothstep(.06,.2,dz),smoothstep(.22,.6,le)*.75)*(1.-far*.7);\n'+
+ ' vec2 sp=gl_FragCoord.xy/k;float wob=vn(sp*.03)*1.2;\n'+
+ ' float h1=1.-smoothstep(.0,.16,abs(fract((sp.x+sp.y)/6.5+wob)-.5)),h2=1.-smoothstep(.0,.16,abs(fract((sp.x-sp.y)/6.5+wob*.8)-.5)),h3=1.-smoothstep(.0,.2,abs(fract(sp.y/5.+wob*.6)-.5));\n'+
+ ' float tone=L*(1.-far*.5)+far*.45;float dark=max(ink,max(h1*.5*smoothstep(.6,.38,tone),max(h2*.55*smoothstep(.4,.22,tone),h3*.6*smoothstep(.22,.08,tone))));\n'+
+ ' vec3 paper=vec3(.962,.947,.912)*(.975+.025*fbm(gl_FragCoord.xy*.012))*(.985+.015*vn(gl_FragCoord.xy*.9));\n'+
+ ' c=mix(paper,vec3(.16,.14,.15),dark*(.88+.12*vn(sp*.2)));}\n';
+var PAINTFN='vec3 paintSmear(vec2 uv){vec2 px=1./uRes;float k=max(1.,uRes.y/760.);vec4 s0=texture(uT,uv);vec3 acc=s0.rgb;float wt=1.,dz=abs(s0.a);\n'+
+ ' for(int sd=0;sd<2;sd++){vec2 p=uv;float sg=sd==0?1.:-1.;for(int i=0;i<7;i++){vec2 g=p*uRes/k;float an=vn(g*.011)*9.4+vn(g*.0035+3.)*4.;p+=sg*vec2(cos(an),sin(an))*px*k*1.5;\n'+
+ '  vec4 s=texture(uT,p);if(s.a<0.||abs(abs(s.a)-dz)>dz*.04)break;vec3 df=s.rgb-s0.rgb;float w=exp(-dot(df,df)/(dot(s0.rgb,s0.rgb)*.04+.002));acc+=s.rgb*w;wt+=w;}}\n'+
+ ' return acc/wt;}\n';
+var PAINTF='{float L=dot(c,vec3(.2126,.7152,.0722)),k=max(1.,uRes.y/760.);vec2 sp=gl_FragCoord.xy/k;\n'+
+ ' vec3 g1=vec3(.20,.10,.34),g2=vec3(.55,.22,.52),g3=vec3(.93,.45,.40),g4=vec3(1.,.78,.45);\n'+   // Pam's palette: violet shadows, magenta and rose, orange-gold light
+ ' vec3 grad=L<.35?mix(g1,g2,L/.35):(L<.7?mix(g2,g3,(L-.35)/.35):mix(g3,g4,(L-.7)/.3));c=mix(c,grad,.5);c=mix(vec3(dot(c,vec3(.2126,.7152,.0722))),c,1.15);\n'+
+ ' float an=vn(sp*.009)*9.4+vn(sp*.003+3.)*4.;vec2 dr=vec2(cos(an),sin(an)),nr=vec2(-dr.y,dr.x);\n'+
+ ' float br=vn(vec2(dot(sp,dr)*.04,dot(sp,nr)*.7)),br2=vn(vec2(dot(sp+nr,dr)*.04,dot(sp+nr,nr)*.7));c*=.9+.2*br;c+=vec3(1.,.9,.75)*max(br2-br,0.)*.35;\n'+   // swirling brushstrokes with a raised edge of paint
+ ' c=mix(c,floor(c*10.+.5)/10.,.15);c*=1.+(sin(sp.x*1.7)*sin(sp.y*1.7))*.018;}\n';
+function lookFinish(){if(!(INK||PAINT)||typeof COMPM==='undefined')return;var f=COMPM.fragmentShader,a='c+=(hsh(gl_FragCoord.xy+fract(uTime*7.3)*97.)-.5)*.014;';
+ if(f.indexOf(a)<0){console.warn('lookFinish: anchor not found');return}f=f.replace(a,(INK?INKF:PAINTF)+a);
+ if(PAINT){f=f.replace('void main(){vec4 s0=',PAINTFN+'void main(){vec4 s0=').replace('vec3 c0=s0.rgb,','vec3 c0=paintSmear(vU),')}
+ COMPM.fragmentShader=f;COMPM.needsUpdate=true}
 // once the room is built: everything else gets a soft clay finish (no glaze, no mirror shine). Paintings, labels, lights and the sky keep theirs.
 function clayFinish(){if(!CLAY)return;var art=[];for(var k in ARTM)art.push(ARTM[k]);
  // the colour of the whole picture: warm and natural, like sunlit fired clay (not an over-saturated stop-motion set)
@@ -3279,7 +3314,8 @@ var SHS=mobile||LOWGPU?2048:4096,RT={w:2,h:2},dirty=2;
 /* ---------- lighting: low evening sun through the opening ---------- */
 var SUN=v3.norm([-.6,.26,-.76]),SUNCOL=[4.4,3.6,2.7],SKY=lin('#eef0f2').map(function(v){return v*.44}),GROUND=lin('#8a6a52').map(function(v){return v*.2}),FAR=60,SKYSUN=v3.norm([-.6,.06,-.76]);
 var EXPOSURE=.95,BLOOMK=.022,BLOOMT=3.5,RAYK=1.,cam={x:0,y:1.62,z:-2.4,yaw:0,pitch:0,fov:1};
-var DRM=(typeof DREAM!=='undefined'&&DREAM);   // the dream look: a rose sun, lavender sky light, teal light from below, a softer, wider glow
+var DRM=(typeof DREAM!=='undefined'&&DREAM);
+if(typeof INK!=='undefined'&&INK){RAYK=0;BLOOMK=0}   // ink drawing: no glow or light shafts on paper   // the dream look: a rose sun, lavender sky light, teal light from below, a softer, wider glow
 if(DRM){SUNCOL=[3.0,2.4,2.1];SKY=lin('#d0cbdc').map(function(v){return v*.26});GROUND=lin('#2c2830').map(function(v){return v*.18});BLOOMK=.035;BLOOMT=2.8;EXPOSURE=1.08}
 function fovFor(as){var deg=as>=1.2?46:as>=.8?54:64;return deg*Math.PI/180}   // vertical field of view, like a 35-50mm film lens
 function camDir(){var cp=Math.cos(cam.pitch);return[-Math.sin(cam.yaw)*cp,Math.sin(cam.pitch),-Math.cos(cam.yaw)*cp]}
@@ -3914,7 +3950,7 @@ fontReady.then(function(){
   x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=22;x.fillStyle='#ffffff';x.font='italic 500 132px "Cormorant Garamond",Georgia,serif';x.fillText('Pam\u2019s Gallery',W/2,860);x.fillStyle='#ffd27a';var mw=x.measureText('Pam\u2019s Gallery').width;x.fillRect(W/2-mw/2,890,mw,5);x.shadowColor='rgba(20,10,30,.85)';x.shadowBlur=18;x.fillStyle='#ffffff';x.font='400 62px Jost,Helvetica,Arial,sans-serif';x.fillText(EMAIL,W/2,985)}),
   sc,ax,ay,19,10.2,nrm,{go:function(){location.href='mailto:'+EMAIL},tip:'Write to '+EMAIL,far:120,on:function(){return false}},{unlit:1,emis:[2.2,2.15,2.1]});SKYTEXT.m=MATS[MATS.length-1];
  LABELS.forEach(function(f){f()});
-clayFinish();dreamFinish(); upload();resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;buildK();camAt(cur*(K.length-1));resize()});
+clayFinish();dreamFinish();lookFinish(); upload();resize();addEventListener('resize',function(){mobile=Math.min(innerWidth,innerHeight)<700;buildK();camAt(cur*(K.length-1));resize()});
  prep3(function(){scrollTo(0,0);cur=0;camAt(0);render(0);dirty=0;openDoors(George.start);
  requestAnimationFrame(frame)});
 });

@@ -23,7 +23,8 @@ var SHS=mobile||LOWGPU?2048:4096,RT={w:2,h:2},dirty=2;
 /* ---------- lighting: low evening sun through the opening ---------- */
 var SUN=v3.norm([-.6,.26,-.76]),SUNCOL=[4.4,3.6,2.7],SKY=lin('#eef0f2').map(function(v){return v*.44}),GROUND=lin('#8a6a52').map(function(v){return v*.2}),FAR=60,SKYSUN=v3.norm([-.6,.06,-.76]);
 var EXPOSURE=.95,BLOOMK=.022,BLOOMT=3.5,RAYK=1.,cam={x:0,y:1.62,z:-2.4,yaw:0,pitch:0,fov:1};
-var DRM=(typeof DREAM!=='undefined'&&DREAM);   // the dream look: a rose sun, lavender sky light, teal light from below, a softer, wider glow
+var DRM=(typeof DREAM!=='undefined'&&DREAM);
+if(typeof INK!=='undefined'&&INK){RAYK=0;BLOOMK=0}   // ink drawing: no glow or light shafts on paper   // the dream look: a rose sun, lavender sky light, teal light from below, a softer, wider glow
 if(DRM){SUNCOL=[3.0,2.4,2.1];SKY=lin('#d0cbdc').map(function(v){return v*.26});GROUND=lin('#2c2830').map(function(v){return v*.18});BLOOMK=.035;BLOOMT=2.8;EXPOSURE=1.08}
 function fovFor(as){var deg=as>=1.2?46:as>=.8?54:64;return deg*Math.PI/180}   // vertical field of view, like a 35-50mm film lens
 function camDir(){var cp=Math.cos(cam.pitch);return[-Math.sin(cam.yaw)*cp,Math.sin(cam.pitch),-Math.cos(cam.yaw)*cp]}
