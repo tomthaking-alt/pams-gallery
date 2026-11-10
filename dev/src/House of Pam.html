@@ -2363,11 +2363,11 @@ function scrollCanvas(){
  return c}
 function textCanvas(W,H,draw){var c=cnv(W,H),x=c.getContext('2d');draw(x,W,H);return c}
 function wrap(x,t,X,Y,mw,lh){var w=t.split(' '),line='',yy=Y;w.forEach(function(s){var tt=line?line+' '+s:s;if(x.measureText(tt).width>mw&&line){x.fillText(line,X,yy);line=s;yy+=lh}else line=tt});x.fillText(line,X,yy)}
-function plaqueCanvas(p){return textCanvas(2048,1152,function(x){x.scale(3.2,3.2);var W=640,H=360;x.fillStyle='#fbf8f2';x.fillRect(0,0,W,H);x.strokeStyle='#b89a62';x.lineWidth=6;x.strokeRect(9,9,W-18,H-18);x.fillStyle='#1c120c';
+function plaqueCanvas(p){var D=DREAM;return textCanvas(2048,1152,function(x){x.scale(3.2,3.2);var W=640,H=360;x.fillStyle=D?'#1d1828':'#fbf8f2';x.fillRect(0,0,W,H);x.strokeStyle='#b89a62';x.lineWidth=6;x.strokeRect(9,9,W-18,H-18);x.fillStyle=D?'#f3ecfb':'#1c120c';
  x.font='italic 600 76px "Cormorant Garamond",Georgia,serif';wrap(x,p.t,38,96,W-70,70);
- x.font='400 38px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#2e221a';x.fillText(p.m,40,H-122);
- x.font='600 44px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#1c120c';x.fillText(p.p,40,H-70);
- x.font='600 27px Jost,Helvetica,Arial,sans-serif';x.fillStyle='#7a5a26';x.fillText('TAP TO ENQUIRE  →',40,H-28)})}
+ x.font='400 '+(D?42:38)+'px Jost,Helvetica,Arial,sans-serif';x.fillStyle=D?'#d9cfe8':'#2e221a';x.fillText(p.m,40,H-(D?126:122));
+ x.font='600 '+(D?47:44)+'px Jost,Helvetica,Arial,sans-serif';x.fillStyle=D?'#f3ecfb':'#1c120c';x.fillText(p.p,40,H-70);
+ x.font='600 '+(D?31:27)+'px Jost,Helvetica,Arial,sans-serif';x.fillStyle=D?'#e2c48e':'#7a5a26';x.fillText('TAP TO ENQUIRE  →',40,H-26)})}
 
 /* ---------- GL helpers ---------- */
 function texFrom(c,o){o=o||{};var t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
@@ -2548,24 +2548,24 @@ if(CLAY){[[Mx.floor,'#eccaa9',3.2,.78,.22],[Mx.marble,'#f3dcc6',1.8,.85,.3],[Mx.
    light, a sky ceiling, glowing seams and bead clusters. dream:[kind,strength,scale] picks the moving light drawn on a surface
    (backend.js, dreamGlow): 1 sheen, 2 floor rings, 3 gold circles on the frieze, 4 the collections star chart, 5 mother-of-pearl. dreamC tints the collections room. ---------- */
 var DPH=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);   // phones (the renderer's own test isn't ready yet here)
-if(DREAM){var dm=function(m,c,r,d,dc){m.col=lin(c);m.rough=r;m.metal=0;m.bump=Math.min(m.bump,.12);m.refl=0;if(d)m.dream=d;if(dc)m.dreamC=dc};
- dm(Mx.wall,'#5a5478',.82,[1,.05,.3],[.5,.46,.62]);      // dusky twilight plum; the collections room is deeper still
- dm(Mx.floor,'#26223a',.22,[2,.28],[.85,.85,.95]);        // a night lake with fine rings of light
+if(DREAM){var dm=function(m,c,r,d,dc){m.col=lin(c);m.rough=r;m.metal=0;m.bump=Math.min(m.bump,.12);m.refl=0;m.mist=1;if(d)m.dream=d;if(dc)m.dreamC=dc};
+ dm(Mx.wall,'#463f55',.85,[1,.04,.3],[.58,.54,.62]);      // deep, muted aubergine-plum (so the paintings are the richest colour); the collections room is deeper still
+ dm(Mx.floor,'#231f30',.22,[2,.1],[.85,.85,.95]);         // a night lake with faint rings of light
  dm(Mx.ceiling,'#17122c',.6,[4,1]);                       // deep vault; a slowly turning gold star chart over the collections
- dm(Mx.coffer,'#3b3160',.45,[5,.12]);                     // a dark mother-of-pearl lattice under the sky window
- dm(Mx.key,'#15112a',.5,[3,.55]);                         // large interlocking circles of fine gold that breathe and drift, instead of the Greek key
- dm(Mx.marble,'#d9d0e8',.3,[5,.1]);                       // moon pearl with a mother-of-pearl shimmer
- dm(Mx.tile,'#b9addb',.35);                               // cloud-glass terrace
+ dm(Mx.coffer,'#2a2340',.55,[5,.04]);                     // dark mother-of-pearl beams under the sky window
+ dm(Mx.key,'#15112a',.5,[3,.3]);                          // large interlocking circles of antique gold with a slow travelling wave of light, instead of the Greek key
+ dm(Mx.marble,'#b4adbd',.4,[5,.05]);Mx.marble.uvs=[3.2,3.2];   // soft moonstone (larger veins, so none visibly repeat)
+ dm(Mx.tile,'#cdc6c0',.35);                               // pale cloud-stone terrace
  Mx.gold.col=lin('#e7b8a4');Mx.gold.rough=.28;            // rose gold rails and rings (picture frames use other golds)
- Mx.colD=mat({col:'#e4dcf0',tex:TX.marble,rough:.28,uvs:[1.4,1.4],dream:[5,.14]});
+ Mx.colD=mat({col:'#ece6de',tex:TX.marble,rough:.3,uvs:[1.4,1.4],dream:[5,.07],mist:1});   // warm pearl columns
  Mx.skyWin=mat({isSky:1,unlit:1,win:1});
- Mx.seam=mat({col:'#d9c8ff',emis:[1.6,1.6,1.6],unlit:1});
- Mx.seamT=mat({col:'#ffdcae',emis:[2.4,2.4,2.4],unlit:1});
- Mx.orbA=mat({col:'#fff4e6',emis:[7,7,7],unlit:1,pulse:1});Mx.orbB=mat({col:'#ffd29a',emis:[8,8,8],unlit:1,pulse:1});Mx.orbC=mat({col:'#ffc4a8',emis:[7,7,7],unlit:1,pulse:1})}   // pearl, champagne and rose-gold light
+ Mx.seam=mat({col:'#e9d9bd',emis:[.7,.7,.7],unlit:1});   // a fine gilt edge catching the light, not a strip light
+ Mx.seamT=mat({col:'#ffdcae',emis:[1.1,1.1,1.1],unlit:1});
+ Mx.orbA=mat({col:'#fff1de',emis:[4,4,4],unlit:1,pulse:1});Mx.orbB=mat({col:'#ffdcb0',emis:[4.2,4.2,4.2],unlit:1,pulse:1});Mx.orbC=mat({col:'#ffe7c4',emis:[5,5,5],unlit:1,pulse:1})}   // champagne and pearl light
 function dreamFinish(){if(!DREAM||typeof COMPM==='undefined')return;var f=COMPM.fragmentShader;
  function r(a,b){if(f.indexOf(a)>=0)f=f.replace(a,b);else console.warn('dreamFinish: grade anchor not found')}
- r('c=mix(vec3(l),c,.88);','c=mix(vec3(l),c,1.06);c+=vec3(.016,.004,.03)*(1.-smoothstep(0.,.45,l));');   // a touch more colour, violet-lifted shadows
- r('c*=1.-dot(q,q)*.7;','c=mix(c,c*vec3(.5,.42,.78),min(1.,dot(q,q)*1.2));');                         // an indigo vignette instead of black
+ r('c=mix(vec3(l),c,.88);','c=mix(vec3(l),c,.96);c+=vec3(.006,.003,.010)*(1.-smoothstep(0.,.45,l));');   // natural colour, faintly violet shadows
+ r('c*=1.-dot(q,q)*.7;','c=mix(c,c*vec3(.6,.56,.68),min(1.,dot(q,q)*1.));');                          // a soft, near-neutral vignette
  COMPM.fragmentShader=f;COMPM.needsUpdate=true}
 // once the room is built: everything else gets a soft clay finish (no glaze, no mirror shine). Paintings, labels, lights and the sky keep theirs.
 function clayFinish(){if(!CLAY)return;var art=[];for(var k in ARTM)art.push(ARTM[k]);
@@ -2614,7 +2614,7 @@ function pedestal(x,z,h){if(CLAY||DREAM){PEDM=PEDM||(DREAM?Mx.marble:mat({col:li
   var R=.026,P=[[.335,0],[.335,.05],[.33,.056],[.305,.058],[.305,.075]].concat(pedRoll(.305,.075+R,R,-Math.PI/2,Math.PI/2,8),
    [[.272,.075+2*R+.004],[.268,.16],[.266,h/2],[.268,h-.16],[.272,h-.06-2*R-.004]],pedRoll(.3,h-.06-R,R,-Math.PI/2,Math.PI/2,8),
    [[.31,h-.06],[.31,h-.006],[.305,h],[.12,h+.002],[0,h+.002]]);
-  lathe(PEDM,B([x,0,z]),[0,0,0],P,64);if(DREAM){torus(Mx.seam,B([x,0,z]),[0,.04,0],.345,.007,64);torus(Mx.seam,B([x,0,z]),[0,h-.03,0],.318,.006,64)}   // the dream: pearl, with rings of light
+  lathe(PEDM,B([x,0,z]),[0,0,0],P,64);if(DREAM)torus(Mx.seam,B([x,0,z]),[0,.04,0],.345,.006,64);   // the dream: moonstone, with a fine gilt ring of light at the foot
   blob(x,z,.9,.9);return}
  lathe(Mx.marble,B([x,0,z]),[0,0,0],CLAY?[[.33,0],[.36,.03],[.37,.07],[.35,.11],[.29,.15],[.27,.2],[.27,h-.2],[.29,h-.15],[.35,h-.11],[.37,h-.07],[.36,h-.03],[.33,h],[0,h]]
  :[[.3,0],[.3,.06],[.24,.1],[.2,.16],[.2,h-.14],[.24,h-.1],[.3,h-.06],[.3,h],[0,h]],48);blob(x,z,.9,.9)}
@@ -2664,7 +2664,7 @@ rect(Mx.wall,XW,X0,0,RH,ZF,PZ1);rect(Mx.wall,XW,X0,0,RH,PZ0,ZB);rect(Mx.wall,XW,
 function trimRun(ax,f,sg,a0,a1,gaps){
  function R(m,d,y0,y1,b0,b1){var lo=Math.min(f,f+sg*d),hi=Math.max(f,f+sg*d);if(ax==='x')rect(m,lo,hi,y0,y1,b0,b1);else rect(m,b0,b1,y0,y1,lo,hi)}
  var segs=[[a0,a1]];(gaps||[]).forEach(function(g){var out=[];segs.forEach(function(q){if(g[1]<=q[0]||g[0]>=q[1]){out.push(q);return}if(g[0]>q[0])out.push([q[0],g[0]]);if(g[1]<q[1])out.push([g[1],q[1]])});segs=out});
- segs.forEach(function(q){R(Mx.marble,.025,0,.72,q[0],q[1]);R(DREAM?Mx.seam:Mx.gold,.035,.72,.75,q[0],q[1])});
+ segs.forEach(function(q){R(Mx.marble,.025,0,.72,q[0],q[1]);R(Mx.gold,.035,.72,.75,q[0],q[1])});
  R(Mx.key,.01,CT,CT+.3,a0,a1);R(Mx.marble,.14,CT+.3,CT+.42,a0,a1);R(Mx.marble,.06,CT-.06,CT,a0,a1)}
 var PGAP=[[PZ1-.21,PZ0+.21]];
 trimRun('x',X0,1,ZF,ZB,PGAP);trimRun('x',X1,-1,ZF,ZB);trimRun('z',ZB,-1,X0,X1);
@@ -2911,16 +2911,16 @@ function spaced(x,str,cx,y,sp){var ch=Array.from(str),w=-sp;ch.forEach(function(
 function rrect(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath()}
 var LOCKC=null;
 function lockedCanvas(){if(LOCKC)return LOCKC;var R=rnd;LOCKC=textCanvas(600,800,function(x,W,H){
- var g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#d6d2cc');g.addColorStop(.55,'#c4bfb8');g.addColorStop(1,'#b2aca4');x.fillStyle=g;x.fillRect(0,0,W,H);
- for(var i=0;i<W;i+=3){x.fillStyle='rgba(255,255,255,'+(.025+R()*.035).toFixed(3)+')';x.fillRect(i,0,1,H)}       // the weave of a primed canvas
+ var D=DREAM,g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,D?'#2e2840':'#d6d2cc');g.addColorStop(.55,D?'#262038':'#c4bfb8');g.addColorStop(1,D?'#1e1930':'#b2aca4');x.fillStyle=g;x.fillRect(0,0,W,H);
+ for(var i=0;i<W;i+=3){x.fillStyle='rgba(255,255,255,'+((.025+R()*.035)*(D?.4:1)).toFixed(3)+')';x.fillRect(i,0,1,H)}       // the weave of a primed canvas
  for(var j=0;j<H;j+=3){x.fillStyle='rgba(0,0,0,'+(.018+R()*.025).toFixed(3)+')';x.fillRect(0,j,W,1)}
  var vg=x.createRadialGradient(W/2,H*.45,W*.1,W/2,H/2,W*.85);vg.addColorStop(0,'rgba(255,255,255,.08)');vg.addColorStop(1,'rgba(0,0,0,.12)');x.fillStyle=vg;x.fillRect(0,0,W,H);
- var cx=W/2,cy=H*.43;x.fillStyle='rgba(251,249,245,.92)';x.beginPath();x.arc(cx,cy,92,0,7);x.fill();
- x.strokeStyle='#6c6359';x.lineWidth=12;x.lineCap='round';x.beginPath();x.moveTo(cx-25,cy-4);x.lineTo(cx-25,cy-28);x.arc(cx,cy-28,25,Math.PI,0);x.lineTo(cx+25,cy-4);x.stroke();
- x.fillStyle='#6c6359';rrect(x,cx-40,cy-8,80,62,11);x.fill();x.fillStyle='rgba(251,249,245,.95)';x.beginPath();x.arc(cx,cy+16,8,0,7);x.fill();x.fillRect(cx-3.5,cy+18,7,17);
- x.textAlign='center';x.fillStyle='#4f4840';x.font='500 42px Jost,Helvetica,Arial,sans-serif';spaced(x,'COMING SOON',cx,cy+170,9);
- x.font='italic 500 40px "Cormorant Garamond",Georgia,serif';x.fillStyle='#5c544b';x.fillText('in the studio',cx,cy+224)});return LOCKC}
-function lockedFrame(o,ry,w,h,f,ct){var b=B(o,ry),fm=Mx.gold24,ow=w/2,oh=h/2,zt=.045;
+ var cx=W/2,cy=H*.43;x.fillStyle=D?'rgba(233,217,189,.12)':'rgba(251,249,245,.92)';x.beginPath();x.arc(cx,cy,92,0,7);x.fill();
+ x.strokeStyle=D?'#e8d3a8':'#6c6359';x.lineWidth=12;x.lineCap='round';x.beginPath();x.moveTo(cx-25,cy-4);x.lineTo(cx-25,cy-28);x.arc(cx,cy-28,25,Math.PI,0);x.lineTo(cx+25,cy-4);x.stroke();
+ x.fillStyle=D?'#e8d3a8':'#6c6359';rrect(x,cx-40,cy-8,80,62,11);x.fill();x.fillStyle=D?'#2a2440':'rgba(251,249,245,.95)';x.beginPath();x.arc(cx,cy+16,8,0,7);x.fill();x.fillRect(cx-3.5,cy+18,7,17);
+ x.textAlign='center';x.fillStyle=D?'#e8d3a8':'#4f4840';x.font='500 42px Jost,Helvetica,Arial,sans-serif';spaced(x,'COMING SOON',cx,cy+170,9);
+ x.font='italic 500 40px "Cormorant Garamond",Georgia,serif';x.fillStyle=D?'#cdbb98':'#5c544b';x.fillText('in the studio',cx,cy+224)});return LOCKC}
+function lockedFrame(o,ry,w,h,f,ct){var b=B(o,ry),fm=DREAM?Mx.goldDark:Mx.gold24,ow=w/2,oh=h/2,zt=.045;
  box(fm,b,[0,oh+f/2,zt/2],[w+2*f,f,zt]);box(fm,b,[0,-oh-f/2,zt/2],[w+2*f,f,zt]);box(fm,b,[-ow-f/2,0,zt/2],[f,h,zt]);box(fm,b,[ow+f/2,0,zt/2],[f,h,zt]);
  function roll(x0,y0,x1,y1,z,r){var p0=bx(b,[x0,y0,z]),dir=v3.sub(bx(b,[x1,y1,z]),p0),L=Math.hypot(dir[0],dir[1],dir[2]);cyl(fm,aim(p0,dir),[0,0,0],r,L,12)}
  [[ow+f-.014,oh+f-.014,.014],[ow+f*.45,oh+f*.45,.007],[ow+.006,oh+.006,.006]].forEach(function(q){var X=q[0],Y=q[1],r=q[2];roll(-X-r,Y,X+r,Y,zt,r);roll(-X-r,-Y,X+r,-Y,zt,r);roll(-X,-Y-r,-X,Y+r,zt,r);roll(X,-Y-r,X,Y+r,zt,r)});
@@ -2929,12 +2929,12 @@ function lockedFrame(o,ry,w,h,f,ct){var b=B(o,ry),fm=Mx.gold24,ow=w/2,oh=h/2,zt=
  LABELS.push(function(){label(lockedCanvas(),c,ax,[0,1,0],w,h,n,{go:function(){},tip:'<i>Coming soon</i> · a new painting for '+esc(ct),far:14},{blend:0,rough:.85})})}
 function wallTitle(ci,t){return textCanvas(2048,300,function(x,W,H){x.textAlign='center';
  if(DREAM){x.font='600 54px Jost,Helvetica,Arial,sans-serif';var cw=x.measureText('COLLECTION '+roman(ci)).width+18*12+300;x.font='italic 600 158px "Cormorant Garamond",Georgia,serif';
-  var pw=Math.min(W-16,Math.max(cw,x.measureText(t).width)+140);x.fillStyle='rgba(16,10,36,.84)';rrect(x,(W-pw)/2,8,pw,H-16,46);x.fill()}
- x.fillStyle=DREAM?'#efe7ff':'#5a3d14';x.font='600 54px Jost,Helvetica,Arial,sans-serif';spaced(x,'COLLECTION '+roman(ci),W/2,64,18);
+  var pw=Math.min(W-16,Math.max(cw,x.measureText(t).width)+140);x.fillStyle='rgba(20,16,26,.6)';rrect(x,(W-pw)/2,8,pw,H-16,4);x.fill();x.strokeStyle='#b89a6a';x.lineWidth=2;x.stroke()}
+ x.fillStyle=DREAM?'#d9bf90':'#5a3d14';x.font='600 54px Jost,Helvetica,Arial,sans-serif';spaced(x,'COLLECTION '+roman(ci),W/2,64,18);
  var kw=x.measureText('COLLECTION '+roman(ci)).width+18*12;x.fillRect(W/2-kw/2-150,46,110,3);x.fillRect(W/2+kw/2+40,46,110,3);
- x.fillStyle=DREAM?'#fff8ee':'#24150c';x.font='italic 600 158px "Cormorant Garamond",Georgia,serif';x.fillText(t,W/2,234)})}
+ x.fillStyle=DREAM?'#efe5d2':'#24150c';x.font='italic 600 '+(DREAM?140:158)+'px "Cormorant Garamond",Georgia,serif';x.fillText(t,W/2,234)})}
 function carved(t,W,H,px,sp){return textCanvas(W,H,function(x){x.textAlign='center';x.textBaseline='middle';x.font='500 '+px+'px "Cormorant Garamond",Georgia,serif';
- if(DREAM){var tw=Math.min(W-96,x.measureText(t).width+sp*(t.length-1));x.fillStyle='rgba(16,10,36,.8)';rrect(x,(W-tw)/2-40,8,tw+80,H-16,30);x.fill()}
+ if(DREAM){var tw=Math.min(W-96,x.measureText(t).width+sp*(t.length-1));x.fillStyle='rgba(20,16,26,.7)';rrect(x,(W-tw)/2-40,8,tw+80,H-16,4);x.fill();x.strokeStyle='#b89a6a';x.lineWidth=2;x.stroke()}
  else{x.fillStyle='rgba(70,48,22,.55)';spaced(x,t,W/2+2,H/2+4,sp)}
  var g=x.createLinearGradient(0,H*.25,0,H*.75);if(DREAM){g.addColorStop(0,'#fff1c4');g.addColorStop(1,'#e8c27a')}else{g.addColorStop(0,'#f6dd96');g.addColorStop(.5,'#c99b45');g.addColorStop(1,'#8d6526')}x.fillStyle=g;spaced(x,t,W/2,H/2,sp)})}
 LABELS.push(function(){
@@ -3223,15 +3223,15 @@ if(!DREAM)[-1.6,-3.2,-4.8,-6.4,-8.0].forEach(function(z){[-1.6,1.6].concat(Math.
 // tiered crystal cascade chandelier with a brass crown, under a plaster ceiling rose (like Pam's living room)
 var ROSE=mat({col:'#f6f3ec',rough:.4});
 /* the dream: a cluster of glowing beads (a sphere of them, scattered like seeds) hung from a fine pearl rod, kept above every painting */
-function dreamCluster(cx,cz,n,lo,Rmax,lc){var R=Math.min(Rmax,(RH-.22-lo)/2);if(R<.12)return;var cy=lo+R,O=[Mx.orbA,Mx.orbB,Mx.orbC];
- for(var i=0;i<n;i++){var y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),a=i*2.39996,k=.55+.45*((i*37)%11)/10,s=.009+.011*((i*13)%7)/6;
+function dreamCluster(cx,cz,n,lo,Rmax,lc){var R=Math.min(Rmax,(RH-.22-lo)/2);if(R<.12)return;var cy=lo+R,O=[Mx.orbB,Mx.orbB,Mx.orbA];
+ for(var i=0;i<n;i++){var y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),a=i*2.39996,k=.55+.45*((i*37)%11)/10,s=.005+.004*((i*13)%7)/6;
   ell(O[i%3],B([cx+Math.cos(a)*r*R*k,cy+y*R*k,cz+Math.sin(a)*r*R*k]),[0,0,0],[s,s,s],8)}
- ell(Mx.orbC,B([cx,cy,cz]),[0,0,0],[.045,.045,.045],12);cyl(Mx.colD,B([cx,cy,cz]),[0,0,0],.004,RH-cy,6);LIGHTS.point.push({p:[cx,cy,cz],c:lc})}
+ ell(Mx.orbC,B([cx,cy,cz]),[0,0,0],[.025,.025,.025],12);cyl(Mx.colD,B([cx,cy,cz]),[0,0,0],.004,RH-cy,6);LIGHTS.point.push({p:[cx,cy,cz],c:lc})}
 var ARTTOP=ARTPOS.reduce(function(t,a){return Math.max(t,a.c[1]+a.h/2+.2)},0),COLTOP=CYC+.42;
 COLPOS.forEach(function(a){if(a)a.works.forEach(function(q){COLTOP=Math.max(COLTOP,q.c[1]+q.h/2)})});
-if(DREAM)dreamCluster(XM,-5,70,Math.max(2.55,COLTOP+.1),.3,[26,34,60]);
+if(DREAM)dreamCluster(XM,-5,110,Math.max(2.55,COLTOP+.1),.3,[32,27,24]);
 (function(){var cx=0,cz=-5.2,O=B([cx,0,cz]);
- if(DREAM){dreamCluster(cx,cz,110,Math.max(2.45,ARTTOP+.1),.36,[44,30,60]);return}
+ if(DREAM){dreamCluster(cx,cz,170,Math.max(2.45,ARTTOP+.1),.36,[46,38,32]);return}
  if(CLAY){ell(Mx.candle,O,[0,RH-.4,0],[.05,.08,.05],14);LIGHTS.point.push({p:[cx,RH-.4,cz],c:[60,48,34]});
   clayModel('chandelier-v1',function(lo,hi){return mm(mT(cx,RH+.01,cz),mS(1.0/(hi[1]-lo[1])),clayCentre(lo,hi,1))},{rough:.35,emis:[.22,.18,.13]});return}
  lathe(ROSE,B([cx,RH,cz]),[0,0,0],[[0,-.09],[.12,-.09],[.2,-.07],[.3,-.07],[.38,-.05],[.45,-.05],[.5,-.03],[.55,-.03],[.62,-.012],[.62,0],[0,0]],48);

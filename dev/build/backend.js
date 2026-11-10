@@ -24,7 +24,7 @@ var SHS=mobile||LOWGPU?2048:4096,RT={w:2,h:2},dirty=2;
 var SUN=v3.norm([-.6,.26,-.76]),SUNCOL=[4.4,3.6,2.7],SKY=lin('#eef0f2').map(function(v){return v*.44}),GROUND=lin('#8a6a52').map(function(v){return v*.2}),FAR=60,SKYSUN=v3.norm([-.6,.06,-.76]);
 var EXPOSURE=.95,BLOOMK=.022,BLOOMT=3.5,RAYK=1.,cam={x:0,y:1.62,z:-2.4,yaw:0,pitch:0,fov:1};
 var DRM=(typeof DREAM!=='undefined'&&DREAM);   // the dream look: a rose sun, lavender sky light, teal light from below, a softer, wider glow
-if(DRM){SUNCOL=[3.2,2.2,2.0];SKY=lin('#c9c0ea').map(function(v){return v*.4});GROUND=lin('#3a3456').map(function(v){return v*.2});BLOOMK=.07;BLOOMT=2.0;EXPOSURE=1.0}
+if(DRM){SUNCOL=[3.0,2.4,2.1];SKY=lin('#d0cbdc').map(function(v){return v*.26});GROUND=lin('#2c2830').map(function(v){return v*.18});BLOOMK=.035;BLOOMT=2.8;EXPOSURE=1.08}
 function fovFor(as){var deg=as>=1.2?46:as>=.8?54:64;return deg*Math.PI/180}   // vertical field of view, like a 35-50mm film lens
 function camDir(){var cp=Math.cos(cam.pitch);return[-Math.sin(cam.yaw)*cp,Math.sin(cam.pitch),-Math.cos(cam.yaw)*cp]}
 
@@ -44,11 +44,11 @@ var SKYM=new THREE.ShaderMaterial({uniforms:{uSecs:G3.uSecs,uFar:G3.uFar,uDomeC:
    turning once every 17 minutes; a still mirror lake below. SKYW draws the same sky through the welcome hall's ceiling. */
 var DSKY='vec3 dpal(float t){return .5+.5*cos(6.2832*(t+vec3(0.,.33,.67)));}\n'+
  'vec3 dreamSky(vec3 d){vec3 c=skyCol(d);float e=max(d.y,0.);\n'+
- ' float az=atan(d.x,-d.z)+uSecs*.006;az=abs(mod(az,.7854)-.3927);vec2 p=vec2(cos(az),sin(az))*(1.-e)*2.6;\n'+
+ ' float az=atan(d.x,-d.z)+uSecs*.003;az=abs(mod(az,1.5708)-.7854);vec2 p=vec2(cos(az),sin(az))*(1.-e)*2.6;\n'+
  ' float w=fb3(p*1.3+vec2(uSecs*.01,0.))*4.;vec2 q=p+vec2(sin(w),cos(w))*.35;float n1=fb3(q*2.2);\n'+
  '#ifndef DLITE\n n1=n1*.7+fb3(q*4.7+3.)*.3;\n#endif\n'+
- ' vec3 ink=mix(vec3(.85,.78,1.),dpal(n1*1.3+uSecs*.0042),.45);float fil=pow(.5+.5*sin(n1*42.),10.);float m=smoothstep(.04,.3,e);\n'+
- ' c+=ink*smoothstep(.4,.76,n1)*.45*m+ink*fil*.2*m;return c;}\n'+
+ ' vec3 ink=mix(vec3(.85,.78,1.),dpal(n1*1.3+uSecs*.0042),.18);float fil=pow(.5+.5*sin(n1*22.),10.);float m=smoothstep(.04,.3,e)*smoothstep(.12,.4,acos(clamp(dot(d,normalize(vec3(-.45,.2,-.87))),-1.,1.)));\n'+
+ ' c+=ink*smoothstep(.4,.76,n1)*.28*m+ink*fil*.06*m;return c;}\n'+
  'vec3 dreamSea(vec3 d){float e=-d.y;vec2 sp=d.xz/(e+.004);float rp=sin(length(sp-vec2(0.,-30.))*.8-uSecs*.6)*.004*smoothstep(0.,.2,e);\n'+
  ' vec3 c=dreamSky(normalize(vec3(d.x+rp,max(e,.003),d.z)))*.55;return mix(c,skyBase(vec3(d.x,0.,d.z))*.9,smoothstep(.06,0.,e)*.5);}\n';
 var SKYD=null,SKYW=null;
@@ -56,12 +56,13 @@ if(DRM){var skyHead='uniform float uSecs,uFar,uPass;uniform vec3 uDomeC;varying 
  SKYD=new THREE.ShaderMaterial({uniforms:SKYM.uniforms,side:THREE.DoubleSide,defines:mobile||LOWGPU?{DLITE:''}:{},vertexShader:SKYM.vertexShader,
   fragmentShader:skyHead+'void main(){if(uPass>.5&&uPass<1.5&&vW.y<0.)discard;vec3 d=normalize(vW-uDomeC);vec3 c=(d.y>=0.?dreamSky(d):dreamSea(d))*.85;gl_FragColor=vec4(c,length(vW-cameraPosition)/uFar);}'});
  SKYW=new THREE.ShaderMaterial({uniforms:SKYM.uniforms,side:THREE.DoubleSide,defines:mobile||LOWGPU?{DLITE:''}:{},vertexShader:SKYM.vertexShader,
-  fragmentShader:skyHead+'void main(){vec3 r=vW-cameraPosition;vec2 q=vW.xz-vec2(0.,-5.2);float rr=length(q),a=atan(q.y,q.x)+uSecs*.008;\n'+
-   ' vec3 c=mix(vec3(.045,.036,.10),vec3(.014,.011,.04),smoothstep(0.,5.,rr));float nb=fb3(q*.35+vec2(uSecs*.006,0.));c+=vec3(.10,.06,.2)*smoothstep(.45,.85,nb);\n'+
+  fragmentShader:skyHead+'void main(){vec3 r=vW-cameraPosition,rd=normalize(r);vec2 q=vW.xz-vec2(0.,-5.2),sq=rd.xz/max(rd.y,.05);float rr=length(q),a=atan(q.y,q.x)+uSecs*.008;\n'+
+   ' vec3 c=mix(vec3(.04,.032,.085),vec3(.012,.01,.035),smoothstep(0.,2.5,length(sq)));float nb=fb3(sq*.6+vec2(uSecs*.004,0.)),nb2=fb3(sq*1.3-vec2(0.,uSecs*.003));c+=vec3(.16,.09,.30)*smoothstep(.45,.85,nb)*(.6+.4*nb2);\n'+
    ' float sg=.5236,af=abs(mod(a,sg)-sg*.5);vec2 b=vec2(cos(af),sin(af))*rr/.42;float j0=floor(b.y/.866),i0=floor(b.x-.5*j0),R=1.+.04*sin(uSecs*.2),ln=9.;\n'+
    ' for(int dj=-1;dj<=2;dj++)for(int di=-1;di<=2;di++){float jj=j0+float(dj),ii=i0+float(di);vec2 cc=vec2(ii+.5*jj,.866*jj);ln=min(ln,abs(length(b-cc)-R));}\n'+
-   ' float aw=fwidth(ln)*1.1+.012;c+=vec3(1.,.8,.5)*smoothstep(aw,0.,ln)*.55*smoothstep(4.6,1.,rr);c+=vec3(1.,.82,.55)*.18*exp(-rr*1.4);\n'+
-   ' vec2 g=floor(q*13.),f=fract(q*13.)-.5;float h=hsh(g);float st=step(.86,h)*smoothstep(.07,.0,length(f-(vec2(hsh(g+3.1),hsh(g+7.7))-.5)*.6));\n'+
+   ' float aw=fwidth(ln)*1.1+.012;c+=vec3(.86,.66,.4)*smoothstep(aw,0.,ln)*.3*smoothstep(1.9,.5,rr)*(1.-smoothstep(.18,.5,length(fwidth(b))));c+=vec3(1.,.82,.55)*.12*exp(-rr*1.6);\n'+
+   ' vec2 g=floor(sq*13.),f=fract(sq*13.)-.5;float h=hsh(g);float st=step(.88,h)*smoothstep(.07,.0,length(f-(vec2(hsh(g+3.1),hsh(g+7.7))-.5)*.6));\n'+
+   ' vec2 g2=floor(sq*31.),f2=fract(sq*31.)-.5;float h2=hsh(g2+19.);st+=step(.9,h2)*smoothstep(.09,.0,length(f2))*.35;\n'+
    ' c+=vec3(1.,.95,.88)*st*(.55+.45*sin(uSecs*(.4+h)+h*30.));gl_FragColor=vec4(c,length(r)/uFar);}'})}
 
 /* paintings and plaques show their true colours, untouched by the grade */
@@ -90,13 +91,13 @@ var DFLOW='vec3 dpal(float t){return .5+.5*cos(6.2832*(t+vec3(0.,.33,.67)));}\n'
  ' e=mix(vec3(.8,.76,.95),dpal(w*.22+(p.x+p.z)*.03+p.y*.05+uSecs*.01),.5)*(.55+.45*w)*(.3+fr*fr)*uDK;if(p.y>.55&&p.y<2.95)e*=.35;\n'+
  '#elif DREAM_FLOW==2\n'+   // rings of light spreading slowly across the floor from under each bead cluster
  ' float d1=length(p.xz-vec2(0.,-5.2)),d2=length(p.xz-vec2('+XM.toFixed(3)+',-5.));\n'+
- ' float r=pow(.5+.5*sin(d1*4.-uSecs*.22),24.)*smoothstep(6.,1.,d1)+pow(.5+.5*sin(d2*4.-uSecs*.22),24.)*smoothstep(5.,1.,d2);\n'+
- ' e=mix(vec3(1.,.82,.55),vec3(.75,.68,1.),.5+.5*sin(d1*.7+d2*.5))*r*uDK;\n'+
+ ' float r=pow(.5+.5*sin(d1*4.-uSecs*.22),12.)*smoothstep(3.5,.8,d1)+pow(.5+.5*sin(d2*4.-uSecs*.22),12.)*smoothstep(3.,.8,d2);\n'+
+ ' e=mix(vec3(1.,.85,.62),vec3(.8,.74,.95),.25)*r*uDK;\n'+
  '#elif DREAM_FLOW==3\n'+   // the frieze: interlocking circles of fine gold (sacred geometry) that breathe and drift slowly round the room
- ' vec2 b=vec2(p.x+p.z+uSecs*.015,p.y-'+CT.toFixed(3)+')/.15;float j0=floor(b.y/.866),i0=floor(b.x-.5*j0),R=1.+.06*sin(uSecs*.25),ln=9.;\n'+
+ ' vec2 b=vec2(p.x+p.z+uSecs*.012,p.y-'+CT.toFixed(3)+')/.32;float j0=floor(b.y/.866),i0=floor(b.x-.5*j0),R=1.+.06*sin(uSecs*.25),ln=9.;\n'+
  ' for(int dj=-1;dj<=2;dj++)for(int di=-1;di<=2;di++){float jj=j0+float(dj),ii=i0+float(di);vec2 c=vec2(ii+.5*jj,.866*jj);ln=min(ln,abs(length(b-c)-R));}\n'+
- ' float aw=fwidth(ln)*1.1+.012,line=smoothstep(aw,0.,ln);vec3 gc=mix(vec3(1.,.8,.5),vec3(1.,.9,.75),.5+.5*sin(uSecs*.07+b.x*.05));\n'+
- ' e=gc*(line*1.1+.025)*uDK;\n'+
+ ' float aw=fwidth(ln)*1.1+.012,line=smoothstep(aw,0.,ln)*(1.-smoothstep(.18,.5,length(fwidth(b))));line*=.12+.88*smoothstep(.35,1.,.5+.5*sin(b.x*.09-uSecs*.07));\n'+
+ ' e=vec3(.86,.64,.36)*line*.9*uDK;\n'+
  '#elif DREAM_FLOW==5\n'+   // mother-of-pearl: a soft, pale shimmer that shifts with the angle you look from
  ' float fr=1.-abs(dot(n,v));float t=fr*1.6+(p.x+p.y+p.z)*.08+uSecs*.008;e=mix(vec3(.85,.82,.95),dpal(t),.35)*(.25+fr*fr)*uDK;\n'+
  '#elif DREAM_FLOW==4\n'+   // the collections room: a gold star chart turning slowly round Pam's spiral sun
@@ -108,7 +109,7 @@ var DFLOW='vec3 dpal(float t){return .5+.5*cos(6.2832*(t+vec3(0.,.33,.67)));}\n'
  '#endif\n'+
  ' return e*k;}\n';
 var HEADF='varying vec3 vWPos;\nuniform float uPass,uFar,uRH,uEnvD;uniform vec4 uRoom;uniform vec2 uRes;\n'+
- '#if defined(DREAM_FLOW)||defined(DREAM_PULSE)\nuniform float uSecs,uCalm;\n#endif\n#ifdef DREAM_FLOW\nuniform float uDK,uDS;uniform vec3 uDC;\n'+DFLOW+'#endif\n'+
+ '#if defined(DREAM_FLOW)||defined(DREAM_PULSE)||defined(DREAM_MIST)\nuniform float uSecs,uCalm;\n#endif\n#ifdef DREAM_FLOW\nuniform float uDK,uDS;uniform vec3 uDC;\n'+DFLOW+'#endif\n'+
  '#ifdef PLANAR_REFL\nuniform sampler2D uReflTex;uniform float uReflAmt;\n#endif\n'+
  '#ifdef WALK_FOG\nuniform float uFog;\n'+SKYBASE+'\n#endif\n'+ROOMAO;
 var NBEGIN='float faceDirection=dot(vNormal,vViewPosition)>=0.?1.:-1.;\nvec3 normal=normalize(vNormal)*faceDirection;\nvec3 nonPerturbedNormal=normal;\n';
@@ -121,13 +122,14 @@ var REFLF='#ifdef PLANAR_REFL\n{vec3 wn=inverseTransformDirection(normal,viewMat
 var AOF='#ifdef STANDARD\n{vec3 wN=inverseTransformDirection(normal,viewMatrix);float rao=roomAO(vWPos,wN);reflectedLight.indirectDiffuse*=rao;reflectedLight.indirectSpecular*=mix(1.,rao,.7);\n'+
  ' #ifdef USE_CLEARCOAT\n clearcoatSpecularIndirect*=mix(1.,rao,.7);\n #endif\n}\n#endif\n';
 var METF='#if defined(RE_IndirectSpecular)\n{vec3 Rw=inverseTransformDirection(reflect(-geometryViewDir,geometryNormal),viewMatrix);radiance*=mix(1.,mix(.22,1.3,smoothstep(-.35,.8,Rw.y)),metalnessFactor);}\n#endif\n';
+var MISTF='#ifdef DREAM_MIST\n{float dd=length(vWPos-cameraPosition);float fm=(1.-exp(-dd*.045))*.45;float gm=exp(-max(vWPos.y,0.)*2.4)*(.6+.4*sin(vWPos.x*.7+uSecs*.05)*sin(vWPos.z*.6-uSecs*.04))*.09;gl_FragColor.rgb=mix(gl_FragColor.rgb,vec3(.16,.12,.24),clamp(fm+gm,0.,.5));}\n#endif\n';
 var FOGF='#ifdef WALK_FOG\n{vec3 hz=skyBase(normalize(vec3(vWPos.x,max(vWPos.y,0.)*.3,vWPos.z+10.)))*.92;gl_FragColor.rgb=mix(gl_FragColor.rgb,hz,uFog*smoothstep(4.,60.,length(vWPos-cameraPosition)));}\n#endif\n';
 var SUNCUT=THREE.ShaderChunk.lights_fragment_begin.replace('getDirectionalLightInfo( directionalLight, directLight );','getDirectionalLightInfo( directionalLight, directLight );\n\t\tdirectLight.color*=sunIn(vWPos);');
 function patchShader(sh,extra){var U=sh.uniforms;U.uPass=G3.uPass;U.uFar=G3.uFar;U.uRH=G3.uRH;U.uRoom=G3.uRoom;U.uRes=G3.uRes;U.uReflTex=G3.uReflTex;U.uEnvD=G3.uEnvD;U.uSecs=G3.uSecs;U.uCalm=G3.uCalm;for(var k in extra)U[k]=extra[k];
  sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vWPos;').replace('#include <project_vertex>','#include <project_vertex>\nvWPos=(modelMatrix*vec4(transformed,1.)).xyz;');
  sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\n'+HEADF)
   .replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(uPass>.5&&uPass<1.5&&vWPos.y<.002)discard;')
-  .replace('#include <color_fragment>','#include <color_fragment>\n#ifdef DREAM_FLOW\nif(vWPos.x<uRoom.x-.1)diffuseColor.rgb*=uDC;\n#endif\n')
+  .replace('#include <color_fragment>','#include <color_fragment>\n#ifdef DREAM_FLOW\nif(vWPos.x<uRoom.x-.1)diffuseColor.rgb*=uDC;\n#if DREAM_FLOW==1\ndiffuseColor.rgb*=mix(1.,.55,smoothstep(1.9,uRH,vWPos.y));\n#endif\n#endif\n')
   .replace('#include <normal_fragment_begin>',NBEGIN)
   .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n#ifdef DREAM_FLOW\ntotalEmissiveRadiance+=dreamGlow(vWPos,normal,normalize(vViewPosition));\n#endif\n')
   .replace('#include <bumpmap_pars_fragment>',BUMPF)
@@ -136,7 +138,7 @@ function patchShader(sh,extra){var U=sh.uniforms;U.uPass=G3.uPass;U.uFar=G3.uFar
   .replace('#include <lights_fragment_end>',REFLF+'#include <lights_fragment_end>')
   .replace('#include <aomap_fragment>','#include <aomap_fragment>\n'+AOF)
   .replace('#include <opaque_fragment>','#include <opaque_fragment>\n#ifdef OPAQUE\ngl_FragColor.a=length(vWPos-cameraPosition)/uFar;\n#endif\n')
-  .replace('#include <dithering_fragment>','#include <dithering_fragment>\n#ifdef DREAM_PULSE\ngl_FragColor.rgb*=.8+.2*sin(uSecs*.8+vWPos.y*7.+vWPos.x*3.);\n#endif\n'+FOGF+'if(uPass>1.5)gl_FragColor.rgb=min(gl_FragColor.rgb,vec3(4.));\n')}
+  .replace('#include <dithering_fragment>','#include <dithering_fragment>\n#ifdef DREAM_PULSE\ngl_FragColor.rgb*=.8+.2*sin(uSecs*.8+vWPos.y*7.+vWPos.x*3.);\n#endif\n'+MISTF+FOGF+'if(uPass>1.5)gl_FragColor.rgb=min(gl_FragColor.rgb,vec3(4.));\n')}
 function mkBC(extra){return function(sh){patchShader(sh,extra)}}
 function blendOpts(m,o){if(!m.blend)return;o.transparent=true;o.opacity=m.alpha;o.depthWrite=false;o.polygonOffset=true;o.polygonOffsetFactor=-1;o.polygonOffsetUnits=-4;
  o.blending=THREE.CustomBlending;o.blendSrc=THREE.SrcAlphaFactor;o.blendDst=THREE.OneMinusSrcAlphaFactor;o.blendSrcAlpha=THREE.ZeroFactor;o.blendDstAlpha=THREE.OneFactor}
@@ -155,6 +157,7 @@ function mat3(m,env){
  var ex={};
  if(m.refl){M.defines.PLANAR_REFL='';ex.uReflAmt={value:m.refl};REFLU.push([m,ex.uReflAmt])}
  if(m.fog){M.defines.WALK_FOG='';ex.uFog={value:m.fog}}
+ if(m.mist&&DRM)M.defines.DREAM_MIST='';
  if(m.dream){M.defines.DREAM_FLOW=m.dream[0];ex.uDK={value:m.dream[1]};ex.uDS={value:m.dream[2]||.35};ex.uDC={value:new THREE.Vector3().fromArray(m.dreamC||[1,1,1])}}
  M.onBeforeCompile=mkBC(ex);return M}
 
