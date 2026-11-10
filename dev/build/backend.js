@@ -114,7 +114,7 @@ function splitIO(v){var n=v.length/24,fl=new Uint8Array(n),nb=0,t;for(t=0;t<n;t+
 var HEMI=null,ENVPH=null,ENVINM=[],ENVOUTM=[],REFLHIDE=[],BLENDL=[],DYNL=[],LIT=false,ENVRT={},PM=null,cubeRT=null,cubeCam=null,envAt=0;
 function build3(m){var v=new Float32Array(m.v);m.v=null;m._3=[];
  var parts=(m.isSky||m.art||m.unlit||m.blend||m.flat)?[[v,0]]:splitIO(v);
- parts.forEach(function(pv){if(!pv[0].length)return;var M=mat3(m,ENVPH);if(M.isMeshStandardMaterial)(pv[1]?ENVOUTM:ENVINM).push(M);
+ parts.forEach(function(pv){if(!pv[0].length)return;var M=mat3(m,ENVPH);if(M.isMeshStandardMaterial){(pv[1]?ENVOUTM:ENVINM).push(M);var er=ENVRT[pv[1]?'out':'in'];if(er)M.envMap=er.texture}
   var x=new THREE.Mesh(geoFrom(pv[0]),M);x.matrixAutoUpdate=false;
   x.castShadow=!m.blend&&!m.isSky&&!m.unlit&&!m.art&&!m.flat&&NOSHADOW.indexOf(m)<0;x.receiveShadow=!m.isSky&&!m.unlit&&!m.art;
   if(m.refl||m===Mx.blob||m===Mx.seaPlane)REFLHIDE.push(x);if(m.blend)BLENDL.push([m,x]);
