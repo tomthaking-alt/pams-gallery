@@ -93,7 +93,7 @@ function mat3(m,env){
  var e=m.emis,em=Math.max(e[0],e[1],e[2]),M,o;
  if(m.unlit||m.flat){o={color:m.flat?c3([0,0,0]):c3([m.col[0]*e[0],m.col[1]*e[1],m.col[2]*e[2]]),side:THREE.DoubleSide};if(m.tex)o.map=m.tex;blendOpts(m,o);M=new THREE.MeshBasicMaterial(o);M.onBeforeCompile=mkBC({});return M}
  o={color:c3(m.col),roughness:Math.max(.035,m.rough),metalness:m.metal,side:THREE.DoubleSide,envMap:env,envMapIntensity:m.envK||1};
- if(m.tex)o.map=m.tex;
+ if(m.tex)o.map=m.tex;if(m.cut)o.alphaTest=m.cut;   /* cut-out pictures (clay frames): see-through where the picture is clear */
  if(m.bump>0){o.bumpMap=m.htex||m.tex;o.bumpScale=m.bump*.02}
  if(em>0){o.emissive=c3([e[0]/em,e[1]/em,e[2]/em]);o.emissiveIntensity=em}
  blendOpts(m,o);
