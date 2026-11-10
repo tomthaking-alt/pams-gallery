@@ -84,6 +84,8 @@ rep('if(ema>26&&!window.__fixedQuality&&degrade())ema=18', 'if(ema>26&&!window._
 # ---- no stray raw-GL calls may remain
 left = [m.start() for m in re.finditer(r'\bgl\.(?!getExtension|getParameter)', s)]
 assert not left, [s[k-60:k+60] for k in left[:5]]
+if '--dream' in sys.argv:   # the dream-look preview build
+    rep('var DREAM_DEFAULT=false;', 'var DREAM_DEFAULT=true;')
 if '--lab' in sys.argv:
     rep('<meta charset="utf-8">', '<meta charset="utf-8">\n<meta name="robots" content="noindex">')
 open(out, 'w').write(s)
