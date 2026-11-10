@@ -129,7 +129,6 @@ function hideDyn(){DYNL.forEach(function(d){d.pool.forEach(function(x){x.visible
 function upgradeMats(){
  Mx.floor.x3={clearcoat:.65,clearcoatRoughness:.035};Mx.floor.rough=.3;Mx.floor.refl=.9;            // honed marble under a polished glaze
  Mx.marble.x3={clearcoat:.3,clearcoatRoughness:.12};                                                  // polished columns and balustrade
- STAT.x3={clearcoat:.35,clearcoatRoughness:.1,sheen:.25,sheenRoughness:.6,sheenColor:c3([.9,.86,.8])};
  Mx.crystal.x3={ior:2.1,specularIntensity:1,iridescence:.22,iridescenceIOR:1.5,iridescenceThicknessRange:[180,520]};Mx.crystal.rough=.07;Mx.crystal.metal=0;Mx.crystal.envK=2.;Mx.crystal.col=[.32,.32,.35];Mx.crystal.emis=[.28,.26,.22];   // clear glass: almost no diffuse, all sparkle and reflection
  [Mx.gold,Mx.gold24,Mx.steel].forEach(function(m){m.envK=1.25});
  Mx.blob.flat=1;
