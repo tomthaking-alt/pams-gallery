@@ -8,7 +8,7 @@ mkdir -p "$OUT" "$REPO/lib" "$REPO/api"
 python3 "$DEV/build/mk3.py" "$DEV/src/House of Pam.html" "$OUT/full.html" >/dev/null           # the gallery page with three.js
 rm -rf "$OUT/lib2"; python3 "$DEV/build/split4.py" "$OUT/full.html" "$OUT/index.html" "$OUT/lib2" > "$OUT/split.log"   # pictures out into files (watermarks, copyright)
 NEW=0; for f in "$OUT"/lib2/*; do b=$(basename "$f"); [ -e "$REPO/lib/$b" ] || { cp "$f" "$REPO/lib/"; NEW=$((NEW+1)); }; done; echo "new pictures: $NEW"
-for f in "$DEV"/src/film/*; do [ -e "$REPO/lib/$(basename "$f")" ] || cp "$f" "$REPO/lib/"; done   # opening films (made by dev/build/film.sh)
+for f in "$DEV"/src/film/* "$DEV"/src/clay/*; do [ -e "$REPO/lib/$(basename "$f")" ] || cp "$f" "$REPO/lib/"; done   # opening films (made by dev/build/film.sh) and clay pictures
 python3 "$DEV/build/fill4.py" "$OUT/index.html" "$DEV/api/app.src.js" "$OUT/app.js" >/dev/null && node --check "$OUT/app.js"   # catalogue of built-in works into the server
 python3 "$DEV/build/webp.py" "$OUT/app.js" "$REPO/lib"                                          # smaller WebP copies
 CARD=$(python3 "$DEV/build/sharecard.py" "$OUT/app.js" "$OUT/lib2"); cp -n "$OUT/lib2/$(basename "$CARD")" "$REPO/lib/" 2>/dev/null || true
