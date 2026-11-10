@@ -2526,18 +2526,21 @@ var Mx={
    for each part of the room; gold becomes gold-painted clay. Pam's paintings stay exactly as they are. Set before the room is built,
    because the texture scale is fixed when the walls and floor are made. ---------- */
 var CLAY=!!MATIMG.clay,CLAYT=CLAY?texFrom(MATIMG.clay):null,CLAYH=CLAY&&MATIMG.clayH?texFrom(MATIMG.clayH,{lin:1}):null;
-if(CLAY){[[Mx.floor,'#eecbad',3.2,.8,.45],[Mx.marble,'#f3dcc6',1.8,.85,.5],[Mx.wall,'#efccb0',3,.9,.55],[Mx.ceiling,'#f1d9c2',2.8,.88,.4],[Mx.coffer,'#ebcdb2',2.2,.88,.4],
+/* the leaf-headed figure on the balcony: Pam asked for him to be removed (November 2026). Set to true to bring him back. */
+var CREATURE=false;
+if(CLAY){[[Mx.floor,'#f5d6bf',3.2,.8,.45],[Mx.marble,'#f3dcc6',1.8,.85,.5],[Mx.wall,'#efccb0',3,.9,.55],[Mx.ceiling,'#f1d9c2',2.8,.88,.4],[Mx.coffer,'#ebcdb2',2.2,.88,.4],
   [Mx.key,'#e6cba8',1.6,.85,.4],[Mx.ivory,'#efdcbe',1.6,.8,.4],[Mx.ivoryDark,'#d2b38a',1.6,.82,.4],[Mx.tile,'#d9b48f',3.2,.8,.45],[Mx.whiteLac,'#f1e0c6',1.6,.8,.35]]
   .forEach(function(q){var m=q[0];m.tex=CLAYT;m.htex=CLAYH;m.col=lin(q[1]);m.uvs=[q[2],q[2]];m.rough=q[3];m.bump=q[4];m.refl=0;m.metal=0;m.unit=0});
- [Mx.gold,Mx.gold24,Mx.decoGold,Mx.brass,Mx.steel].forEach(function(m){m.col=lin('#e8b54c');m.rough=.42;m.metal=.3;m.tex=CLAYT;m.htex=CLAYH;m.bump=.35;m.unit=0;m.uvs=[.6,.6]});   // gold-painted clay
+ [Mx.gold,Mx.gold24,Mx.decoGold,Mx.brass,Mx.steel].forEach(function(m){m.col=lin('#e8b54c');m.rough=.55;m.metal=.15;m.tex=CLAYT;m.htex=CLAYH;m.bump=.8;m.unit=0;m.uvs=[.35,.35]});   // gold-painted clay, thumbprints and all
  Mx.goldDark.col=lin('#a87a2c');Mx.goldDark.metal=.25;Mx.goldDark.rough=.55}
 // once the room is built: everything else gets a soft clay finish (no glaze, no mirror shine). Paintings, labels, lights and the sky keep theirs.
 function clayFinish(){if(!CLAY)return;var art=[];for(var k in ARTM)art.push(ARTM[k]);
  // the colour of the whole picture: warm and rich, like a stop-motion set under studio lamps (instead of the cool, softened marble look)
- if(typeof COMPM!=='undefined'&&COMPM.fragmentShader.indexOf('c=mix(vec3(l),c,.88);')>=0){COMPM.fragmentShader=COMPM.fragmentShader.replace('c=mix(vec3(l),c,.88);','c=mix(vec3(l),c,1.2);c*=vec3(1.03,.985,.94)*1.16;c=mix(c,c*c*(3.-2.*c),.18);');COMPM.fragmentShader=COMPM.fragmentShader.replace('c*=1.-dot(q,q)*.7;','c*=1.-dot(q,q)*.32;');COMPM.needsUpdate=true}
+ if(typeof COMPM!=='undefined'&&COMPM.fragmentShader.indexOf('c=mix(vec3(l),c,.88);')>=0){COMPM.fragmentShader=COMPM.fragmentShader.replace('c=mix(vec3(l),c,.88);','c=mix(vec3(l),c,1.15);c*=vec3(1.035,.965,.965)*1.22;c=mix(c,c*c*(3.-2.*c),.18);');COMPM.fragmentShader=COMPM.fragmentShader.replace('c*=1.-dot(q,q)*.7;','c*=1.-dot(q,q)*.32;');COMPM.needsUpdate=true}
  // the leaf-headed figure on the balcony: warm beige clay with the veins pressed in, as in Pam's sculpture photo (body, leaves and cloth alike)
  ['torso','neck','head','uarm','farm','hand','handG','thigh','shin','foot'].forEach(function(k){CR[k].forEach(function(m){if(m.clay)return;m.clay=1;
-  m.col=lin(m.tex===CRT.lf?'#fbe6c4':'#f0dcbc');m.rough=.82;m.bump=Math.max(m.bump,.6)*1.3;m.emis=[.02,.015,.01]})});
+  var leaf=m.tex===CRT.lf;if(!leaf&&CLAYT){m.tex=CLAYT;m.htex=CLAYH;m.bump=.9}else m.bump=Math.max(m.bump,.6)*1.3;
+  m.col=lin(leaf?'#f6dfbb':'#ecd2ad');m.rough=.85;m.emis=[.015,.011,.008]})});
  MATS.concat(WALKM).forEach(function(m){if(art.indexOf(m)>=0||m.art||m.isSky||m.unlit||m.blend||m.flat)return;var e=m.emis||[0,0,0];if(e[0]+e[1]+e[2]>0)return;
   m.refl=0;m.rough=Math.max(m.rough,m.metal>.5?.48:.7);m.metal=Math.min(m.metal,.35);
   if(!m.unit&&!m.htex&&m.bump<.3&&CLAYH){m.htex=CLAYH;m.bump=.3}})}
@@ -2570,7 +2573,7 @@ function amphora(x,y,z,s){var b=B([x,y,z]),pr=[[0,0],[.06,0],[.07,.02],[.05,.06]
  lathe(Mx.amph,b,[0,0,0],pr,48);
  [-1,1].forEach(function(sd){torus(Mx.amph,{o:bx(b,[sd*.1*s,.6*s,0]),x:[1,0,0],y:[0,0,1],z:[0,-1,0]},[0,0,0],.075*s,.012*s,24)});
  blob(x,z,.5*s,.5*s)}
-function pedestal(x,z,h){if(CLAY){clayModel('pedestal-v1',function(lo,hi){return mm(mT(x,0,z),mS(h/(hi[1]-lo[1])),clayCentre(lo,hi))},{rough:.85});blob(x,z,.9,.9);return}
+function pedestal(x,z,h){if(CLAY){clayModel('pedestal-v1',function(lo,hi){return mm(mT(x,0,z),mS(h/(hi[1]-lo[1])),clayCentre(lo,hi))},{rough:.85,col:[1.3,1.18,1.1]});blob(x,z,.9,.9);return}
  lathe(Mx.marble,B([x,0,z]),[0,0,0],CLAY?[[.33,0],[.36,.03],[.37,.07],[.35,.11],[.29,.15],[.27,.2],[.27,h-.2],[.29,h-.15],[.35,h-.11],[.37,h-.07],[.36,h-.03],[.33,h],[0,h]]
  :[[.3,0],[.3,.06],[.24,.1],[.2,.16],[.2,h-.14],[.24,h-.1],[.3,h-.06],[.3,h],[0,h]],48);blob(x,z,.9,.9)}
 function olive(x,z,s){s=s||1;lathe(Mx.terracotta,B([x,0,z]),[0,0,0],[[0,0],[.22*s,0],[.3*s,.55*s],[.31*s,.58*s],[0,.58*s]],32);blob(x,z,.9*s,.9*s);
@@ -2650,6 +2653,7 @@ HL.cols.forEach(function(q){column(q[0],q[1],CT,.22)});
 // balcony: travertine paving and a white marble balustrade with carved balusters, piers and urns
 var BX0=X0-.4,BX1=X1+.4;
 rect(Mx.tile,BX0,BX1,-.3,0,BAL-.1,ZF-.05);
+if(CLAY&&CREATURE)rect(Mx.tile,BX0-7,BX1+7,-.3,0,BAL-2.4,BAL-.1);   // clay: a ledge beyond the rail for the leaf-headed figure to walk along
 (function(){var yr=.98,bal=[[0,0],[.05,0],[.05,.04],[.034,.06],[.04,.1],[.068,.2],[.078,.32],[.06,.46],[.034,.58],[.03,.64],[.044,.7],[.058,.76],[.058,.82],[.044,.84],[0,.86]];
  function run(x0,x1,z0,z1){rect(Mx.marble,x0,x1,0,.12,z0,z1);rect(Mx.marble,x0,x1,yr,yr+.09,z0+.01,z1-.01);
   var cx=(x0+x1)/2,cz=(z0+z1)/2,ex=(x1-x0)>(z1-z0);rect(Mx.marble,ex?x0:cx-(x1-x0)/2-.03,ex?x1:cx+(x1-x0)/2+.03,yr+.09,yr+.13,ex?cz-(z1-z0)/2-.03:z0,ex?cz+(z1-z0)/2+.03:z1)}
@@ -2748,8 +2752,13 @@ function paintMat(k){if(ARTM[k])return ARTM[k];var p=ART[k];
  if(p.img){var im=new Image();im.onload=function(){var c=cnv(im.naturalWidth,im.naturalHeight);c.getContext('2d').drawImage(im,0,0);pm.tex=texFrom(c);pm.htex=null;pm.bump=.3;pm.rough=.55;pm.col=[.4,.4,.4];pm.art=1;dirty=2};im.src=p.img}
  return pm}
 /* ---------- frames: one to suit each painting ---------- */
+/* clay frames made for a painting's personality: two rolled ropes of clay in its colours and its own corner ornament, modelled
+   with Higgsfield (files made by dev/build/statue.py). Paintings not listed here get gold clay. */
+var CLAYFR={'Orchid in the Clouds':{roll:['#efe6f4','#c9a9df'],orn:'frame-orchid-v1'},
+ 'White Bloom over Ember':{roll:['#e8762e','#b8321f'],orn:'frame-ember-v1'}},ROPEM={};
+function ropeMat(col){return ROPEM[col]||(ROPEM[col]=mat({col:lin(col),tex:CLAYT,htex:CLAYH,bump:.35,rough:.8,uvs:[1.2,1.2]}))}
 function frameStyle(key){var G=Mx.gold24,D=Mx.goldDark;return({
- gilt:{t:'baroque',fw:.1,gap:.055,base:G,rolls:[G,G,G],orn:G,cove:D},
+ gilt:{t:'baroque',fw:CLAY?.14:.1,gap:.055,base:G,rolls:[G,G,G],orn:G,cove:D},
  silver:{t:'baroque',fw:.1,gap:.055,base:Mx.silver,rolls:[Mx.silver,Mx.silver,Mx.silver],orn:Mx.silver,cove:Mx.silverDark},
  ivory:{t:'baroque',fw:.1,gap:.055,base:Mx.ivory,rolls:[G,Mx.ivory,G],orn:G,cove:Mx.ivoryDark},
  deco:{t:'deco',fw:.12,gap:.035,m:Mx.decoGold,dk:D},
@@ -2772,6 +2781,15 @@ function frameBuild(F,b,w,h){if(!F)F=frameStyle('gilt');var fw=F.fw,gap=F.gap,ow
  function roll(m,x0,y0,x1,y1,z,r){var p0=bx(b,[x0,y0,z]),dir=v3.sub(bx(b,[x1,y1,z]),p0),L=Math.hypot(dir[0],dir[1],dir[2]);cyl(m,aim(p0,dir),[0,0,0],r,L,14)}
  function rollRing(m,X,Y,z,r){roll(m,-X-r,Y,X+r,Y,z,r);roll(m,-X-r,-Y,X+r,-Y,z,r);roll(m,-X,-Y-r,-X,Y+r,z,r);roll(m,X,-Y-r,X,Y+r,z,r)}
  function panel(){quadL(Mx.liner,b,[0,0,.012],[1,0,0],[0,1,0],ow,oh,[0,0,1]);box(Mx.gap,b,[0,0,.03],[w+.008,h+.008,.004],[4]);box(Mx.edge,b,[0,0,.0295],[w,h,.035],[4]);return .047}
+ if(F.t==='clay'){var sp=F.spec,R1=fw*.42,R2=fw*.2,X1=ow+R1*.9,Y1=oh+R1*.9,z1=R1,X2=ow+R2*.4,Y2=oh+R2*.4,z2=R1*1.15;
+  [[ropeMat(sp.roll[0]),X1,Y1,z1,R1],[ropeMat(sp.roll[1]),X2,Y2,z2,R2]].forEach(function(q){rollRing(q[0],q[1],q[2],q[3],q[4]);
+   [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(function(c){ell(q[0],b,[c[0]*q[1],c[1]*q[2],q[3]],[q[4],q[4],q[4]],16)})});   // rounded clay joints at the corners
+  var Bm=new Float32Array([b.x[0],b.x[1],b.x[2],0,b.y[0],b.y[1],b.y[2],0,b.z[0],b.z[1],b.z[2],0,b.o[0],b.o[1],b.o[2],1]),cx=ow+fw*1.55,cy=oh+fw*1.55;   /* set out on the rope so they never cover the painting */
+ 
+  clayModel(sp.orn,function(lo,hi){var k=.6/Math.max(hi[1]-lo[1],hi[2]-lo[2]),base=mm(mSx(k,k,k*.4),mT(hi[2],-hi[1],-lo[0]),mRy(-Math.PI/2));   /* flattened into a relief */
+     // the model's top-left corner at the origin, facing out
+   return[[-cx,cy,0],[cx,cy,-Math.PI/2],[cx,-cy,Math.PI],[-cx,-cy,Math.PI/2]].map(function(q){return mm(Bm,mT(q[0],q[1],R1*.6),mRz(q[2]),base)})},{rough:.8});
+  return panel()}
  if(F.t==='baroque'){(function(){var fd=.075,ow=w/2+gap,oh=h/2+gap,OX=ow+fw,OY=oh+fw,zt=fd*.7,fm=F.base;
  // 24-carat gilded frame: base bars, a shadowed cove, a rounded outer roll, a raised ridge and a fine inner bead
  box(fm,b,[0,oh+fw/2,zt/2],[2*OX,fw,zt]);box(fm,b,[0,-oh-fw/2,zt/2],[2*OX,fw,zt]);
@@ -2814,7 +2832,7 @@ function frameBuild(F,b,w,h){if(!F)F=frameStyle('gilt');var fw=F.fw,gap=F.gap,ow
  return .036}
 // opt: sc = scale, col = hung in the collections hall (no plaque or own spotlight; tapping walks up close)
 function hang(k,o,ry,opt){opt=opt||{};
- var p=ART[k],SC=opt.sc||SCALE,w=p.w*SC,h=p.h*SC,b=B(o,ry),F=frameStyle(CLAY?'gilt':frameOf(p)),fw=F.fw,gap=F.gap,artZ=frameBuild(F,b,w,h);
+ var p=ART[k],SC=opt.sc||SCALE,w=p.w*SC,h=p.h*SC,b=B(o,ry),F=CLAY&&CLAYFR[p.t]?{t:'clay',fw:.15,gap:.05,spec:CLAYFR[p.t]}:frameStyle(CLAY?'gilt':frameOf(p)),fw=F.fw,gap=F.gap,artZ=frameBuild(F,b,w,h);
  var pm=paintMat(k);quadL(pm,b,[0,0,artZ],[1,0,0],[0,1,0],w/2,h/2,[0,0,1]);
  var ax=bn(b,[1,0,0]),ay=[0,1,0],n=bn(b,[0,0,1]),tipT='<i>'+p.t+'</i> · '+p.p,center=bx(b,[0,0,0]),go=opt.col?function(){colTap(k)}:function(){openArt(k)};
  PICK.push({c:bx(b,[0,0,.05]),ax:ax,ay:ay,hw:w/2+fw,hh:h/2+fw,n:n,go:go,tip:tipT,far:opt.col?14:0});
@@ -3040,7 +3058,7 @@ function clayModel(name,place,o){var im=new Image(),buf=null;o=o||{};
   var c=cnv(im.naturalWidth,im.naturalHeight);c.getContext('2d').drawImage(im,0,0);
   var m=mat({unit:1,tex:texFrom(c),col:o.col||[1,1,1],rough:o.rough==null?.75:o.rough,emis:o.emis||[0,0,0]});
   if(o.sheen!==false)m.x3=typeof c3==='function'?{sheen:.5,sheenRoughness:.7,sheenColor:c3([1,.95,.85])}:null;   // soft clay sheen
-  bake({v:v},place(lo,hi),m);upload();dirty=2}
+  var Ms=place(lo,hi);(Array.isArray(Ms)?Ms:[Ms]).forEach(function(M){bake({v:v},M,m)});upload();dirty=2}
  fetch('/lib/'+name+'.bin').then(function(r){if(!r.ok)throw new Error(r.status);return r.arrayBuffer()}).then(function(b){buf=b;go()}).catch(function(){});   // without it, that piece is simply missing
  im.onload=go;im.src='/lib/'+name+'.webp'}
 function clayCentre(lo,hi,top){return mT(-(lo[0]+hi[0])/2,top?-hi[1]:-lo[1],-(lo[2]+hi[2])/2)}
@@ -3050,10 +3068,21 @@ statueLoad('statue-yellow-v1',-3.4,-9.2,.45,.64);statueLoad('statue-blue-v1',3.4
 var WALKM=[];['torso','neck','head','uarm','farm','hand','handG','thigh','shin','foot'].forEach(function(k){WALKM=WALKM.concat(CR[k])});WALKM=WALKM.concat(PIGALL);
 /* the living figure: rises from beneath the balcony, peeks over the rail, then walks off into the distance and dances */
 var CRS=9,CRX=0,CRZ=-15.8,CRT0=80;   // he rises in the middle of the balcony, behind the title
+// clay: he is 3 m tall, standing on a ledge just beyond the rail, so his legs show between the balusters, behind them
+if(CLAY){CRS=3;CRZ=BAL-.6;CRT0=42}
 function walkPose(ph,hunch){var s=Math.sin(ph),c=Math.cos(ph);return{hy:.48-.012*Math.abs(c),ln:.12+(hunch||0),nx:.22,hx:.05,tw:.08*s,sd:.03*s,
  lh:[.42*s,.03],rh:[-.42*s,.03],lk:.12+.55*Math.max(0,Math.sin(ph-1.3)),rk:.12+.55*Math.max(0,Math.sin(ph+Math.PI-1.3)),lf:-.25*s,rf:.25*s,
  la:[-.38*s,.14],ra:[.38*s,.14],le:.35+.15*s,re:.35-.15*s,lw:.2,rw:.2}}
-function crState(t){t=((t%CRT0)+CRT0)%CRT0;var S=CRS,peakB=1.5-.955*S+(CLAY?2.6:0),lowB=-6-1.15*S,P,x=CRX,z=CRZ,ry=0,base;
+// clay routine: walks in along the ledge, turns to the visitor, leans on the rail and looks around, then turns and strolls off
+function crStateClay(t){var x=0,ry=0,P,b=0,H=Math.PI/2;
+ if(t<5.5){x=-7.5+7.5*sm(0,5.5,t)*.15+7.5*.85*Math.min(1,t/5.2);ry=H;P=walkPose(t*5.6)}
+ else if(t<7){var f=sm(5.5,7,t);ry=H*(1-f);P=walkPose(0)}
+ else if(t<16){var lk=t-7;P={hy:.48,ln:.06+.2*sm(7,8.5,t)*(1-sm(15,16,t)),nx:.08,hx:-.05,hyw:.5*Math.sin(lk*.55)*sm(8.5,10,t)*(1-sm(14.5,15.5,t)),hz:.08*Math.sin(lk*.8),lk:.06,rk:.06}}
+ else if(t<17.5){var f2=sm(16,17.5,t);ry=H*f2;P=walkPose(0)}
+ else if(t<24){x=8*Math.min(1,(t-17.5)/5.6);ry=H;P=walkPose((t-17.5)*5.6)}
+ else{x=99;ry=H;P=walkPose(0)}   // off to the side, out of sight, until he comes round again
+ return{x:x,z:CRZ,ry:ry,b:b,P:P}}
+function crState(t){t=((t%CRT0)+CRT0)%CRT0;if(CLAY)return crStateClay(t);var S=CRS,peakB=1.5-.955*S,lowB=-6-1.15*S,P,x=CRX,z=CRZ,ry=0,base;
  if(t<15){                                                  // rising and peeking over the rail, looking around
   var r=sm(0,7,t);base=lowB+(peakB-lowB)*r+.12*Math.sin(t*1.3)*sm(7,8,t);
   P={hy:.48,ln:.32,nx:.05,hx:-.12,hyw:.55*Math.sin((t-7)*.8)*sm(7,8.5,t),hz:.12*Math.sin(t*.9),la:[2.85,.22],ra:[2.85,.22],le:.15,re:.15,lw:.9,rw:.9,lh:[.3,.05],rh:[.3,.05],lk:.5,rk:.5}}
@@ -3086,9 +3115,10 @@ function inv4(m){var a=m[0],b=m[1],c=m[2],d=m[4],e=m[5],f=m[6],g=m[8],h=m[9],i=m
 function xf(m,p){return[m[0]*p[0]+m[4]*p[1]+m[8]*p[2]+m[12],m[1]*p[0]+m[5]*p[1]+m[9]*p[2]+m[13],m[2]*p[0]+m[6]*p[1]+m[10]*p[2]+m[14]]}
 var IKQ={};
 function ikSeed(s,tW,tK){var best=null,be=1e9;[[1.6,.25,.8,.8],[2.2,.3,.6,1.2],[1.2,.2,1.2,.6],[2.6,.4,.4,1.4],[1.9,.1,1.6,1.0],[2.0,.5,1.0,.4]].forEach(function(q0){var q=armIK(s,tW,tK,armIK(s,tW,tK,q0)),r=armFK(s,q[0],q[1],q[2],q[3]),a=v3.sub(r[0],tW),b=v3.sub(r[1],tK),e=v3.dot(a,a)+v3.dot(b,b);if(e<be){be=e;best=q}});return best}
-function gripRail(st,t){var g=sm(4.2,6.4,t)*(1-sm(17.8,18.9,t)),lift=sm(3.2,4.6,t)*(1-sm(5.2,6.4,t))+sm(16.6,17.8,t);if(g<=0)return;var P=st.P;function v(k,d){return P[k]==null?d:P[k]}
+function gripRail(st,t){var g=CLAY?sm(7.6,8.8,t)*(1-sm(15,15.9,t)):sm(4.2,6.4,t)*(1-sm(17.8,18.9,t)),lift=CLAY?sm(7,7.6,t)*(1-sm(8.2,8.8,t))+sm(15,15.6,t):sm(3.2,4.6,t)*(1-sm(5.2,6.4,t))+sm(16.6,17.8,t);if(g<=0)return;var K=CRS/9;   /* reach scales with his size */
+ var P=st.P;function v(k,d){return P[k]==null?d:P[k]}
  var W=mm(mT(st.x,st.b,st.z),mRy(st.ry),mS(CRS)),tor=mm(W,mT(0,v('hy',.48),0),mRy(v('tw',0)),mRz(v('tl',0)),mRx(v('ln',.06)),mRz(v('sd',0))),it=inv4(tor),top=1.11;
- [-1,1].forEach(function(s){var k=s<0?'l':'r',hx=st.x+s*1.05,wrist=xf(it,[hx,top+.16+1.3*lift,BAL-.5-.5*lift]),knk=xf(it,[hx,top+.1+1.3*lift,BAL+.2-.6*lift]);
+ [-1,1].forEach(function(s){var k=s<0?'l':'r',hx=st.x+s*(CLAY?.24:1.05),wrist=xf(it,[hx,top+(.16+1.3*lift)*K,BAL-(.5+.5*lift)*K]),knk=xf(it,[hx,top+(.1+1.3*lift)*K,BAL+(.2-.6*lift)*K]);
   var q0=IKQ[k],qn=q0?armIK(s,wrist,knk,q0):ikSeed(s,wrist,knk),q=IKQ[k]=q0?q0.map(function(v,i){return v+(qn[i]-v)*.6}):qn,A=P[k+'a']||[.12,.1,0];
   P[k+'a']=[A[0]+(q[0]-A[0])*g,A[1]+(q[1]-A[1])*g,0];P[k+'e']=v(k+'e',.25)+(q[2]-v(k+'e',.25))*g;P[k+'w']=v(k+'w',.1)+(q[3]-v(k+'w',.1))*g;P[k+'wy']=v(k+'wy',.9)*(1-g)+Math.PI*g;P[k+'grip']=g>.6})}
 /* the welcome title makes room for the leaf-headed figure: while his head and shoulders are up behind it, the words part to either side,
@@ -3098,7 +3128,7 @@ function tsSplit(el){var t=el.textContent.trim(),w=t.split(/\s+/),best=0,bd=1e9;
  for(var k=1;k<w.length;k++){var d=Math.abs(w.slice(0,k).join(' ').length-w.slice(k).join(' ').length);if(d<bd){bd=d;best=k}}
  el.textContent='';var a=document.createElement('span'),c=document.createElement('span');a.className='tsl';c.className='tsr';
  a.textContent=w.slice(0,best).join(' ');c.textContent=w.slice(best).join(' ');el.appendChild(a);el.appendChild(document.createTextNode(' '));el.appendChild(c)}
-function titleSplit(VPm){var els=[titleEl.querySelector('h1'),titleEl.querySelector('p')].filter(Boolean);if(!els.length)return;
+function titleSplit(VPm){if(!CREATURE)return;var els=[titleEl.querySelector('h1'),titleEl.querySelector('p')].filter(Boolean);if(!els.length)return;
  els.forEach(function(e){if(!e.querySelector('.tsl'))tsSplit(e)});
  var W=innerWidth,H=innerHeight;function scr(p){var w=VPm[3]*p[0]+VPm[7]*p[1]+VPm[11]*p[2]+VPm[15];if(w<=.01)return null;
   return[((VPm[0]*p[0]+VPm[4]*p[1]+VPm[8]*p[2]+VPm[12])/w*.5+.5)*W,(1-((VPm[1]*p[0]+VPm[5]*p[1]+VPm[9]*p[2]+VPm[13])/w*.5+.5))*H]}
@@ -3114,7 +3144,7 @@ function titleSplit(VPm){var els=[titleEl.querySelector('h1'),titleEl.querySelec
  els.forEach(function(e,i){var T=TSP[i];T.l+=(want[i].l-T.l)*k;T.r+=(want[i].r-T.r)*k;if(Math.abs(want[i].l-T.l)+Math.abs(want[i].r-T.r)>.5)moving=true;
   var L=e.querySelector('.tsl'),R=e.querySelector('.tsr');if(L)L.style.transform=Math.abs(T.l)>.5?'translateX('+T.l.toFixed(1)+'px)':'';if(R)R.style.transform=Math.abs(T.r)>.5?'translateX('+T.r.toFixed(1)+'px)':''});
  if(moving)dirty=Math.max(dirty,1)}
-var CRV=null;function crVisible(VPm){var st=crState(window.__ct!=null?window.__ct:NOWS),c=[st.x,st.b+CRS*.6,st.z],r=CRS*.75,v=0;
+var CRV=null;function crVisible(VPm){if(!CREATURE)return false;var st=crState(window.__ct!=null?window.__ct:NOWS),c=[st.x,st.b+CRS*.6,st.z],r=CRS*.75,v=0;
  for(var i=-1;i<=1;i+=2)for(var j=-1;j<=1;j+=2)for(var k=-1;k<=1;k+=2){var p=[c[0]+i*r,c[1]+j*r,c[2]+k*r],w=VPm[3]*p[0]+VPm[7]*p[1]+VPm[11]*p[2]+VPm[15];if(w<=0)continue;
   var x=(VPm[0]*p[0]+VPm[4]*p[1]+VPm[8]*p[2]+VPm[12])/w,y=(VPm[1]*p[0]+VPm[5]*p[1]+VPm[9]*p[2]+VPm[13])/w;if(x>-1.6&&x<1.6&&y>-1.6&&y<1.6)v=1}
  return v||window.__ct!=null}

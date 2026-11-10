@@ -150,7 +150,7 @@ function buildLights(){
   if(Q.spotSh&&l.sh!==false){s.castShadow=true;s.shadow.mapSize.set(1024,1024);s.shadow.camera.near=.25;s.shadow.camera.far=9;s.shadow.bias=-.0006;s.shadow.normalBias=.015;s.shadow.radius=3.2}});
  LIGHTS.point.forEach(function(l){var pk=Math.max(l.c[0],l.c[1],l.c[2]),p=new THREE.PointLight(0xffffff,pk,8,2);p.color.setRGB(l.c[0]/pk,l.c[1]/pk,l.c[2]/pk,LINEAR);p.position.set(l.p[0],l.p[1],l.p[2]);S3.add(p)});
  var h=HEMI=new THREE.HemisphereLight(0xffffff,0xffffff,1);h.color.setRGB(SKY[0]*Math.PI,SKY[1]*Math.PI,SKY[2]*Math.PI,LINEAR);
- if(typeof CLAY!=='undefined'&&CLAY){var wk=lin('#ffe6c8');h.color.setRGB(wk[0]*.36*Math.PI,wk[1]*.36*Math.PI,wk[2]*.36*Math.PI,LINEAR)}   /* clay: warm studio fill light */
+ if(typeof CLAY!=='undefined'&&CLAY){var wk=lin('#ffe8e0');h.color.setRGB(wk[0]*.42*Math.PI,wk[1]*.42*Math.PI,wk[2]*.42*Math.PI,LINEAR)}   /* clay: warm studio fill light */
 h.groundColor.setRGB(GROUND[0]*Math.PI,GROUND[1]*Math.PI,GROUND[2]*Math.PI,LINEAR);S3.add(h)}
 
 /* ---------- image-based lighting: the room itself, captured into a cube map and prefiltered ---------- */
@@ -244,7 +244,7 @@ function render(time){
  C3.fov=cam.fov*180/Math.PI;C3.aspect=as;C3.near=.05;C3.far=200;C3.updateProjectionMatrix();C3.position.set(eye[0],eye[1],eye[2]);C3.up.set(0,1,0);C3.lookAt(eye[0]+dd[0],eye[1]+dd[1],eye[2]+dd[2]);C3.updateMatrixWorld();
  G3.uSecs.value=NOWS%3600;
  if(envAt&&Date.now()>envAt){envAt=0;captureEnv()}
- var rz=BAL+.12,vy=eye[1]-1.11,vz=eye[2]-rz;if(vz>.05){var nl=Math.hypot(vy,vz);CRCLIP.normal.set(0,vz/nl,-vy/nl);CRCLIP.constant=-(CRCLIP.normal.y*1.11+CRCLIP.normal.z*rz)}else CRCLIP.constant=1e4;
+ var rz=BAL+.12,vy=eye[1]-1.11,vz=eye[2]-rz;if(vz>.05&&!(typeof CLAY!=='undefined'&&CLAY)){var nl=Math.hypot(vy,vz);CRCLIP.normal.set(0,vz/nl,-vy/nl);CRCLIP.constant=-(CRCLIP.normal.y*1.11+CRCLIP.normal.z*rz)}else CRCLIP.constant=1e4;
  DYNL.forEach(function(d){d.n=0});drawPigeon();if(crVisible(VP))drawWalker();
  if(typeof titleSplit==='function')titleSplit(VP);
  DYNL.forEach(function(d){for(var i=d.n;i<d.pool.length;i++)d.pool[i].visible=false});
