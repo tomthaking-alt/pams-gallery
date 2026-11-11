@@ -23,7 +23,13 @@ function watch(p, name) {
 }
 async function newCtx(b, opts) {
   const ctx = await b.newContext(Object.assign({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 2, acceptDownloads: true }, opts || {}));
-  await ctx.addInitScript(t => { try { localStorage.setItem('pgTok', t); localStorage.setItem('pgFilm', '1'); localStorage.setItem('georgeIntro', 'done'); localStorage.setItem('georgeAway', '1') } catch (e) { } }, OT);
+  await ctx.addInitScript(t => {
+    try { localStorage.setItem('pgTok', t); localStorage.setItem('pgFilm', '1'); localStorage.setItem('georgeIntro', 'done'); localStorage.setItem('georgeAway', '1') } catch (e) { }
+    // test speed only: software rendering is slow, so the 3D behind the dashboard is not drawn (window.__freeze, test copy of the page),
+    // and the blur behind open windows is left out (it takes tens of seconds per screenshot in software)
+    window.__freeze = 1;
+    document.addEventListener('DOMContentLoaded', () => { const st = document.createElement('style'); st.textContent = 'dialog::backdrop{backdrop-filter:none!important}'; document.head.appendChild(st) });
+  }, OT);
   return ctx;
 }
 const ready = p => p.waitForFunction(() => typeof openDash === 'function' && typeof ME !== 'undefined' && ME && ME.owner, null, { timeout: 600000, polling: 500 });
@@ -67,6 +73,9 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
   await mock(['MOCK.FAILWRITES', '']);
   const cat0 = (await P({ a: 'catGet' }, OT)).cat; const left = (await P({ a: 'draftGet' }, OT)).draft; if (left) await P({ a: 'draftClear', t: left.t }, OT);
   ok(cat0 && cat0.v && cat0.arts.length >= 6, 'a published catalogue to work with (on a fresh database run api3.js && demo.js first)'); if (!cat0 || cat0.arts.length < 6) return;
+  const hv = await P({ a: 'catHist' }, OT);
+  if (hv.total < 25) { let v = cat0.v; for (let i = hv.total; i < 25; i++) { const x = JSON.parse(JSON.stringify(cat0)); x.site.banner = { on: false, text: 'P6UI page filler ' + i }; const r = await P({ a: 'catSave', cat: x, base: v }, OT); if (r.ok) v = r.cat.v }
+    await P({ a: 'catSave', cat: cat0, base: v }, OT) }
   const b = await chromium.launch({ args: ARGS });
   const ctx = await newCtx(b);
   const pA = await open(ctx, 'tab A');
@@ -130,6 +139,14 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     ok(/Live now/.test(r0) && r0.includes('Renamed “' + tOld + '” to “' + T1 + '”'), '(c) the newest is “Live now”, with “Renamed “' + tOld + '” to “' + T1 + '””');
     const cnt = await pA.evaluate(() => { const n = [...document.querySelectorAll('#edVers p.note')].map(x => x.textContent).find(t => /^Showing /.test(t)); return n || '' });
     ok(cnt === 'Showing ' + Math.min(20, h1.total) + ' of ' + h1.total + ' versions.', '(c) “' + cnt + '”');
+    const more = btn(pA, 'Show earlier versions', '#edVers');
+    if (h1.total > 20) {
+      ok(await more.isVisible(), '(c) with more than twenty, “Show earlier versions” is there');
+      await click(pA, more); await until(pA, () => document.querySelectorAll('#edVers .vrow').length > 20, null, 20000);
+      const cnt2 = await pA.evaluate(() => [...document.querySelectorAll('#edVers p.note')].map(x => x.textContent).find(t => /^Showing /.test(t)) || '');
+      const vs = await pA.evaluate(() => [...document.querySelectorAll('#edVers .vrow .vhead b')].length);
+      ok(cnt2 === 'Showing ' + Math.min(40, h1.total) + ' of ' + h1.total + ' versions.' && vs === Math.min(40, h1.total) && (h1.total > 40 || !(await more.isVisible())), '(c) it adds the next twenty: “' + cnt2 + '”');
+    } else ok(!(await more.isVisible()), '(c) no “Show earlier versions” button when everything is shown');
     await pA.locator('#edVers').scrollIntoViewIfNeeded(); await pA.evaluate(() => document.getElementById('edVers').scrollIntoView());
     await shot(pA, 'c-earlier-versions');
   });
@@ -143,7 +160,7 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     ok((await P({ a: 'catHist' }, OT)).total === h1.total, '(d) nothing changes before Pam says yes');
     await row.scrollIntoViewIfNeeded(); await shot(pA, 'd-restore-asks');
     await click(pA, row.locator('button').filter({ hasText: exact('Yes, bring it back') }));
-    await until(pA, () => !EDbusy && !!(EDmsg || EDfail));
+    await until(pA, () => /^Brought back|^That version is the same/.test(EDmsg || '') || !!EDfail);
     const m = await txt(pA, '#edMsg') || '';
     ok(m.startsWith('Brought back the version from ' + when + '. Visitors will see it from their next visit.'), '(d) “' + m.slice(0, 110) + '”');
     const h2 = await P({ a: 'catHist' }, OT), live = (await P({ a: 'catGet' }, OT)).cat;
@@ -204,8 +221,8 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     ok(await pA.evaluate(() => ED.arts.length) === n && (await P({ a: 'draftGet' }, OT)).draft === null && /Your unpublished changes were discarded\./.test(await txt(pA, '#dBody') || ''), '(f) after discarding, the painting is back, no draft is left, and the dashboard says so');
   });
 
-  await step('(g) a second tab', async () => {
-    const pB = await open(ctx, 'tab B'); await dash(pB, 'a');
+  await step('(g) a second tab', async () => { const pB = await open(ctx, 'tab B'); try {
+    await dash(pB, 'a');
     await reopen(pA, 'a');
     const tA = await pA.evaluate(() => ED.arts[0].t);
     await editTitle(pA, 0, 'P6UI Tab A title');
@@ -234,10 +251,9 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     ok(await until(pB, () => !EDbusy && /^Published/.test(EDmsg || '')), '(g) after Pam confirms, tab B publishes');
     const lg = (await P({ a: 'catGet' }, OT)).cat, hg = await P({ a: 'catHist' }, OT);
     ok(lg.arts[1].t === 'P6UI Tab B title!' && hg.list[1].changes.includes('Renamed “' + tA + '” to “P6UI Tab A title”'), '(g) tab B’s change is live, and tab A’s version is still kept in Earlier versions');
-    await pB.close();
-  });
+  } finally { await pB.close() } });
 
-  await step('(h) the database refuses to save', async () => {
+  await step('(h) the database refuses to save', async () => { try {
     await reopen(pA, 'a');
     const hh = await P({ a: 'catHist' }, OT), lh = (await P({ a: 'catGet' }, OT)).cat;
     ok((await mock(['MOCK.FAILWRITES', 'cat:ver:*'])).result === 'OK', '(h) the pretend database now refuses to keep new versions, as a full database does');
@@ -261,23 +277,25 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     await mock(['MOCK.FAILWRITES', '']);
     await click(pA, '#edPub');
     ok(await until(pA, () => !EDbusy && /^Published/.test(EDmsg || '')) && (await P({ a: 'catGet' }, OT)).cat.arts[2].t === 'P6UI Not published yet 2', '(h) once the database is back, the same changes publish');
-  });
+  } finally { await mock(['MOCK.FAILWRITES', '']) } });
 
   await step('(i) limits', async () => {
     await reopen(pA, 'a');
-    const row = pA.locator('#dBody .edrow').nth(0); await click(pA, row.locator('.edacts button').filter({ hasText: exact('Edit') })); await pA.waitForTimeout(200);
+    const row = pA.locator('#dBody .edrow').nth(0);
+    if (!(await row.evaluate(r => r.classList.contains('open')))) { await click(pA, row.locator('.edacts button').filter({ hasText: exact('Edit') })); await pA.waitForTimeout(200) }
     const box = titleBox(pA, 0); await box.fill(''); await box.pressSequentially('x'.repeat(85));
     const c1 = await row.locator('.cnt').first().textContent();
     ok(c1 === '5 characters left', '(i) near the limit the title box says “' + c1 + '”');
     await box.pressSequentially('y'.repeat(10));
     const v = await box.inputValue(), c2 = await row.locator('.cnt').first().textContent(), full = await row.locator('.cnt').first().evaluate(x => x.classList.contains('full'));
     ok(v.length === 90 && c2 === 'That’s the limit — 90 characters.' && full, '(i) typing stops at 90 characters: “' + c2 + '”');
+    await row.scrollIntoViewIfNeeded(); await shot(pA, 'i-limit-reached');
     const L = await pA.evaluate(() => { const f = document.querySelector('#dBody .edrow.open'), q = s => (f.querySelector(s) || {}).maxLength; return [q('input[placeholder="e.g. Oil on canvas"]'), q('input[placeholder="e.g. 60 × 80 cm"]'), q('input[placeholder="e.g. 2025"]'), q('textarea'), q('input[aria-label="Price"]')] });
     ok(JSON.stringify(L) === '[80,80,12,1200,40]', '(i) the other boxes hold what the gallery keeps (medium 80, size 80, year 12, description 1200, price 40): ' + JSON.stringify(L));
     await box.evaluate(i => { const d = new DataTransfer(); d.setData('text', 'z'.repeat(50)); i.dispatchEvent(new ClipboardEvent('paste', { clipboardData: d, bubbles: true })) }); await pA.waitForTimeout(100);
     const c3 = await row.locator('.cnt').first().textContent();
     ok(c3 === 'Only part of what you pasted fits — this box holds up to 90 characters.', '(i) a paste that doesn’t fit is pointed out: “' + c3 + '”');
-    await row.scrollIntoViewIfNeeded(); await shot(pA, 'i-limit');
+    await shot(pA, 'i-paste-too-long');
     await tabTo(pA, 's');
     const S = await pA.evaluate(() => { const q = s => (document.querySelector('#dBody ' + s) || {}).maxLength; return [q('input[type=email]'), q('input[placeholder="e.g. 07700 900123"]'), q('input[placeholder="e.g. London, UK"]'), q('input[type=url]'), q('input[placeholder^="e.g. New collection"]')] });
     ok(JSON.stringify(S) === '[200,40,80,200,160]', '(i) Settings boxes too (email 200, phone 40, place 80, links 200, banner 160): ' + JSON.stringify(S));
@@ -285,9 +303,52 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     await until(pA, () => ED && !EDdirty && !EDload, null, 30000);
   });
 
+  await step('(k) changes made while publishing', async () => {
+    await reopen(pA, 'a');
+    await editTitle(pA, 3, 'P6UI First edit');
+    let held = 0;
+    await pA.route('**/api/app', async (route, req) => { if (req.method() === 'POST' && /"a":"catSave"/.test(req.postData() || '') && !held++) await new Promise(r => setTimeout(r, 3000)); await route.continue() });
+    await click(pA, '#edPub');
+    await until(pA, () => EDbusy, null, 5000);
+    ok(/^Publishing…$/.test(await txt(pA, '#edState') || '') && await pA.evaluate(() => document.getElementById('edPub').disabled), '(k) while it publishes, the bar says “Publishing…”');
+    await titleBox(pA, 3).fill('P6UI Second edit');
+    await until(pA, () => !EDbusy && !!(EDmsg || EDfail));
+    await pA.unroute('**/api/app');
+    const m = await txt(pA, '#edMsg') || '', live = (await P({ a: 'catGet' }, OT)).cat;
+    ok(m.startsWith('Published. You made more changes while it was publishing — press “Publish changes” again to publish those too.'), '(k) “' + m.slice(0, 110) + '…”');
+    ok(live.arts[3].t === 'P6UI First edit' && await pA.evaluate(() => EDdirty && ED.arts[3].t === 'P6UI Second edit' && ED.v === PUBV), '(k) the first change is live; the one made meanwhile is kept, unpublished, on top of it');
+    ok(await waitState(pA, /saved as a draft$/, 12000), '(k) and saved as a draft');
+    await shot(pA, 'k-changed-while-publishing');
+    await click(pA, '#edPub');
+    ok(await until(pA, () => !EDbusy && /^Published —/.test(EDmsg || '')) && (await P({ a: 'catGet' }, OT)).cat.arts[3].t === 'P6UI Second edit', '(k) Publish again publishes it, with no question asked');
+  });
+
+  await step('(l) a tab closed straight after a change', async () => {
+    const pC = await open(ctx, 'tab C'); await dash(pC, 'a');
+    await editTitle(pC, 4, 'P6UI Closed in a hurry'); await pC.waitForTimeout(700);
+    ok((await P({ a: 'draftGet' }, OT)).draft === null, '(l) less than a second after a change: not on the server yet');
+    await pC.close(); await new Promise(r => setTimeout(r, 2000));
+    const d = (await P({ a: 'draftGet' }, OT)).draft;
+    ok(!!d && d.cat.arts[4].t === 'P6UI Closed in a hurry', '(l) closing the tab sends it to the server on the way out');
+    await reopen(pA);
+    ok(await until(pA, () => document.querySelector('#dBody .edoffer'), null, 30000) && (await txt(pA, '#dBody .edoffer') || '').includes('to “P6UI Closed in a hurry”'), '(l) the next time the dashboard opens, it offers that change');
+    await click(pA, btn(pA, 'Discard them', '#dBody .edoffer')); await click(pA, btn(pA, 'Yes, discard them', '#dBody .edoffer'));
+    ok(await until(pA, () => !OFFER && !document.querySelector('#dBody .edoffer'), null, 15000) && (await P({ a: 'draftGet' }, OT)).draft === null && await pA.evaluate(() => localStorage.getItem('pgDashDraft')) === null, '(l) “Discard them” → “Yes, discard them” removes both copies');
+    const live = (await P({ a: 'catGet' }, OT)).cat, old = JSON.parse(JSON.stringify(live)); old.arts[5].t = 'P6UI Kept the old way';
+    await pA.evaluate(o => localStorage.setItem('pgDashDraft', JSON.stringify({ t: Date.now() - 3600e3, base: o.v, ed: o })), old);
+    await reopen(pA);
+    const o = (await until(pA, () => document.querySelector('#dBody .edoffer'), null, 30000)) ? await txt(pA, '#dBody .edoffer') : '';
+    ok(/They were saved on this device\./.test(o) && o.includes('to “P6UI Kept the old way”'), '(l) a copy kept on this device by the dashboard before this update is offered too');
+    await shot(pA, 'l-offer-from-this-device');
+    await click(pA, btn(pA, 'Continue where I left off', '#dBody .edoffer'));
+    ok(await waitState(pA, /saved as a draft$/, 12000) && await pA.evaluate(() => ED.arts[5].t) === 'P6UI Kept the old way', '(l) Continue brings it back and saves it as a draft');
+    await click(pA, '#edDis'); await click(pA, btn(pA, 'Yes, discard them', '#dBody .edask'));
+    ok(await until(pA, () => ED && !EDdirty && !EDload && !OFFER, null, 30000) && (await P({ a: 'draftGet' }, OT)).draft === null && await pA.evaluate(() => localStorage.getItem('pgDashDraft')) === null, '(l) “Discard changes” removes both copies');
+  });
+
   await step('(j) phone', async () => {
     const live = (await P({ a: 'catGet' }, OT)).cat, other = JSON.parse(JSON.stringify(live)); other.arts[0].t = 'P6UI From the laptop';
-    const sv = await P({ a: 'draftSave', draft: other, base: live.v, sid: 'p6uilaptop' + Math.random().toString(36).slice(2, 8) }, OT);
+    const sv = await P({ a: 'draftSave', draft: other, base: live.v, sid: 'p6uilaptop' + Math.random().toString(36).slice(2, 8), take: true }, OT);
     ok(sv.ok, '(j) a draft saved from another device (the laptop)');
     const ph = await newCtx(b, Object.assign({}, devices['iPhone 13'], { deviceScaleFactor: 2 }));
     const pP = await open(ph, 'phone');

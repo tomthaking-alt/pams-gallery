@@ -281,7 +281,8 @@ body.hasBanner .dreampill{top:calc(var(--barh,56px) + 40px)}
 .vbox{margin:.8rem 0;padding:.8rem .9rem;border:1px solid rgba(75,46,34,.18);border-radius:10px;background:#fffdf9}.vbox h4{margin:0 0 .3rem;font-size:1rem}.vbox h4:focus{outline:2px solid var(--bronze);outline-offset:2px}
 #dash [hidden]{display:none!important}
 .edoffer p{margin:.45rem 0 0}.edoffer .edacts{margin:.7rem 0 0}.edoffer .edconfirm{background:#fffaf4}
-#edMsg:focus{outline:2px solid var(--bronze);outline-offset:2px}.vbk{margin:.5rem 0 0}.vimp:empty{display:none}
+#edMsg:focus{outline:2px solid var(--bronze);outline-offset:2px}#edVers,#dBody .vrow,#dBody .vbox,#dBody .edoffer,#edMsg{scroll-margin-top:7rem}
+.edtop .edinfo{flex:1 1 11rem}.vbk{margin:.5rem 0 0}.vimp:empty{display:none}
 .edform{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:.7rem 1rem;margin-top:.8rem}
 .ef{display:flex;flex-direction:column;gap:.3rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:0}
 .ef input,.ef textarea,.ef select,.edsz input,.edadd select{font:inherit;font-size:.92rem;letter-spacing:0;text-transform:none;color:var(--ink);padding:.55rem .6rem;min-height:40px;border:1px solid rgba(75,46,34,.25);border-radius:2px;background:#fff;width:100%;box-sizing:border-box}
@@ -1936,8 +1937,8 @@ function verRow(x,live){var li=el('li','vrow'),hd=el('div','vhead'),when=fdt(x.v
  if(x.v!==live){var rb=sbtn('Restore',function(){cf.textContent='';cf.appendChild(el('span',null,'Bring back the version from '+when+'? It goes live straight away, and the version that’s live now stays in this list.'+(EDdirty?' Your unpublished changes will be discarded.':'')));
    var y=sbtn('Yes, bring it back',function(){y.disabled=true;restoreVer(x.v,when)},'btn main');cf.appendChild(y);cf.appendChild(sbtn('Cancel',function(){cf.hidden=true;rb.focus()}));cf.hidden=false;y.focus()},'sb','Restore the version from '+when);acts.appendChild(rb)}
  li.appendChild(acts);li.appendChild(cf);return li}
-function restoreVer(v,when){$('dErr').textContent='';EDfail='';clearTimeout(srvT);Promise.resolve(EDsrvP).then(function(){return api({a:'catRestore',v:v,base:PUBV,sid:EDSID})}).then(function(r){
- if(r.error){EDfail=r.code==='stale'?'Your gallery was published again from another device or tab, so nothing was brought back. The list is up to date now — please choose again.':edErrMsg(r);$('dErr').textContent=EDfail;if(r.code==='stale')edRefreshLive().then(function(){drawTab()});else drawTab();return}
+function restoreVer(v,when){$('dErr').textContent='';EDfail='';clearTimeout(srvT);srvIdle().then(function(){return api({a:'catRestore',v:v,base:PUBV,sid:EDSID})}).then(function(r){
+ if(r.error){EDfailKeep=false;EDfail=r.code==='stale'?'Your gallery was published again from another device or tab, so nothing was brought back. The list is up to date now — please choose again.':edErrMsg(r);$('dErr').textContent=EDfail;if(r.code==='stale')edRefreshLive().then(function(){drawTab()});else drawTab();return}
  edAfterLive(r,r.unchanged?'That version is the same as your live gallery, so nothing needed to change.':'Brought back the version from '+when+'. Visitors will see it from their next visit.')})}
 function ymd(t,hm){var d=new Date(t),p=function(n){return(n<10?'0':'')+n};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+(hm?'-'+p(d.getHours())+p(d.getMinutes()):'')}
 // a file to keep: made in the browser and saved from inside the dashboard (outside it, the page can't be clicked while the dashboard is open)
@@ -1960,7 +1961,7 @@ function importFile(f,box,lead){box.textContent='';var shut=function(){box.textC
    if(p.same){w.appendChild(el('p',null,'This backup is the same as your live gallery, so restoring it wouldn’t change anything.'));acts.appendChild(sbtn('Close',shut))}
    else{w.appendChild(el('p',null,'If you restore it, it goes live straight away, and the version that’s live now stays in Earlier versions. What would change:'));var ul=el('ul');p.changes.forEach(function(x){ul.appendChild(el('li',null,x))});w.appendChild(ul);
     if(EDdirty)w.appendChild(el('p',null,'Your unpublished changes will be discarded.'));
-    var y=sbtn('Restore this backup',function(){y.disabled=true;clearTimeout(srvT);Promise.resolve(EDsrvP).then(function(){return api({a:'catImport',cat:c,base:PUBV,sid:EDSID,from:o.v||0})}).then(function(r){
+    var y=sbtn('Restore this backup',function(){y.disabled=true;clearTimeout(srvT);srvIdle().then(function(){return api({a:'catImport',cat:c,base:PUBV,sid:EDSID,from:o.v||0})}).then(function(r){
      if(r.error){if(r.code==='stale'){edRefreshLive().then(function(){importFile(f,box,'Your gallery was published again from another device or tab, so the backup wasn’t restored yet. Here’s what it would change now — please check it, then choose again.')});return}
       y.disabled=false;box.appendChild(el('p','err',edErrMsg(r)));return}
      edAfterLive(r,'Your backup is live again. Visitors will see it from their next visit.')})},'btn main');
@@ -2043,7 +2044,7 @@ function tableOf(heads){var w=el('div','tbl'),t=el('table'),th=el('thead'),tr=el
 var ED=null,EDdirty=false,EDopen={},EDmsg='',vRange='all';
 /* never lose a change: unpublished changes are kept on this device at once and on the server as a draft two seconds after the
    last change (straight away when the page is hidden or the dashboard closes); every publish is kept as a version with a note of what changed */
-var PUBV=0,PUBCAT=null,EDSID=Date.now().toString(36)+Math.random().toString(36).slice(2,10),EDgen=0,EDsrv='',EDsrvGen=-1,EDsrvBusy=false,EDsrvAgain=false,EDsrvP=null,EDsrvWhy='',EDtake=false,EDfromT=0,EDlocal=true,EDbusy=false,EDerr='',EDfail='',EDnote='',EDnoteWarn=false,EDstale=false,EDlines=[],NEWER=[],OFFER=null,SRVD=null,ASK=null,EDload=null,srvT=0;
+var PUBV=0,PUBCAT=null,EDSID=Date.now().toString(36)+Math.random().toString(36).slice(2,10),EDgen=0,EDsrv='',EDsrvGen=-1,EDsrvBusy=false,EDsrvAgain=false,EDsrvP=null,EDsrvT=0,EDat=0,EDsrvWhy='',EDtake=false,EDfromT=0,EDlocal=true,EDbusy=false,EDerr='',EDfail='',EDfailKeep=false,EDnote='',EDnoteWarn=false,EDstale=false,EDlines=[],NEWER=[],OFFER=null,SRVD=null,ASK=null,EDload=null,srvT=0;
 var SEEDNOTE='Your gallery hasn’t been published from this dashboard yet, so it has started from the paintings built into the site. If you have published before, please don’t publish now — tell Claude first, because it means your saved gallery couldn’t be found.';
 function fdt(t){try{return new Date(t).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}catch(e){return''}}
 // a reply that went wrong, in words for Pam (no codes); keep: say that her changes are safe on this device
@@ -2066,17 +2067,18 @@ function loadED(cb){if(!EDload){EDerr='';EDload=Promise.all([api({a:'catGet'}),a
 function sameEd(a,b){var x=JSON.parse(JSON.stringify(a)),y=JSON.parse(JSON.stringify(b));x.v=y.v=0;return JSON.stringify(x)===JSON.stringify(y)}
 // unpublished changes found on opening, on the server (a draft) or only on this device: the newer is offered, with what it would change.
 // One that wouldn't change anything (the gallery already looks like that) is tidied away quietly
-function edOffer(){var dev=draftGet();
+function edOffer(n){var dev=draftGet();n=n||0;
  if(dev&&PUBCAT&&sameEd(edNorm(JSON.parse(JSON.stringify(dev.ed))),PUBCAT)){draftClear(1);dev=null}
  edPick(dev);var o=OFFER;if(!o||!PUBCAT)return;
  return api({a:'catImport',cat:o.cat,dry:true}).then(function(j){var p=j.preview;if(OFFER!==o||!p)return;
   if(!p.same){o.changes=p.changes||[];return}
   if(o.src==='device')draftClear(1);else{SRVD=null;api({a:'draftClear',t:o.t})}
-  return edOffer()})}
-function edPick(dev){var srv=SRVD,o=null;OFFER=null;
- if(dev&&(!srv||dev.t>srv.t+2000))o={src:'device',t:dev.t,base:+dev.base||0,sid:dev.sid||'',cat:dev.ed};
+  if(n<2)return edOffer(n+1);OFFER=null})}
+// which copy: from the same session, the server's unless this device has changes the server never got; from different sessions, the newer
+function edPick(dev){var srv=SRVD,o=null,one=!!(dev&&srv&&dev.sid&&dev.sid===srv.sid);OFFER=null;
+ if(dev&&(one?dev.st!==srv.t:!srv||dev.t>srv.t))o={src:'device',t:dev.t,base:+dev.base||0,sid:dev.sid||'',cat:dev.ed};
  else if(srv)o={src:'server',t:srv.t,base:+srv.base||0,sid:srv.sid||'',cat:srv.cat};
- if(!o)return;o.older=srv&&o.src==='device'&&srv.sid!==o.sid?srv.t:0;o.stale=!!PUBV&&o.base!==PUBV;o.newer=[];OFFER=o;
+ if(!o)return;o.older=one?0:o.src==='device'?(srv?srv.t:0):(dev?dev.t:0);o.stale=!!PUBV&&o.base!==PUBV;o.newer=[];OFFER=o;
  if(o.stale)api({a:'catHist'}).then(function(h){if(OFFER===o&&h.list){o.newer=h.list.filter(function(x){return x.v>o.base});if(dashD.open)drawTab()}})}
 function edFail(body){body.appendChild(el('p','empty','Your paintings and settings couldn’t be loaded, so nothing can be changed right now.'));body.appendChild(el('p','err',EDerr));body.appendChild(sbtn('Try again',function(){EDerr='';drawTab()},'btn'))}
 // each time the dashboard opens: nothing unpublished → start again from the live version; unpublished changes → keep them, but learn whether the gallery was published elsewhere meanwhile
@@ -2091,7 +2093,7 @@ document.addEventListener('visibilitychange',function(){if(document.visibilitySt
    so a closed tab, a flat battery or a phone tidying away its tabs never loses them */
 var DRAFTK='pgDashDraft',draftT=0;
 function draftSave(){clearTimeout(draftT);draftT=setTimeout(draftLocalNow,400)}
-function draftLocalNow(){clearTimeout(draftT);if(!EDdirty||!ED||OFFER)return;try{localStorage.setItem(DRAFTK,JSON.stringify({t:Date.now(),base:ED.v||0,sid:EDSID,ed:ED}));EDlocal=true}catch(e){EDlocal=false}edState()}
+function draftLocalNow(){clearTimeout(draftT);if(!EDdirty||!ED||OFFER)return;try{localStorage.setItem(DRAFTK,JSON.stringify({t:EDat||Date.now(),base:ED.v||0,sid:EDSID,st:EDsrv==='saved'&&EDsrvGen===EDgen?EDsrvT:0,ed:ED}));EDlocal=true}catch(e){EDlocal=false}edState()}
 // the copy on this device is shared by every tab of this browser: it is removed only when it is this tab's own (any: when it was chosen or found unneeded)
 function draftClear(any){clearTimeout(draftT);try{var d=draftGet();if(any||!d||!d.sid||d.sid===EDSID)localStorage.removeItem(DRAFTK)}catch(e){}}
 function draftGet(){try{var d=JSON.parse(localStorage.getItem(DRAFTK)||'null');return d&&d.ed&&Array.isArray(d.ed.arts)?d:null}catch(e){return null}}
@@ -2099,21 +2101,22 @@ function draftSrvLater(ms){clearTimeout(srvT);srvT=setTimeout(function(){draftSr
 function draftSrvNow(keep){clearTimeout(srvT);if(!ED||!EDdirty||OFFER||EDbusy||!TOK||EDsrvGen===EDgen)return;if(EDsrvBusy){EDsrvAgain=true;return}
  var g=EDgen,b={a:'draftSave',draft:ED,base:ED.v||0,sid:EDSID};if(EDtake)b.take=true;EDsrvBusy=true;
  EDsrvP=api(b,{keepalive:keep}).then(function(j){EDsrvBusy=false;
-  if(j.ok){EDtake=false;EDfromT=0;EDsrvGen=g;EDsrv='saved';EDsrvWhy=''}
+  if(j.ok){EDtake=false;EDfromT=0;EDsrvGen=g;EDsrv='saved';EDsrvT=j.t;EDsrvWhy='';if(g===EDgen)draftLocalNow()}   // the copy here notes that the server has exactly this
   else{var out=j._s===401||j._s===403;EDsrv=j.code==='draft_other'?'other':'local';
    EDsrvWhy=j.code==='draft_other'?'':!j._s?'The gallery can’t be reached just now, so these changes are kept on this device for now. They’ll be saved online by themselves once the connection is back.':out?'You’re signed out, so these changes are only kept on this device. Please sign in again from “Account” to keep them safe online.':'The gallery’s server couldn’t save them just now, so they’re kept on this device for now. It will try again by itself.';
    if(j.code!=='draft_other'&&!out&&!EDsrvAgain)draftSrvLater(30000)}   // try again in half a minute (another device's draft: on the next change)
   edState();if(EDsrvAgain||(j.ok&&g!==EDgen)){EDsrvAgain=false;draftSrvLater()}})}
 function draftFlush(){if(!ED||!EDdirty||OFFER||EDbusy)return;draftLocalNow();draftSrvNow(true)}
+function srvIdle(){return Promise.resolve(EDsrvP).catch(function(){})}   // after any draft save still on its way, so it can't land after a publish or a discard
 // 'Discard changes': both copies go (the server's only when it is this dashboard's own, or the draft it carried on from)
 function draftDrop(){clearTimeout(srvT);draftClear();EDsrv='';EDsrvGen=-1;EDsrvWhy='';var b={a:'draftClear',sid:EDSID};if(EDfromT)b.t=EDfromT;EDtake=false;EDfromT=0;
- return TOK?Promise.resolve(EDsrvP).then(function(){return api(b)}):Promise.resolve({})}
+ return TOK?srvIdle().then(function(){return api(b)}):Promise.resolve({})}
 function draftNotice(body){var o=OFFER,d=el('div','mailwarn edoffer');d.setAttribute('role','region');d.setAttribute('aria-label','Unpublished changes');
  d.appendChild(el('b',null,'You have unpublished changes from '+fdt(o.t)+'.'));d.appendChild(document.createTextNode(o.src==='server'?' They were saved as a draft.':' They were saved on this device.'));
  if(o.changes&&o.changes.length){d.appendChild(el('p',null,'What they change:'));var cl=el('ul');o.changes.forEach(function(x){cl.appendChild(el('li',null,x))});d.appendChild(cl)}
  if(o.stale){d.appendChild(el('p',null,'Your gallery has been published again since you started them, so they don’t include those newer changes. If you carry on, you’ll be asked to confirm before they replace the newer version.'));
   if(o.newer.length){var ul=el('ul');o.newer.slice(0,3).forEach(function(x){ul.appendChild(el('li',null,'Published '+fdt(x.v)+': '+((x.changes||[]).slice(0,3).join('; ')||'no notes')))});if(o.newer.length>3)ul.appendChild(el('li',null,'and '+(o.newer.length-3)+' more'));d.appendChild(ul)}}
- if(o.older)d.appendChild(el('p',null,'There’s also an older draft from '+fdt(o.older)+'. If you carry on with these changes, it will be replaced.'));
+ if(o.older)d.appendChild(el('p',null,'There’s also an older '+(o.src==='device'?'draft':'copy on this device')+' from '+fdt(o.older)+'. If you carry on with these changes, it will be replaced.'));
  var acts=el('div','edacts'),cf=el('div','edconfirm'),yes=sbtn('Yes, discard them',function(){yes.disabled=true;offerDiscard()},'sb warn'),dis=sbtn('Discard them',function(){cf.hidden=false;yes.focus()},'sb warn');cf.hidden=true;
  acts.appendChild(sbtn('Continue where I left off',offerContinue,'btn main'));acts.appendChild(dis);d.appendChild(acts);
  cf.appendChild(el('span',null,'Discard these changes for good? They were never published, so they can’t be brought back afterwards.'));cf.appendChild(yes);cf.appendChild(sbtn('Keep them',function(){cf.hidden=true;dis.focus()}));d.appendChild(cf);body.appendChild(d)}
@@ -2126,7 +2129,7 @@ function offerDiscard(){var o=OFFER;if(!o)return;OFFER=null;var dev=draftGet(),s
  if(o.src==='device'){draftClear(1);if(srv&&srv.sid===o.sid){SRVD=null;job=api({a:'draftClear',t:srv.t})}}
  else{SRVD=null;job=api({a:'draftClear',t:o.t});if(dev&&dev.sid===o.sid)draftClear(1)}
  EDnote='Your unpublished changes were discarded.';EDnoteWarn=false;job.then(function(){return edOffer()}).then(function(){drawTab()})}
-function markDirty(){EDdirty=true;EDgen++;EDmsg='';draftSave();draftSrvLater();edState()}
+function markDirty(){EDdirty=true;EDgen++;EDat=Date.now();EDmsg='';if(EDfail&&!EDfailKeep){if($('dErr').textContent===EDfail)$('dErr').textContent='';EDfail=''}draftSave();draftSrvLater();edState()}
 function edState(){var s=$('edState'),p=$('edPub'),d=$('edDis'),e=$('edErr'),w=$('edWhy');if(!s)return;
  s.textContent=EDbusy?'Publishing…':!EDdirty?(PUBCAT?'Everything is published':'Nothing published yet'):EDsrv==='saved'&&EDsrvGen===EDgen?'Unpublished changes — saved as a draft':EDsrv==='local'||EDsrv==='other'?(EDlocal?'Unpublished changes — saved on this device only':'Unpublished changes — not saved yet. Please keep this page open and publish when you can.'):'Unpublished changes';
  if(p)p.disabled=EDbusy||!EDdirty;if(d)d.disabled=EDbusy||!EDdirty;if(e)e.textContent=EDfail||'';
@@ -2177,7 +2180,7 @@ function ensureWM(cat){var todo=(cat.arts||[]).filter(function(a){return/^\/api\
  return todo.reduce(function(pr,a){return pr.then(function(){return new Promise(function(res){var im=new Image();
   im.onload=function(){try{var d=wmCanvas(im,1600).toDataURL('image/jpeg',.85);api({a:'imgUpload',data:d,type:'image/jpeg'}).then(function(j){if(j&&j.url){a.wm=j.url;a.wmOf=a.img}res()},function(){res()})}catch(e){res()}};
   im.onerror=function(){res()};im.src=edSrc(a.img)})})},Promise.resolve())}
-function publish(){if(EDbusy||!ED)return;ASK=null;EDfail=edProblems();if(EDfail){$('dErr').textContent=EDfail;drawTab();return}
+function publish(){if(EDbusy||!ED)return;ASK=null;EDfail=edProblems();EDfailKeep=!!EDfail;if(EDfail){$('dErr').textContent=EDfail;drawTab();return}
  var step2=function(base){var rm=edRemovals();if(!rm.length)return doPublish(base);
   ASK={t:'Publishing will take these out of your gallery:',list:rm,q:'Visitors won’t see them any more. The version that’s live now stays in Settings → Earlier versions, so you can bring them back.',yes:'Take them out and publish',go:function(){doPublish(base)}};drawTab()};
  if(PUBV&&ED.v!==PUBV){ASK={t:'Your gallery was published again after you started these changes.',p:NEWER.length?'Published since then:':'The newer version is from '+fdt(PUBV)+'.',
@@ -2185,13 +2188,14 @@ function publish(){if(EDbusy||!ED)return;ASK=null;EDfail=edProblems();if(EDfail)
  step2(ED.v||0)}
 // base: the version these changes started from (or, once Pam has confirmed, the newer one they replace)
 function doPublish(base){if(EDbusy||!ED)return;EDbusy=true;EDfail='';EDmsg='';$('dErr').textContent='';clearTimeout(draftT);clearTimeout(srvT);if(document.querySelector('#dBody .edask'))drawTab();else edState();var g=0;
- Promise.resolve(EDsrvP).then(function(){return ensureWM(ED)}).then(function(){return ensureTZ(ED)}).then(function(){g=EDgen;return api({a:'catSave',cat:ED,base:base,sid:EDSID})}).then(function(j){if(j&&j.emailed)notice('Members emailed','Your new early-access work was announced to '+j.emailed+' member'+(j.emailed>1?'s':'')+' who asked for news.');return j}).then(function(j){EDbusy=false;
-  if(j.error){EDfail=j.code==='stale'?'Your gallery was published again from another device or tab while you were working. Nothing is lost — your changes are kept as a draft. Press “Publish changes” again to see what to do.':j.code==='base_missing'?'This page is out of date. Your changes are kept as a draft — please reload the page and publish again.':edErrMsg(j,1);
+ srvIdle().then(function(){return ensureWM(ED)}).then(function(){return ensureTZ(ED)}).then(function(){g=EDgen;return api({a:'catSave',cat:ED,base:base,sid:EDSID})}).then(function(j){if(j&&j.emailed)notice('Members emailed','Your new early-access work was announced to '+j.emailed+' member'+(j.emailed>1?'s':'')+' who asked for news.');return j}).then(function(j){EDbusy=false;
+  if(j.error){EDfailKeep=false;EDfail=j.code==='stale'?'Your gallery was published again from another device or tab while you were working. Nothing is lost — your changes are kept as a draft. Press “Publish changes” again to see what to do.':j.code==='base_missing'?'This page is out of date. Your changes are kept as a draft — please reload the page and publish again.':edErrMsg(j,1);
    $('dErr').textContent=EDfail;if(j.code==='stale')edRefreshLive();draftSave();draftSrvLater();drawTab();return}
   PV=j.pv||PV;PUBCAT=edNorm(JSON.parse(JSON.stringify(j.cat)));PUBV=PUBCAT.v;EDstale=false;EDnote='';NEWER=[];EDlines=j.unchanged?[]:(j.changes||[]);EDtake=false;
   if(g===EDgen){ED=JSON.parse(JSON.stringify(PUBCAT));EDdirty=false;EDsrv='';EDsrvWhy='';draftClear();if(EDfromT)api({a:'draftClear',t:EDfromT});EDfromT=0;EDmsg=j.unchanged?'Nothing new to publish — your gallery already looks like this.':'Published — visitors will see your changes from their next visit.'}
   else{ED.v=PUBV;EDmsg='Published. You made more changes while it was publishing — press “Publish changes” again to publish those too.';draftSave();draftSrvLater()}
-  applySite(PUBCAT);siteRefresh();drawTab()})}
+  applySite(PUBCAT);siteRefresh();drawTab()})
+ .catch(function(e){if(!EDbusy){console.error(e);return}EDbusy=false;EDfailKeep=false;EDfail='Something went wrong, so nothing was published. Your changes are kept on this device — please try again.';$('dErr').textContent=EDfail;draftSave();draftSrvLater();drawTab()})}
 // paintings and collections that publishing would take off the live gallery
 function edRemovals(){if(!PUBCAT||!ED)return[];var have={},out=[];ED.arts.forEach(function(a){have[a.id]=1});
  PUBCAT.arts.forEach(function(a){if(!have[a.id])out.push('The painting “'+(a.t||'Untitled')+'”')});
@@ -2464,7 +2468,7 @@ function drawTab(){var body=$('dBody'),j=DASH;body.textContent='';if(dTab!=='v')
   if(!j.members.list.length){body.appendChild(el('p','empty','No members yet.'));return}
   var P=tableOf(['Name','Email','Joined','Paintings owned','News']);j.members.list.forEach(function(m){var tr=el('tr');tr.appendChild(el('td',null,m.name));tr.appendChild(el('td',null,m.email));tr.appendChild(el('td',null,fdate(m.joined)));tr.appendChild(el('td',null,m.owned.join(', ')||'—'));tr.appendChild(el('td',null,m.news?'Yes':'—'));P.tb.appendChild(tr)});body.appendChild(P.w)}}
 [].forEach.call(document.querySelectorAll('#dash .dtabs button'),function(b){b.addEventListener('click',function(){dTab=b.getAttribute('data-t');[].forEach.call(document.querySelectorAll('#dash .dtabs button'),function(x){x.setAttribute('aria-selected',x===b)});drawTab()})});
-$('dRefresh').addEventListener('click',loadDash);$('dClose').addEventListener('click',function(){dashD.close()});
+$('dRefresh').addEventListener('click',function(){loadDash();edSync()});$('dClose').addEventListener('click',function(){dashD.close()});
 /* ---------- about & contact ---------- */
 var about=$('about');$('aboutText').textContent=ABOUT;$('aboutMail').textContent=EMAIL;$('aboutMail').href='mailto:'+EMAIL;$('aboutEnq').href='mailto:'+EMAIL+'?subject='+encodeURIComponent('Enquiry for '+ARTIST);
 $('navAbout').addEventListener('click',function(){about.showModal()});$('aboutClose').addEventListener('click',function(){about.close()});
