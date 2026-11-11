@@ -43,9 +43,12 @@ async function pipe(cmds) {
 }
 const J = s => { try { return s ? JSON.parse(s) : null } catch (e) { return null } };
 // like pipe(), but a command the database turns away (for example because it is full) is an error, never a quiet success
-const FULL_MSG = 'The gallery’s database is full, so nothing new could be saved. Your changes are still safe in your draft — please tell Claude so it can make room.';
-const SAVE_MSG = 'The gallery’s database couldn’t save this just now, so nothing was changed. Your changes are still safe in your draft — please try again in a few minutes, and tell Claude if it keeps happening.';
-const refused = m => { console.error('db refused:', m); return /OOM|maxmemory/i.test(m) ? err(FULL_MSG, 507) : err(SAVE_MSG, 503) };
+// (the dashboard adds where Pam's unpublished changes are kept: as a draft, or only on her device)
+const FULL_MSG = 'The gallery’s database is full, so nothing new could be saved. Please tell Claude so it can make room.';
+const SAVE_MSG = 'The gallery’s database couldn’t save this just now, so nothing was changed. Please try again in a few minutes, and tell Claude if it keeps happening.';
+const LIMIT_MSG = 'The gallery’s database has used up its allowance of requests for now, so nothing new could be saved. Please tell Claude.';
+// a full Upstash database says 'ERR DB capacity quota exceeded' (reads and deletes still work); Redis itself says 'OOM … maxmemory'
+const refused = m => { console.error('db refused:', m); return /OOM|maxmemory|capacity quota|max data size/i.test(m) ? err(FULL_MSG, 507) : /max (daily |monthly )?requests? limit|request limit exceeded/i.test(m) ? err(LIMIT_MSG, 503) : err(SAVE_MSG, 503) };
 async function pipeOk(cmds) {
   if (!cmds.length) return [];
   const r = await fetch(DB_URL.replace(/\/$/, '') + '/pipeline', { method: 'POST', headers: { Authorization: 'Bearer ' + DB_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify(cmds) });
@@ -138,11 +141,12 @@ const okCat = c => c && typeof c === 'object' && Array.isArray(c.arts) ? c : nul
 async function liveCat() {
   const raw = await db('GET', 'cat'), c = okCat(J(raw));
   if (c) return { cat: c, recovered: false };
-  const top = await db('ZREVRANGE', 'cat:idx', '0', '0', 'WITHSCORES'), v = top && top.length > 1 ? Math.round(+top[1]) : 0;
-  let k = v ? unpackV(await db('GET', 'cat:ver:' + v)) : null;
-  if (!k) k = okCat(J(((await db('LRANGE', 'cat:hist', '0', '0')) || [])[0]));   // from before every version was kept
-  if (k || raw) console.error('cat: the live copy is ' + (raw ? 'unreadable' : 'missing') + (k ? '; showing version ' + k.v : ''));
-  return { cat: k, recovered: !!k };
+  const top = (await db('ZREVRANGE', 'cat:idx', '0', '4', 'WITHSCORES')) || [];
+  let k = null, old = false;
+  for (let i = 1; i < top.length && !k; i += 2) k = unpackV(await db('GET', 'cat:ver:' + Math.round(+top[i])));   // the newest kept version that can be read
+  if (!k && !top.length) { k = okCat(J(((await db('LRANGE', 'cat:hist', '0', '0')) || [])[0])); old = !!k }   // only when nothing is kept the new way: a copy from before every version was kept
+  if (k || raw) console.error('cat: the live copy is ' + (raw ? 'unreadable' : 'missing') + (k ? '; showing version ' + k.v + (old ? ' (old list)' : '') : ''));
+  return { cat: k, recovered: !!k, old };
 }
 async function getCat() { return withEmb((await liveCat()).cat) }
 // works added to the site itself join Pam's saved catalogue (at the end) until she removes them
@@ -247,7 +251,10 @@ function cleanCat(c) {
    'cat:idx'      sorted set, score = v, member = a small summary: counts, a few names, what changed (plain English)
    'cat:draft'    unpublished changes from the dashboard {t, base, sid, cat}: a closed tab or a flat battery loses nothing
    'cat:lock'     held for a few seconds while a version is written, so two publishes never cross
-   'mig:catidx'   set once the versions kept the old way ('cat:hist', the last ten) have joined the full list */
+   'cat:draftdone' the last 50 dashboard sessions whose draft was carried on from another device ('c') or discarded there ('d'), so
+                  the copy still kept on their own device isn't offered later as forgotten work: [{s: session, t, k}]
+   'mig:catidx'   'h:<v>' once the versions kept the old way ('cat:hist', the last ten) have joined the full list, v being the newest
+                  of them; a newer one there (the old code put back for a while) is moved over too */
 const KEEP = 2000;
 const cleanSid = s => /^[a-z0-9]{8,40}$/i.test(String(s || '')) ? String(s) : '';
 const packV = c => 'z:' + zlib.gzipSync(JSON.stringify(c)).toString('base64');
@@ -356,17 +363,18 @@ function catChanges(p0, n0) {
 // at most eight lines in the list, then how many more
 function capLines(L) { L = (L || []).map(s => clean(s, 160)); const k = L.length - 8; return k > 0 ? L.slice(0, 8).concat(['and ' + k + ' more change' + (k > 1 ? 's' : '')]) : L }
 // the same gallery to a visitor: same cleaned content once the built-in works are added in ('seen' and the version number aside)
-function viewOf(c) { const x = cleanCat(withEmb(JSON.parse(JSON.stringify(c)))); x.v = 0; delete x.seen; return JSON.stringify(x) }
+function viewOf(c) { const x = cleanCat(withEmb(JSON.parse(JSON.stringify(c)))); x.v = 0; delete x.seen; x.colls.forEach(k => { delete k.id }); return JSON.stringify(x) }   // collections' ids are bookkeeping: visitors never see them
 function sameCat(a, b) { return !!(okCat(a) && okCat(b)) && viewOf(a) === viewOf(b) }
 function verSum(c, m) {
   return { v: c.v, kind: m.kind || 'publish', arts: c.arts.length, colls: c.colls.length, prints: c.prints.length, texts: Object.keys(c.texts || {}).length,
     names: c.arts.slice(0, 3).map(a => clean(a.t, 60)), changes: capLines(m.changes), from: m.from || undefined, old: m.old ? 1 : undefined };
 }
 // one publish at a time: a second one (another tab or device) is asked to wait instead of racing
+const BUSY_MSG = 'Another publish is still finishing. Please wait a few seconds, then try again.';
 async function withLock(fn) {
   const tok = id();
-  if ((await pipeOk([['SET', 'cat:lock', tok, 'NX', 'EX', '30']]))[0] !== 'OK') throw err('Another publish is still finishing. Please wait a few seconds, then try again.', 409, { code: 'busy' });
-  try { return await fn() } finally { try { if (await db('GET', 'cat:lock') === tok) await db('DEL', 'cat:lock') } catch (e) { } }
+  if ((await pipeOk([['SET', 'cat:lock', tok, 'NX', 'EX', '30']]))[0] !== 'OK') throw err(BUSY_MSG, 409, { code: 'busy' });
+  try { return await fn(tok) } finally { try { if (await db('GET', 'cat:lock') === tok) await db('DEL', 'cat:lock') } catch (e) { } }
 }
 // a page must say which version it started from; an older page (another tab or device) must not quietly undo newer work
 function checkBase(prev, base) {
@@ -374,31 +382,50 @@ function checkBase(prev, base) {
   if (base == null || base === '' || !isFinite(+base)) throw err('This page is out of date, so it can’t publish safely. Please reload the page and try again.', 409, { code: 'base_missing', live: prev.v });
   if (+base !== prev.v) throw err('Your gallery was published again from another device or tab after this page was opened, so publishing from here could undo that newer work. Reload the page, then publish again — your changes are kept as a draft.', 409, { code: 'stale', live: prev.v });
 }
+// has the old list been moved over, up to its newest version? (the flag names it; an older flag is just a time, so it moves over once more)
+const migDone = (flag, h0) => { const c = okCat(J(h0)); return !!flag && flag === 'h:' + (c ? c.v : 0) };
+async function migrateIfDue() {
+  const [flag, h] = await pipe([['GET', 'mig:catidx'], ['LRANGE', 'cat:hist', '0', '0']]);
+  if (!migDone(flag, (h || [])[0])) await migrateHist();
+}
 async function pubState() {
-  const [raw, d, mig] = await pipe([['GET', 'cat'], ['GET', 'cat:draft'], ['GET', 'mig:catidx']]);
-  if (!mig) await migrateHist();
+  const [raw, d, flag, h] = await pipe([['GET', 'cat'], ['GET', 'cat:draft'], ['GET', 'mig:catidx'], ['LRANGE', 'cat:hist', '0', '0']]);
+  // a failed move is tried again next time: every old version is still in 'cat:hist', and the live one is kept by putLive
+  if (!migDone(flag, (h || [])[0])) await migrateHist().catch(e => console.error('migrate', e.message));
   let prev = okCat(J(raw)), recovered = false;
   if (!prev) { const L = await liveCat(); prev = L.cat; recovered = L.recovered }
   return { prev, recovered, draft: J(d) };
 }
-// one-off and safe to repeat: the versions kept the old way join the full list, with what changed between them
+// safe to repeat: the versions kept the old way join the full list, with what changed between them
 async function migrateHist() {
-  const [h, raw] = await pipe([['LRANGE', 'cat:hist', '0', '9'], ['GET', 'cat']]);
-  const L = (h || []).map(s => okCat(J(s))).filter(Boolean), live = okCat(J(raw));
+  const [h, raw] = await pipeOk([['LRANGE', 'cat:hist', '0', '9'], ['GET', 'cat']]);     // a read that fails stops it (nothing is marked as moved)
+  const L = (h || []).map(s => okCat(J(s))).filter(Boolean), live = okCat(J(raw)), top = okCat(J((h || [])[0]));
   if (live && !L.some(x => x.v === live.v) && !(await db('GET', 'cat:ver:' + live.v))) L.push(live);
   const seen = new Set(), H = L.filter(x => +x.v > 0 && !seen.has(x.v) && seen.add(x.v)).sort((a, b) => b.v - a.v);
   for (let i = 0; i < H.length; i++) {      // one small request per version
     const c = H[i], older = H[i + 1], v = String(c.v);
     await pipeOk([['SET', 'cat:ver:' + v, packV(c), 'NX'], ['ZREMRANGEBYSCORE', 'cat:idx', v, v], ['ZADD', 'cat:idx', v, JSON.stringify(verSum(c, { kind: 'publish', changes: older ? catChanges(older, c) : [], old: !older }))]]);
   }
-  await pipeOk([['SET', 'mig:catidx', String(Date.now())]]);
+  await pipeOk([['SET', 'mig:catidx', 'h:' + (top ? top.v : 0)]]);
+}
+// the live copy is always kept as a version too, whatever wrote it (for example the old code, put back for a while)
+async function keepLive(prev) {
+  const v = String(prev.v);
+  if ((await pipeOk([['SET', 'cat:ver:' + v, packV(prev), 'NX']]))[0] !== 'OK') return;      // kept already: the usual case
+  const top = await db('ZREVRANGE', 'cat:idx', '0', '0', 'WITHSCORES'), tv = top && top.length > 1 ? Math.round(+top[1]) : 0;
+  const before = tv && tv < prev.v ? unpackV(await db('GET', 'cat:ver:' + tv)) : null;
+  await pipeOk([['ZREMRANGEBYSCORE', 'cat:idx', v, v], ['ZADD', 'cat:idx', v, JSON.stringify(verSum(prev, { kind: 'publish', changes: before ? catChanges(before, prev) : [], old: !before }))]]);
 }
 // the version and its line in the list first, then the live copy: nothing goes live without being kept
-async function writeVersion(c, meta, sid, draft) {     // three small steps, each checked; a failure stops before anything goes live
+async function writeVersion(c, meta, sid, draft, tok) {     // three small steps, each checked; a failure stops before anything goes live
   const v = String(c.v);
   if ((await pipeOk([['SET', 'cat:ver:' + v, packV(c)]]))[0] !== 'OK') throw err(SAVE_MSG, 503);
   const n = (await pipeOk([['ZREMRANGEBYSCORE', 'cat:idx', v, v], ['ZADD', 'cat:idx', v, JSON.stringify(verSum(c, meta))], ['ZCARD', 'cat:idx']]))[2];
-  const w = [['SET', 'cat', JSON.stringify(c)]]; if (draft && sid && draft.sid === sid) w.push(['DEL', 'cat:draft']);
+  // still this publish's turn (a very slow one could outlast the lock and cross another), and the draft still the one it started from
+  // (one carried on from another dashboard meanwhile, or saved again since, stays)
+  const [lk, dr] = await pipeOk([['GET', 'cat:lock'], ['GET', 'cat:draft']]), d2 = J(dr);
+  if (tok && lk !== tok) throw err(BUSY_MSG, 409, { code: 'busy' });
+  const w = [['SET', 'cat', JSON.stringify(c)]]; if (draft && sid && draft.sid === sid && d2 && d2.sid === sid && d2.t === draft.t) w.push(['DEL', 'cat:draft']);
   if ((await pipeOk(w))[0] !== 'OK') throw err(SAVE_MSG, 503);
   if (+n > KEEP) await pruneVers().catch(e => console.error('prune', e.message));
 }
@@ -408,14 +435,32 @@ async function pruneVers() {      // more than KEEP versions: the oldest go (at 
   if (vs.length) await pipeOk(vs.map(v => ['DEL', 'cat:ver:' + v]).concat([['ZREMRANGEBYSCORE', 'cat:idx', '-inf', String(Math.max(...vs))]]));
 }
 // make a version live (publish, restore or a backup file). The same as what's live: nothing new is written.
-async function putLive(prev, n, meta, sid, draft, recovered) {
-  if (prev && !recovered && sameCat(prev, n)) { if (draft && sid && draft.sid === sid) await pipeOk([['DEL', 'cat:draft']]); return { prev, c: prev, unchanged: true, changes: [] } }
+async function putLive(prev, n, meta, sid, draft, recovered, tok) {
+  if (prev && !recovered && sameCat(prev, n)) {
+    if (draft && sid && draft.sid === sid) await pipeOk([['DEL', 'cat:draft']]);
+    await gateImages(prev, prev).catch(e => console.error('gate', e.message));   // the picture locks as they should be (heals one left wrong)
+    return { prev, c: prev, unchanged: true, changes: [] };
+  }
   if (prev && n.v <= prev.v) n.v = prev.v + 1;
+  if (prev && !recovered) await keepLive(prev);
   const changes = (meta.changes || []).concat(catChanges(prev, n));
   await gateImages(prev, n);
-  try { await writeVersion(n, Object.assign({}, meta, { changes }), sid, draft) }
-  catch (e) { if (prev) await gateImages(n, prev).catch(() => { }); throw e }   // picture locks back as they were
+  try { await writeVersion(n, Object.assign({}, meta, { changes }), sid, draft, tok) }
+  catch (e) {
+    // the database may have taken the new live copy although its answer was lost on the way back: then it is live, and that's success
+    const now = okCat(J(await db('GET', 'cat').catch(() => null)));
+    if (now && now.v === n.v) { console.error('publish: the answer was lost, but the version is live', e.message); return { prev, c: n, changes } }
+    if (prev) await gateImages(n, prev).catch(() => { }); throw e;   // picture locks back as they were
+  }
   return { prev, c: n, changes };
+}
+// a dashboard's catalogue that can't be read at all (it's checked again by cleanCat, which turns it into plain text and numbers)
+function cleanOr(c, msg) { try { return cleanCat(c) } catch (e) { throw err(msg, 400) } }
+const ODD_MSG = 'Some of the details couldn’t be read — please check them and try again.';
+// sessions whose draft was carried on ('c') or discarded ('d') on another device: see 'cat:draftdone' above
+async function markDone(sid, k) {
+  const L = J(await db('GET', 'cat:draftdone')), A = (Array.isArray(L) ? L : []).filter(x => x && x.s !== sid);
+  A.unshift({ s: sid, t: Date.now(), k }); await pipeOk([['SET', 'cat:draftdone', JSON.stringify(A.slice(0, 50))]]);
 }
 async function afterLive(o) {     // after the lock: members who asked for news hear about new members-only work
   let emailed = 0; if (!o.unchanged) try { emailed = await dropMail(o.prev, o.c) } catch (e) { console.error('drop', e.message) }
@@ -781,12 +826,12 @@ const actions = {
     if (L.recovered) await withLock(async () => { if (!okCat(J(await db('GET', 'cat')))) { await pipeOk([['SET', 'cat', JSON.stringify(L.cat)]]); healed = L.cat.v } }).catch(e => console.error('heal', e.message));
     if (!L.cat) return { cat: null, none: true, live: 0, pv: {} };   // nothing published yet: the only time the dashboard may start from the built-in paintings
     const cat = withEmb(L.cat);
-    return { cat, live: cat.v, pv: ownerPv(cat), healed: healed || undefined };
+    return { cat, live: cat.v, pv: ownerPv(cat), healed: healed || undefined, healedOld: healed && L.old ? 1 : undefined };
   },
   // the list of published versions, newest first, twenty at a time
   async catHist(req, b) {
     await owner(req);
-    if (!(await db('GET', 'mig:catidx'))) await migrateHist();
+    await migrateIfDue().catch(e => console.error('migrate', e.message));   // the list as it is; the move is tried again next time
     const from = Math.max(0, Math.min(KEEP, Math.floor(+(b && b.from) || 0)));
     const [rows, total, raw] = await pipe([['ZREVRANGE', 'cat:idx', String(from), String(from + 20)], ['ZCARD', 'cat:idx'], ['GET', 'cat']]);
     const L = (rows || []).map(J).filter(x => x && x.v), live = okCat(J(raw)) || (await liveCat()).cat;
@@ -796,7 +841,7 @@ const actions = {
   async catVer(req, b) {
     await owner(req);
     if (!b.v) { const { cat } = await liveCat(); if (!cat) throw err('Nothing has been published yet.', 404); return { cat, live: true } }
-    if (!(await db('GET', 'mig:catidx'))) await migrateHist();
+    await migrateIfDue().catch(e => console.error('migrate', e.message));
     const v = Math.round(+b.v), c = v > 0 ? unpackV(await db('GET', 'cat:ver:' + v)) : null;
     if (!c) throw err('That version is no longer kept.', 404);
     return { cat: c };
@@ -805,12 +850,12 @@ const actions = {
   async catRestore(req, b) {
     await owner(req);
     const v = Math.round(+b.v), sid = cleanSid(b.sid);
-    const out = await withLock(async () => {
+    const out = await withLock(async tok => {
       const { prev, draft, recovered } = await pubState();
       const old = v > 0 ? unpackV(await db('GET', 'cat:ver:' + v)) : null; if (!old) throw err('That version is no longer kept.', 404);
-      checkBase(prev, b.base);
       const n = cleanCat(old); if (!n.arts.length) throw err('That version has no paintings, so it can’t be brought back.', 400);
-      return await putLive(prev, n, { kind: 'restore', from: v, changes: ['Restored the version from ' + verWhen(v)] }, sid, draft, recovered);
+      if (!(prev && !recovered && sameCat(prev, n))) checkBase(prev, b.base);    // the same as what's live: nothing is replaced, whichever version the page started from
+      return await putLive(prev, n, { kind: 'restore', from: v, changes: ['Restored the version from ' + verWhen(v)] }, sid, draft, recovered, tok);
     });
     return await afterLive(out);
   },
@@ -824,11 +869,11 @@ const actions = {
   async catSave(req, b) {
     await owner(req);
     if (!b.cat || typeof b.cat !== 'object') throw err('Nothing to save.', 400);
-    const c = cleanCat(b.cat), sid = cleanSid(b.sid); if (!c.arts.length) throw err('Keep at least one painting in the gallery.', 400);
-    const out = await withLock(async () => {
+    const c = cleanOr(b.cat, ODD_MSG), sid = cleanSid(b.sid); if (!c.arts.length) throw err('Keep at least one painting in the gallery.', 400);
+    const out = await withLock(async tok => {
       const { prev, draft, recovered } = await pubState();
-      checkBase(prev, b.base);
-      return await putLive(prev, c, { kind: 'publish' }, sid, draft, recovered);
+      if (!(prev && !recovered && sameCat(prev, c))) checkBase(prev, b.base);    // the same as what's live (a publish whose answer was lost, sent again): nothing is replaced
+      return await putLive(prev, c, { kind: 'publish' }, sid, draft, recovered, tok);
     });
     return await afterLive(out);
   },
@@ -838,7 +883,8 @@ const actions = {
     let raw = b.cat && typeof b.cat === 'object' ? b.cat : null;
     if (raw && raw.kind === 'pams-gallery-backup' && raw.cat && typeof raw.cat === 'object') raw = raw.cat;   // the whole file is fine too
     if (!raw || !Array.isArray(raw.arts)) throw err('That file isn’t a gallery backup.', 400);
-    const n = cleanCat(raw), sid = cleanSid(b.sid), from = Math.round(+(b.from || raw.v) || 0) || undefined;
+    const n = cleanOr(raw, 'That file isn’t a gallery backup.'), sid = cleanSid(b.sid);
+    const fv = typeof b.from === 'number' && b.from > 0 ? b.from : typeof raw.v === 'number' ? raw.v : 0, from = isFinite(fv) && fv > 0 ? Math.round(fv) : undefined;
     if (!n.arts.length) throw err('That backup has no paintings the gallery can use, so it can’t be restored.', 400);
     if (b.dry) {
       const { cat: prev } = await liveCat(), keys = [];
@@ -847,36 +893,50 @@ const actions = {
       return { ok: true, preview: { arts: n.arts.length, colls: n.colls.length, prints: n.prints.length, texts: Object.keys(n.texts).length, names: n.arts.slice(0, 3).map(a => clean(a.t, 60)),
         dropped: raw.arts.length - n.arts.length, missing: metas.filter(x => !J(x)).length, same: sameCat(prev, n), changes: capLines(catChanges(prev, n)) } };
     }
-    const out = await withLock(async () => {
+    const out = await withLock(async tok => {
       const { prev, draft, recovered } = await pubState();
-      checkBase(prev, b.base);
-      return await putLive(prev, n, { kind: 'import', from, changes: ['Restored from a backup file'] }, sid, draft, recovered);
+      if (!(prev && !recovered && sameCat(prev, n))) checkBase(prev, b.base);
+      return await putLive(prev, n, { kind: 'import', from, changes: ['Restored from a backup file'] }, sid, draft, recovered, tok);
     });
     return await afterLive(out);
   },
   // unpublished changes, saved as Pam works. One draft at a time: a dashboard replaces another dashboard's draft only when Pam chose to
+  // carry on with it there (take = the time of the draft she was shown: a newer one saved meanwhile is never replaced unseen)
   async draftSave(req, b) {
     await owner(req);
     const sid = cleanSid(b.sid); if (!sid || !b.draft || typeof b.draft !== 'object' || !Array.isArray(b.draft.arts)) throw err('Nothing to save.', 400);
-    const cat = cleanCat(b.draft); delete cat.v;
-    const old = J(await db('GET', 'cat:draft'));
-    if (old && old.sid && old.sid !== sid && !b.take) throw err('Another device or tab has unpublished changes saved as a draft.', 409, { code: 'draft_other', draft: { t: old.t, base: old.base } });
-    const d = { t: Date.now(), base: Math.max(0, Math.round(+b.base || 0)), sid, cat };
-    await pipeOk([['SET', 'cat:draft', JSON.stringify(d)]]);
-    return { ok: true, t: d.t };
+    const cat = cleanOr(b.draft, ODD_MSG); delete cat.v;
+    const gen = Math.max(0, Math.floor(+b.gen || 0)) || 0, take = b.take === true ? true : Math.round(+b.take || 0) || 0;
+    const d = { t: Date.now(), base: Math.max(0, Math.round(+b.base || 0)) || 0, sid, gen, cat };
+    for (let i = 0; i < 3; i++) {
+      const old = J(await db('GET', 'cat:draft'));
+      if (old && old.sid && old.sid !== sid && !(take === true || (take && +old.t === take))) throw err('Another device or tab has unpublished changes saved as a draft.', 409, { code: 'draft_other', draft: { t: old.t, base: old.base } });
+      if (old && old.sid === sid && gen && +old.gen > gen) return { ok: true, t: old.t, gen: +old.gen, kept: true };   // an older save from this dashboard arriving late: the newer one stays
+      // no draft yet: written only if there still isn't one, so two dashboards saving their first draft at the same moment can't both be told 'saved'
+      if ((await pipeOk([old ? ['SET', 'cat:draft', JSON.stringify(d)] : ['SET', 'cat:draft', JSON.stringify(d), 'NX']]))[0] !== 'OK') continue;
+      if (old && old.sid !== sid && b.from && +b.from === +old.t) await markDone(old.sid, 'c').catch(e => console.error('draftdone', e.message));   // carried on from that draft itself
+      return { ok: true, t: d.t };
+    }
+    throw err('Another device or tab has unpublished changes saved as a draft.', 409, { code: 'draft_other' });
   },
-  async draftGet(req) {
+  // the draft, the server's clock (to compare with copies kept on a device), and which of the dashboard's own copies were carried on or discarded elsewhere
+  async draftGet(req, b) {
     await owner(req);
-    const [rd, rc] = await pipe([['GET', 'cat:draft'], ['GET', 'cat']]), d = J(rd);
-    if (!d || !okCat(d.cat)) return { draft: null };
-    if (sameCat(J(rc), d.cat)) { await pipeOk([['DEL', 'cat:draft']]); return { draft: null } }   // nothing in it that isn't live already
-    return { draft: d };
+    const devs = (Array.isArray(b && b.devs) ? b.devs : []).slice(0, 20).map(x => typeof x === 'string' ? cleanSid(x) : '').filter(Boolean);
+    const [rd, rc, rn] = await pipe([['GET', 'cat:draft'], ['GET', 'cat'], ['GET', 'cat:draftdone']]), D = J(rn), done = {};
+    if (Array.isArray(D)) devs.forEach(s => { const x = D.find(y => y && y.s === s); if (x) done[s] = { t: x.t, k: x.k } });
+    const out = { draft: null, now: Date.now(), done }, d = J(rd);
+    if (!d || !okCat(d.cat)) return out;
+    if (sameCat(J(rc), d.cat)) { await pipeOk([['DEL', 'cat:draft']]).catch(e => console.error('draft tidy', e.message)); return out }   // nothing in it that isn't live already
+    out.draft = d; return out;
   },
   async draftClear(req, b) {
     await owner(req);
     const d = J(await db('GET', 'cat:draft'));
     if (!d || !((b.t && +b.t === d.t) || (b.sid && b.sid === d.sid))) return { ok: true, cleared: false };
-    await pipeOk([['DEL', 'cat:draft']]); return { ok: true, cleared: true };
+    await pipeOk([['DEL', 'cat:draft']]);
+    if ((b.done === 'c' || b.done === 'd') && d.sid && d.sid !== b.sid) await markDone(d.sid, b.done).catch(e => console.error('draftdone', e.message));
+    return { ok: true, cleared: true };
   },
   // a photo, already resized in the browser; kept in pieces small enough for the database
   async imgUpload(req, b) {

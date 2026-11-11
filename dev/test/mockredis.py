@@ -4,13 +4,13 @@ def alive(k):
     if k in E and E[k]<time.time(): D.pop(k,None);E.pop(k,None)
     return k in D
 FAILW=['']   # test-only: writes to this key are refused the way a full Upstash database refuses them ('' = off, '*' = every write, 'img:*' = keys starting img:)
-WRITES={'SET','SETNX','INCR','EXPIRE','DEL','HINCRBY','HSETNX','LPUSH','LTRIM','SADD','SREM','ZADD','ZINCRBY','ZREM','ZREMRANGEBYSCORE','PFADD'}
+WRITES={'SET','SETNX','INCR','EXPIRE','HINCRBY','HSETNX','LPUSH','LTRIM','SADD','SREM','ZADD','ZINCRBY','ZREM','ZREMRANGEBYSCORE','PFADD'}   # as on Upstash, a full database still lets keys be deleted
 class Refused(Exception): pass
 def run(c):
     c=[str(x) for x in c];op=c[0].upper();a=c[1:]
     if op=='MOCK.FAILWRITES': FAILW[0]=a[0] if a else '';return 'OK'
     f=FAILW[0]
-    if f and op in WRITES and (f=='*' or (a[0].startswith(f[:-1]) if f.endswith('*') else a[0]==f)): raise Refused("OOM command not allowed when used memory > 'maxmemory'.")
+    if f and op in WRITES and (f=='*' or (a[0].startswith(f[:-1]) if f.endswith('*') else a[0]==f)): raise Refused('ERR DB capacity quota exceeded')   # Upstash's own words
     [alive(k) for k in list(E)]
     if op=='GET': v=D.get(a[0]);return v if isinstance(v,str) else None
     if op=='SET':
