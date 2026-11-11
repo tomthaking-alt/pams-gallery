@@ -108,6 +108,26 @@ async function part1() {
   r = await P({ a: 'catImport', cat: file, base: v, sid: sA }, OT); ok(r.ok && r.changes[0] === 'Restored from a backup file' && r.cat.arts[0].t === A.t, 'a backup goes live as a new version: ' + r.changes.slice(0, 3).join(' | ')); v = r.cat.v;
   h = await P({ a: 'catHist' }, OT); ok(h.list[0].kind === 'import' && h.list[0].from === old.v, 'listed as restored from a backup file');
   ok((await P({ a: 'catImport', cat: { arts: 'x' }, dry: true }, OT))._s === 400 && (await P({ a: 'catImport', cat: { arts: [{ id: 'bad id!', img: 'nope' }] }, dry: true }, OT))._s === 400, 'not a backup, or nothing usable in it: refused');
+  // what restoring a version would change, before anything changes
+  const nh = (await P({ a: 'catHist' }, OT)).total;
+  r = await P({ a: 'catRestore', v: made[0].v, dry: true }, OT);   // the first rename above (the backup just brought the starting version back)
+  ok(r.ok && r.preview && !r.preview.same && same(r.preview.changes, ['Renamed “' + A.t + '” to “P6 Renamed”']) && (await P({ a: 'catHist' }, OT)).total === nh && (await P({ a: 'catGet' }, OT)).cat.v === v, 'restore, just looking: says what bringing back a version would change, and changes nothing: ' + (r.preview && r.preview.changes.slice(0, 2).join(' | ')));
+  r = await P({ a: 'catRestore', v: v, dry: true }, OT); ok(r.ok && r.preview && r.preview.same === true, 'restore, just looking, of the live version: “the same”');
+  r = await P({ a: 'catRestore', v: 1, dry: true }, OT); ok(r._s === 404, 'restore, just looking, of a version that was never kept: 404');
+  // a backup's problems, by name
+  const bad = clone((await P({ a: 'catGet' }, OT)).cat); bad.arts.push({ id: 'bad id!', t: 'P6 Broken', img: 'emb:p1' }); bad.arts.push({ id: 'p6lost', t: 'P6 Lost photo', img: '/api/app?img=p6notthere00' });
+  r = await P({ a: 'catImport', cat: bad, dry: true }, OT);
+  ok(r.ok && r.preview.dropped === 1 && same(r.preview.droppedNames, ['P6 Broken']) && r.preview.missing === 1 && same(r.preview.missingNames, ['P6 Lost photo']), 'a backup’s problems are named: ' + JSON.stringify(r.preview && [r.preview.droppedNames, r.preview.missingNames]));
+  // a draft started before a newer publish: compared with the version it started from, only its own changes are listed
+  const base0 = (await P({ a: 'catGet' }, OT)).cat, mine = clone(base0); mine.arts[1].t = 'P6 Mine only';
+  const newer = clone(base0); newer.arts[2].t = 'P6 Newer elsewhere'; r = await P({ a: 'catSave', cat: newer, base: base0.v }, OT); if (r.ok) v = r.cat.v;
+  r = await P({ a: 'catImport', cat: mine, dry: true, against: base0.v }, OT);
+  ok(r.ok && same(r.preview.changes, ['Renamed “' + base0.arts[1].t + '” to “P6 Mine only”']) && r.preview.against === base0.v && r.preview.sameAgainst === false && r.preview.same === false, 'a draft compared with the version it started from lists only its own change: ' + JSON.stringify(r.preview && r.preview.changes));
+  r = await P({ a: 'catImport', cat: mine, dry: true }, OT);
+  ok(r.ok && r.preview.changes.length === 2 && !r.preview.against, 'compared with the live gallery it would also undo the newer change: ' + JSON.stringify(r.preview && r.preview.changes));
+  r = await P({ a: 'catImport', cat: clone(base0), dry: true, against: base0.v }, OT); ok(r.ok && r.preview.sameAgainst === true, 'a draft with nothing of its own since the version it started from: sameAgainst');
+  r = await P({ a: 'catImport', cat: mine, dry: true, against: 1 }, OT); ok(r.ok && !r.preview.against && r.preview.changes.length === 2, 'started from a version that isn’t kept any more: compared with the live gallery instead');
+  ok((await P({ a: 'catHist' }, OT)).total === nh + 1, 'looking changes nothing (only the one publish above was added)');
   // tidy up
   r = await P({ a: 'catSave', cat: clone(cat0), base: v }, OT); ok((r.ok || r.unchanged) && same(r.cat.arts.map(a => a.t), cat0.arts.map(a => a.t)), 'restored the test catalogue');
 }

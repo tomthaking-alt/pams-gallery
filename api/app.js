@@ -44,9 +44,9 @@ async function pipe(cmds) {
 const J = s => { try { return s ? JSON.parse(s) : null } catch (e) { return null } };
 // like pipe(), but a command the database turns away (for example because it is full) is an error, never a quiet success
 // (the dashboard adds where Pam's unpublished changes are kept: as a draft, or only on her device)
-const FULL_MSG = 'The gallery’s database is full, so nothing new could be saved. Please tell Claude so it can make room.';
-const SAVE_MSG = 'The gallery’s database couldn’t save this just now, so nothing was changed. Please try again in a few minutes, and tell Claude if it keeps happening.';
-const LIMIT_MSG = 'The gallery’s database has used up its allowance of requests for now, so nothing new could be saved. Please tell Claude.';
+const FULL_MSG = 'The gallery’s storage is full, so nothing new could be saved. Please tell Claude so it can make room.';
+const SAVE_MSG = 'The gallery’s server couldn’t save this just now, so nothing was changed. Please try again in a few minutes, and tell Claude if it keeps happening.';
+const LIMIT_MSG = 'The gallery’s server has used up its allowance for now, so nothing new could be saved. Please tell Claude.';
 // a full Upstash database says 'ERR DB capacity quota exceeded' (reads and deletes still work); Redis itself says 'OOM … maxmemory'
 const refused = m => { console.error('db refused:', m); return /OOM|maxmemory|capacity quota|max data size/i.test(m) ? err(FULL_MSG, 507) : /max (daily |monthly )?requests? limit|request limit exceeded/i.test(m) ? err(LIMIT_MSG, 503) : err(SAVE_MSG, 503) };
 async function pipeOk(cmds) {
@@ -456,6 +456,28 @@ async function putLive(prev, n, meta, sid, draft, recovered, tok) {
 }
 // a dashboard's catalogue that can't be read at all (it's checked again by cleanCat, which turns it into plain text and numbers)
 function cleanOr(c, msg) { try { return cleanCat(c) } catch (e) { throw err(msg, 400) } }
+// what a backup file (raw: as it came) or a kept version would change, before anything changes: how much it holds, which paintings in the file
+// can't be used and which photos aren't on the server any more (by name), whether it is the same as the live gallery, and what would change.
+// against: a version number (the one a draft started from): then 'changes' are compared with that version instead (falling back to the live
+// gallery if it isn't kept), so Pam sees only her own changes, and sameAgainst says whether there are any
+async function previewOf(n, raw, against) {
+  const { cat: prev } = await liveCat(), keys = [], who = [];
+  const nameOf = t => clean(typeof t === 'string' ? t : '', 60) || 'Untitled';
+  n.arts.forEach(a => who.push([a.img, nameOf(a.t)]));
+  n.prints.forEach(p => who.push([p.img, nameOf(p.t || (n.arts.find(a => a.id === p.art) || {}).t) + ' (print)']));
+  const named = [];
+  who.forEach(([img, t]) => { const m = /img=([a-z0-9]{6,40})/i.exec(img || ''); if (m) { keys.push(m[1]); named.push(t) } });
+  const metas = keys.length ? await pipe(keys.map(k => ['GET', 'img:' + k])) : [];
+  const missing = named.filter((t, i) => !J(metas[i])), kept = new Set(n.arts.map(a => a.id));
+  const lost = raw && Array.isArray(raw.arts) ? raw.arts.filter(a => !(a && typeof a === 'object' && kept.has(String(a.id)))) : [];
+  let base = null, av = Math.round(+against || 0);
+  if (av > 0) base = unpackV(await db('GET', 'cat:ver:' + av));
+  if (!base) av = 0;
+  return { arts: n.arts.length, colls: n.colls.length, prints: n.prints.length, texts: Object.keys(n.texts).length, names: n.arts.slice(0, 3).map(a => clean(a.t, 60)),
+    dropped: raw && Array.isArray(raw.arts) ? raw.arts.length - n.arts.length : 0, droppedNames: lost.slice(0, 5).map(a => nameOf(a && a.t)),
+    missing: missing.length, missingNames: missing.slice(0, 5),
+    same: sameCat(prev, n), changes: capLines(catChanges(base || prev, n)), against: av || undefined, sameAgainst: base ? sameCat(base, n) : undefined };
+}
 const ODD_MSG = 'Some of the details couldn’t be read — please check them and try again.';
 // sessions whose draft was carried on ('c') or discarded ('d') on another device: see 'cat:draftdone' above
 async function markDone(sid, k, gen) {     // gen: how many edits that dashboard had made by then (its copy on its own device with no more than that is all dealt with)
@@ -850,10 +872,15 @@ const actions = {
   async catRestore(req, b) {
     await owner(req);
     const v = Math.round(+b.v), sid = cleanSid(b.sid);
+    if (b.dry) {   // only say what bringing it back would change: nothing changes
+      const old = v > 0 ? unpackV(await db('GET', 'cat:ver:' + v)) : null; if (!old) throw err('That version is no longer kept.', 404);
+      const n = cleanCat(old); if (!n.arts.length) throw err('That version has no paintings, so it can’t be restored.', 400);
+      return { ok: true, preview: await previewOf(n, null) };
+    }
     const out = await withLock(async tok => {
       const { prev, draft, recovered } = await pubState();
       const old = v > 0 ? unpackV(await db('GET', 'cat:ver:' + v)) : null; if (!old) throw err('That version is no longer kept.', 404);
-      const n = cleanCat(old); if (!n.arts.length) throw err('That version has no paintings, so it can’t be brought back.', 400);
+      const n = cleanCat(old); if (!n.arts.length) throw err('That version has no paintings, so it can’t be restored.', 400);
       if (!(prev && !recovered && sameCat(prev, n))) checkBase(prev, b.base);    // the same as what's live: nothing is replaced, whichever version the page started from
       return await putLive(prev, n, { kind: 'restore', from: v, changes: ['Restored the version from ' + verWhen(v)] }, sid, draft, recovered, tok);
     });
@@ -886,13 +913,7 @@ const actions = {
     const n = cleanOr(raw, 'That file isn’t a gallery backup.'), sid = cleanSid(b.sid);
     const fv = typeof b.from === 'number' && b.from > 0 ? b.from : typeof raw.v === 'number' ? raw.v : 0, from = isFinite(fv) && fv > 0 ? Math.round(fv) : undefined;
     if (!n.arts.length) throw err('That backup has no paintings the gallery can use, so it can’t be restored.', 400);
-    if (b.dry) {
-      const { cat: prev } = await liveCat(), keys = [];
-      n.arts.concat(n.prints).forEach(x => { const m = /img=([a-z0-9]{6,40})/i.exec(x.img || ''); if (m) keys.push(m[1]) });
-      const metas = keys.length ? await pipe(keys.map(k => ['GET', 'img:' + k])) : [];
-      return { ok: true, preview: { arts: n.arts.length, colls: n.colls.length, prints: n.prints.length, texts: Object.keys(n.texts).length, names: n.arts.slice(0, 3).map(a => clean(a.t, 60)),
-        dropped: raw.arts.length - n.arts.length, missing: metas.filter(x => !J(x)).length, same: sameCat(prev, n), changes: capLines(catChanges(prev, n)) } };
-    }
+    if (b.dry) return { ok: true, preview: await previewOf(n, raw, b.against) };
     const out = await withLock(async tok => {
       const { prev, draft, recovered } = await pubState();
       if (!(prev && !recovered && sameCat(prev, n))) checkBase(prev, b.base);
