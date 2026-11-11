@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-6P3aCGZVZ6okHQZXOOldeCDDa50CjFWlKCsEWGIDrjo=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-5JEkT272FO/hL06xXZu9WR/9XWMJwafSQr4qGRHPEtA=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -1458,7 +1458,7 @@ $('cmFiles').addEventListener('change',function(){var fs=[].slice.call(this.file
 $('fComm').addEventListener('submit',function(e){e.preventDefault();var f=this,d=new FormData(f);formErr(f);busy(f,true);
  api({a:'commission',name:d.get('name'),email:d.get('email'),phone:d.get('phone'),idea:d.get('idea'),size:d.get('size'),budget:d.get('budget'),when:d.get('when'),where:d.get('where'),photos:cmPhotos}).then(function(j){busy(f,false);if(j.error)return formErr(f,j.error);
   f.reset();cmPhotos=[];cmDraw();f.hidden=true;$('cmDone').hidden=false;$('cmDone').scrollIntoView({block:'center',behavior:'smooth'})})});
-function afterDoors(){var pk=location.hash.slice(1);if((pk==='join'||pk==='signin')&&!ME)setTimeout(function(){joinNow(pk==='signin')},600);if(PAGES[pk])setTimeout(function(){openPage(pk)},500);var wm=/^#wall(\d+)$/.exec(location.hash||'');if(wm){var wk=-1;ART.forEach(function(a,i){if(a.emb==='p'+wm[1])wk=i});if(wk>=0)setTimeout(function(){viewOnWall(wk);wallCam(wk)},700)}   // back from Android's AR viewer when it isn't installed: the in-browser camera instead
+function afterDoors(){var pk=location.hash.slice(1);if((pk==='join'||pk==='signin')&&!ME)setTimeout(function(){joinNow(pk==='signin')},600);if(PAGES[pk])setTimeout(function(){openPage(pk)},500);var wm=/^#wall(\d+)$/.exec(location.hash||'');if(wm){var wk=-1;ART.forEach(function(a,i){if(a.emb==='p'+wm[1])wk=i});if(wk>=0)setTimeout(function(){viewOnWall(wk,1);wallCam(wk)},700)}   // back from Android's AR viewer when it isn't installed: the in-browser camera instead
  var m=/^#art-([a-z0-9]+)$/i.exec(location.hash||'');if(m){var k=-1;ART.forEach(function(a,i){if(a.id===m[1])k=i});if(k>=0)setTimeout(function(){if(!(window.goArt&&!teaser(ART[k])&&!aucLive(ART[k])&&window.goArt(k)))openArt(k)},900)}   // walk to it in the gallery (auctions and members' previews open their window)
  if(/[?&]paid=1/.test(location.search)){setTimeout(function(){notice('Thank you!','Your payment has gone through. Pam will be in touch by email about delivery — thank you for supporting her work.')},700);try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}}}
 function isSold(p){return /sold/i.test(p.status||'')}
@@ -1608,12 +1608,14 @@ var TOUCH=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window,IOSAR
 $('arBtn').hidden=false;
 $('arBtn').addEventListener('click',function(){viewOnWall(curArt)});
 var wallK=0;
-function viewOnWall(k){var p=ART[k];if(wallK!==k){W3.key='';W3.turn=0;$('wallTurn').value=0}wallK=k;if(dlg.open)dlg.close();wallStop();$('wallImg').src=p.img||thumb(k);$('wallImg').alt=p.t;wallEl.hidden=false;$('wallBg').hidden=true;$('wallV').hidden=true;$('wallArt').hidden=true;wallMode('');
+function viewOnWall(k,noAR){var p=ART[k];if(wallK!==k){W3.key='';W3.turn=0;$('wallTurn').value=0}wallK=k;if(dlg.open)dlg.close();wallStop();$('wallImg').src=p.img||thumb(k);$('wallImg').alt=p.t;wallEl.hidden=false;$('wallBg').hidden=true;$('wallV').hidden=true;$('wallArt').hidden=true;wallMode('');
  var m=$('wallMsg');m.hidden=false;m.textContent='';m.appendChild(el('p','wh',p.t));m.appendChild(el('p',null,'See it at home before you buy. How would you like to try it?'));
  var c=el('button','wbtn','Use my camera');c.type='button';c.addEventListener('click',function(){wallLive(wallK)});
  var ph=el('button','wbtn alt','Use a photo of any wall');ph.type='button';ph.addEventListener('click',function(){$('wallFile').click()});
- m.appendChild(c);m.appendChild(ph);if(wallARok(p)){var ar=el('button','wbtn link','Or see it at true size in your phone’s AR viewer');ar.type='button';ar.addEventListener('click',function(){wallAR(wallK)});m.appendChild(ar)}
- m.appendChild(el('p','wnote','Try different frames and turn it to match your wall. Your photo stays on your device; it isn’t uploaded anywhere.'));w3Chips(k);setTimeout(function(){try{c.focus()}catch(e){}},50)}
+ var arOK=wallARok(p),ar=null;if(arOK){ar=el('button','wbtn','See it on your wall in AR');ar.type='button';ar.addEventListener('click',function(){wallAR(wallK)});m.appendChild(ar);c.className='wbtn alt'}   // AR first, where the phone has it
+ m.appendChild(c);m.appendChild(ph);
+ m.appendChild(el('p','wnote','Try different frames and turn it to match your wall. Your photo stays on your device; it isn’t uploaded anywhere.'));w3Chips(k);setTimeout(function(){try{(ar||c).focus()}catch(e){}},50);
+ if(arOK&&TOUCH&&!noAR)wallAR(k)}   // on phones, AR opens straight away (still inside the tap, as the AR viewers require); the choices above wait for them when they come back
 function wallLive(k){wallCam(k)}
 function wallARok(p){var n=p.ar&&p.emb?+p.emb.slice(1):0;return n&&(IOSAR||ANDROID&&/^https:/.test(location.href))?n:0}
 function wallAR(k){var p=ART[k],n=p.ar&&p.emb?+p.emb.slice(1):0;
