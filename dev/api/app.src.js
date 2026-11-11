@@ -572,7 +572,7 @@ const actions = {
   async catHist(req) {
     await owner(req);
     const L = (await db('LRANGE', 'cat:hist', '0', '9')).map(J).filter(Boolean);
-    return { list: L.map(c => ({ v: c.v, arts: (c.arts || []).length, colls: (c.colls || []).length, prints: (c.prints || []).length, texts: Object.keys(c.texts || {}).length })) };
+    return { list: L.map(c => ({ v: c.v, arts: (c.arts || []).length, colls: (c.colls || []).length, prints: (c.prints || []).length, texts: Object.keys(c.texts || {}).length, names: (c.arts || []).slice(0, 3).map(a => clean(a.t, 60)) })) };   // a few painting names, to recognise each version
   },
   async catRestore(req, b) {
     await owner(req);
@@ -592,6 +592,8 @@ const actions = {
     if (!b.cat || typeof b.cat !== 'object') throw err('Nothing to save.', 400);
     const c = cleanCat(b.cat); if (!c.arts.length) throw err('Keep at least one painting in the gallery.', 400);
     const prev = J(await db('GET', 'cat'));
+    // an older dashboard (another tab or device, opened before the last publish) must not quietly undo newer work
+    if (b.base != null && prev && prev.v && +b.base !== prev.v) throw err('Your gallery was changed on another device or tab after you opened this page, so publishing from here would undo those changes. Reload the page to get the latest version, then make your change again.', 409);
     await gateImages(prev, c);
     await pipe([['SET', 'cat', JSON.stringify(c)], ['LPUSH', 'cat:hist', JSON.stringify(c)], ['LTRIM', 'cat:hist', '0', '9']]);   // the last ten versions are kept, just in case
     let emailed = 0; try { emailed = await dropMail(prev, c) } catch (e) { console.error('drop', e.message) }
