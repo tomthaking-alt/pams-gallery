@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-R+4rfMC4iWv04wNceV+mh/a17lfazLydWxf4by7HShk=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-olxcB6Xvz+ygbQFQl9dgC66fnV9TnS4GD3ng0KE6M78=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -1179,13 +1179,14 @@ var FRAMES={"gilt": "Gilded baroque", "silver": "Silver baroque", "ivory": "Ivor
 function frameAuto(p){var id=p.emb||(/^emb:/.test(p.img||'')?p.img.slice(4):'');return FRDEF[id]||(/ink|pen\b|pencil|drawing|charcoal|graphite|etching|linocut|print/i.test(p.m||'')?'black':/digital/i.test(p.m||'')?'brass':/watercolou?r|gouache|pastel/i.test(p.m||'')?'oak':'gilt')}
 function frameOf(p){return p&&p.fr&&FRAMES[p.fr]?p.fr:frameAuto(p||{})}
 function priceOf(a){return a.mode==='auction'?'Auction':a.mode==='price'&&a.p?a.p:'Price on request'}
-function embImg(v){return /^emb:/.test(v||'')&&EMB[v.slice(4)]?EMB[v.slice(4)].img:v}
+function wpOf(u){return /^\/lib\/[\w-]+\.jpg$/.test(u||'')?u.replace(/\.jpg$/,'.webp'):u}   // the build makes a WebP copy of every built-in painting and thumbnail
+function embImg(v){return /^emb:/.test(v||'')&&EMB[v.slice(4)]?wpOf(EMB[v.slice(4)].img):v}
 /* works added to the site itself appear in Pam's catalogue until she removes them */
 function withEmb(c){if(!c||!Array.isArray(c.arts))return c;var seen=Array.isArray(c.seen)&&c.seen.length?c.seen:['p1','p2','p3','p4','p5','p6'],have={};c.arts.forEach(function(a){have[a.id]=1});
  Object.keys(EMB).forEach(function(id){var e=EMB[id];if(seen.indexOf(id)<0&&!have[id])c.arts.push({id:id,t:e.t,m:e.m||'',s:'',year:'',d:e.d||'',p:'',mode:'request',status:'Available',w:e.w,h:e.h,bg:e.bg||'#cfc6d6',img:'emb:'+id,ar:false})});return c}
 function applyCat(c){if(!c||!Array.isArray(c.arts)||!c.arts.length)return false;c=withEmb(c);
  var list=c.arts.map(function(a){var e=/^emb:/.test(a.img),im=embImg(a.img);if(!im&&a.ea&&!a.em)im=teaserPH(a);if(!im||/^emb:/.test(im))return null;
-  return{id:a.id,t:a.t,m:a.m||'',s:a.s||'Size on request',year:a.year||'',d:a.d||'',p:priceOf(a),price:a.p||'',mode:a.mode,status:a.status||'Available',w:a.w||.5,h:a.h||.7,bg:a.bg||'#cfc6d6',auc:a.mode==='auction'?a.auc:undefined,img:im,full:e?EMB[a.img.slice(4)].full:im,tn:e?EMB[a.img.slice(4)].tn:im,emb:e?a.img.slice(4):'',fr:a.fr||'',ea:a.ea||0,em:a.em?1:0,ar:e&&/^emb:p([1-9]|1[0-5])$/.test(a.img),wm:e?EMB[a.img.slice(4)].wm:(a.wm&&a.wmOf===a.img?a.wm:'')}}).filter(Boolean);
+  return{id:a.id,t:a.t,m:a.m||'',s:a.s||'Size on request',year:a.year||'',d:a.d||'',p:priceOf(a),price:a.p||'',mode:a.mode,status:a.status||'Available',w:a.w||.5,h:a.h||.7,bg:a.bg||'#cfc6d6',auc:a.mode==='auction'?a.auc:undefined,img:im,full:e?(EMB[a.img.slice(4)].full===EMB[a.img.slice(4)].img?im:EMB[a.img.slice(4)].full):im,tn:e?wpOf(EMB[a.img.slice(4)].tn):im,emb:e?a.img.slice(4):'',fr:a.fr||'',ea:a.ea||0,em:a.em?1:0,ar:e&&/^emb:p([1-9]|1[0-5])$/.test(a.img),wm:e?EMB[a.img.slice(4)].wm:(a.wm&&a.wmOf===a.img?a.wm:'')}}).filter(Boolean);
  if(!list.length)return false;ART.length=0;list.forEach(function(a){ART.push(a)});THUMB={};
  var ix={};ART.forEach(function(a,i){ix[a.id]=i});function map(L){return(L||[]).map(function(x){return ix[x]}).filter(function(i){return i!=null})}
  FAVS=map(c.favs).slice(0,6);
@@ -3915,12 +3916,14 @@ canvas.addEventListener('click',function(e){var q=pickAt(e.clientX,e.clientY);if
 var hint=document.getElementById('hint'),lab=document.getElementById('where');
 var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches,cur=0,lastLab='';
 function progress(){var max=document.documentElement.scrollHeight-innerHeight;return max>0?Math.min(1,Math.max(0,scrollY/max)):0}
+var lastIn=performance.now();['pointerdown','pointermove','keydown','wheel','touchstart','scroll'].forEach(function(t){addEventListener(t,function(){lastIn=performance.now()},{passive:true,capture:true})});
+function ambGap(t){var q=t-lastIn;return q>90000?(mobile?250:120):q>20000?(mobile?66:33):(mobile?38:0)}   // idle for 20 s: half speed; for 90 s: a few frames a second (kinder to batteries)
 var idleT=0,lastT=0,ema=16,samplesN=0,rendered=false;
 var lastFT=0;
 function frame(time){
  requestAnimationFrame(frame);
  if(!col.hidden||!prs.hidden||anyPage()||(window.INTRO&&INTRO.up))return;        // a page (or the opening film) covers the 3D: don't draw
- NOWS=time/1000;if(!reduce&&!dlg.open&&!zv.open&&!about.open&&time-idleT>(mobile?38:0)){dirty=Math.max(dirty,1);idleT=time}
+ NOWS=time/1000;if(!reduce&&!dlg.open&&!zv.open&&!about.open&&time-idleT>ambGap(time)){dirty=Math.max(dirty,1);idleT=time}
  var p=progress(),prev=cur;var dts=Math.min(.1,Math.max(.001,(time-lastFT)/1000||.016));lastFT=time;cur+=(p-cur)*(reduce?1:1-Math.exp(-dts*3.8));if(Math.abs(p-cur)<1e-5)cur=p;
  camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());
  var bA=burnAmt();if(bA<1&&!reduce)dirty=Math.max(dirty,1);
