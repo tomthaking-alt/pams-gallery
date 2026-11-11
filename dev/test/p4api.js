@@ -6,7 +6,8 @@ function ok(c,m){console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1}
 (async()=>{
  const OT=(await P({a:'login',email:'pts98@hotmail.co.uk',password:'testpass123'})).token,BT=(await P({a:'login',email:'bob@example.com',password:'bobpass123'})).token;
  const cat0=(await P({a:'catGet'},OT)).cat;
- const c=JSON.parse(JSON.stringify(cat0));c.site.buy={};await P({a:'catSave',cat:c},OT);
+ const V=async()=>(((await P({a:'catGet'},OT)).cat)||{}).v||0;   // the live version, which every publish must name
+ const c=JSON.parse(JSON.stringify(cat0));c.site.buy={};await P({a:'catSave',cat:c,base:await V()},OT);
  let w=await G('/works'),a=await G('/art/violet-garden');
  ok(!/certificate|insured|working days|within a day|worldwide/i.test(w+a),'nothing unconfirmed is claimed on All works or a painting page');
  ok(/Original works by Pam · Nothing to pay until you’ve agreed · 14-day returns/.test(a),'trust line uses only safe facts');
@@ -14,12 +15,12 @@ function ok(c,m){console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1}
  ok(!/points|loyalty/i.test(w+a),'no loyalty points on the pages');
  const cfg=(await (await fetch(U+'?cat=1')).json()).cfg;ok(cfg&&'mail' in cfg&&'pay' in cfg,'page is told whether emails and card payments are on');
  c.site.buy={ukCost:'£15',ukTime:'3–5 working days',intl:'quote',tracked:'yes',pack:'Wrapped and boxed <script>x</script>',retDays:30,retPost:'buyer',cert:'yes',frame:'Oils ready to hang',reply:'two working days',junk:'x'};
- let r=await P({a:'catSave',cat:c},OT);const sb=r.cat.site.buy;
+ let r=await P({a:'catSave',cat:c,base:await V()},OT);const sb=r.cat.site.buy;
  ok(sb.ukCost==='£15'&&sb.retDays===30&&sb.cert==='yes'&&!sb.junk&&!/[<>]/.test(sb.pack),'buying details saved, cleaned ('+JSON.stringify(sb).slice(0,80)+')');
  w=await G('/works');a=await G('/art/violet-garden');
  ok(/with a certificate of authenticity/.test(w)&&/Certificate of authenticity · /.test(a)&&/Tracked, insured delivery · 30-day returns/.test(a),'confirmed details appear');
  ok(/usually within two working days/.test(w)&&/usually within two working days/.test(a),'reply time shown once set');
- c.site.buy.retDays=99;r=await P({a:'catSave',cat:c},OT);ok(r.cat.site.buy.retDays===14,'odd returns window falls back to 14 days');
+ c.site.buy.retDays=99;r=await P({a:'catSave',cat:c,base:await V()},OT);ok(r.cat.site.buy.retDays===14,'odd returns window falls back to 14 days');
  // points gone from accounts and enquiries
  const me=(await P({a:'me'},BT)).me;ok(me&&me.rewards&&!('points' in me.rewards),'accounts no longer carry a points balance');
  r=await P({a:'order',id:'p2',message:'Hello',useCredit:true,ft:9000},BT);ok(r.ok&&'mailed' in r,'enquiry ok and says whether a copy was emailed');
@@ -27,5 +28,5 @@ function ok(c,m){console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1}
  r=await P({a:'dashOrder',id:o.id,status:'completed',amount:'850'},OT);ok(r.ok&&r.order.awarded&&r.order.amount===850&&!('pointsUsed' in r.order),'marking a sale records it without points');
  const me2=(await P({a:'me'},BT)).me;ok(me2.rewards.sets.some(s=>s.pieces.some(p=>p.owned)),'the sale still counts towards the signed-print reward');
  const pv=await G('/privacy');ok(!/loyalty/i.test(pv),'privacy page no longer mentions points');
- await P({a:'catSave',cat:cat0},OT);console.log('restored');
+ await P({a:'catSave',cat:cat0,base:await V()},OT);console.log('restored');
 })();

@@ -1,6 +1,7 @@
 // Pam's Gallery: members, rewards, buy requests, messages, visitors, the catalogue (paintings, favourites,
 // collections, prints) and the owner dashboard. One Vercel function; data lives in Upstash Redis, reached over its REST API.
 const crypto = require('crypto');
+const zlib = require('zlib');
 
 const DB_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const DB_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -41,6 +42,22 @@ async function pipe(cmds) {
   const j = await r.json(); if (!Array.isArray(j)) throw new Error('db pipeline'); return j.map(x => x.result);
 }
 const J = s => { try { return s ? JSON.parse(s) : null } catch (e) { return null } };
+// like pipe(), but a command the database turns away (for example because it is full) is an error, never a quiet success
+// (the dashboard adds where Pam's unpublished changes are kept: as a draft, or only on her device)
+const FULL_MSG = 'The gallery’s storage is full, so nothing new could be saved. Please tell Claude so it can make room.';
+const SAVE_MSG = 'The gallery’s server couldn’t save this just now, so nothing was changed. Please try again in a few minutes, and tell Claude if it keeps happening.';
+const LIMIT_MSG = 'The gallery’s server has used up its allowance for now, so nothing new could be saved. Please tell Claude.';
+// a full Upstash database says 'ERR DB capacity quota exceeded' (reads and deletes still work); Redis itself says 'OOM … maxmemory'
+const refused = m => { console.error('db refused:', m); return /OOM|maxmemory|capacity quota|max data size/i.test(m) ? err(FULL_MSG, 507) : /max (daily |monthly )?requests? limit|request limit exceeded/i.test(m) ? err(LIMIT_MSG, 503) : err(SAVE_MSG, 503) };
+async function pipeOk(cmds) {
+  if (!cmds.length) return [];
+  const r = await fetch(DB_URL.replace(/\/$/, '') + '/pipeline', { method: 'POST', headers: { Authorization: 'Bearer ' + DB_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify(cmds) });
+  const j = await r.json().catch(() => null);
+  if (!Array.isArray(j)) { if (j && j.error) throw refused(String(j.error)); throw new Error('db pipeline: HTTP ' + r.status) }
+  const bad = j.length !== cmds.length ? { error: 'missing replies' } : j.find(x => !x || x.error);
+  if (bad) throw refused(String(bad.error || 'no reply'));
+  return j.map(x => x.result);
+}
 
 function b64u(b) { return Buffer.from(b).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_') }
 function sign(email) {
@@ -58,7 +75,7 @@ const clean = (s, n) => String(s == null ? '' : s).replace(/[\u0000-\u0008\u000b
 const okEmail = e => /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(e);
 const day = (t) => new Date(t || Date.now()).toISOString().slice(0, 10);
 const id = () => Date.now().toString(36) + crypto.randomBytes(4).toString('hex');
-const err = (msg, code) => Object.assign(new Error(msg), { code });
+const err = (msg, code, extra) => Object.assign(new Error(msg), { code, extra });
 
 // spam trap: a hidden field people never see (bots fill it in) and the time taken to fill the form in. Caught spam gets a polite
 // "thank you" but nothing is stored or sent. Pages loaded before this change don't send the timing, so a missing time is allowed.
@@ -89,7 +106,7 @@ async function gateImages(prev, next) {     // a painting's own pictures stay pr
   const keys = Object.keys(want); if (!keys.length) return;
   const metas = await pipe(keys.map(k => ['GET', 'img:' + k])), set = [];
   metas.forEach((v, i) => { const m = J(v); if (!m) return; const u = want[keys[i]] || undefined; if ((m.until || undefined) !== u) { if (u) m.until = u; else delete m.until; set.push(['SET', 'img:' + keys[i], JSON.stringify(m)]) } });
-  if (set.length) await pipe(set);
+  if (set.length) await pipeOk(set);
 }
 // tokens in email links: confirm a sign-up, or unsubscribe with one click
 function mailTok(email, why) { const e = b64u(email); return e + '.' + b64u(crypto.createHmac('sha256', SECRET).update(why + '|' + email).digest()).slice(0, 22) }
@@ -118,7 +135,20 @@ async function dropMail(prev, next) {      // a new members-only painting: tell 
 }
 
 // ---- the catalogue Pam edits from her dashboard ----
-async function getCat() { return withEmb(J(await db('GET', 'cat'))) }
+// the live catalogue as stored. If the 'cat' key is ever missing or unreadable, the newest kept version stands in, so visitors
+// still see Pam's own gallery (and her dashboard puts it back) rather than only the paintings built into the site
+const okCat = c => c && typeof c === 'object' && Array.isArray(c.arts) ? c : null;
+async function liveCat() {
+  const raw = await db('GET', 'cat'), c = okCat(J(raw));
+  if (c) return { cat: c, recovered: false };
+  const top = (await db('ZREVRANGE', 'cat:idx', '0', '4', 'WITHSCORES')) || [];
+  let k = null, old = false;
+  for (let i = 1; i < top.length && !k; i += 2) k = unpackV(await db('GET', 'cat:ver:' + Math.round(+top[i])));   // the newest kept version that can be read
+  if (!k && !top.length) { k = okCat(J(((await db('LRANGE', 'cat:hist', '0', '0')) || [])[0])); old = !!k }   // only when nothing is kept the new way: a copy from before every version was kept
+  if (k || raw) console.error('cat: the live copy is ' + (raw ? 'unreadable' : 'missing') + (k ? '; showing version ' + k.v + (old ? ' (old list)' : '') : ''));
+  return { cat: k, recovered: !!k, old };
+}
+async function getCat() { return withEmb((await liveCat()).cat) }
 // works added to the site itself join Pam's saved catalogue (at the end) until she removes them
 function withEmb(c) {
   if (!c || !Array.isArray(c.arts)) return c;
@@ -198,11 +228,11 @@ function cleanCat(c) {
   }));
   const ids = new Set(arts.map(a => a.id));
   const favs = (Array.isArray(c.favs) ? c.favs : []).map(String).filter(x => ids.has(x)).filter((x, i, A) => A.indexOf(x) === i).slice(0, 6);
-  const colls = (Array.isArray(c.colls) ? c.colls : []).slice(0, 12).map(k => ({ t: str(k.t, 60) || 'Untitled collection', d: str(k.d, 400),
+  const colls = (Array.isArray(c.colls) ? c.colls : []).filter(k => k && typeof k === 'object').slice(0, 12).map(k => ({ id: okId(k.id) ? String(k.id) : undefined, t: str(k.t, 60) || 'Untitled collection', d: str(k.d, 400),
     works: (Array.isArray(k.works) ? k.works : []).map(String).filter(x => ids.has(x)).filter((x, i, A) => A.indexOf(x) === i).slice(0, 12), soon: Math.round(num(k.soon, 0, 6, 3)) }));
   const prints = (Array.isArray(c.prints) ? c.prints : []).slice(0, 80).filter(p => p && okId(p.id)).map(p => ({
     id: String(p.id), art: ids.has(String(p.art)) ? String(p.art) : '', t: str(p.t, 90), d: str(p.d, 600), img: okImg(p.img) ? p.img : '',
-    sizes: (Array.isArray(p.sizes) ? p.sizes : []).slice(0, 10).map(z => ({ l: str(z.l, 60), p: str(z.p, 30) })).filter(z => z.l), on: p.on !== false
+    sizes: (Array.isArray(p.sizes) ? p.sizes : []).filter(z => z && typeof z === 'object').slice(0, 10).map(z => ({ l: str(z.l, 60), p: str(z.p, 30) })).filter(z => z.l), on: p.on !== false
   })).filter(p => p.art || p.img);
   const texts = {}; if (c.texts && typeof c.texts === 'object') Object.keys(c.texts).slice(0, 150).forEach(k => { if (/^[a-z]{2,10}\.[a-z]{2,14}$/.test(k)) texts[k] = String(c.texts[k] == null ? '' : c.texts[k]).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').slice(0, 3000) });
   const S = c.site && typeof c.site === 'object' ? c.site : {}, url = v => { v = str(v, 200); return /^https:\/\/[^\s"<>]+$/.test(v) ? v : '' };
@@ -213,6 +243,250 @@ function cleanCat(c) {
     share: S.share !== false, likes: S.likes !== false, earlyHours: [24, 48, 72, 168].indexOf(+S.earlyHours) >= 0 ? +S.earlyHours : 0, cur: ['GBP', 'EUR', 'USD'].indexOf(S.cur) >= 0 ? S.cur : 'GBP' };
   const seen = (Array.isArray(c.seen) ? c.seen : []).map(String).filter(x => /^p\d{1,2}$/.test(x)).slice(0, 99);
   return { v: Date.now(), arts, favs, colls, prints, texts, site, seen };
+}
+
+/* ---------- every published version is kept ----------
+   'cat'          the live catalogue (what visitors see)
+   'cat:ver:<v>'  each published version (gzip, base64, 'z:' in front), until there are more than KEEP
+   'cat:idx'      sorted set, score = v, member = a small summary: counts, a few names, what changed (plain English)
+   'cat:draft'    unpublished changes from the dashboard {t, base, sid, cat}: a closed tab or a flat battery loses nothing
+   'cat:lock'     held for a few seconds while a version is written, so two publishes never cross
+   'cat:draftdone' the last 50 dashboard sessions whose draft was carried on from another device ('c') or discarded there ('d'), so
+                  the copy still kept on their own device isn't offered later as forgotten work: [{s: session, t, k, g: its edit count then}]
+   'mig:catidx'   'h:<v>' once the versions kept the old way ('cat:hist', the last ten) have joined the full list, v being the newest
+                  of them; a newer one there (the old code put back for a while) is moved over too */
+const KEEP = 2000;
+const cleanSid = s => /^[a-z0-9]{8,40}$/i.test(String(s || '')) ? String(s) : '';
+const packV = c => 'z:' + zlib.gzipSync(JSON.stringify(c)).toString('base64');
+const unpackV = s => { if (!s) return null; try { return okCat(J(/^z:/.test(s) ? zlib.gunzipSync(Buffer.from(s.slice(2), 'base64')).toString() : s)) } catch (e) { return null } };
+const LON = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+function verWhen(t) {      // '10 Nov, 21:15' in UK time; the year only when it isn't this year
+  const p = {}; LON.formatToParts(new Date(t)).forEach(x => { p[x.type] = x.value });
+  const y = LON.formatToParts(new Date()).find(x => x.type === 'year').value;
+  return p.day + ' ' + p.month + (p.year !== y ? ' ' + p.year : '') + ', ' + p.hour + ':' + p.minute;
+}
+const inQ = t => { t = String(t == null ? '' : t); return '“' + (t.length > 60 ? t.slice(0, 59) + '…' : t) + '”' };
+const andList = L => L.length < 2 ? L.join('') : L.slice(0, -1).join(', ') + ' and ' + L[L.length - 1];
+const fewList = L => L.length <= 3 ? andList(L) : L.slice(0, 3).join(', ') + ' and ' + (L.length - 3) + ' more';
+const canonJ = x => JSON.stringify(x == null ? null : x, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((o, k2) => (o[k2] = v[k2], o), {}) : v);
+const saleOf = a => a.mode === 'auction' ? 'auction' : a.mode === 'price' ? 'price' : 'request';
+// site words, by the part of the site they belong to (the key before the dot)
+const TEXT_SECS = [['film', 'Changed the words in the opening film'], ['hero', 'Changed the words at the entrance'], ['bar', 'Changed the gallery name in the top bar'],
+  ['about', 'Changed the words on the About page'], ['col newart', 'Changed the words on the Collections page'], ['pr', 'Changed the words on the Prints page'],
+  ['enq', 'Changed the words on the balcony'], ['buy msg', 'Changed the thank-you messages after a form is sent'], ['george', 'Changed King George’s words'],
+  ['press social', 'Changed the words on the Galleries & press page'], ['site', 'Changed the credit line on the Collections page'], ['comm', 'Changed the words on the Commissions page'],
+  ['trust', 'Changed the words on the Delivery, returns & authenticity page'], ['members', 'Changed the words about the collectors’ circle'],
+  ['prot', 'Changed the message about protecting your artwork'], ['seo', 'Changed how your gallery appears on Google and in link previews']];
+// which collection became which: the same id, else the same name, else the most paintings in common, else the same place
+function pairColls(P, N) {
+  const pairs = [], usedP = new Set(), usedN = new Set();
+  const pass = score => N.forEach((c, j) => {
+    if (usedN.has(j)) return; let best = -1, top = 0;
+    P.forEach((o, i) => { if (usedP.has(i)) return; const s = score(o, c, i, j); if (s > top) { top = s; best = i } });
+    if (best >= 0) { usedP.add(best); usedN.add(j); pairs.push([P[best], c, best, j]) }
+  });
+  pass((o, c) => o.id && c.id && o.id === c.id ? 1 : 0);
+  pass((o, c) => o.t === c.t ? 1 : 0);
+  pass((o, c, i, j) => { const n = c.works.filter(x => o.works.indexOf(x) >= 0).length; return n ? n * 1000 - Math.abs(i - j) : 0 });
+  pass((o, c, i, j) => i === j ? 1 : 0);
+  return { pairs: pairs.sort((a, b) => a[3] - b[3]), added: N.filter((c, j) => !usedN.has(j)), removed: P.filter((o, i) => !usedP.has(i)) };
+}
+// what changed between two published versions, in words Pam would use (all of it; capLines shortens it for the list)
+function catChanges(p0, n0) {
+  if (!p0) return ['Published your gallery for the first time'];
+  if (sameCat(p0, n0)) return ['Published again with no changes'];
+  const view = c => cleanCat(withEmb(JSON.parse(JSON.stringify(c))));     // both sides as visitors see them, with today's defaults
+  const p = view(p0), n = view(n0), out = [], now = Date.now();
+  const pa = new Map(p.arts.map(a => [a.id, a])), na = new Map(n.arts.map(a => [a.id, a]));
+  n.arts.forEach(a => { if (!pa.has(a.id)) out.push('Added ' + inQ(a.t)) });
+  p.arts.forEach(a => { if (!na.has(a.id)) out.push('Removed ' + inQ(a.t)) });
+  n.arts.forEach(a => {
+    const o = pa.get(a.id); if (!o) return;
+    if (o.t !== a.t) out.push('Renamed ' + inQ(o.t) + ' to ' + inQ(a.t));
+    const f = [], so = saleOf(o), sn = saleOf(a);
+    if ((o.s || '') !== (a.s || '')) f.push('size'); if ((o.m || '') !== (a.m || '')) f.push('medium'); if ((o.year || '') !== (a.year || '')) f.push('year');
+    if ((o.d || '') !== (a.d || '')) f.push('description');
+    if (sn === 'price' && (so !== 'price' || (o.p || '') !== (a.p || ''))) f.push('price');
+    if (sn === 'auction' && so === 'auction' && canonJ(o.auc) !== canonJ(a.auc)) f.push('auction details');
+    if (o.img !== a.img) f.push('photo'); if ((o.fr || '') !== (a.fr || '')) f.push('frame');
+    if (f.length) out.push('Changed the ' + andList(f) + ' of ' + inQ(a.t));
+    if (sn !== so && sn === 'auction') out.push('Put ' + inQ(a.t) + ' up for auction');
+    if (sn !== so && sn === 'request') out.push('Changed ' + inQ(a.t) + ' to “price on request”');
+    if (o.status !== a.status) out.push(a.status === 'Sold' ? 'Marked ' + inQ(a.t) + ' as sold' : a.status === 'On hold' ? 'Put ' + inQ(a.t) + ' on hold' : 'Marked ' + inQ(a.t) + ' as available');
+    const eo = +o.early || 0, en = +a.early || 0;
+    if (eo !== en) { if (en > now) out.push('Made ' + inQ(a.t) + ' members-only until ' + verWhen(en)); else if (eo > now) out.push('Opened ' + inQ(a.t) + ' to everyone') }
+  });
+  if (n.arts.filter(a => pa.has(a.id)).map(a => a.id).join() !== p.arts.filter(a => na.has(a.id)).map(a => a.id).join()) out.push('Changed the order of the paintings');
+  if (p.favs.join() !== n.favs.join()) out.push('Changed This Month’s Favourites');
+  const tOf = id => (na.get(id) || pa.get(id) || {}).t || 'a painting', C = pairColls(p.colls, n.colls);
+  C.added.forEach(c => out.push('Added the collection ' + inQ(c.t)));
+  C.removed.forEach(o => out.push('Removed the collection ' + inQ(o.t)));
+  C.pairs.forEach(([o, c]) => {
+    if (o.t !== c.t) out.push('Renamed the collection ' + inQ(o.t) + ' to ' + inQ(c.t));
+    const add = c.works.filter(x => o.works.indexOf(x) < 0), rem = o.works.filter(x => c.works.indexOf(x) < 0);
+    if (add.length) out.push('Collection ' + inQ(c.t) + ': added ' + fewList(add.map(x => inQ(tOf(x)))));
+    if (rem.length) out.push('Collection ' + inQ(c.t) + ': took out ' + fewList(rem.map(x => inQ(tOf(x)))));
+    if (!add.length && !rem.length && o.works.join() !== c.works.join()) out.push('Collection ' + inQ(c.t) + ': changed the order of the paintings');
+    if ((o.d || '') !== (c.d || '')) out.push('Collection ' + inQ(c.t) + ': changed the description');
+    if ((+o.soon || 0) !== (+c.soon || 0)) out.push('Collection ' + inQ(c.t) + ': changed the number of “coming soon” frames');
+  });
+  const ord = C.pairs.map(x => x[2]); if (ord.join() !== ord.slice().sort((a, b) => a - b).join()) out.push('Changed the order of the collections');
+  const pp = new Map(p.prints.map(x => [x.id, x])), np = new Map(n.prints.map(x => [x.id, x]));
+  const pl = (x, m) => x.t ? 'the print ' + inQ(x.t) : 'the print of ' + inQ((m.get(x.art) || {}).t || 'a painting');
+  n.prints.forEach(x => { if (!pp.has(x.id)) out.push('Added ' + pl(x, na)) });
+  p.prints.forEach(x => { if (!np.has(x.id)) out.push('Removed ' + pl(x, pa)) });
+  n.prints.forEach(x => {
+    const o = pp.get(x.id); if (!o) return; const f = [];
+    if ((o.t || '') !== (x.t || '')) f.push('title'); if (o.art !== x.art) f.push('painting'); if ((o.img || '') !== (x.img || '')) f.push('picture');
+    if ((o.d || '') !== (x.d || '')) f.push('description'); if (canonJ(o.sizes || []) !== canonJ(x.sizes || [])) f.push('sizes and prices');
+    if (f.length) out.push('Changed the ' + andList(f) + ' of ' + pl(x, na));
+    if ((o.on !== false) !== (x.on !== false)) out.push(x.on !== false ? 'Showed ' + pl(x, na) + ' on the Prints page' : 'Hid ' + pl(x, na) + ' from the Prints page');
+  });
+  if (n.prints.filter(x => pp.has(x.id)).map(x => x.id).join() !== p.prints.filter(x => np.has(x.id)).map(x => x.id).join()) out.push('Changed the order of the prints');
+  const hit = new Set();
+  new Set(Object.keys(p.texts).concat(Object.keys(n.texts))).forEach(k => {
+    if ((p.texts[k] == null ? '' : String(p.texts[k])) === (n.texts[k] == null ? '' : String(n.texts[k]))) return;
+    const s = TEXT_SECS.find(x => x[0].split(' ').indexOf(k.split('.')[0]) >= 0); hit.add(s ? s[1] : 'Changed some of the words on the site');
+  });
+  TEXT_SECS.forEach(s => { if (hit.has(s[1])) out.push(s[1]) }); if (hit.has('Changed some of the words on the site')) out.push('Changed some of the words on the site');
+  const ps = p.site, ns = n.site, bo = ps.banner || {}, bn = ns.banner || {};
+  if (['email', 'phone', 'place'].some(k => (ps[k] || '') !== (ns[k] || ''))) out.push('Changed your contact details');
+  if (canonJ(ps.social || {}) !== canonJ(ns.social || {})) out.push('Changed your social media links');
+  if (!!bo.on !== !!bn.on) out.push(bn.on ? 'Turned the banner on' : 'Turned the banner off'); else if ((bo.text || '') !== (bn.text || '')) out.push('Changed the banner');
+  if (canonJ(cleanBuy(ps.buy)) !== canonJ(cleanBuy(ns.buy))) out.push('Changed the buying & delivery details');
+  if (['commissions', 'offers', 'share', 'likes'].some(k => (ps[k] !== false) !== (ns[k] !== false))) out.push('Changed the selling options');
+  if ((+ps.earlyHours || 0) !== (+ns.earlyHours || 0)) out.push('Changed the members’ early access window');
+  if ((ps.cur || 'GBP') !== (ns.cur || 'GBP')) out.push('Changed the currency');
+  if (!out.length) out.push('Small behind-the-scenes changes (nothing visitors will notice)');
+  return out;
+}
+// at most eight lines in the list, then how many more
+function capLines(L) { L = (L || []).map(s => clean(s, 160)); const k = L.length - 8; return k > 0 ? L.slice(0, 8).concat(['and ' + k + ' more change' + (k > 1 ? 's' : '')]) : L }
+// the same gallery to a visitor: same cleaned content once the built-in works are added in ('seen' and the version number aside)
+function viewOf(c) { const x = cleanCat(withEmb(JSON.parse(JSON.stringify(c)))); x.v = 0; delete x.seen; x.colls.forEach(k => { delete k.id }); return JSON.stringify(x) }   // collections' ids are bookkeeping: visitors never see them
+function sameCat(a, b) { return !!(okCat(a) && okCat(b)) && viewOf(a) === viewOf(b) }
+function verSum(c, m) {
+  return { v: c.v, kind: m.kind || 'publish', arts: c.arts.length, colls: c.colls.length, prints: c.prints.length, texts: Object.keys(c.texts || {}).length,
+    names: c.arts.slice(0, 3).map(a => clean(a.t, 60)), changes: capLines(m.changes), from: m.from || undefined, old: m.old ? 1 : undefined };
+}
+// one publish at a time: a second one (another tab or device) is asked to wait instead of racing
+const BUSY_MSG = 'Another publish is still finishing. Please wait a few seconds, then try again.';
+async function withLock(fn) {
+  const tok = id();
+  if ((await pipeOk([['SET', 'cat:lock', tok, 'NX', 'EX', '30']]))[0] !== 'OK') throw err(BUSY_MSG, 409, { code: 'busy' });
+  try { return await fn(tok) } finally { try { if (await db('GET', 'cat:lock') === tok) await db('DEL', 'cat:lock') } catch (e) { } }
+}
+// a page must say which version it started from; an older page (another tab or device) must not quietly undo newer work
+function checkBase(prev, base) {
+  if (!prev) return;    // the very first catalogue: nothing to protect yet
+  if (base == null || base === '' || !isFinite(+base)) throw err('This page is out of date, so it can’t publish safely. Please reload the page and try again.', 409, { code: 'base_missing', live: prev.v });
+  if (+base !== prev.v) throw err('Your gallery was published again from another device or tab after this page was opened, so publishing from here could undo that newer work. Reload the page, then publish again — your changes are kept as a draft.', 409, { code: 'stale', live: prev.v });
+}
+// has the old list been moved over, up to its newest version? (the flag names it; an older flag is just a time, so it moves over once more)
+const migDone = (flag, h0) => { const c = okCat(J(h0)); return !!flag && flag === 'h:' + (c ? c.v : 0) };
+async function migrateIfDue() {
+  const [flag, h] = await pipe([['GET', 'mig:catidx'], ['LRANGE', 'cat:hist', '0', '0']]);
+  if (!migDone(flag, (h || [])[0])) await migrateHist();
+}
+async function pubState() {
+  const [raw, d, flag, h] = await pipe([['GET', 'cat'], ['GET', 'cat:draft'], ['GET', 'mig:catidx'], ['LRANGE', 'cat:hist', '0', '0']]);
+  // a failed move is tried again next time: every old version is still in 'cat:hist', and the live one is kept by putLive
+  if (!migDone(flag, (h || [])[0])) await migrateHist().catch(e => console.error('migrate', e.message));
+  let prev = okCat(J(raw)), recovered = false;
+  if (!prev) { const L = await liveCat(); prev = L.cat; recovered = L.recovered }
+  return { prev, recovered, draft: J(d) };
+}
+// safe to repeat: the versions kept the old way join the full list, with what changed between them
+async function migrateHist() {
+  const [h, raw] = await pipeOk([['LRANGE', 'cat:hist', '0', '9'], ['GET', 'cat']]);     // a read that fails stops it (nothing is marked as moved)
+  const L = (h || []).map(s => okCat(J(s))).filter(Boolean), live = okCat(J(raw)), top = okCat(J((h || [])[0]));
+  if (live && !L.some(x => x.v === live.v) && !(await db('GET', 'cat:ver:' + live.v))) L.push(live);
+  const seen = new Set(), H = L.filter(x => +x.v > 0 && !seen.has(x.v) && seen.add(x.v)).sort((a, b) => b.v - a.v);
+  for (let i = 0; i < H.length; i++) {      // one small request per version
+    const c = H[i], older = H[i + 1], v = String(c.v);
+    await pipeOk([['SET', 'cat:ver:' + v, packV(c), 'NX'], ['ZREMRANGEBYSCORE', 'cat:idx', v, v], ['ZADD', 'cat:idx', v, JSON.stringify(verSum(c, { kind: 'publish', changes: older ? catChanges(older, c) : [], old: !older }))]]);
+  }
+  await pipeOk([['SET', 'mig:catidx', 'h:' + (top ? top.v : 0)]]);
+}
+// the live copy is always kept as a version too, whatever wrote it (for example the old code, put back for a while)
+async function keepLive(prev) {
+  const v = String(prev.v);
+  if ((await pipeOk([['SET', 'cat:ver:' + v, packV(prev), 'NX']]))[0] !== 'OK') return;      // kept already: the usual case
+  const top = await db('ZREVRANGE', 'cat:idx', '0', '0', 'WITHSCORES'), tv = top && top.length > 1 ? Math.round(+top[1]) : 0;
+  const before = tv && tv < prev.v ? unpackV(await db('GET', 'cat:ver:' + tv)) : null;
+  await pipeOk([['ZREMRANGEBYSCORE', 'cat:idx', v, v], ['ZADD', 'cat:idx', v, JSON.stringify(verSum(prev, { kind: 'publish', changes: before ? catChanges(before, prev) : [], old: !before }))]]);
+}
+// the version and its line in the list first, then the live copy: nothing goes live without being kept
+async function writeVersion(c, meta, sid, draft, tok) {     // three small steps, each checked; a failure stops before anything goes live
+  const v = String(c.v);
+  if ((await pipeOk([['SET', 'cat:ver:' + v, packV(c)]]))[0] !== 'OK') throw err(SAVE_MSG, 503);
+  const n = (await pipeOk([['ZREMRANGEBYSCORE', 'cat:idx', v, v], ['ZADD', 'cat:idx', v, JSON.stringify(verSum(c, meta))], ['ZCARD', 'cat:idx']]))[2];
+  // still this publish's turn (a very slow one could outlast the lock and cross another), and the draft still the one it started from
+  // (one carried on from another dashboard meanwhile, or saved again since, stays)
+  const [lk, dr] = await pipeOk([['GET', 'cat:lock'], ['GET', 'cat:draft']]), d2 = J(dr);
+  if (tok && lk !== tok) throw err(BUSY_MSG, 409, { code: 'busy' });
+  const w = [['SET', 'cat', JSON.stringify(c)]]; if (draft && sid && draft.sid === sid && d2 && d2.sid === sid && d2.t === draft.t) w.push(['DEL', 'cat:draft']);
+  if ((await pipeOk(w))[0] !== 'OK') throw err(SAVE_MSG, 503);
+  if (+n > KEEP) await pruneVers().catch(e => console.error('prune', e.message));
+}
+async function pruneVers() {      // more than KEEP versions: the oldest go (at most 200 at a time)
+  const L = await db('ZREVRANGE', 'cat:idx', String(KEEP), String(KEEP + 199), 'WITHSCORES'), vs = [];
+  for (let i = 1; i < (L || []).length; i += 2) vs.push(Math.round(+L[i]));
+  if (vs.length) await pipeOk(vs.map(v => ['DEL', 'cat:ver:' + v]).concat([['ZREMRANGEBYSCORE', 'cat:idx', '-inf', String(Math.max(...vs))]]));
+}
+// make a version live (publish, restore or a backup file). The same as what's live: nothing new is written.
+async function putLive(prev, n, meta, sid, draft, recovered, tok) {
+  if (prev && !recovered && sameCat(prev, n)) {
+    if (draft && sid && draft.sid === sid) await pipeOk([['DEL', 'cat:draft']]);
+    await gateImages(prev, prev).catch(e => console.error('gate', e.message));   // the picture locks as they should be (heals one left wrong)
+    return { prev, c: prev, unchanged: true, changes: [] };
+  }
+  if (prev && n.v <= prev.v) n.v = prev.v + 1;
+  if (prev && !recovered) await keepLive(prev);
+  const changes = (meta.changes || []).concat(catChanges(prev, n));
+  await gateImages(prev, n);
+  try { await writeVersion(n, Object.assign({}, meta, { changes }), sid, draft, tok) }
+  catch (e) {
+    // the database may have taken the new live copy although its answer was lost on the way back: then it is live, and that's success
+    const now = okCat(J(await db('GET', 'cat').catch(() => null)));
+    if (now && now.v === n.v) { console.error('publish: the answer was lost, but the version is live', e.message); return { prev, c: n, changes } }
+    if (prev) await gateImages(n, prev).catch(() => { }); throw e;   // picture locks back as they were
+  }
+  return { prev, c: n, changes };
+}
+// a dashboard's catalogue that can't be read at all (it's checked again by cleanCat, which turns it into plain text and numbers)
+function cleanOr(c, msg) { try { return cleanCat(c) } catch (e) { throw err(msg, 400) } }
+// what a backup file (raw: as it came) or a kept version would change, before anything changes: how much it holds, which paintings in the file
+// can't be used and which photos aren't on the server any more (by name), whether it is the same as the live gallery, and what would change.
+// against: a version number (the one a draft started from): then 'changes' are compared with that version instead (falling back to the live
+// gallery if it isn't kept), so Pam sees only her own changes, and sameAgainst says whether there are any
+async function previewOf(n, raw, against) {
+  const { cat: prev } = await liveCat(), keys = [], who = [];
+  const nameOf = t => clean(typeof t === 'string' ? t : '', 60) || 'Untitled';
+  n.arts.forEach(a => who.push([a.img, nameOf(a.t)]));
+  n.prints.forEach(p => who.push([p.img, nameOf(p.t || (n.arts.find(a => a.id === p.art) || {}).t) + ' (print)']));
+  const named = [];
+  who.forEach(([img, t]) => { const m = /img=([a-z0-9]{6,40})/i.exec(img || ''); if (m) { keys.push(m[1]); named.push(t) } });
+  const metas = keys.length ? await pipe(keys.map(k => ['GET', 'img:' + k])) : [];
+  const missing = named.filter((t, i) => !J(metas[i])), kept = new Set(n.arts.map(a => a.id));
+  const lost = raw && Array.isArray(raw.arts) ? raw.arts.filter(a => !(a && typeof a === 'object' && kept.has(String(a.id)))) : [];
+  let base = null, av = Math.round(+against || 0);
+  if (av > 0) base = unpackV(await db('GET', 'cat:ver:' + av));
+  if (!base) av = 0;
+  return { arts: n.arts.length, colls: n.colls.length, prints: n.prints.length, texts: Object.keys(n.texts).length, names: n.arts.slice(0, 3).map(a => clean(a.t, 60)),
+    dropped: raw && Array.isArray(raw.arts) ? raw.arts.length - n.arts.length : 0, droppedNames: lost.slice(0, 5).map(a => nameOf(a && a.t)),
+    missing: missing.length, missingNames: missing.slice(0, 5),
+    same: sameCat(prev, n), changes: capLines(catChanges(base || prev, n)), against: av || undefined, sameAgainst: base ? sameCat(base, n) : undefined };
+}
+const ODD_MSG = 'Some of the details couldn’t be read — please check them and try again.';
+// sessions whose draft was carried on ('c') or discarded ('d') on another device: see 'cat:draftdone' above
+async function markDone(sid, k, gen) {     // gen: how many edits that dashboard had made by then (its copy on its own device with no more than that is all dealt with)
+  const L = J(await db('GET', 'cat:draftdone')), A = (Array.isArray(L) ? L : []).filter(x => x && x.s !== sid);
+  A.unshift({ s: sid, t: Date.now(), k, g: Math.max(0, Math.floor(+gen || 0)) || 0 }); await pipeOk([['SET', 'cat:draftdone', JSON.stringify(A.slice(0, 50))]]);
+}
+async function afterLive(o) {     // after the lock: members who asked for news hear about new members-only work
+  let emailed = 0; if (!o.unchanged) try { emailed = await dropMail(o.prev, o.c) } catch (e) { console.error('drop', e.message) }
+  return { ok: true, cat: o.c, unchanged: o.unchanged || undefined, emailed, pv: ownerPv(o.c), changes: capLines(o.changes) };
 }
 
 function rewards(u, cat) {
@@ -568,17 +842,49 @@ const actions = {
   },
 
   // ---- the catalogue ----
-  async catGet(req) { await owner(req); const cat = await getCat(); return { cat, pv: ownerPv(cat) } },
-  async catHist(req) {
+  async catGet(req) {
     await owner(req);
-    const L = (await db('LRANGE', 'cat:hist', '0', '9')).map(J).filter(Boolean);
-    return { list: L.map(c => ({ v: c.v, arts: (c.arts || []).length, colls: (c.colls || []).length, prints: (c.prints || []).length, texts: Object.keys(c.texts || {}).length, names: (c.arts || []).slice(0, 3).map(a => clean(a.t, 60)) })) };   // a few painting names, to recognise each version
+    const L = await liveCat(); let healed = 0;
+    if (L.recovered) await withLock(async () => { if (!okCat(J(await db('GET', 'cat')))) { await pipeOk([['SET', 'cat', JSON.stringify(L.cat)]]); healed = L.cat.v } }).catch(e => console.error('heal', e.message));
+    if (!L.cat) return { cat: null, none: true, live: 0, pv: {} };   // nothing published yet: the only time the dashboard may start from the built-in paintings
+    const cat = withEmb(L.cat);
+    return { cat, live: cat.v, pv: ownerPv(cat), healed: healed || undefined, healedOld: healed && L.old ? 1 : undefined };
   },
+  // the list of published versions, newest first, twenty at a time
+  async catHist(req, b) {
+    await owner(req);
+    await migrateIfDue().catch(e => console.error('migrate', e.message));   // the list as it is; the move is tried again next time
+    const from = Math.max(0, Math.min(KEEP, Math.floor(+(b && b.from) || 0)));
+    const [rows, total, raw] = await pipe([['ZREVRANGE', 'cat:idx', String(from), String(from + 20)], ['ZCARD', 'cat:idx'], ['GET', 'cat']]);
+    const L = (rows || []).map(J).filter(x => x && x.v), live = okCat(J(raw)) || (await liveCat()).cat;
+    return { list: L.slice(0, 20), more: L.length > 20, total: +total || 0, live: live ? live.v : 0 };
+  },
+  // one whole version (no v: the live one), for a download
+  async catVer(req, b) {
+    await owner(req);
+    if (!b.v) { const { cat } = await liveCat(); if (!cat) throw err('Nothing has been published yet.', 404); return { cat, live: true } }
+    await migrateIfDue().catch(e => console.error('migrate', e.message));
+    const v = Math.round(+b.v), c = v > 0 ? unpackV(await db('GET', 'cat:ver:' + v)) : null;
+    if (!c) throw err('That version is no longer kept.', 404);
+    return { cat: c };
+  },
+  // bring back an earlier version: it becomes a new version (the one it replaces stays in the list)
   async catRestore(req, b) {
     await owner(req);
-    const L = (await db('LRANGE', 'cat:hist', '0', '9')).map(J).filter(Boolean), c = L.find(x => x.v === +b.v); if (!c) throw err('That version is no longer kept.', 404);
-    const n = cleanCat(c); await pipe([['SET', 'cat', JSON.stringify(n)], ['LPUSH', 'cat:hist', JSON.stringify(n)], ['LTRIM', 'cat:hist', '0', '9']]);
-    return { ok: true, cat: n };
+    const v = Math.round(+b.v), sid = cleanSid(b.sid);
+    if (b.dry) {   // only say what bringing it back would change: nothing changes
+      const old = v > 0 ? unpackV(await db('GET', 'cat:ver:' + v)) : null; if (!old) throw err('That version is no longer kept.', 404);
+      const n = cleanCat(old); if (!n.arts.length) throw err('That version has no paintings, so it can’t be restored.', 400);
+      return { ok: true, preview: await previewOf(n, null) };
+    }
+    const out = await withLock(async tok => {
+      const { prev, draft, recovered } = await pubState();
+      const old = v > 0 ? unpackV(await db('GET', 'cat:ver:' + v)) : null; if (!old) throw err('That version is no longer kept.', 404);
+      const n = cleanCat(old); if (!n.arts.length) throw err('That version has no paintings, so it can’t be restored.', 400);
+      if (!(prev && !recovered && sameCat(prev, n))) checkBase(prev, b.base);    // the same as what's live: nothing is replaced, whichever version the page started from
+      return await putLive(prev, n, { kind: 'restore', from: v, changes: ['Restored the version from ' + verWhen(v)] }, sid, draft, recovered, tok);
+    });
+    return await afterLive(out);
   },
   async growGet(req) { await owner(req); return { grow: J(await db('GET', 'grow')) || { done: [], notes: {} } } },
   async growSave(req, b) {
@@ -590,14 +896,68 @@ const actions = {
   async catSave(req, b) {
     await owner(req);
     if (!b.cat || typeof b.cat !== 'object') throw err('Nothing to save.', 400);
-    const c = cleanCat(b.cat); if (!c.arts.length) throw err('Keep at least one painting in the gallery.', 400);
-    const prev = J(await db('GET', 'cat'));
-    // an older dashboard (another tab or device, opened before the last publish) must not quietly undo newer work
-    if (b.base != null && prev && prev.v && +b.base !== prev.v) throw err('Your gallery was changed on another device or tab after you opened this page, so publishing from here would undo those changes. Reload the page to get the latest version, then make your change again.', 409);
-    await gateImages(prev, c);
-    await pipe([['SET', 'cat', JSON.stringify(c)], ['LPUSH', 'cat:hist', JSON.stringify(c)], ['LTRIM', 'cat:hist', '0', '9']]);   // the last ten versions are kept, just in case
-    let emailed = 0; try { emailed = await dropMail(prev, c) } catch (e) { console.error('drop', e.message) }
-    return { ok: true, cat: c, emailed, pv: ownerPv(c) };
+    const c = cleanOr(b.cat, ODD_MSG), sid = cleanSid(b.sid); if (!c.arts.length) throw err('Keep at least one painting in the gallery.', 400);
+    const out = await withLock(async tok => {
+      const { prev, draft, recovered } = await pubState();
+      if (!(prev && !recovered && sameCat(prev, c))) checkBase(prev, b.base);    // the same as what's live (a publish whose answer was lost, sent again): nothing is replaced
+      return await putLive(prev, c, { kind: 'publish' }, sid, draft, recovered, tok);
+    });
+    return await afterLive(out);
+  },
+  // a backup file: dry = only say what it holds and what would change; otherwise it goes live as a new version
+  async catImport(req, b) {
+    await owner(req);
+    let raw = b.cat && typeof b.cat === 'object' ? b.cat : null;
+    if (raw && raw.kind === 'pams-gallery-backup' && raw.cat && typeof raw.cat === 'object') raw = raw.cat;   // the whole file is fine too
+    if (!raw || !Array.isArray(raw.arts)) throw err('That file isn’t a gallery backup.', 400);
+    const n = cleanOr(raw, 'That file isn’t a gallery backup.'), sid = cleanSid(b.sid);
+    const fv = typeof b.from === 'number' && b.from > 0 ? b.from : typeof raw.v === 'number' ? raw.v : 0, from = isFinite(fv) && fv > 0 ? Math.round(fv) : undefined;
+    if (!n.arts.length) throw err('That backup has no paintings the gallery can use, so it can’t be restored.', 400);
+    if (b.dry) return { ok: true, preview: await previewOf(n, raw, b.against) };
+    const out = await withLock(async tok => {
+      const { prev, draft, recovered } = await pubState();
+      if (!(prev && !recovered && sameCat(prev, n))) checkBase(prev, b.base);
+      return await putLive(prev, n, { kind: 'import', from, changes: ['Restored from a backup file'] }, sid, draft, recovered, tok);
+    });
+    return await afterLive(out);
+  },
+  // unpublished changes, saved as Pam works. One draft at a time: a dashboard replaces another dashboard's draft only when Pam chose to
+  // carry on with it there (take = the time of the draft she was shown: a newer one saved meanwhile is never replaced unseen)
+  async draftSave(req, b) {
+    await owner(req);
+    const sid = cleanSid(b.sid); if (!sid || !b.draft || typeof b.draft !== 'object' || !Array.isArray(b.draft.arts)) throw err('Nothing to save.', 400);
+    const cat = cleanOr(b.draft, ODD_MSG); delete cat.v;
+    const gen = Math.max(0, Math.floor(+b.gen || 0)) || 0, take = b.take === true ? true : Math.round(+b.take || 0) || 0;
+    const d = { t: Date.now(), base: Math.max(0, Math.round(+b.base || 0)) || 0, sid, gen, cat };
+    for (let i = 0; i < 3; i++) {
+      const old = J(await db('GET', 'cat:draft'));
+      if (old && old.sid && old.sid !== sid && !(take === true || (take && +old.t === take))) throw err('Another device or tab has unpublished changes saved as a draft.', 409, { code: 'draft_other', draft: { t: old.t, base: old.base } });
+      if (old && old.sid === sid && gen && +old.gen > gen) return { ok: true, t: old.t, gen: +old.gen, kept: true };   // an older save from this dashboard arriving late: the newer one stays
+      // no draft yet: written only if there still isn't one, so two dashboards saving their first draft at the same moment can't both be told 'saved'
+      if ((await pipeOk([old ? ['SET', 'cat:draft', JSON.stringify(d)] : ['SET', 'cat:draft', JSON.stringify(d), 'NX']]))[0] !== 'OK') continue;
+      if (old && old.sid !== sid && b.from && +b.from === +old.t) await markDone(old.sid, 'c', old.gen).catch(e => console.error('draftdone', e.message));   // carried on from that draft itself
+      return { ok: true, t: d.t };
+    }
+    throw err('Another device or tab has unpublished changes saved as a draft.', 409, { code: 'draft_other' });
+  },
+  // the draft, the server's clock (to compare with copies kept on a device), and which of the dashboard's own copies were carried on or discarded elsewhere
+  async draftGet(req, b) {
+    await owner(req);
+    const devs = (Array.isArray(b && b.devs) ? b.devs : []).slice(0, 20).map(x => typeof x === 'string' ? cleanSid(x) : '').filter(Boolean);
+    const [rd, rc, rn] = await pipe([['GET', 'cat:draft'], ['GET', 'cat'], ['GET', 'cat:draftdone']]), D = J(rn), done = {};
+    if (Array.isArray(D)) devs.forEach(s => { const x = D.find(y => y && y.s === s); if (x) done[s] = { t: x.t, k: x.k, gen: x.g || 0 } });
+    const out = { draft: null, now: Date.now(), done }, d = J(rd);
+    if (!d || !okCat(d.cat)) return out;
+    if (sameCat(J(rc), d.cat)) { await pipeOk([['DEL', 'cat:draft']]).catch(e => console.error('draft tidy', e.message)); return out }   // nothing in it that isn't live already
+    out.draft = d; return out;
+  },
+  async draftClear(req, b) {
+    await owner(req);
+    const d = J(await db('GET', 'cat:draft'));
+    if (!d || !((b.t && +b.t === d.t) || (b.sid && b.sid === d.sid))) return { ok: true, cleared: false };
+    await pipeOk([['DEL', 'cat:draft']]);
+    if ((b.done === 'c' || b.done === 'd') && d.sid && d.sid !== b.sid) await markDone(d.sid, b.done, d.gen).catch(e => console.error('draftdone', e.message));
+    return { ok: true, cleared: true };
   },
   // a photo, already resized in the browser; kept in pieces small enough for the database
   async imgUpload(req, b) {
@@ -973,7 +1333,7 @@ module.exports = async (req, res) => {
         '<body><main><h1>Back in a moment</h1><p>This page couldn’t be loaded just now. Please try again in a minute — or <a href="/">walk through the gallery</a>.</p><p>You can always email Pam at ' + esc(OWNER).replace('@', ' [at] ') + '.</p></main></body></html>');
       console.error(e); return;
     }
-    res.status(code).json({ error: code === 500 ? 'Something went wrong — please try again.' : e.message });
+    res.status(code).json(code === 500 ? { error: 'Something went wrong — please try again.' } : Object.assign({ error: e.message }, e.extra || {}));
     if (code === 500) console.error(e);
   }
 };

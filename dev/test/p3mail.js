@@ -16,10 +16,11 @@ const html=e=>(e.html||'')+' '+(e.text||'');
  ok(OT&&BT,'signed in');
  await call('POST',{a:'news',on:true},null,BT);
  const cat0=(await call('POST',{a:'catGet'},null,OT)).j.cat,cat=JSON.parse(JSON.stringify(cat0));
+ const V=async()=>(((await call('POST',{a:'catGet'},null,OT)).j.cat)||{}).v||0;   // the live version, which every publish must name
  const px='data:image/jpeg;base64,'+require('fs').readFileSync(__dirname+'/fixtures/wm_p7.jpg').toString('base64');const up=(await call('POST',{a:'imgUpload',data:px,type:'image/jpeg'},null,OT)).j.url;
  const img={id:'p98',t:'Moon Orchard',m:'Oil on canvas',s:'30 × 40 cm',year:'2026',d:'',p:'£700',mode:'price',status:'Available',w:.4,h:.3,img:up};cat.arts.push(img);ok(!!up,'uploaded a painting to mark');
  const until=Date.now()+48*36e5;img.early=until;cat.site.earlyHours=48;
- sent.length=0;let r=await call('POST',{a:'catSave',cat},null,OT);
+ sent.length=0;let r=await call('POST',{a:'catSave',cat,base:await V()},null,OT);
  const toBob=sent.filter(e=>[].concat(e.to).includes('bob@example.com'));
  ok(r.j.ok&&r.j.emailed>=1&&toBob.length===1,'Bob (opted in) is emailed about the new members-only work (emailed '+r.j.emailed+')');
  const e=toBob[0]||{};console.log('   subject:',e.subject);
@@ -27,7 +28,7 @@ const html=e=>(e.html||'')+' '+(e.text||'');
  ok(new RegExp(img.t).test(html(e)+e.subject),'the email names the painting');
  ok(!/5%|discount|charity/i.test(html(e)),'no discount or charity wording');
  ok(!sent.some(x=>[].concat(x.to).includes('pts98@hotmail.co.uk')&&/members/i.test(x.subject||'')&&false),'');
- sent.length=0;r=await call('POST',{a:'catSave',cat},null,OT);ok(r.j.ok&&!sent.filter(x=>[].concat(x.to).includes('bob@example.com')).length,'saving again doesn’t email twice');
+ sent.length=0;r=await call('POST',{a:'catSave',cat,base:await V()},null,OT);ok(r.j.ok&&!sent.filter(x=>[].concat(x.to).includes('bob@example.com')).length,'saving again doesn’t email twice');
  // unsubscribe from the drop email
  const ul=/[?&]unsub=([^"'&\s<]+)/.exec(html(e));r=await call('GET',null,{unsub:decodeURIComponent(ul?ul[1]:'')});ok(r.code===200&&/unsubscribed/i.test(r.t),'the unsubscribe link works ('+r.code+')');
  const me=(await call('POST',{a:'me'},null,BT)).j.me;ok(me&&me.news===false,'Bob’s news preference is now off');
@@ -37,7 +38,7 @@ const html=e=>(e.html||'')+' '+(e.text||'');
  r=await call('GET',null,{confirm:decodeURIComponent(cl?cl[1]:'')});ok(r.code===200&&/on the list/i.test(r.t),'confirming works');
  // members who didn't ask for news aren't emailed
  await call('POST',{a:'news',on:false},null,BT);const c2=JSON.parse(JSON.stringify(cat));c2.arts.find(a=>a.id===img.id).early=Date.now()+72*36e5;sent.length=0;
- r=await call('POST',{a:'catSave',cat:c2},null,OT);ok(!sent.some(x=>[].concat(x.to).includes('bob@example.com')),'no email to members who said no');
+ r=await call('POST',{a:'catSave',cat:c2,base:await V()},null,OT);ok(!sent.some(x=>[].concat(x.to).includes('bob@example.com')),'no email to members who said no');
  ok(sent.every(x=>/unsub=/.test(html(x))),'every drop email carries an unsubscribe link ('+sent.length+' sent, to confirmed sign-ups)');
- await call('POST',{a:'catSave',cat:cat0},null,OT);console.log('restored');process.exit()
+ await call('POST',{a:'catSave',cat:cat0,base:await V()},null,OT);console.log('restored');process.exit()
 })();

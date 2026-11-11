@@ -4,7 +4,7 @@ function ok(c,m){console.log((c?'PASS ':'FAIL ')+m);if(!c)process.exitCode=1}
 (async()=>{
  const OT=(await P({a:'login',email:'pts98@hotmail.co.uk',password:'testpass123'})).token, BT=(await P({a:'login',email:'bob@example.com',password:'bobpass123'})).token;
  ok(OT&&BT,'signed in as owner and as a member');
- const ownerOnly=['dash','catGet','catSave','payLink','dashOrder','dashMsg','aucClose','catHist','catRestore','growGet','growSave','imgUpload'];
+ const ownerOnly=['dash','catGet','catSave','payLink','dashOrder','dashMsg','aucClose','catHist','catRestore','growGet','growSave','imgUpload','catVer','catImport','draftSave','draftGet','draftClear'];
  const [h,p]=OT.split('.'),forged=Buffer.from(JSON.stringify({e:'pts98@hotmail.co.uk',x:Date.now()+1e9})).toString('base64').replace(/=+$/,'').replace(/\+/g,'-').replace(/\//g,'_')+'.'+p;
  for(const a of ownerOnly){
   const r0=await P({a,cat:{arts:[]},grow:{},id:'x',data:'AAAA'}),r1=await P({a,cat:{arts:[]},grow:{},id:'x',data:'AAAA'},BT),r2=await P({a,cat:{arts:[]},grow:{},id:'x'},forged);

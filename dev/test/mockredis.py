@@ -3,8 +3,14 @@ D={};E={}
 def alive(k):
     if k in E and E[k]<time.time(): D.pop(k,None);E.pop(k,None)
     return k in D
+FAILW=['']   # test-only: writes to this key are refused the way a full Upstash database refuses them ('' = off, '*' = every write, 'img:*' = keys starting img:)
+WRITES={'SET','SETNX','INCR','EXPIRE','HINCRBY','HSETNX','LPUSH','LTRIM','SADD','SREM','ZADD','ZINCRBY','ZREM','ZREMRANGEBYSCORE','PFADD'}   # as on Upstash, a full database still lets keys be deleted
+class Refused(Exception): pass
 def run(c):
     c=[str(x) for x in c];op=c[0].upper();a=c[1:]
+    if op=='MOCK.FAILWRITES': FAILW[0]=a[0] if a else '';return 'OK'
+    f=FAILW[0]
+    if f and op in WRITES and (f=='*' or (a[0].startswith(f[:-1]) if f.endswith('*') else a[0]==f)): raise Refused('ERR DB capacity quota exceeded')   # Upstash's own words
     [alive(k) for k in list(E)]
     if op=='GET': v=D.get(a[0]);return v if isinstance(v,str) else None
     if op=='SET':
@@ -55,7 +61,10 @@ class H(http.server.BaseHTTPRequestHandler):
         assert self.headers['Authorization']=='Bearer testtoken'
         n=int(self.headers['Content-Length']);assert n<1_100_000,'request too big for upstash free: %d'%n
         b=json.loads(self.rfile.read(n))
-        out=[{'result':run(c)} for c in b] if self.path.endswith('/pipeline') else {'result':run(b)}
-        d=json.dumps(out).encode();self.send_response(200);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(d)));self.end_headers();self.wfile.write(d)
+        def one(c):
+            try: return {'result':run(c)}
+            except Refused as e: return {'error':str(e)}
+        pl=self.path.endswith('/pipeline');out=[one(c) for c in b] if pl else one(b)
+        d=json.dumps(out).encode();self.send_response(400 if not pl and 'error' in out else 200);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(d)));self.end_headers();self.wfile.write(d)
     def log_message(self,*a):pass
 http.server.ThreadingHTTPServer(('127.0.0.1',int(sys.argv[1])),H).serve_forever()
