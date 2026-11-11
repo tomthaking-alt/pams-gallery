@@ -21,8 +21,14 @@ async function part1() {
   let v = cat0.v, r;
   const n0 = (await P({ a: 'catHist' }, OT)).total, made = [];
   // an older page can't publish over newer work
-  r = await P({ a: 'catSave', cat: clone(cat0) }, OT); ok(r._s === 409 && r.code === 'base_missing' && /reload/i.test(r.error), 'a publish that doesn’t say which version it started from is refused (' + r._s + ')');
-  r = await P({ a: 'catSave', cat: clone(cat0), base: v - 1 }, OT); ok(r._s === 409 && r.code === 'stale' && r.live === v, 'a publish from an older version is refused');
+  const cx = clone(cat0); cx.arts[0].t = 'P6 not published';
+  r = await P({ a: 'catSave', cat: cx }, OT); ok(r._s === 409 && r.code === 'base_missing' && /reload/i.test(r.error), 'a publish that doesn’t say which version it started from is refused (' + r._s + ')');
+  r = await P({ a: 'catSave', cat: cx, base: v - 1 }, OT); ok(r._s === 409 && r.code === 'stale' && r.live === v, 'a publish from an older version is refused');
+  // values that can't even be turned into text (only a script could send them): a plain refusal, never a server error
+  const odd = clone(cat0); odd.arts[0].t = { toString: 1, valueOf: 1 };
+  r = await P({ a: 'catImport', cat: odd, dry: true }, OT); ok(r._s === 400 && /isn’t a gallery backup/.test(r.error), 'a backup file with values that can’t be read: “That file isn’t a gallery backup” (' + r._s + ')');
+  r = await P({ a: 'catSave', cat: odd, base: v }, OT); const r2 = await P({ a: 'draftSave', draft: odd, base: v, sid: sid('p6odd') }, OT);
+  ok(r._s === 400 && r2._s === 400 && /couldn’t be read/.test(r.error), 'the same in a publish or a draft: a plain answer (' + r._s + ', ' + r2._s + ')');
   // what changed, in plain English
   const pub = async (c, want, msg) => { const x = await P({ a: 'catSave', cat: c, base: v }, OT); if (x.ok) { v = x.cat.v; made.push({ v, changes: x.changes }) } ok(x.ok && (!want || same(x.changes, want)), msg + ': ' + JSON.stringify(x.changes || x.error)); return x };
   const A = cat0.arts[0], Bp = cat0.arts[1]; let c = clone(cat0);
@@ -39,6 +45,7 @@ async function part1() {
   c = clone(c); c.arts.slice(0, 10).forEach((a, i) => { a.t = 'P6 many ' + i }); r = await pub(c, null, 'ten renames');
   ok(r.changes.length === 9 && r.changes[8] === 'and 2 more changes', 'at most eight lines, then “and 2 more changes”');
   r = await P({ a: 'catSave', cat: clone(c), base: v }, OT); ok(r.ok && r.unchanged === true && r.cat.v === v, 'publishing with nothing changed adds no version');
+  r = await P({ a: 'catSave', cat: clone(c), base: v - 1 }, OT); ok(r.ok && r.unchanged === true && r.cat.v === v, 'the same as what’s live, sent from an older page (a publish whose answer was lost, sent again): nothing is replaced, so no refusal');
   // every version kept and listed, twenty at a time
   let h = await P({ a: 'catHist' }, OT);
   ok(h.total === n0 + made.length && h.total > 10 && h.live === v && h.list[0].v === v, 'every version kept: ' + h.total + ' listed, the newest live');
@@ -68,6 +75,27 @@ async function part1() {
   await P({ a: 'draftSave', draft: (await P({ a: 'catGet' }, OT)).cat, base: v, sid: sA }, OT); ok(!(await P({ a: 'draftGet' }, OT)).draft, 'a draft with nothing unpublished in it is tidied away');
   const long = clone(d); long.arts[0].t = 'x'.repeat(200); await P({ a: 'draftSave', draft: long, base: v, sid: sA }, OT);
   r = await P({ a: 'draftGet' }, OT); ok(r.draft && r.draft.cat.arts[0].t.length === 90, 'drafts keep the same limits as publishing'); await P({ a: 'draftClear', sid: sA }, OT);
+  // a dashboard's newest edits stay, whatever order its saves arrive in
+  const sG = sid('p6g'), dg = clone(cat0); dg.arts[0].t = 'P6 edit 5'; await P({ a: 'draftSave', draft: dg, base: v, sid: sG, gen: 5 }, OT);
+  dg.arts[0].t = 'P6 edit 3'; const late = await P({ a: 'draftSave', draft: dg, base: v, sid: sG, gen: 3 }, OT);
+  r = await P({ a: 'draftGet' }, OT); ok(late.ok && late.kept && r.draft && r.draft.cat.arts[0].t === 'P6 edit 5' && r.draft.gen === 5, 'an older save from the same dashboard arriving late doesn’t replace its newer edits');
+  ok(typeof r.now === 'number' && Math.abs(r.now - Date.now()) < 60000, 'draftGet says the server’s time (to compare with copies kept on a device)');
+  // carrying on replaces only the draft Pam was shown, and notes where it went
+  const sH = sid('p6h'), tG = r.draft.t; dg.arts[0].t = 'P6 carried on';
+  r = await P({ a: 'draftSave', draft: dg, base: v, sid: sH, take: tG - 1 }, OT); ok(r._s === 409 && r.code === 'draft_other' && (await P({ a: 'draftGet' }, OT)).draft.sid === sG, 'carrying on after another draft was saved meanwhile: refused, and that newer draft stays');
+  r = await P({ a: 'draftSave', draft: dg, base: v, sid: sH, take: tG, from: tG }, OT); ok(r.ok, 'carrying on with the draft Pam was shown');
+  r = await P({ a: 'draftGet', devs: [sG, sH, 'not a session!', { x: 1 }] }, OT);
+  ok(r.draft && r.draft.sid === sH && r.done[sG] && r.done[sG].k === 'c' && r.done[sG].gen === 5 && !r.done[sH], 'the dashboard it came from is noted as carried on (so its own device doesn’t offer it again later)');
+  r = await P({ a: 'draftClear', t: r.draft.t, done: 'd' }, OT); ok(r.cleared && (await P({ a: 'draftGet', devs: [sH] }, OT)).done[sH].k === 'd', '“Discard them” on another dashboard’s draft notes it as discarded');
+  // two dashboards saving their first draft at the same moment: never both told “saved”
+  let both = 0; for (let i = 0; i < 6; i++) { const x = await Promise.all([P({ a: 'draftSave', draft: dg, base: v, sid: sid('p6r') }, OT), P({ a: 'draftSave', draft: d, base: v, sid: sid('p6s') }, OT)]); if (x[0].ok && x[1].ok) both++; const dd = (await P({ a: 'draftGet' }, OT)).draft; if (dd) await P({ a: 'draftClear', t: dd.t }, OT) }
+  ok(both === 0, 'two dashboards saving their first draft at once are never both told “saved” (' + both + ' of 6)');
+  // collections' ids are bookkeeping: a draft that only changes them is nothing new
+  const live1 = (await P({ a: 'catGet' }, OT)).cat, ids = clone(live1); ids.colls.forEach((k, i) => { k.id = 'p6coll' + i + Math.random().toString(36).slice(2, 6) });
+  r = await P({ a: 'draftSave', draft: ids, base: live1.v, sid: sid('p6i') }, OT);
+  ok(r.ok && (await P({ a: 'draftGet' }, OT)).draft === null && (await P({ a: 'catImport', cat: ids, dry: true }, OT)).preview.same === true, 'a draft that only gives the collections new ids (nothing visitors see) is tidied away, and counts as the same gallery');
+  ids.colls[0].t = 'P6 renamed collection'; r = await P({ a: 'catImport', cat: ids, dry: true }, OT);
+  ok(r.preview && !r.preview.same && r.preview.changes.some(x => /^Renamed the collection .* to “P6 renamed collection”$/.test(x)), 'a real change to a collection still counts: ' + (r.preview && r.preview.changes[0]));
   // backups
   r = await P({ a: 'catVer' }, OT); ok(r.cat && r.cat.v === v && r.live, 'download the live version');
   const old = (await P({ a: 'catVer', v: cat0.v }, OT)).cat; ok(old && old.v === cat0.v && old.arts[0].t === A.t, 'download any kept version');
@@ -122,9 +150,30 @@ async function part2() {
     r = await Q({ a: 'catSave', cat: mini(['A', 'X', 'C']) }, OT); ok(r._s === 409 && r.code === 'base_missing', how + ' live copy: a publish without a base is still refused');
     r = await Q({ a: 'catGet' }, OT); ok(r.cat && r.cat.v === v && r.healed === v && JSON.parse((await DB([['GET', 'cat']]))[0]).v === v, how + ' live copy: opening the dashboard puts it back');
   }
+  // the live copy missing and the newest kept version unreadable too: the next newest kept version (never the old list, which may be weeks old)
+  const [liveJ, packed] = await DB([['GET', 'cat'], ['GET', 'cat:ver:' + v]]); await DB([['DEL', 'cat'], ['SET', 'cat:ver:' + v, 'z:broken']]);
+  r = await call('GET', null, { cat: '1' }); const hl = await Q({ a: 'catGet' }, OT);
+  ok(r.cat && r.cat.arts[1].t === 'B' && hl.healed && hl.cat.arts[1].t === 'B' && !hl.healedOld, 'the live copy and the newest kept version both unreadable: the next newest kept version stands in (' + (r.cat && r.cat.arts.map(a => a.t).join()) + ')');
+  await DB([['SET', 'cat:ver:' + v, packed], ['SET', 'cat', liveJ]]);
   // one publish at a time
   await DB([['SET', 'cat:lock', 'someone', 'NX', 'EX', '30']]);
   r = await Q({ a: 'catSave', cat: mini(['A', 'B3', 'C']), base: v }, OT); ok(r._s === 409 && r.code === 'busy', 'a second publish waits while one is being written');
+  await DB([['DEL', 'cat:lock']]);
+  // the database takes the new live copy, but its answer is lost on the way back: it is live, so it's reported as published, and the photo locks stay right
+  const up = await Q({ a: 'imgUpload', data: 'QUJDRA==', type: 'image/jpeg' }, OT), key = /img=([a-z0-9]+)/.exec(up.url || '')[1];
+  const c6 = mini(['A', 'B2', 'C']); c6.arts[0].img = up.url; c6.arts[0].early = Date.now() + 864e5;
+  r = await Q({ a: 'catSave', cat: c6, base: v }, OT); v = r.cat.v; ok(r.ok && (await call('GET', null, { img: key }))._s === 404, 'a members-only painting’s own photo is kept private');
+  const real = global.fetch; let cut = 0; const c7 = clone(c6); delete c7.arts[0].early;
+  global.fetch = async (u, o) => { const res = await real(u, o); if (!cut && o && typeof o.body === 'string' && o.body.startsWith('[["SET","cat","')) { cut = 1; throw new TypeError('fetch failed') } return res };
+  try { r = await Q({ a: 'catSave', cat: c7, base: v }, OT) } finally { global.fetch = real }
+  let lv = JSON.parse((await DB([['GET', 'cat']]))[0]);
+  ok(cut && r.ok && r.cat.v === lv.v && lv.v !== v && !lv.arts[0].early && (await call('GET', null, { img: key }))._s === 200, 'a publish that went live although the database’s answer was lost: reported as published, and the photo is open to everyone (' + r._s + ')');
+  v = lv.v;
+  // a very slow publish that outlasts its lock stops before replacing the live copy (another publish may have started meanwhile)
+  let stole = 0; global.fetch = async (u, o) => { if (!stole && o && typeof o.body === 'string' && o.body.includes('"ZADD","cat:idx"')) { stole = 1; await real(PU + '/pipeline', { method: 'POST', headers: { Authorization: 'Bearer testtoken' }, body: JSON.stringify([['SET', 'cat:lock', 'someone-else']]) }) } return real(u, o) };
+  try { r = await Q({ a: 'catSave', cat: mini(['A', 'B7', 'C']), base: v }, OT) } finally { global.fetch = real }
+  lv = JSON.parse((await DB([['GET', 'cat']]))[0]);
+  ok(stole && r._s === 409 && r.code === 'busy' && lv.v === v, 'a publish that outlasted its lock stops before going live: “Another publish is still finishing” (' + r._s + ')');
   await DB([['DEL', 'cat:lock']]);
   // a database that turns writes away (as a full one does): never “Published”
   const n0 = (await DB([['ZCARD', 'cat:idx']]))[0];
@@ -158,6 +207,17 @@ async function part2() {
   r = await Q({ a: 'catSave', cat: mini(['A3', 'B2', 'C']), base: H[3].v }, OT); ok(r.ok && same(r.changes, ['Renamed “A2” to “A3”']), 'publishing on top of the old versions');
   await DB([['DEL', 'mig:catidx']]); r = await Q({ a: 'catHist' }, OT); ok(r.total === 5 && r.list[0].kind === 'publish' && same(r.list[0].changes, ['Renamed “A2” to “A3”']), 'moving again later leaves newer versions alone');
   r = await Q({ a: 'catRestore', v: H[0].v, base: r.live }, OT); ok(r.ok && r.cat.arts[1].t === 'B', 'an old version can be brought back');
+  const t6 = (await Q({ a: 'catHist' }, OT)).total, o5 = mini(['A4', 'B', 'C'], Date.now() + 5000);
+  await DB([['LPUSH', 'cat:hist', JSON.stringify(o5)], ['SET', 'cat', JSON.stringify(o5)]]);   // as the old code publishes, if it's ever put back for a while
+  r = await Q({ a: 'catHist' }, OT); ok(r.total === t6 + 1 && r.list[0].v === o5.v && r.live === o5.v, 'a version published the old way after the move joins the list by itself (' + r.total + ')');
+  r = await Q({ a: 'catSave', cat: mini(['A5', 'B', 'C']), base: o5.v }, OT); const back = await Q({ a: 'catRestore', v: o5.v, base: r.cat && r.cat.v }, OT);
+  ok(r.ok && back.ok && back.cat.arts[0].t === 'A4', 'and can be brought back after newer publishes');
+  const o6 = mini(['A6', 'B', 'C'], Date.now() + 9000); await DB([['SET', 'cat', JSON.stringify(o6)]]);   // written straight into the live copy, kept nowhere else
+  r = await Q({ a: 'catSave', cat: mini(['A7', 'B', 'C']), base: o6.v }, OT);
+  ok(r.ok && (await Q({ a: 'catHist' }, OT)).list.some(x => x.v === o6.v) && (await Q({ a: 'catVer', v: o6.v }, OT)).cat.arts[0].t === 'A6', 'a live copy that wasn’t kept anywhere is kept as a version before it’s replaced');
+  // only the old list exists and the live copy is missing: the old copy stands in, and the dashboard is told it's an old one
+  await stopMock(); await startMock(); OT = await owner(); await DB([['LPUSH', 'cat:hist', JSON.stringify(H[3])]]);
+  r = await Q({ a: 'catGet' }, OT); ok(r.cat && r.cat.v === H[3].v && r.healed === H[3].v && r.healedOld === 1, 'with only the old list, its newest copy stands in, marked as an old copy');
   await stopMock();
 }
 

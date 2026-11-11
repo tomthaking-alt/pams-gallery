@@ -252,7 +252,7 @@ function cleanCat(c) {
    'cat:draft'    unpublished changes from the dashboard {t, base, sid, cat}: a closed tab or a flat battery loses nothing
    'cat:lock'     held for a few seconds while a version is written, so two publishes never cross
    'cat:draftdone' the last 50 dashboard sessions whose draft was carried on from another device ('c') or discarded there ('d'), so
-                  the copy still kept on their own device isn't offered later as forgotten work: [{s: session, t, k}]
+                  the copy still kept on their own device isn't offered later as forgotten work: [{s: session, t, k, g: its edit count then}]
    'mig:catidx'   'h:<v>' once the versions kept the old way ('cat:hist', the last ten) have joined the full list, v being the newest
                   of them; a newer one there (the old code put back for a while) is moved over too */
 const KEEP = 2000;
@@ -458,9 +458,9 @@ async function putLive(prev, n, meta, sid, draft, recovered, tok) {
 function cleanOr(c, msg) { try { return cleanCat(c) } catch (e) { throw err(msg, 400) } }
 const ODD_MSG = 'Some of the details couldn’t be read — please check them and try again.';
 // sessions whose draft was carried on ('c') or discarded ('d') on another device: see 'cat:draftdone' above
-async function markDone(sid, k) {
+async function markDone(sid, k, gen) {     // gen: how many edits that dashboard had made by then (its copy on its own device with no more than that is all dealt with)
   const L = J(await db('GET', 'cat:draftdone')), A = (Array.isArray(L) ? L : []).filter(x => x && x.s !== sid);
-  A.unshift({ s: sid, t: Date.now(), k }); await pipeOk([['SET', 'cat:draftdone', JSON.stringify(A.slice(0, 50))]]);
+  A.unshift({ s: sid, t: Date.now(), k, g: Math.max(0, Math.floor(+gen || 0)) || 0 }); await pipeOk([['SET', 'cat:draftdone', JSON.stringify(A.slice(0, 50))]]);
 }
 async function afterLive(o) {     // after the lock: members who asked for news hear about new members-only work
   let emailed = 0; if (!o.unchanged) try { emailed = await dropMail(o.prev, o.c) } catch (e) { console.error('drop', e.message) }
@@ -914,7 +914,7 @@ const actions = {
       if (old && old.sid === sid && gen && +old.gen > gen) return { ok: true, t: old.t, gen: +old.gen, kept: true };   // an older save from this dashboard arriving late: the newer one stays
       // no draft yet: written only if there still isn't one, so two dashboards saving their first draft at the same moment can't both be told 'saved'
       if ((await pipeOk([old ? ['SET', 'cat:draft', JSON.stringify(d)] : ['SET', 'cat:draft', JSON.stringify(d), 'NX']]))[0] !== 'OK') continue;
-      if (old && old.sid !== sid && b.from && +b.from === +old.t) await markDone(old.sid, 'c').catch(e => console.error('draftdone', e.message));   // carried on from that draft itself
+      if (old && old.sid !== sid && b.from && +b.from === +old.t) await markDone(old.sid, 'c', old.gen).catch(e => console.error('draftdone', e.message));   // carried on from that draft itself
       return { ok: true, t: d.t };
     }
     throw err('Another device or tab has unpublished changes saved as a draft.', 409, { code: 'draft_other' });
@@ -924,7 +924,7 @@ const actions = {
     await owner(req);
     const devs = (Array.isArray(b && b.devs) ? b.devs : []).slice(0, 20).map(x => typeof x === 'string' ? cleanSid(x) : '').filter(Boolean);
     const [rd, rc, rn] = await pipe([['GET', 'cat:draft'], ['GET', 'cat'], ['GET', 'cat:draftdone']]), D = J(rn), done = {};
-    if (Array.isArray(D)) devs.forEach(s => { const x = D.find(y => y && y.s === s); if (x) done[s] = { t: x.t, k: x.k } });
+    if (Array.isArray(D)) devs.forEach(s => { const x = D.find(y => y && y.s === s); if (x) done[s] = { t: x.t, k: x.k, gen: x.g || 0 } });
     const out = { draft: null, now: Date.now(), done }, d = J(rd);
     if (!d || !okCat(d.cat)) return out;
     if (sameCat(J(rc), d.cat)) { await pipeOk([['DEL', 'cat:draft']]).catch(e => console.error('draft tidy', e.message)); return out }   // nothing in it that isn't live already
@@ -935,7 +935,7 @@ const actions = {
     const d = J(await db('GET', 'cat:draft'));
     if (!d || !((b.t && +b.t === d.t) || (b.sid && b.sid === d.sid))) return { ok: true, cleared: false };
     await pipeOk([['DEL', 'cat:draft']]);
-    if ((b.done === 'c' || b.done === 'd') && d.sid && d.sid !== b.sid) await markDone(d.sid, b.done).catch(e => console.error('draftdone', e.message));
+    if ((b.done === 'c' || b.done === 'd') && d.sid && d.sid !== b.sid) await markDone(d.sid, b.done, d.gen).catch(e => console.error('draftdone', e.message));
     return { ok: true, cleared: true };
   },
   // a photo, already resized in the browser; kept in pieces small enough for the database

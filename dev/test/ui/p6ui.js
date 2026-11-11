@@ -64,6 +64,7 @@ async function editTitle(p, i, val) {
   if (!(await row.evaluate(r => r.classList.contains('open')))) { await click(p, row.locator('.edacts button').filter({ hasText: exact('Edit') })); await p.waitForTimeout(200) }
   await titleBox(p, i).fill(val);
 }
+const devKeys = p => p.evaluate(() => Object.keys(localStorage).filter(k => /^pgDashDraft/.test(k)).length);   // copies of unpublished changes kept on this device (one per dashboard session)
 async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + ' — stopped: ' + String(e && e.message || e).split('\n')[0].slice(0, 300)) } }
 
 (async () => {
@@ -92,8 +93,8 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     ok(saved && dt >= 1500 && dt < 9000, '(a) about two seconds later: “Unpublished changes — saved as a draft” (' + (dt / 1000).toFixed(1) + ' s)');
     const d = (await P({ a: 'draftGet' }, OT)).draft, a = d && d.cat.arts.find(x => x.id === id0);
     ok(!!a && a.t === T1 && d.base === v0, '(a) draftGet on the server has the new title, marked with the version it started from');
-    const dev = await pA.evaluate(() => JSON.parse(localStorage.getItem('pgDashDraft') || 'null'));
-    ok(!!dev && dev.ed.arts[0].t === T1 && dev.sid === d.sid, '(a) and this device keeps a copy too');
+    const dev = await pA.evaluate(() => JSON.parse(localStorage.getItem('pgDashDraft:' + EDSID) || 'null'));
+    ok(!!dev && dev.ed.arts[0].t === T1 && dev.sid === d.sid && dev.gen > 0 && await devKeys(pA) === 1, '(a) and this device keeps a copy too (this tab’s own)');
     await shot(pA, 'a-saved-as-draft');
   });
 
@@ -129,7 +130,7 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     ok(/^Published — visitors will see your changes from their next visit\./.test(m) && m.includes('Renamed “' + tOld + '” to “' + T1 + '”'), '(c) “' + m.slice(0, 120) + '”');
     ok(await waitState(pA, /^Everything is published$/, 5000), '(c) the bar says “Everything is published”');
     ok((await P({ a: 'draftGet' }, OT)).draft === null, '(c) publishing cleared the server draft');
-    ok(await pA.evaluate(() => localStorage.getItem('pgDashDraft')) === null, '(c) and the copy on this device');
+    ok(await devKeys(pA) === 0, '(c) and the copy on this device');
     h1 = await P({ a: 'catHist' }, OT);
     ok(h1.total === h0.total + 1 && h1.list[0].v === h1.live && h1.list[0].changes[0] === 'Renamed “' + tOld + '” to “' + T1 + '”', '(c) the server keeps it as a new version with its note');
     await shot(pA, 'c-published');
@@ -262,7 +263,7 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     await click(pA, '#edPub');
     await until(pA, () => !EDbusy && (EDfail || EDmsg));
     const e = await txt(pA, '#edErr') || '', m = await pA.evaluate(() => EDmsg);
-    ok(/^The gallery’s database is full, so nothing new could be saved\. Your changes are still safe in your draft/.test(e) && !m && !(await pA.$('#edMsg')), '(h) Publish shows a clear message and not “Published”: “' + e.slice(0, 100) + '…”');
+    ok(e === 'The gallery’s database is full, so nothing new could be saved. Please tell Claude so it can make room. Your changes are kept as a draft.' && !m && !(await pA.$('#edMsg')), '(h) Publish shows a clear message and not “Published”: “' + e + '”');
     ok(/^Unpublished changes/.test(await txt(pA, '#edState') || '') && await pA.evaluate(() => EDdirty && ED.arts[2].t === 'P6UI Not published yet'), '(h) the change is still there, unpublished');
     const hh2 = await P({ a: 'catHist' }, OT), lh2 = (await P({ a: 'catGet' }, OT)).cat;
     ok(hh2.total === hh.total && lh2.v === lh.v && lh2.arts[2].t === lh.arts[2].t, '(h) nothing changed on the live gallery');
@@ -272,7 +273,7 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     ok(await waitState(pA, /^Unpublished changes — saved on this device only$/, 12000), '(h) when the draft can’t be saved either: “' + await txt(pA, '#edState') + '”');
     const w = await txt(pA, '#edWhy') || '';
     ok(w === 'The gallery’s server couldn’t save them just now, so they’re kept on this device for now. It will try again by itself.', '(h) “' + w + '”');
-    ok(await pA.evaluate(() => JSON.parse(localStorage.getItem('pgDashDraft')).ed.arts[2].t) === 'P6UI Not published yet 2', '(h) and this device has them');
+    ok(await pA.evaluate(() => JSON.parse(localStorage.getItem('pgDashDraft:' + EDSID)).ed.arts[2].t) === 'P6UI Not published yet 2', '(h) and this device has them');
     await shot(pA, 'h-draft-refused');
     await mock(['MOCK.FAILWRITES', '']);
     await click(pA, '#edPub');
@@ -333,7 +334,7 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     await reopen(pA);
     ok(await until(pA, () => document.querySelector('#dBody .edoffer'), null, 30000) && (await txt(pA, '#dBody .edoffer') || '').includes('to “P6UI Closed in a hurry”'), '(l) the next time the dashboard opens, it offers that change');
     await click(pA, btn(pA, 'Discard them', '#dBody .edoffer')); await click(pA, btn(pA, 'Yes, discard them', '#dBody .edoffer'));
-    ok(await until(pA, () => !OFFER && !document.querySelector('#dBody .edoffer'), null, 15000) && (await P({ a: 'draftGet' }, OT)).draft === null && await pA.evaluate(() => localStorage.getItem('pgDashDraft')) === null, '(l) “Discard them” → “Yes, discard them” removes both copies');
+    ok(await until(pA, () => !OFFER && !document.querySelector('#dBody .edoffer'), null, 15000) && (await P({ a: 'draftGet' }, OT)).draft === null && await devKeys(pA) === 0, '(l) “Discard them” → “Yes, discard them” removes both copies');
     const live = (await P({ a: 'catGet' }, OT)).cat, old = JSON.parse(JSON.stringify(live)); old.arts[5].t = 'P6UI Kept the old way';
     await pA.evaluate(o => localStorage.setItem('pgDashDraft', JSON.stringify({ t: Date.now() - 3600e3, base: o.v, ed: o })), old);
     await reopen(pA);
@@ -343,7 +344,166 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     await click(pA, btn(pA, 'Continue where I left off', '#dBody .edoffer'));
     ok(await waitState(pA, /saved as a draft$/, 12000) && await pA.evaluate(() => ED.arts[5].t) === 'P6UI Kept the old way', '(l) Continue brings it back and saves it as a draft');
     await click(pA, '#edDis'); await click(pA, btn(pA, 'Yes, discard them', '#dBody .edask'));
-    ok(await until(pA, () => ED && !EDdirty && !EDload && !OFFER, null, 30000) && (await P({ a: 'draftGet' }, OT)).draft === null && await pA.evaluate(() => localStorage.getItem('pgDashDraft')) === null, '(l) “Discard changes” removes both copies');
+    ok(await until(pA, () => ED && !EDdirty && !EDload && !OFFER, null, 30000) && (await P({ a: 'draftGet' }, OT)).draft === null && await devKeys(pA) === 0, '(l) “Discard changes” removes both copies');
+  });
+
+  await step('(m) a late answer from before a publish', async () => {
+    await reopen(pA, 'a');
+    await editTitle(pA, 0, 'P6UI Race one'); ok(await waitState(pA, /saved as a draft$/, 12000), '(m) a change, saved as a draft');
+    let arm = 1;
+    await pA.route('**/api/app', async route => { const pd = route.request().postData() || '';
+      if (arm === 1 && /"a":"catGet"/.test(pd)) { arm = 2; const resp = await route.fetch(), body = await resp.text(); await new Promise(r => setTimeout(r, 5000)); await route.fulfill({ status: resp.status(), headers: resp.headers(), body }).catch(() => { }); return }
+      await route.continue() });
+    await click(pA, '#dRefresh'); await pA.waitForTimeout(300);
+    await click(pA, '#edPub');
+    ok(await until(pA, () => !EDbusy && /^Published/.test(EDmsg || ''), null, 30000), '(m) Refresh, then Publish straight away: published');
+    await pA.waitForTimeout(6000);   // the answer to the refresh, fetched before the publish, arrives only now
+    await pA.unroute('**/api/app');
+    const live = (await P({ a: 'catGet' }, OT)).cat, s = await pA.evaluate(() => ({ PUBV, t: ED.arts[0].t, dirty: EDdirty, bar: document.getElementById('edState').textContent }));
+    ok(arm === 2 && s.PUBV === live.v && s.t === 'P6UI Race one' && !s.dirty && s.bar === 'Everything is published', '(m) the late answer doesn’t turn the dashboard back to the version before the publish (“' + s.t + '”, ' + s.bar + ')');
+    await editTitle(pA, 1, 'P6UI Typed after it');
+    ok(await waitState(pA, /saved as a draft$/, 12000) && await pA.evaluate(() => ED.arts[1].t === 'P6UI Typed after it') && ((await P({ a: 'draftGet' }, OT)).draft || { cat: { arts: [{}, {}] } }).cat.arts[1].t === 'P6UI Typed after it', '(m) what Pam types next is kept, and saved as a draft');
+    await click(pA, '#edPub'); ok(await until(pA, () => !EDbusy && /^Published —/.test(EDmsg || ''), null, 30000), '(m) and publishes with no question asked');
+  });
+
+  await step('(n) each tab keeps its own copy', async () => { const pB = await open(ctx, 'tab B2'); let pC = null; try {
+    await dash(pB, 'a'); await reopen(pA, 'a');
+    await editTitle(pA, 0, 'P6UI Tab A again'); ok(await waitState(pA, /saved as a draft$/, 12000), '(n) tab A’s change is saved as a draft');
+    await editTitle(pB, 1, 'P6UI Tab B only'); ok(await waitState(pB, /^Unpublished changes — saved on this device only$/, 12000), '(n) tab B’s is kept on this device only (tab A has the draft)');
+    await titleBox(pA, 0).fill('P6UI Tab A types on'); await pA.waitForTimeout(1500);
+    const bk = await pB.evaluate(() => { const d = JSON.parse(localStorage.getItem('pgDashDraft:' + EDSID) || 'null'); return d && d.ed.arts[1].t });
+    ok(bk === 'P6UI Tab B only' && /saved on this device only$/.test(await txt(pB, '#edState') || ''), '(n) tab A typing on doesn’t touch tab B’s copy, so “saved on this device only” stays true');
+    await pB.close({ runBeforeUnload: false }); await pA.waitForTimeout(800);
+    pC = await open(ctx, 'tab C2'); await dash(pC);
+    const o = (await until(pC, () => document.querySelector('#dBody .edoffer'), null, 30000)) ? await txt(pC, '#dBody .edoffer') : '';
+    ok(o.includes('to “P6UI Tab B only”') && !o.includes('P6UI Tab A'), '(n) once tab B is gone, a new tab offers tab B’s changes, and leaves tab A’s (still open) alone');
+    await shot(pC, 'n-tab-b-offered');
+    await click(pC, btn(pC, 'Discard them', '#dBody .edoffer')); await click(pC, btn(pC, 'Yes, discard them', '#dBody .edoffer'));
+    await until(pC, () => !OFFER && !document.querySelector('#dBody .edoffer'), null, 15000); await tabTo(pC, 'a');
+    ok(await until(pC, () => /still open in another tab of this browser/.test(document.getElementById('dBody').textContent), null, 15000), '(n) and says tab A’s unpublished changes are still open in another tab');
+    await shot(pC, 'n-open-in-another-tab');
+    ok(await pA.evaluate(() => EDdirty && ED.arts[0].t === 'P6UI Tab A types on') && /saved as a draft$/.test(await txt(pA, '#edState') || '') && ((await P({ a: 'draftGet' }, OT)).draft || { cat: { arts: [{}] } }).cat.arts[0].t === 'P6UI Tab A types on', '(n) tab A still has its changes, saved as a draft');
+    await click(pA, '#edDis'); await click(pA, btn(pA, 'Yes, discard them', '#dBody .edask'));
+    ok(await until(pA, () => ED && !EDdirty && !EDload && !OFFER, null, 30000) && (await P({ a: 'draftGet' }, OT)).draft === null && await devKeys(pA) === 0, '(n) tidy: no copies left');
+  } finally { await pB.close().catch(() => { }); if (pC) await pC.close().catch(() => { }) } });
+
+  await step('(o) unpublished changes that can’t be checked', async () => {
+    const live = (await P({ a: 'catGet' }, OT)).cat, lap = JSON.parse(JSON.stringify(live)); lap.arts[0].t = 'P6UI Laptop draft';
+    ok((await P({ a: 'draftSave', draft: lap, base: live.v, sid: 'p6uilapo' + Math.random().toString(36).slice(2, 8) }, OT)).ok, '(o) a draft saved from another device (the laptop)');
+    let n = 0; await pA.route('**/api/app', route => { if (/"a":"draftGet"/.test(route.request().postData() || '') && n < 2) { n++; return route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'The gallery’s database couldn’t save this just now, so nothing was changed.' }) }) } return route.continue() });
+    await reopen(pA, 'a');
+    const e = (await until(pA, () => document.querySelector('#dBody .err'), null, 20000)) ? await txt(pA, '#dBody .err') : '';
+    ok(/^Your unpublished changes couldn’t be checked just now/.test(e) && !(await pA.$('#dBody .edoffer')) && !(await pA.$('#dBody .edrow')) && await btn(pA, 'Try again', '#dBody').count() === 1, '(o) when they can’t be checked: “' + e.slice(0, 70) + '…”, with “Try again”, and nothing to edit or overwrite');
+    ok(((await P({ a: 'draftGet' }, OT)).draft || { cat: { arts: [{}] } }).cat.arts[0].t === 'P6UI Laptop draft', '(o) the laptop’s draft is untouched');
+    await shot(pA, 'o-cant-check');
+    await pA.unroute('**/api/app');
+    await click(pA, btn(pA, 'Try again', '#dBody'));
+    ok(await until(pA, () => document.querySelector('#dBody .edoffer'), null, 30000) && (await txt(pA, '#dBody .edoffer') || '').includes('to “P6UI Laptop draft”'), '(o) “Try again” then offers the laptop’s changes');
+    await click(pA, btn(pA, 'Discard them', '#dBody .edoffer')); await click(pA, btn(pA, 'Yes, discard them', '#dBody .edoffer'));
+    ok(await until(pA, () => !OFFER && !document.querySelector('#dBody .edoffer'), null, 15000) && (await P({ a: 'draftGet' }, OT)).draft === null, '(o) tidy: discarded');
+  });
+
+  await step('(p) a publish whose answer is lost', async () => {
+    await reopen(pA, 'a');
+    await editTitle(pA, 2, 'P6UI Answer lost'); await waitState(pA, /saved as a draft$/, 12000);
+    await pA.route('**/api/app', async route => { if (/"a":"catSave"/.test(route.request().postData() || '')) { const resp = await route.fetch(); await resp.body(); return route.abort('failed') } return route.continue() });
+    await click(pA, '#edPub'); await until(pA, () => !EDbusy && (EDmsg || EDfail), null, 30000);
+    await pA.unroute('**/api/app');
+    const m = await txt(pA, '#edMsg') || '', live = (await P({ a: 'catGet' }, OT)).cat;
+    ok(live.arts[2].t === 'P6UI Answer lost' && /^Published — visitors will see your changes/.test(m) && m.includes('to “P6UI Answer lost”') && /^Everything is published$/.test(await txt(pA, '#edState') || ''), '(p) it went through but the answer never came: the dashboard checks, and says “' + m.slice(0, 60) + '…”');
+    ok((await P({ a: 'draftGet' }, OT)).draft === null && await devKeys(pA) === 0, '(p) and no draft is left behind');
+  });
+
+  await step('(q) an error page instead of an answer', async () => {
+    await editTitle(pA, 2, 'P6UI Not sent'); await waitState(pA, /saved as a draft$/, 12000);
+    await pA.route('**/api/app', route => /"a":"catSave"/.test(route.request().postData() || '') ? route.fulfill({ status: 504, contentType: 'text/plain', body: 'An error occurred with your deployment\n\nFUNCTION_INVOCATION_TIMEOUT\n' }) : route.continue());
+    await click(pA, '#edPub'); await until(pA, () => !EDbusy && (EDmsg || EDfail), null, 30000);
+    await pA.unroute('**/api/app');
+    const e = await txt(pA, '#edErr') || '';
+    ok(e === 'The gallery’s server didn’t answer properly just now. Please wait a minute, then try again. Your changes are kept as a draft.' && await pA.evaluate(() => EDdirty), '(q) an error page from the host: “' + e + '”');
+    await shot(pA, 'q-error-page');
+    await click(pA, '#edPub'); ok(await until(pA, () => !EDbusy && /^Published —/.test(EDmsg || ''), null, 30000) && (await P({ a: 'catGet' }, OT)).cat.arts[2].t === 'P6UI Not sent', '(q) Publish again publishes it');
+  });
+
+  await step('(r) a draft save that never answers', async () => {
+    let release = null; const held = new Promise(r => { release = r });
+    await pA.route('**/api/app', async route => { if (/"a":"draftSave"/.test(route.request().postData() || '')) { await held; return route.abort('failed').catch(() => { }) } return route.continue() });
+    await editTitle(pA, 3, 'P6UI Stalled save'); await pA.waitForTimeout(2600);   // its draft save is on its way, and never answers
+    const t0 = Date.now(); await click(pA, '#edPub');
+    const done = await until(pA, () => !EDbusy && /^Published/.test(EDmsg || ''), null, 40000), dt = Date.now() - t0;
+    ok(done && dt < 25000 && (await P({ a: 'catGet' }, OT)).cat.arts[3].t === 'P6UI Stalled save', '(r) Publish still goes through (' + (dt / 1000).toFixed(1) + ' s) instead of waiting for ever');
+    release(); await pA.waitForTimeout(500); await pA.unroute('**/api/app');
+  });
+
+  await step('(s) a backup restored after the gallery was published elsewhere', async () => {
+    await tabTo(pA, 's'); await until(pA, () => document.querySelector('#edVers .vrow'), null, 30000);
+    const live = (await P({ a: 'catGet' }, OT)).cat, bk = { kind: 'pams-gallery-backup', version: 1, v: live.v, saved: new Date(live.v).toISOString(), cat: JSON.parse(JSON.stringify(live)) };
+    bk.cat.arts[4].t = 'P6UI Backup title'; const fp = path.join(SHOTS, 'p6ui-backup-stale.json'); fs.writeFileSync(fp, JSON.stringify(bk));
+    await pA.setInputFiles('#edVers input[type=file]', fp);
+    ok(await until(pA, () => document.querySelector('#edVers .vbox'), null, 30000), '(s) a backup’s preview');
+    const x = JSON.parse(JSON.stringify(live)); x.arts[5].t = 'P6UI Published elsewhere';
+    ok((await P({ a: 'catSave', cat: x, base: live.v }, OT)).ok, '(s) meanwhile the gallery is published from another device');
+    await click(pA, btn(pA, 'Restore this backup', '#edVers .vbox'));
+    const shown = await until(pA, () => { const b = document.querySelector('#edVers .vbox'); return !!b && /published again from another device or tab, so the backup wasn’t restored yet/.test(b.textContent) }, null, 20000);
+    const pv = await txt(pA, '#edVers .vbox') || '';
+    ok(shown && pv.includes('to “P6UI Backup title”') && (await P({ a: 'catGet' }, OT)).cat.arts[5].t === 'P6UI Published elsewhere', '(s) nothing is restored, and the new preview is there to check: “' + pv.slice(0, 90) + '…”');
+    await pA.locator('#edVers .vbox').scrollIntoViewIfNeeded(); await shot(pA, 's-backup-asks-again');
+    await click(pA, btn(pA, 'Cancel', '#edVers .vbox'));
+  });
+
+  await step('(t) changes carried on from another device', async () => {
+    const ph = await newCtx(b, { viewport: { width: 1000, height: 800 }, deviceScaleFactor: 1 });
+    try {
+      let pP = await open(ph, 'phone 2'); await dash(pP, 'a');
+      await editTitle(pP, 0, 'P6UI Phone change'); ok(await waitState(pP, /saved as a draft$/, 12000), '(t) a change on the phone, saved as a draft (the phone stays open)');
+      await reopen(pA, 'a');
+      ok(await until(pA, () => document.querySelector('#dBody .edoffer'), null, 30000) && (await txt(pA, '#dBody .edoffer') || '').includes('to “P6UI Phone change”'), '(t) the laptop offers the phone’s changes');
+      await click(pA, btn(pA, 'Continue where I left off', '#dBody .edoffer')); await waitState(pA, /saved as a draft$/, 12000);
+      await editTitle(pA, 1, 'P6UI Laptop addition');
+      await click(pA, '#edPub'); ok(await until(pA, () => !EDbusy && /^Published —/.test(EDmsg || ''), null, 30000), '(t) carried on and published from the laptop');
+      await reopen(pP, 'a');
+      const told = await waitState(pP, /^Unpublished changes — saved on this device only$/, 15000), why = await txt(pP, '#edWhy') || '';
+      ok(told && /^Another device carried on with these changes \(.+\), so they’re no longer saved as a draft — only on this device\./.test(why), '(t) the phone, still open, is told: “' + why.slice(0, 100) + '…”');
+      await pP.close(); await new Promise(r => setTimeout(r, 1500));
+      ok(((await P({ a: 'draftGet' }, OT)).draft || {}).sid === undefined, '(t) closing it doesn’t save those same changes back as a draft');
+      pP = await open(ph, 'phone 3'); await dash(pP, 'a'); await pP.waitForTimeout(500);
+      const left = await devKeys(pP);
+      ok(!(await pP.$('#dBody .edoffer')) && left === 0 && /^Everything is published$/.test(await txt(pP, '#edState') || ''), '(t) back on the phone, its own copy isn’t offered as forgotten changes (they were carried on and published), and is tidied away');
+    } finally { await ph.close() }
+  });
+
+  await step('(u) changes typed while a version is brought back', async () => {
+    await reopen(pA, 's'); await until(pA, () => document.querySelectorAll('#edVers .vrow').length > 1, null, 30000);
+    const row = pA.locator('#edVers .vrow').nth(1);
+    await click(pA, row.locator('button').filter({ hasText: exact('Restore') }));
+    await pA.route('**/api/app', async route => { if (/"a":"catRestore"/.test(route.request().postData() || '')) await new Promise(r => setTimeout(r, 3000)); return route.continue() });
+    await click(pA, row.locator('button').filter({ hasText: exact('Yes, bring it back') }));
+    ok(await until(pA, () => EDbusy, null, 5000) && /^Publishing…$/.test(await txt(pA, '#edState') || '') && await pA.evaluate(() => document.getElementById('edPub').disabled), '(u) while it is brought back, the bar says “Publishing…”');
+    await pA.locator('#dBody input[placeholder="e.g. 07700 900123"]').fill('07700 900456');
+    await until(pA, () => !EDbusy && !!(EDmsg || EDfail), null, 30000); await pA.unroute('**/api/app');
+    const s = await pA.evaluate(() => ({ m: EDmsg, dirty: EDdirty, ph: ED.site.phone, stale: EDstale }));
+    ok(/^Brought back the version from .* The changes you made while that was happening are kept, unpublished\.$/.test(s.m || '') && s.dirty && s.ph === '07700 900456' && s.stale, '(u) what Pam typed meanwhile is kept, unpublished: “…' + (s.m || '').slice(-72) + '”');
+    ok(await waitState(pA, /saved as a draft$/, 12000), '(u) and saved as a draft');
+    await click(pA, '#edDis'); await click(pA, btn(pA, 'Yes, discard them', '#dBody .edask'));
+    await until(pA, () => ED && !EDdirty && !EDload, null, 30000);
+  });
+
+  await step('(v) “Publish my changes anyway” replaces only the version Pam was asked about', async () => {
+    await reopen(pA, 'a');
+    await editTitle(pA, 0, 'P6UI Mine'); await waitState(pA, /saved as a draft$/, 12000);
+    let live = (await P({ a: 'catGet' }, OT)).cat, x = JSON.parse(JSON.stringify(live)); x.arts[5].t = 'P6UI Elsewhere one'; await P({ a: 'catSave', cat: x, base: live.v }, OT);
+    await click(pA, '#dRefresh'); await until(pA, () => EDstale && NEWER.length === 1, null, 20000);
+    await click(pA, '#edPub'); await until(pA, () => document.querySelector('#dBody .edask'), null, 10000);
+    live = (await P({ a: 'catGet' }, OT)).cat; x = JSON.parse(JSON.stringify(live)); x.arts[6].t = 'P6UI Elsewhere two'; await P({ a: 'catSave', cat: x, base: live.v }, OT);
+    await click(pA, '#dRefresh'); await until(pA, () => NEWER.length === 2, null, 20000);
+    await click(pA, btn(pA, 'Publish my changes anyway', '#dBody .edask'));
+    await until(pA, () => !EDbusy && !!(EDfail || EDmsg), null, 30000);
+    const l2 = (await P({ a: 'catGet' }, OT)).cat;
+    ok(l2.arts[6].t === 'P6UI Elsewhere two' && l2.arts[0].t !== 'P6UI Mine' && /published again/.test(await txt(pA, '#edErr') || ''), '(v) a version published after Pam was asked isn’t replaced unseen');
+    await click(pA, '#edPub'); await until(pA, () => document.querySelector('#dBody .edask'), null, 10000);
+    ok((await txt(pA, '#dBody .edask') || '').includes('to “P6UI Elsewhere two”'), '(v) pressing Publish again asks about it too');
+    await click(pA, btn(pA, 'Publish my changes anyway', '#dBody .edask'));
+    ok(await until(pA, () => !EDbusy && /^Published/.test(EDmsg || ''), null, 30000) && (await P({ a: 'catGet' }, OT)).cat.arts[0].t === 'P6UI Mine', '(v) and once Pam confirms, her changes are published');
   });
 
   await step('(j) phone', async () => {

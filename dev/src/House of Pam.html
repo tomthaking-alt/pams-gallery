@@ -2075,11 +2075,12 @@ function loadED(cb){if(!EDload){EDerr='';edLock();var mine=draftAll().map(functi
   if(j.error){EDerr=j._s===401||j._s===403?'You’re signed out. Please sign in again from “Account”, then open the dashboard again.':edErrMsg(j);return}
   if(!j.cat&&j.none!==true){EDerr='The gallery’s server gave an answer the dashboard didn’t expect, so nothing has been loaded. Please try again in a minute.';return}
   if(d.error){EDerr=d._s===401||d._s===403?'You’re signed out. Please sign in again from “Account”, then open the dashboard again.':'Your unpublished changes couldn’t be checked just now, so the dashboard hasn’t opened yet — nothing has been changed. Please try again in a minute.';return}
-  PV=j.pv||{};PUBCAT=j.cat?edNorm(j.cat):null;PUBV=PUBCAT?PUBCAT.v||0:0;ED=PUBCAT?JSON.parse(JSON.stringify(PUBCAT)):edNorm(seedCat());if(!PUBCAT)ED.v=0;
+  PV=j.pv||{};PUBCAT=j.cat?edNorm(j.cat):null;PUBV=PUBCAT?PUBCAT.v||0:0;var ed0=PUBCAT?JSON.parse(JSON.stringify(PUBCAT)):edNorm(seedCat());if(!PUBCAT)ed0.v=0;
   EDdirty=false;EDstale=false;EDfail='';EDtake=0;EDfrom=0;EDfromT=0;EDsrv='';EDsrvGen=-1;EDsrvWhy='';EDsrvTry=0;NEWER=[];ASK=null;
   EDnote=!PUBCAT?SEEDNOTE:j.healed?'The live copy of your gallery couldn’t be read, so it has been put back from '+(j.healedOld?'an older copy, saved before every version was kept':'the newest saved version that could be read')+' ('+fdt(j.healed)+'). Please check everything looks right'+(j.healedOld?', and tell Claude before you publish.':'.'):'';EDnoteWarn=!!EDnote;
   EDskew=d.now?d.now-Date.now():0;EDdone=d.done||{};
-  SRVD=d.draft&&d.draft.cat&&Array.isArray(d.draft.cat.arts)?d.draft:null;return edOffer()})
+  SRVD=d.draft&&d.draft.cat&&Array.isArray(d.draft.cat.arts)?d.draft:null;
+  return edHeld().then(function(held){ED=ed0;return edOffer(0,held)})})   // the editor appears only once it's known what to offer
   .catch(function(e){console.error(e);if(!ED)EDerr='The dashboard couldn’t load your gallery just now. Please try again in a minute.'}).then(function(){EDload=null})}
  EDload.then(cb)}
 function sameEd(a,b){var x=JSON.parse(JSON.stringify(a)),y=JSON.parse(JSON.stringify(b));x.v=y.v=0;return JSON.stringify(x)===JSON.stringify(y)}
@@ -2090,7 +2091,7 @@ function edHeld(){try{if(navigator.locks&&navigator.locks.query)return navigator
 // unpublished changes found on opening: the copies kept on this device (one per dashboard session) and the server's draft. The newest is offered,
 // with what it would change; the others are offered after it. One still open in another tab of this browser is left to that tab; one carried on
 // or discarded on another device since is tidied away, and so is one that wouldn't change anything (the gallery already looks like that)
-function edOffer(n){n=n||0;return edHeld().then(function(held){EDheldSids=held;OFFER=null;var L=edCands(held),srv=SRVD;
+function edOffer(n,hd){n=n||0;return(hd?Promise.resolve(hd):edHeld()).then(function(held){EDheldSids=held;OFFER=null;var L=edCands(held),srv=SRVD;
   EDheld=draftAll().some(function(d){return d.sid&&d.sid!==EDSID&&held[d.sid]})||(srv&&srv.sid!==EDSID&&held[srv.sid])?'Some unpublished changes are still open in another tab of this browser. To carry on with them, go back to that tab — or close it, then open the dashboard here again.':'';
   if(!L.length)return;var o=L[0];o.more=L.filter(function(x){return x!==o&&x.src==='device'}).length;
   o.older=o.src==='device'&&srv&&!o.one&&srv.sid!==EDSID&&!held[srv.sid]?srv.t:0;   // another session's draft on the server, replaced if Pam carries on with these
@@ -2099,13 +2100,13 @@ function edOffer(n){n=n||0;return edHeld().then(function(held){EDheldSids=held;O
   if(!PUBCAT)return;
   return api({a:'catImport',cat:o.cat,dry:true}).then(function(j){var p=j.preview;if(OFFER!==o||!p)return;
    if(!p.same){o.changes=p.changes||[];return}
-   OFFER=null;edForget(o);if(n<5)return edOffer(n+1)})})}
+   OFFER=null;edForget(o);if(n<5)return edOffer(n+1,held)})})}
 // newest first. From the same session the copy on this device is offered (it holds exactly what was typed) unless the server has later edits;
 // device times are put on the server's clock first
 function edCands(held){var srv=SRVD,L=[];
  draftAll().forEach(function(d){if(d.sid&&(d.sid===EDSID||held[d.sid]))return;
   if(PUBCAT&&sameEd(edNorm(JSON.parse(JSON.stringify(d.ed))),PUBCAT)){draftDel(d.key);return}   // the gallery already looks like this
-  var dn=d.sid&&EDdone[d.sid];if(dn&&d.st&&d.st<=dn.t){draftDel(d.key);return}   // carried on or discarded on another device, and nothing added here since
+  var dn=d.sid&&EDdone[d.sid];if(dn&&((d.st&&d.st<=dn.t)||(+d.gen>0&&+dn.gen>=+d.gen))){draftDel(d.key);return}   // carried on or discarded on another device, and nothing added here since
   L.push({src:'device',key:d.key,t:+d.t||0,ts:(+d.t||0)+EDskew,base:+d.base||0,sid:d.sid||'',gen:+d.gen||0,st:+d.st||0,cat:d.ed,part:dn&&!(d.st&&d.st>dn.t)?dn:null})});
  if(srv&&srv.sid!==EDSID&&!held[srv.sid]){var m=L.filter(function(x){return x.sid&&x.sid===srv.sid})[0];
   if(m&&(+srv.gen||0)<=m.gen){m.one=srv.t;m.saved=m.st===srv.t||(m.gen>0&&+srv.gen===m.gen)}
@@ -2124,9 +2125,10 @@ function edRefreshLive(){var s=++EDrs;return Promise.all([api({a:'catGet'}),api(
  if(j.cat){PUBCAT=edNorm(j.cat);PUBV=PUBCAT.v||0;Object.keys(j.pv||{}).forEach(function(k){PV[k]=j.pv[k]});if(ED&&!EDdirty&&!OFFER){ED=JSON.parse(JSON.stringify(PUBCAT));sw=true}}
  NEWER=h.list&&ED?h.list.filter(function(x){return x.v>(ED.v||0)}):[];EDstale=!!(ED&&EDdirty&&PUBV&&ED.v!==PUBV);if(/^[agrts]$/.test(dTab)&&dashD.open&&(sw||edCalm()))drawTab()})}
 // a dashboard that thinks the server has its draft checks (on opening the dashboard, or coming back to the page): another device may have carried it
-// on or discarded it meanwhile. Then these changes stay here, kept on this device; a draft that simply went is saved again
+// on or discarded it meanwhile: then these changes stay here, kept on this device, and aren't saved as a draft again (a new change is).
+// A draft that simply went is saved again
 function edCheckSrv(){if(!ED||!EDdirty||EDbusy||EDsrv!=='saved'||!TOK)return;api({a:'draftGet',devs:[EDSID]}).then(function(d){if(d.error||!ED||!EDdirty||EDbusy||EDsrv!=='saved'||(d.draft&&d.draft.sid===EDSID))return;
- var dn=d.done&&d.done[EDSID];EDsrvGen=-1;if(dn&&dn.t>=EDsrvT){EDsrv='other';EDsrvWhy='These changes were '+(dn.k==='c'?'carried on':'discarded')+' on another device ('+fdt(dn.t)+'), so they’re no longer saved as a draft — only on this device. Discard them here if you don’t need them any more.';draftLocalNow();edState()}else{EDsrv='';draftSrvNow(false)}})}
+ var dn=d.done&&d.done[EDSID];if(dn&&dn.t>=EDsrvT){EDsrv='other';EDsrvWhy=(dn.k==='c'?'Another device carried on with these changes':'These changes were discarded on another device')+' ('+fdt(dn.t)+'), so they’re no longer saved as a draft — only on this device. Discard them here if you don’t need them any more.';draftLocalNow();edState()}else{EDsrvGen=-1;EDsrv='';draftSrvNow(false)}})}
 addEventListener('beforeunload',function(e){if(EDbusy||(EDdirty&&!(EDsrv==='saved'&&EDsrvGen===EDgen))){e.preventDefault();e.returnValue=''}});   // only while the newest changes aren't on the server yet
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'){draftFlush();return}EDsrvTry=0;if(ED&&EDdirty&&!EDbusy){if(EDsrv==='local')draftSrvLater();edCheckSrv()}});
 addEventListener('pagehide',function(){draftFlush()});dashD.addEventListener('close',function(){draftFlush()});addEventListener('online',function(){EDsrvTry=0;draftSrvNow(false)});
@@ -2168,7 +2170,7 @@ function draftDrop(){clearTimeout(srvT);draftClear();EDsrv='';EDsrvGen=-1;EDsrvW
  return TOK?srvIdle().then(function(){return api(b)}):Promise.resolve({})}
 function draftNotice(body){var o=OFFER,d=el('div','mailwarn edoffer');d.setAttribute('role','region');d.setAttribute('aria-label','Unpublished changes');
  d.appendChild(el('b',null,'You have unpublished changes from '+fdt(o.t)+'.'));d.appendChild(document.createTextNode(o.saved?' They were saved as a draft.':' They were saved on this device.'));
- if(o.part)d.appendChild(el('p',null,'Part of these changes was already '+(o.part.k==='c'?'carried on from':'discarded on')+' another device ('+fdt(o.part.t)+').'));
+ if(o.part)d.appendChild(el('p',null,(o.part.k==='c'?'Another device has already carried on with part of these changes':'Part of these changes was already discarded on another device')+' ('+fdt(o.part.t)+').'));
  if(o.changes&&o.changes.length){d.appendChild(el('p',null,'What they change:'));var cl=el('ul');o.changes.forEach(function(x){cl.appendChild(el('li',null,x))});d.appendChild(cl)}
  if(o.stale){d.appendChild(el('p',null,'Your gallery has been published again since you started them, so they don’t include those newer changes. If you carry on, you’ll be asked to confirm before they replace the newer version.'));
   if(o.newer.length){var ul=el('ul');o.newer.slice(0,3).forEach(function(x){ul.appendChild(el('li',null,'Published '+fdt(x.v)+': '+((x.changes||[]).slice(0,3).join('; ')||'no notes')))});if(o.newer.length>3)ul.appendChild(el('li',null,'and '+(o.newer.length-3)+' more'));d.appendChild(ul)}}
