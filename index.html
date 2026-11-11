@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-ECaIbET2hb2kTvGdPppUonkxC5csGSKAT3Xb9zJUdg0=' 'sha256-04Ic1TiaXuTgDnTzoOvsxwWL07rxX+nOU7kh5L58d+g=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-ECaIbET2hb2kTvGdPppUonkxC5csGSKAT3Xb9zJUdg0=' 'sha256-6P3aCGZVZ6okHQZXOOldeCDDa50CjFWlKCsEWGIDrjo=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -45,18 +45,38 @@ body.hasBanner .dreampill{top:calc(var(--barh,56px) + 40px)}
 .dream #title h1{text-shadow:0 2px 22px rgba(30,14,70,.9),0 0 64px rgba(120,80,255,.5)}.dream #title p{text-shadow:0 1px 12px rgba(24,10,60,.95)}
 #title p{margin:1rem 0 0;font-size:clamp(.72rem,1.6vw,.85rem);letter-spacing:.42em;text-transform:uppercase;color:#fff6e6;text-shadow:0 1px 12px rgba(40,20,5,.7)}
 #hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 22px);z-index:3;color:#faf9f7;background:rgba(43,30,24,.85);backdrop-filter:blur(6px);padding:.65rem 1.3rem;border-radius:99px;font-size:.85rem;letter-spacing:.08em;pointer-events:none}
-#enqPanel{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:4;width:min(560px,calc(100vw - 32px));box-sizing:border-box;padding:clamp(1.5rem,4vw,2.4rem) clamp(1.25rem,4vw,2.4rem);text-align:center;color:#fffaf2;
- background:rgba(24,16,30,.58);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);border:1px solid rgba(240,214,160,.35);border-radius:4px;box-shadow:0 24px 70px rgba(10,6,14,.45);
- opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s}
+#enqPanel{position:fixed;left:50%;top:calc(var(--barh,56px) + (100vh - var(--barh,56px))/2);top:calc(var(--barh,56px) + (100dvh - var(--barh,56px))/2);transform:translate(-50%,-50%);z-index:4;width:min(740px,calc(100vw - 28px));max-height:calc(100vh - var(--barh,56px) - 24px);max-height:calc(100dvh - var(--barh,56px) - 24px);overflow:auto;overscroll-behavior:contain;box-sizing:border-box;padding:clamp(1.3rem,3.6vw,2.2rem) clamp(1rem,3.6vw,2.3rem) clamp(1.1rem,3vw,1.7rem);text-align:center;color:#1c120c;background:radial-gradient(120% 75% at 50% 0%,rgba(246,214,150,.5),rgba(246,214,150,0) 62%),linear-gradient(180deg,#fffbf3,#f7eedb);border:1px solid rgba(184,154,98,.75);border-radius:10px;box-shadow:inset 0 0 0 6px rgba(255,251,243,.92),inset 0 0 0 7px rgba(184,154,98,.4),0 0 90px 24px rgba(246,206,130,.32),0 30px 80px rgba(28,18,12,.36);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s;scrollbar-width:thin}
 #enqPanel.live{pointer-events:auto}
-#enqPanel h2{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;font-size:clamp(2.6rem,8vw,3.6rem);line-height:1;color:#f6dca4;letter-spacing:.01em}
-#enqPanel .lead{margin:.9rem auto 0;max-width:40ch;font-size:clamp(1rem,2.6vw,1.1rem);line-height:1.6;color:#fffaf2}
-#enqPanel .mail{margin:1.1rem 0 0;font-size:clamp(1.15rem,3.6vw,1.45rem);font-weight:400;letter-spacing:.02em;color:#fff;user-select:all;-webkit-user-select:all;word-break:break-all}
-#enqPanel .row{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:1.4rem}
-#enqPanel .pbtn{font:inherit;font-size:.95rem;font-weight:400;padding:.75rem 1.2rem;min-height:44px;border-radius:2px;border:1px solid rgba(246,220,164,.7);background:transparent;color:#fffaf2;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
-#enqPanel .pbtn.main{background:#f6dca4;color:#2a1c14;border-color:#f6dca4}
-#enqPanel .pbtn:focus-visible{outline:2px solid #fff;outline-offset:3px}
-#enqPanel .note{margin:.8rem 0 0;min-height:1.2em;font-size:.85rem;color:#f6dca4}
+#enqPanel .kick{margin:0 0 .4rem;font:500 .7rem/1.2 Jost,Helvetica,Arial,sans-serif;letter-spacing:.32em;text-transform:uppercase;color:#7a5a2a;display:flex;align-items:center;justify-content:center;gap:.8rem}
+#enqPanel .kick::before,#enqPanel .kick::after{content:"";width:2.4rem;height:1px;background:linear-gradient(90deg,rgba(184,137,58,0),#b8893a)}#enqPanel .kick::after{transform:scaleX(-1)}
+#enqPanel h2{margin:0;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:600;font-size:clamp(2.7rem,8.5vw,4rem);line-height:1;color:#1c120c;letter-spacing:.005em}
+#enqPanel .orn{display:block;width:min(240px,62%);height:auto;margin:.6rem auto 0;overflow:visible}#enqPanel .orn .gem{transform-origin:120px 7px;animation:enqGem 3.6s ease-in-out infinite}
+@keyframes enqGem{0%,100%{transform:scale(1);filter:none}50%{transform:scale(1.18);filter:drop-shadow(0 0 4px rgba(232,190,110,.95))}}
+#enqPanel .lead{margin:.85rem auto 0;max-width:44ch;font-size:clamp(.98rem,2.5vw,1.08rem);line-height:1.6;color:#3a2a20}
+#enqPanel .pick{margin:1.2rem 0 .45rem;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;font-size:1.2rem;color:#4a3828}
+#enqWorks{list-style:none;margin:0 -.5rem;padding:.55rem 1.4rem .8rem;display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:rgba(184,154,98,.55) transparent;-webkit-mask-image:linear-gradient(90deg,transparent,#000 1.6rem,#000 calc(100% - 1.6rem),transparent);mask-image:linear-gradient(90deg,transparent,#000 1.6rem,#000 calc(100% - 1.6rem),transparent)}   /* soft edges: there is more to see either side */
+#enqWorks li{flex:none;scroll-snap-align:center}#enqWorks li:first-child{margin-left:auto}#enqWorks li:last-child{margin-right:auto}
+#enqWorks button{all:unset;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:.4rem;cursor:pointer;max-width:152px;padding:.25rem;border-radius:6px;opacity:0;transform:translateY(-10px);transition:opacity .45s ease var(--d,0ms),transform .6s cubic-bezier(.2,1.35,.4,1) var(--d,0ms)}
+#enqPanel.live #enqWorks button{opacity:1;transform:none}
+#enqWorks .ef{display:block;padding:5px;background:#fff;border:1px solid #c9a96a;box-shadow:inset 0 0 0 1px #fff,0 2px 0 rgba(184,154,98,.25),0 9px 20px rgba(28,18,12,.22);transition:box-shadow .25s ease,transform .25s ease}
+#enqWorks img{display:block;height:108px;width:auto;max-width:142px;object-fit:contain}
+#enqWorks button:hover .ef,#enqWorks button:focus-visible .ef{transform:translateY(-4px);box-shadow:inset 0 0 0 1px #fff,0 0 0 3px rgba(232,201,131,.75),0 16px 28px rgba(28,18,12,.3)}
+#enqWorks button:focus-visible{outline:2px solid #b8862f;outline-offset:2px}
+#enqWorks .et{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:600;font-size:1rem;line-height:1.15;color:#1c120c;max-width:142px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#enqWorks .ep{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#6b5240}
+#enqPanel .row{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:1.1rem}
+#enqPanel .pbtn{font:inherit;font-size:.93rem;font-weight:400;padding:.72rem 1.25rem;min-height:46px;box-sizing:border-box;border-radius:99px;border:1px solid rgba(28,18,12,.3);background:#fffdf8;color:#1c120c;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;transition:transform .2s ease,box-shadow .2s ease}
+#enqPanel .pbtn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(28,18,12,.14)}
+#enqPanel .pbtn.main{background:#1c120c;color:#fbf8f2;border-color:#1c120c;box-shadow:0 8px 22px rgba(28,18,12,.28)}
+#enqPanel .pbtn:focus-visible{outline:2px solid #b8862f;outline-offset:3px}
+#enqPanel .mail{margin:.85rem 0 0;font-size:.95rem;letter-spacing:.02em;color:#4a3828;user-select:all;-webkit-user-select:all;word-break:break-all}
+#enqPanel .note{margin:.35rem 0 0;min-height:1.2em;font-size:.85rem;color:#7a5a2a}
+#enqPanel .more{margin:.2rem 0 0}#enqPanel .more .linkb{font:inherit;font-size:.92rem;color:#1c120c;background:none;border:0;padding:.45rem .3rem;min-height:40px;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(184,137,58,.8);text-underline-offset:4px}#enqPanel .more .linkb::after{content:" ›"}#enqPanel .more .linkb:hover{color:#7a5a2a}#enqPanel .more .linkb:focus-visible{outline:2px solid #b8862f;outline-offset:2px;border-radius:4px}
+#enqPanel::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(105deg,rgba(255,244,214,0) 38%,rgba(255,244,214,.75) 50%,rgba(255,244,214,0) 62%);background-size:260% 100%;background-position:130% 0;opacity:0}
+#enqPanel.live::after{animation:enqSheen 1.8s ease .25s 1 both}@keyframes enqSheen{0%{opacity:0;background-position:130% 0}20%{opacity:1}100%{opacity:0;background-position:-30% 0}}   /* light catching the gilt, once, as you arrive */
+@media (max-width:700px){#enqWorks img{height:86px;max-width:116px}#enqWorks .et{max-width:116px;font-size:.95rem}#enqWorks{gap:.75rem}#enqPanel .pbtn{padding:.65rem 1rem;font-size:.9rem}}
+@media (max-height:720px){#enqPanel h2{font-size:clamp(2.3rem,7vw,3.2rem)}#enqPanel .lead{margin-top:.6rem;line-height:1.5}#enqPanel .pick{margin-top:.8rem}#enqWorks img{height:74px}}
+@media (prefers-reduced-motion:reduce){#enqWorks button{transition:none;opacity:1;transform:none}#enqPanel .orn .gem,#enqPanel.live::after{animation:none}#enqPanel .pbtn,#enqWorks .ef{transition:none}}
 #tip{position:fixed;z-index:4;pointer-events:none;background:rgba(250,249,247,.94);color:var(--walnut);padding:.45rem .8rem;font-size:.85rem;letter-spacing:.03em;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .15s;white-space:nowrap}
 #tip i{font-family:'Cormorant Garamond',Georgia,serif;font-size:1.1rem}
 #loading{position:fixed;inset:0;z-index:6;background:#140f0c;color:#e9dcc6;transition:opacity .75s ease;overflow:hidden}
@@ -565,7 +585,7 @@ dialog::backdrop{background:rgba(22,15,11,.7);backdrop-filter:blur(3px)}
 .follow a::after{content:"↗";font-size:.8em;opacity:.55}
 .follow a:hover{border-color:var(--walnut);background:#faf6ee}
 #enqPanel .follow a{background:rgba(255,255,255,.9)}
-#enqPanel .follow{justify-content:center}#enqPanel .follow .fl{color:rgba(255,246,230,.75)}
+#enqPanel .follow{justify-content:center}#enqPanel .follow .fl{color:#6b5240}
 #banner{position:fixed;left:0;right:0;top:var(--barh,56px);z-index:5;display:flex;align-items:center;justify-content:center;padding:.4rem 2.8rem;background:#2a1b12;color:#f4e5c2;font-size:.8rem;letter-spacing:.04em;text-align:center;min-height:34px;box-sizing:border-box}
 #banner[hidden]{display:none}
 #banner button{position:absolute;right:max(6px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);background:none;border:0;color:inherit;font-size:1.25rem;width:36px;height:36px;cursor:pointer;border-radius:50%}
@@ -762,11 +782,16 @@ body.gIntro.gBar #artBar#artBar.on{opacity:1;visibility:visible;pointer-events:n
 <button id="pzoom" type="button" aria-label="Zoom in on this painting" hidden><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6"/></svg></button>
 <div id="tip"></div>
 <section id="enqPanel" aria-labelledby="enqTitle" aria-hidden="true">
+ <p class="kick" aria-hidden="true">The Balcony</p>
  <h2 id="enqTitle">Enquiries</h2>
+ <svg class="orn" viewBox="0 0 240 14" width="240" height="14" aria-hidden="true"><path d="M8 7H102M138 7H232" stroke="#b8893a" stroke-width="1.2" stroke-linecap="round"/><circle cx="108" cy="7" r="1.7" fill="#b8893a"/><circle cx="132" cy="7" r="1.7" fill="#b8893a"/><path class="gem" d="M120 1.2 125.8 7 120 12.8 114.2 7Z" fill="#b8893a"/></svg>
  <p class="lead">Interested in a painting? Select any work in the gallery to see its details, or write to me directly.</p>
+ <p class="pick" id="enqPick" hidden>Which one caught your eye?</p>
+ <ul class="enqWorks" id="enqWorks" aria-labelledby="enqPick"></ul>
+ <div class="row"><button class="pbtn main" id="enqAsk" type="button">Write to Pam</button><a class="pbtn" id="enqWrite" href="#">Email Pam</a><button class="pbtn" id="enqCopy" type="button">Copy email</button></div>
  <p class="mail"><span id="enqMail"></span></p>
- <div class="row"><a class="pbtn main" id="enqWrite" href="#">Email Pam</a><button class="pbtn" id="enqCopy" type="button">Copy email</button><button class="pbtn" id="enqCol" type="button">See the collections</button></div>
  <p class="note" id="enqNote" role="status"></p>
+ <p class="more"><button class="linkb" id="enqCol" type="button">See the collections</button></p>
  <div class="follow" data-follow hidden></div>
 </section>
 <noscript><div class="nos">The 3D gallery needs JavaScript. <a href="/works">See every painting in the simple gallery</a>, or email Pam at pts98 [at] hotmail.co.uk.</div></noscript>
@@ -1470,7 +1495,16 @@ var enqP=$('enqPanel');$('enqMail').textContent=EMAIL;$('enqWrite').href='mailto
 if(COLMAIN)$('enqCol').textContent='See this month’s favourites';$('enqCol').addEventListener('click',function(){if(COLMAIN&&window.goSide)window.goSide();else openCollection()});
 $('enqCopy').addEventListener('click',function(){var note=$('enqNote');function sel(){var r=document.createRange();r.selectNodeContents($('enqMail'));var s=getSelection();s.removeAllRanges();s.addRange(r);note.textContent='Email selected — copy it from here'}
  try{navigator.clipboard.writeText(EMAIL).then(function(){note.textContent='Email copied'},sel)}catch(e){sel()}});
-function showEnq(f){enqP.style.opacity=f;enqP.style.visibility=f>.02?'visible':'hidden';var live=f>.5;enqP.classList.toggle('live',live);enqP.setAttribute('aria-hidden',live?'false':'true')}
+$('enqAsk').addEventListener('click',function(){openMsg()});
+var enqSig='';
+function enqWorks(){var box=$('enqWorks');if(!box)return;var L=ART.map(function(p,k){return{p:p,k:k}}).filter(function(o){return o.p&&!teaser(o.p)});
+ L.sort(function(a,b){return(isSold(a.p)?1:0)-(isSold(b.p)?1:0)||a.k-b.k});L=L.slice(0,12);
+ function pr(p){return isSold(p)?'Sold':aucLive(p)?'Auction · bidding open':(p.p||'')}
+ var sig=L.map(function(o){return o.p.id+'/'+pr(o.p)+'/'+(o.p.tn||o.p.img||'')}).join('|');if(sig===enqSig)return;enqSig=sig;box.textContent='';$('enqPick').hidden=!L.length;
+ L.forEach(function(o,i){var li=document.createElement('li'),b=document.createElement('button'),fr=document.createElement('span'),im=new Image(),t=document.createElement('span'),q=document.createElement('span'),P=pr(o.p);
+  b.type='button';b.style.setProperty('--d',(120+i*70)+'ms');b.setAttribute('aria-label',o.p.t+(P?', '+P:'')+'. See its details');fr.className='ef';im.alt='';im.decoding='async';im.src=o.p.tn||thumb(o.k);fr.appendChild(im);
+  t.className='et';t.textContent=o.p.t;q.className='ep';q.textContent=P;b.appendChild(fr);b.appendChild(t);if(P)b.appendChild(q);b.addEventListener('click',function(){openArt(o.k)});li.appendChild(b);box.appendChild(li)})}
+function showEnq(f){if(f>.02&&enqP.style.visibility!=='visible')enqWorks();enqP.style.opacity=f;enqP.style.visibility=f>.02?'visible':'hidden';var live=f>.5;enqP.classList.toggle('live',live);enqP.setAttribute('aria-hidden',live?'false':'true')}
 
 /* ---------- artwork details ---------- */
 var dlg=$('dlg'),curArt=0;
