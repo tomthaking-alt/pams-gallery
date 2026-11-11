@@ -1,10 +1,13 @@
 /* ---------- rendering: three.js scene graph, physically based materials, image-based lighting and custom shaders ---------- */
 var mobile=Math.min(innerWidth,innerHeight)<700||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+/* the lighter setting: after the browser stopped the 3D earlier in this visit (it ran short of graphics memory), or on a device with very little memory */
+var LITE=false;try{LITE=sessionStorage.getItem('pgLite')==='1'}catch(e){}if(navigator.deviceMemory&&navigator.deviceMemory<=2)LITE=true;
 /* quality adapts to the device: starts high, then steps down if frames are slow */
 var GPU='';try{var dri=gl.getExtension('WEBGL_debug_renderer_info');GPU=dri?String(gl.getParameter(dri.UNMASKED_RENDERER_WEBGL)):''}catch(e){}
 var LOWGPU=/[?&]q=high/.test(location.search)?false:/[?&]q=low/.test(location.search)||/Intel|Mali-(T\d+|G[1-6]\d\b)|Adreno[^\d]*[3-5]\d\d|PowerVR|SwiftShader|llvmpipe|Software/i.test(GPU)&&!/Iris\(R\) Xe|Arc/i.test(GPU);
 var Q=LOWGPU?{dpr:mobile?1.3:1.25,samples:2,refl:false,bloom:true,dof:false,ao:true,rays:true,level:2,spotSh:false}:{dpr:mobile?1.7:2,samples:4,refl:!mobile,bloom:true,dof:!mobile,ao:true,rays:true,level:0,spotSh:!mobile};
-if(typeof LOOKTOG!=='undefined'&&LOOKTOG)Q.dof=false;   // the ink and painted looks: everything in focus (a drawing has no depth of field), so Pam's statues stay sharp
+if(typeof LOOKTOG!=='undefined'&&LOOKTOG)Q.dof=false;
+if(LITE)Q={dpr:1,samples:0,refl:false,bloom:true,dof:false,ao:false,rays:false,level:5,spotSh:false};   // the ink and painted looks: everything in focus (a drawing has no depth of field), so Pam's statues stay sharp
 var T3T={boot:performance.now()};
 var DG={prev:0,stuck:0,snaps:[]};
 function degrade(e){
@@ -19,7 +22,7 @@ function degrade(e){
  else if(Q.level<=8){Q.dpr=Math.max(mobile?.85:1,Q.dpr*.85)}
  else{Q.level=99;return false}
  resize();return true}
-var SHS=mobile||LOWGPU?2048:4096,RT={w:2,h:2},dirty=2;
+var SHS=LITE?1024:2048,RT={w:2,h:2},dirty=2;
 
 /* ---------- lighting: low evening sun through the opening ---------- */
 var SUN=v3.norm([-.6,.26,-.76]),SUNCOL=[4.4,3.6,2.7],SKY=lin('#eef0f2').map(function(v){return v*.44}),GROUND=lin('#8a6a52').map(function(v){return v*.2}),FAR=60,SKYSUN=v3.norm([-.6,.06,-.76]);
@@ -272,7 +275,12 @@ function prep3(cb){var done=false;T3T.built=performance.now();
   if(ENVBAKE)loadBakedEnv(function(ok){if(!ok){try{captureEnv()}catch(e){console.error(e)}}fin()});
   else{try{captureEnv()}catch(e){console.error(e)}fin()}}
  camAt(0);var as=innerWidth/Math.max(1,innerHeight);C3.aspect=as;C3.fov=fovFor(as)*180/Math.PI;C3.updateProjectionMatrix();C3.position.set(cam.x,cam.y,cam.z);C3.updateMatrixWorld();
- setTimeout(function(){try{R3.compile(S3,C3)}catch(e){console.error(e)}go()},0)}
+ setTimeout(function(){var ms=null;try{ms=R3.compile(S3,C3)}catch(e){console.error(e)}
+  // where the browser can compile shaders in the background, wait until they are ready before the first frame (kinder to slower graphics chips)
+  var bg=false;try{bg=R3.extensions.has('KHR_parallel_shader_compile')}catch(e){}if(!bg||!ms||!ms.forEach){go();return}
+  var t0=performance.now();(function wait(){var left=0;ms.forEach(function(m){try{var pr=R3.properties.get(m).currentProgram;if(pr&&!pr.isReady())left++}catch(e){}});if(!left||performance.now()-t0>15000)go();else setTimeout(wait,40)})()},0)}
+/* if the browser takes the 3D away part-way through a visit (usually: the device ran short of graphics memory), say so plainly; reopening uses the lighter setting */
+canvas.addEventListener('webglcontextlost',function(e){e.preventDefault();try{sessionStorage.setItem('pgLite','1')}catch(_){}var L=document.getElementById('lost');if(L&&L.hidden){L.hidden=false;var b=document.getElementById('lostGo');if(b)b.focus()}},false);
 /* build-time helper: the room's lighting as an equirectangular float image (used to make the baked environment) */
 function bakeEq(k){var pp=G3.uPass.value;hideDyn();syncBlend();G3.uPass.value=2;var P=k==='in'?[0,1.55,-4.6]:[0,1.45,-11.6];
  var crt=new THREE.WebGLCubeRenderTarget(512,{type:THREE.HalfFloatType}),cc=new THREE.CubeCamera(.05,200,crt);cc.position.set(P[0],P[1],P[2]);cc.updateMatrixWorld(true);cc.update(R3,S3);
@@ -311,12 +319,12 @@ var BDM=pmat(BDOWN,{uT:{value:null},uPx:{value:new THREE.Vector2()},uFirst:{valu
 var sceneRT=null,reflRT=null,aoRT=null,dofRT=null,rayRT=null,BL=[],SUNV=new THREE.Vector3(),SKYSD=v3.norm([-.45,.2,-.87]);
 function mkRT(w,h,o){return new THREE.WebGLRenderTarget(w,h,Object.assign({type:THREE.HalfFloatType,depthBuffer:false,stencilBuffer:false,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,generateMipmaps:false},o||{}))}
 function resize(){
- var dpr=Math.min(devicePixelRatio||1,Q.dpr),w=Math.max(2,Math.round(innerWidth*dpr)),h=Math.max(2,Math.round(innerHeight*dpr));
+ var cap=Math.sqrt((mobile?1.7e6:4.2e6)/Math.max(1,innerWidth*innerHeight)),dpr=Math.min(devicePixelRatio||1,Q.dpr,Math.max(1,cap)),w=Math.max(2,Math.round(innerWidth*dpr)),h=Math.max(2,Math.round(innerHeight*dpr));   // a pixel budget: big high-resolution screens no longer ask for 7-15 million pixels
  R3.setPixelRatio(1);R3.setSize(w,h,false);RT.w=w;RT.h=h;
  [sceneRT,reflRT,aoRT,dofRT,rayRT].concat(BL).forEach(function(t){if(t)t.dispose()});BL=[];
- sceneRT=mkRT(w,h,{depthBuffer:true,samples:Math.min(Q.samples,R3.capabilities.maxSamples||4)});
+ sceneRT=mkRT(w,h,{depthBuffer:true,samples:Math.min(Q.samples,dpr>=1.5?2:4,R3.capabilities.maxSamples||4)});   // on sharp screens 2x edge smoothing is plenty (4x used several times the memory)
  reflRT=Q.refl?mkRT(w>>1,h>>1,{depthBuffer:true,generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter}):null;
- aoRT=mkRT(Math.max(1,w>>1),Math.max(1,h>>1));dofRT=mkRT(w,h);rayRT=mkRT(Math.max(1,w>>1),Math.max(1,h>>1));
+ aoRT=mkRT(Math.max(1,w>>1),Math.max(1,h>>1));dofRT=Q.dof?mkRT(w,h):null;rayRT=mkRT(Math.max(1,w>>1),Math.max(1,h>>1));
  var bw=w>>1,bh=h>>1;for(var i=0;i<5&&bw>=4&&bh>=4;i++){BL.push(mkRT(bw,bh));bw>>=1;bh>>=1}
  dirty=2}
 function bloomPass(){var n=BL.length,u=BDM.uniforms,i;
