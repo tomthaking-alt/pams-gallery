@@ -1,8 +1,9 @@
 // Phase 6 in a real browser: the dashboard never loses a change. Drives the owner dashboard on the local site with Node Playwright
-// (Chromium, software 3D) and prints PASS/FAIL lines like the other tests. Takes about three to five minutes.
+// (Chromium, software 3D) and prints PASS/FAIL lines like the other tests. Takes about six minutes.
 // Needs: the local site and pretend database with the test accounts and demo catalogue
 //   python3 dev/test/mockredis.py 8793 & node dev/test/devserver.js & node dev/test/api3.js && node dev/test/demo.js
 // Run: node dev/test/ui/p6ui.js      Screenshots (2x) of every new state go to dev/out/shots/p6/.
+// Only some steps (each of the later ones sets up what it needs): P6UI_ONLY=x,y node dev/test/ui/p6ui.js
 // It puts the gallery back as it found it at the end (a new version with the starting catalogue) and leaves no draft behind.
 const { chromium, devices } = require('playwright');
 const fs = require('fs'), path = require('path');
@@ -633,8 +634,9 @@ async function step(name, fn) { if (ONLY.length && !ONLY.some(k => name.startsWi
     ok(await pA.evaluate(() => dashD.open && !ASK && !document.querySelector('#dBody .edask') && document.activeElement && document.activeElement.id === 'edPub'), '(o2) Escape closes the question, not the dashboard, and the focus goes back to Publish');
     await click(pA, '#edDis'); await click(pA, btn(pA, 'Yes, discard them', '#dBody .edask'));
     ok(await until(pA, () => { const t = document.getElementById('edOfT'); return !!t && document.activeElement === t && /^Done — those changes were discarded\.$/.test(t.textContent) }, null, 30000), '(o2) after discarding, the older changes are offered next, starting “Done — those changes were discarded.” (with the focus)');
+    await until(pA, () => /to “P6UI Older draft”/.test((document.querySelector('#dBody .edoffer') || {}).textContent || ''), null, 20000);   // what they change is filled in once the server has compared them
     const o3 = await txt(pA, '#dBody .edoffer') || '';
-    ok(o3.includes('You also have other unpublished changes, from') && o3.includes('to “P6UI Older draft”'), '(o2) “' + o3.slice(0, 110) + '…”');
+    ok(o3.includes('You also have other unpublished changes, from') && o3.includes('to “P6UI Older draft”') && await pA.evaluate(() => document.activeElement && document.activeElement.id === 'edOfT'), '(o2) “' + o3.slice(0, 110) + '…” (the focus stays on it while it fills in)');
     await shot(pA, 'o2-done-then-older');
     await click(pA, btn(pA, 'Discard them', '#dBody .edoffer')); await click(pA, btn(pA, 'Yes, discard them', '#dBody .edoffer'));
     ok(await until(pA, () => !OFFER && document.activeElement && document.activeElement.id === 'edNote' && /^Your unpublished changes were discarded\./.test(document.activeElement.textContent), null, 30000), '(o2) and after that: “Your unpublished changes were discarded.” (with the focus)');
