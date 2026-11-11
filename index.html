@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-ECaIbET2hb2kTvGdPppUonkxC5csGSKAT3Xb9zJUdg0=' 'sha256-6P3aCGZVZ6okHQZXOOldeCDDa50CjFWlKCsEWGIDrjo=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-6P3aCGZVZ6okHQZXOOldeCDDa50CjFWlKCsEWGIDrjo=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -89,6 +89,17 @@ body.hasBanner .dreampill{top:calc(var(--barh,56px) + 40px)}
 #loading .lbg video.on{opacity:1}
 #loading .lbg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,9,7,.84) 0%,rgba(13,9,7,.74) 24%,rgba(13,9,7,.62) 42%,rgba(13,9,7,.62) 62%,rgba(13,9,7,.76) 78%,rgba(13,9,7,.88) 100%);transition:opacity .9s ease}
 #loading .lbg .ldoors{transition:opacity .8s ease}
+/* the ink look: the hall drawn in ink on cream paper, a soft glow of paper behind the painting, the words in ink (contrast stays above 4.5:1) */
+.ink #loading{background:radial-gradient(ellipse 80% 70% at 50% 52%,#faf6ee 0%,#f2ebdf 62%,#e7dece 100%);color:#2a1d14}
+.ink #loading .lbg::after{background:linear-gradient(180deg,rgba(248,244,236,.5) 0%,rgba(248,244,236,0) 22%,rgba(248,244,236,0) 64%,rgba(248,244,236,.78) 86%,rgba(248,244,236,.92) 100%),radial-gradient(ellipse 58% 54% at 50% 50%,rgba(248,244,236,.86) 0%,rgba(248,244,236,.62) 48%,rgba(248,244,236,.2) 82%,rgba(248,244,236,.08) 100%)}   /* calm paper behind the painting, the title and the progress line */
+.ink #loading .lt{color:#1c120c;text-shadow:0 1px 16px rgba(248,244,236,.95),0 0 2px rgba(248,244,236,.9)}
+.ink #loading .lt::after{background:linear-gradient(90deg,transparent,#b8893a 22%,#dcb66c 50%,#b8893a 78%,transparent)}
+.ink #loading .ls{color:#3e2c1e;font-weight:500;text-shadow:0 0 8px rgba(248,244,236,.95),0 0 3px rgba(248,244,236,.95)}
+.ink #loading figcaption{color:#2a1d14;text-shadow:0 1px 10px rgba(248,244,236,.95)}
+.ink #loading .lfr{box-shadow:0 26px 52px rgba(40,26,14,.32),0 3px 8px rgba(40,26,14,.28)}
+.ink #loading .lmsg{color:#4e3a2a;text-shadow:0 0 8px rgba(248,244,236,.95)}.ink #loading .lb{background:rgba(28,18,12,.16)}
+.ink #loading .ldust i{background:#c49a4c}.ink #loading .lfa{filter:drop-shadow(0 6px 8px rgba(40,26,14,.22))}
+.ink #ldGo{background:#1c120c;color:#fbf8f2;border-color:#1c120c;box-shadow:0 12px 32px rgba(28,18,12,.28)}.ink #ldGo:hover{background:#3a2a20}.ink #ldGo:focus-visible{outline-color:#b8862f}
 #loading.doors .lw,#loading.doors .lstage,#loading.doors .lfoot,#loading.doors .lbird,#loading.doors .ldust{opacity:0;transition:opacity .6s ease}
 #loading.doors .lbg::after{opacity:0}
 #loading .ldust{position:absolute;inset:0;overflow:hidden;pointer-events:none}
@@ -813,16 +824,18 @@ body.gIntro.gBar #artBar#artBar.on{opacity:1;visibility:visible;pointer-events:n
  var SLOT=RM?3.6:3.2,FADE=RM?1.2:1.0;
  // the hall film behind the paintings (a still picture for reduced motion, data saver or slow connections) and, on a first
  // visit, the bronze doors opening as visitors step in. The doors film only loads once the hall is playing, and entry never waits for it.
- var BG=document.getElementById('ldBg'),PO=document.getElementById('ldPoster'),hall=null,doors=null,FV='-v1',
+ var BG=document.getElementById('ldBg'),PO=document.getElementById('ldPoster'),hall=null,doors=null,FV='-v1',FK=(function(){try{var q=(location.search.match(/[?&]look=(dream|ink|paint|clay)\b/)||[])[1];return(q||(localStorage.getItem('pgLook')==='paint'?'paint':'ink'))==='ink'?'-ink':''}catch(e){return'-ink'}})(),   // the ink look opens with the films drawn in ink; the colour version with the sunlit ones
+
   shape=innerHeight>innerWidth*1.1?'tall':'wide',cn=navigator.connection||{},vt=document.createElement('video'),
   ext=vt.canPlayType('video/mp4; codecs="avc1.640028"')==='probably'?'mp4':vt.canPlayType('video/webm; codecs="vp9"')?'webm':'',
   film=!!ext&&!RM&&!cn.saveData&&!/(^|-)[23]g$/.test(cn.effectiveType||'')&&!(navigator.deviceMemory&&navigator.deviceMemory<2);
- PO.onload=function(){BG.classList.add('on')};PO.src='/lib/hall-'+shape+FV+'.jpg';
+ if(FK)document.documentElement.classList.add('ink');   // the ink look's light opening, from the very first frame
+ PO.onload=function(){BG.classList.add('on')};PO.src='/lib/hall-'+shape+FK+FV+'.jpg';
  function clip(name,loop){var v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.setAttribute('muted','');v.playsInline=true;v.setAttribute('playsinline','');
   v.loop=!!loop;v.preload='auto';v.disablePictureInPicture=true;v.setAttribute('aria-hidden','true');v.tabIndex=-1;v.src='/lib/'+name+FV+'.'+ext;return v}
- if(film){hall=clip('hall-'+shape,1);BG.insertBefore(hall,PO.nextSibling);
+ if(film){hall=clip('hall-'+shape+FK,1);BG.insertBefore(hall,PO.nextSibling);
   hall.addEventListener('playing',function(){hall.classList.add('on');
-   if(!seen&&!doors){doors=clip('doors');doors.className='ldoors';BG.appendChild(doors);doors.load()}},{once:true});
+   if(!seen&&!doors){doors=clip('doors'+FK);doors.className='ldoors';BG.appendChild(doors);doors.load()}},{once:true});
   var hp=hall.play();if(hp&&hp.catch)hp.catch(function(){})}   // a phone in low-power mode may refuse to play: the still picture stays
  function now(){return(performance.now()-T0)/1000}
  // the title waits for its typeface, so it never jumps from one font to another
