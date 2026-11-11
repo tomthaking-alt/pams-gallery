@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-DUaPUUjFT6gpG8YEY2+2S81NRCEGILOBHgla7Q3gZIk=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-2UBJxmBnHAHJmyU5IofkCeNVXg3y7PxaHTOUBZdFoiw=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -272,6 +272,17 @@ body.hasBanner .dreampill{top:calc(var(--barh,56px) + 40px)}
 .sb:disabled{opacity:.4;cursor:default}
 .edconfirm{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;margin-top:.6rem;padding:.6rem .7rem;background:#fff6f2;border:1px solid rgba(138,59,42,.25);font-size:.86rem}
 .edconfirm[hidden]{display:none}
+.cnt{display:block;font-size:.78rem;letter-spacing:0;text-transform:none;color:var(--muted);line-height:1.4}.cnt:empty{display:none}.cnt.full{color:#8a3b2a}
+.edbar .err,.edbar .why{flex-basis:100%;margin:0}.edbar .why:empty,.edbar .err:empty{display:none}.edbar.asking{position:static}
+.edask{flex-basis:100%;background:#fff6f2;border:1px solid rgba(138,59,42,.25);border-radius:3px;padding:.7rem .9rem;font-size:.88rem;line-height:1.5;color:var(--ink)}
+.edask>b:focus{outline:2px solid var(--bronze);outline-offset:2px}.edask .edacts,.vrow .edacts{margin:.5rem 0 0}.edask p{margin:.35rem 0 0}
+.edask ul,.vrow ul,.vbox ul,.mailwarn ul,.edmsg ul{margin:.35rem 0 .5rem 1.2rem;padding:0}
+.vlist{list-style:none;margin:.6rem 0 0;padding:0}.vrow{padding:.7rem 0;border-top:1px solid rgba(75,46,34,.1);font-size:.9rem}
+.vhead{display:flex;flex-wrap:wrap;gap:.6rem;align-items:baseline}.vlive{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#2f6b3a;border:1px solid currentColor;border-radius:99px;padding:.05rem .55rem}
+.vbox{margin:.8rem 0;padding:.8rem .9rem;border:1px solid rgba(75,46,34,.18);border-radius:10px;background:#fffdf9}.vbox h4{margin:0 0 .3rem;font-size:1rem}.vbox h4:focus{outline:2px solid var(--bronze);outline-offset:2px}
+#dash [hidden]{display:none!important}
+.edoffer p{margin:.45rem 0 0}.edoffer .edacts{margin:.7rem 0 0}.edoffer .edconfirm{background:#fffaf4}
+#edMsg:focus{outline:2px solid var(--bronze);outline-offset:2px}.vbk{margin:.5rem 0 0}.vimp:empty{display:none}
 .edform{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:.7rem 1rem;margin-top:.8rem}
 .ef{display:flex;flex-direction:column;gap:.3rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);min-width:0}
 .ef input,.ef textarea,.ef select,.edsz input,.edadd select{font:inherit;font-size:.92rem;letter-spacing:0;text-transform:none;color:var(--ink);padding:.55rem .6rem;min-height:40px;border:1px solid rgba(75,46,34,.25);border-radius:2px;background:#fff;width:100%;box-sizing:border-box}
@@ -1728,9 +1739,9 @@ document.addEventListener('focusin',function(e){var t=e.target,f=t&&t.form;if(f&
 document.addEventListener('submit',function(e){LASTF=e.target},true);
 function trapOf(){var f=LASTF,i=f&&f.querySelector('.hp input');return{hp:i?i.value:'',ft:Date.now()-(f&&+f.dataset.t0||PAGE_T0)}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',trapForms);else trapForms();
-function api(body){var h={'Content-Type':'application/json'};if(TOK)h.Authorization='Bearer '+TOK;
+function api(body,o){var h={'Content-Type':'application/json'};if(TOK)h.Authorization='Bearer '+TOK;
  if(/^(order|message|commission|sub|signup)$/.test(body.a)){var tr=trapOf();body.hp=tr.hp;body.ft=tr.ft;if(LASTF){LASTF.dataset.t0=''}}
- return fetch(API,{method:'POST',headers:h,body:JSON.stringify(body)}).then(function(r){return r.json().catch(function(){return{error:'Accounts aren’t available here yet.'}}).then(function(j){j=j||{};if(!r.ok&&!j.error)j.error='Something went wrong — please try again.';j._s=r.status;return j})})
+ var s=JSON.stringify(body),ka=false;if(o&&o.keepalive)try{ka=new Blob([s]).size<60000}catch(e){}return fetch(API,{method:'POST',headers:h,body:s,keepalive:ka}).then(function(r){return r.json().catch(function(){return{error:'Accounts aren’t available here yet.'}}).then(function(j){j=j||{};if(!r.ok&&!j.error)j.error='Something went wrong — please try again.';j._s=r.status;return j})})
  .catch(function(){return{error:'The gallery can’t be reached right now — please email Pam at '+EMAIL+'.'}})}
 (function(){try{localStorage.removeItem('pgVid');sessionStorage.removeItem('pgSeen')}catch(e){}   // the old per-device id is no longer used
  var off=function(){try{return localStorage.getItem('pgNoTrack')==='1'}catch(e){return false}};
@@ -1834,7 +1845,7 @@ window.openMsg=openMsg;
 CATP.then(function(){siteRefresh();liveLoad()});setInterval(function(){if(!document.hidden&&((window.abOn&&abOn())||bidD.open))liveLoad()},20000);
 /* owner dashboard */
 var DASH=null,dTab='o',STL={new:'New',contacted:'In talks',awaiting:'Awaiting payment',paid:'Paid',sent:'Sent',completed:'Completed',cancelled:'Cancelled'};
-function openDash(){$('dErr').textContent='';if(!dashD.open)dashD.showModal();loadDash()}
+function openDash(){$('dErr').textContent='';if(!dashD.open)dashD.showModal();loadDash();edSync()}
 function loadDash(){$('dBody').textContent='';$('dBody').appendChild(el('p','empty','Loading…'));api({a:'dash'}).then(function(j){if(j.error){$('dErr').textContent=j.error;$('dBody').textContent='';return}DASH=j;drawDash()})}
 function drawDash(){var j=DASH,v=j.visits,today=v.perDay[v.perDay.length-1],wk=v.perDay.slice(-7).reduce(function(a,b){return a+b},0),newO=j.orders.filter(function(o){return o.status==='new'}).length,unread=j.msgs.filter(function(m){return !m.read}).length;
  var st=$('dStats');st.textContent='';[[today,'Visits today'],[v.uniquePerDay[v.uniquePerDay.length-1],'Visitors today'],[wk,'Visits, last 7 days'],[v.total,'Visits, all time'],[v.unique,'Different visitors'],[j.members.count,'Members'],[newO,'New enquiries'],[unread,'Unread messages']].forEach(function(x){var d=el('div','stat');d.appendChild(el('b',null,String(x[0])));d.appendChild(el('span',null,x[1]));st.appendChild(d)});
@@ -1874,22 +1885,22 @@ function drawTexts(body){pubBar(body);txDefaults();body.appendChild(el('p','note
  var groups={},order=[];TX.forEach(function(x){if(!groups[x[1]]){groups[x[1]]=[];order.push(x[1])}groups[x[1]].push(x)});
  order.forEach(function(g){var grid=edsec(body,g,TXN[g]);groups[g].forEach(function(x){var k=x[0],w=el('div','txf'+(ED.texts[k]!=null?' chg':'')),lab=el('div','txl'),inpEl=el(x[4]?'textarea':'input'),id='tx_'+k.replace('.','_');
    var lt=el('label',null,x[2]);lt.htmlFor=id;lab.appendChild(lt);var rs=sbtn('Use the original',function(){delete ED.texts[k];inpEl.value=TXD[k]||'';w.classList.remove('chg');markDirty()},'link');lab.appendChild(rs);
-   inpEl.id=id;inpEl.value=ED.texts[k]!=null?ED.texts[k]:(TXD[k]||'');inpEl.addEventListener('input',function(){if(inpEl.value===(TXD[k]||''))delete ED.texts[k];else ED.texts[k]=inpEl.value;w.classList.toggle('chg',ED.texts[k]!=null);markDirty()});
-   w.appendChild(lab);w.appendChild(inpEl);if(x[4])w.style.gridColumn='1 / -1';grid.appendChild(w)})})}
+   inpEl.id=id;inpEl.value=ED.texts[k]!=null?ED.texts[k]:(TXD[k]||'');lim(inpEl,3000);inpEl.addEventListener('input',function(){if(inpEl.value===(TXD[k]||''))delete ED.texts[k];else ED.texts[k]=inpEl.value;w.classList.toggle('chg',ED.texts[k]!=null);markDirty()});
+   w.appendChild(lab);w.appendChild(inpEl);w.appendChild(inpEl._cnt);if(x[4])w.style.gridColumn='1 / -1';grid.appendChild(w)})})}
 function drawSettings(body){pubBar(body);var S=ED.site;
  var g1=edsec(body,'Contact details','Shown on your About page, on the balcony, and used for every “Email Pam” link.');
- g1.appendChild(field('Email for enquiries',inp(S.email||EMAIL,'you@example.com',function(v){S.email=v.trim()},'email')));
- g1.appendChild(field('Phone (optional)',inp(S.phone,'e.g. 07700 900123',function(v){S.phone=v})));
- g1.appendChild(field('Where you’re based (optional)',inp(S.place,'e.g. London, UK',function(v){S.place=v})));
+ g1.appendChild(field('Email for enquiries',inp(S.email||EMAIL,'you@example.com',function(v){S.email=v.trim()},'email',200)));
+ g1.appendChild(field('Phone (optional)',inp(S.phone,'e.g. 07700 900123',function(v){S.phone=v},null,40)));
+ g1.appendChild(field('Where you’re based (optional)',inp(S.place,'e.g. London, UK',function(v){S.place=v},null,80)));
  var g2=edsec(body,'Social media','Paste the full link to each account you have. A “Follow Pam” button appears on the site for each one you fill in — leave the others empty.');
- SOC.forEach(function(x){g2.appendChild(field(x[1],inp(S.social[x[0]],x[0]==='website'?'https://…':'https://www.'+(x[0]==='x'?'x':x[0])+'.com/yourname',function(v){v=v.trim();if(v&&!/^https?:\/\//i.test(v))v='https://'+v.replace(/^\/+/,'');if(v)S.social[x[0]]=v.replace(/^http:/i,'https:');else delete S.social[x[0]]},'url')))});
+ SOC.forEach(function(x){g2.appendChild(field(x[1],inp(S.social[x[0]],x[0]==='website'?'https://…':'https://www.'+(x[0]==='x'?'x':x[0])+'.com/yourname',function(v){v=v.trim();if(v&&!/^https?:\/\//i.test(v))v='https://'+v.replace(/^\/+/,'');if(v)S.social[x[0]]=v.replace(/^http:/i,'https:');else delete S.social[x[0]]},'url',200)))});
  var g3=edsec(body,'Announcement banner','A slim strip across the top of the site — for a new collection, an auction, an open studio or a delivery offer.');
- g3.appendChild(chk('Show the banner',S.banner.on,function(v){S.banner.on=v}));g3.appendChild(field('Banner text',inp(S.banner.text,'e.g. New collection “The Masquerade” — now showing',function(v){S.banner.text=v})));
+ g3.appendChild(chk('Show the banner',S.banner.on,function(v){S.banner.on=v}));g3.appendChild(field('Banner text',inp(S.banner.text,'e.g. New collection “The Masquerade” — now showing',function(v){S.banner.text=v},null,160)));
  var gE=edsec(body,'Members’ early access','How long new paintings are shown only to members before everyone can see them. It’s used as the starting date when you mark a new painting “members only”, and in the wording that explains early access.');
  var es=el('select');[['','Choose a window — [EARLY ACCESS WINDOW, e.g. 48 hours]'],['24','24 hours'],['48','48 hours'],['72','3 days'],['168','1 week']].forEach(function(o){var op=el('option',null,o[1]);op.value=o[0];if(String(S.earlyHours||'')===o[0])op.selected=true;es.appendChild(op)});
  es.addEventListener('change',function(){S.earlyHours=+es.value||0;markDirty()});gE.appendChild(field('Early access window',es));
  var B=S.buy=S.buy||{};var gB=edsec(body,'Buying & delivery — draft for you to check','What you fill in here is what buyers read on “Buying with confidence”, in the enquiry window and on each painting’s page. Anything left empty isn’t promised to anyone: buyers see general wording instead, such as “Pam confirms the delivery cost and timing with you before you pay”.');
- function bt(k,label,ph){var i=el('input');i.value=B[k]||'';i.placeholder=ph;i.maxLength=k==='pack'||k==='frame'?300:60;i.addEventListener('input',function(){B[k]=i.value.trim();markDirty();bstat()});gB.appendChild(field(label,i,k==='pack'||k==='frame'?'wide':''))}
+ function bt(k,label,ph){var i=el('input');i.value=B[k]||'';i.placeholder=ph;lim(i,k==='pack'||k==='frame'?300:60);i.addEventListener('input',function(){B[k]=i.value.trim();markDirty();bstat()});gB.appendChild(field(label,i,k==='pack'||k==='frame'?'wide':''))}
  function bs(k,label,opts){var sl=el('select');opts.forEach(function(o){var op=el('option',null,o[1]);op.value=o[0];if(String(B[k]==null?'':B[k])===o[0])op.selected=true;sl.appendChild(op)});sl.addEventListener('change',function(){B[k]=sl.value;markDirty();bstat()});gB.appendChild(field(label,sl))}
  bt('ukCost','UK delivery cost','[UK DELIVERY COST, e.g. Free, or £15]');bt('ukTime','UK delivery time','[DELIVERY TIME, e.g. 3–5 working days]');
  bs('intl','Sending abroad',[['','Not set yet'],['quote','Yes — I quote when people enquire'],['no','No — UK only for now']]);
@@ -1908,11 +1919,55 @@ function drawSettings(body){pubBar(body);var S=ED.site;
  g4.appendChild(chk('I’m taking commissions (the Commissions page shows its request form)',S.commissions!==false,function(v){S.commissions=v}));
  var cs=el('select');[['GBP','£ Pounds'],['EUR','€ Euros'],['USD','$ Dollars']].forEach(function(c){var o=el('option',null,c[1]);o.value=c[0];if((S.cur||'GBP')===c[0])o.selected=true;cs.appendChild(o)});cs.addEventListener('change',function(){S.cur=cs.value;markDirty()});g4.appendChild(field('Currency for offers, bids and payments',cs));
  var g5=edsec(body,'Payments & quick sign-in');[['Email alerts to you',DASH&&DASH.mail],['Emails to buyers (thank-yous, outbid notices, payment links)',DASH&&DASH.buyerMail],['Card, Apple Pay & Google Pay (Stripe)',DASH&&DASH.pay],['Sign in with Google',DASH&&DASH.google]].forEach(function(x){var d=el('div','txf');d.appendChild(el('b',null,x[0]));d.appendChild(el('span',x[1]?'stat-ok':'stat-off',x[1]?'✓ Switched on':'Not switched on yet — the Grow tab shows how, step by step'));g5.appendChild(d)});
- var hs=el('section','edsec');hs.appendChild(el('h3',null,'Earlier versions'));hs.appendChild(el('p','note','Each time you publish, the version before is kept (the last ten). Restore one if a change didn’t work out.'));var hl=el('div');hl.appendChild(el('p','note','Loading…'));hs.appendChild(hl);body.appendChild(hs);
- api({a:'catHist'}).then(function(j){hl.textContent='';if(j.error||!j.list||!j.list.length){hl.appendChild(el('p','note',j.error||'Nothing published yet.'));return}
-  j.list.forEach(function(v,i){var r=el('div','hrow');r.appendChild(el('span',null,new Date(v.v).toLocaleString(undefined,{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})+' — '+v.arts+' paintings, '+v.colls+' collections, '+v.prints+' prints'+(i===0?' (live now)':'')+(v.names&&v.names.length?' · '+v.names.join(', ')+(v.arts>v.names.length?'…':''):'')));
-   if(i>0){var b=sbtn('Restore',function(){if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Tap again to restore';return}b.disabled=true;api({a:'catRestore',v:v.v}).then(function(r){if(r.error){$('dErr').textContent=r.error;b.disabled=false;return}
-    ED=withEmb(r.cat);ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;draftClear();EDmsg='Restored the version from '+new Date(v.v).toLocaleString()+'.';applySite(ED);siteRefresh();drawTab()})});r.appendChild(b)}hl.appendChild(r)})})}
+ drawVersions(body)}
+function drawVersions(body){var hs=el('section','edsec');hs.id='edVers';hs.appendChild(el('h3',null,'Earlier versions'));
+ hs.appendChild(el('p','note','Every time you publish, a copy is kept here with a note of what changed — up to 2,000 versions, newest first. You can download any of them, or bring one back: it goes live straight away, and the version it replaces stays in this list too.'));
+ var bk=el('div','edacts vbk'),box=el('div','vimp'),fi=el('input'),up=sbtn('Restore from a backup file',function(){fi.click()});up.id='vbkUp';fi.type='file';fi.accept='.json,application/json';fi.hidden=true;
+ bk.appendChild(sbtn('Download a backup',function(ev){dlVer(0,ev.currentTarget)}));bk.appendChild(up);bk.appendChild(fi);hs.appendChild(bk);
+ hs.appendChild(el('p','note','A backup is a small file with your paintings’ details, collections, prints, words and settings. Your photos aren’t inside it — they stay safely on the gallery’s server, and the backup points to them.'));
+ fi.addEventListener('change',function(){var f=fi.files[0];fi.value='';if(f)importFile(f,box)});hs.appendChild(box);
+ var ol=el('ol','vlist'),cnt=el('p','note'),more=sbtn('Show earlier versions',function(){page()}),shown={},n=0;more.hidden=true;ol.appendChild(el('li','note','Loading…'));hs.appendChild(ol);hs.appendChild(cnt);hs.appendChild(more);body.appendChild(hs);
+ function page(){more.disabled=true;api({a:'catHist',from:n}).then(function(j){more.disabled=false;if(!n)ol.textContent='';if(j.error){ol.appendChild(el('li','err',edErrMsg(j)));return}
+  if(!n&&!(j.list&&j.list.length)){ol.appendChild(el('li','note','Nothing published yet.'));return}
+  j.list.forEach(function(x){if(shown[x.v])return;shown[x.v]=1;n++;ol.appendChild(verRow(x,j.live))});more.hidden=!j.more;cnt.textContent='Showing '+n+' of '+j.total+' version'+(j.total===1?'':'s')+'.'})}
+ page()}
+function verRow(x,live){var li=el('li','vrow'),hd=el('div','vhead'),when=fdt(x.v);hd.appendChild(el('b',null,when));hd.appendChild(el('span','note',{'publish':'Published','restore':'Brought back','import':'From a backup file'}[x.kind]||'Published'));if(x.v===live)hd.appendChild(el('span','vlive','Live now'));li.appendChild(hd);
+ li.appendChild(el('div','note',x.arts+' painting'+(x.arts===1?'':'s')+' · '+x.colls+' collection'+(x.colls===1?'':'s')+' · '+x.prints+' print'+(x.prints===1?'':'s')+(x.names&&x.names.length?' · '+x.names.join(', ')+(x.arts>x.names.length?'…':''):'')));
+ if(x.old)li.appendChild(el('p','note','Changes weren’t noted down for versions this old.'));else if(x.changes&&x.changes.length){var ul=el('ul','vch');x.changes.forEach(function(c){ul.appendChild(el('li',null,c))});li.appendChild(ul)}
+ var acts=el('div','edacts'),cf=el('div','edconfirm');cf.hidden=true;acts.appendChild(sbtn('Download',function(ev){dlVer(x.v,ev.currentTarget)},'sb','Download the version from '+when));
+ if(x.v!==live){var rb=sbtn('Restore',function(){cf.textContent='';cf.appendChild(el('span',null,'Bring back the version from '+when+'? It goes live straight away, and the version that’s live now stays in this list.'+(EDdirty?' Your unpublished changes will be discarded.':'')));
+   var y=sbtn('Yes, bring it back',function(){y.disabled=true;restoreVer(x.v,when)},'btn main');cf.appendChild(y);cf.appendChild(sbtn('Cancel',function(){cf.hidden=true;rb.focus()}));cf.hidden=false;y.focus()},'sb','Restore the version from '+when);acts.appendChild(rb)}
+ li.appendChild(acts);li.appendChild(cf);return li}
+function restoreVer(v,when){$('dErr').textContent='';EDfail='';clearTimeout(srvT);Promise.resolve(EDsrvP).then(function(){return api({a:'catRestore',v:v,base:PUBV,sid:EDSID})}).then(function(r){
+ if(r.error){EDfail=r.code==='stale'?'Your gallery was published again from another device or tab, so nothing was brought back. The list is up to date now — please choose again.':edErrMsg(r);$('dErr').textContent=EDfail;if(r.code==='stale')edRefreshLive().then(function(){drawTab()});else drawTab();return}
+ edAfterLive(r,r.unchanged?'That version is the same as your live gallery, so nothing needed to change.':'Brought back the version from '+when+'. Visitors will see it from their next visit.')})}
+function ymd(t,hm){var d=new Date(t),p=function(n){return(n<10?'0':'')+n};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+(hm?'-'+p(d.getHours())+p(d.getMinutes()):'')}
+// a file to keep: made in the browser and saved from inside the dashboard (outside it, the page can't be clicked while the dashboard is open)
+function saveJSON(name,o){var u=URL.createObjectURL(new Blob([JSON.stringify(o,null,1)],{type:'application/json'})),a=el('a');a.href=u;a.download=name;a.hidden=true;dashD.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},5000)}
+function dlVer(v,btn){var t=btn.textContent;btn.disabled=true;btn.textContent='Preparing…';$('dErr').textContent='';api(v?{a:'catVer',v:v}:{a:'catVer'}).then(function(j){btn.disabled=false;btn.textContent=t;if(j.error){$('dErr').textContent=edErrMsg(j);return}
+ saveJSON(v?'pams-gallery-version-'+ymd(v,1)+'.json':'pams-gallery-backup-'+ymd(Date.now())+'.json',{kind:'pams-gallery-backup',version:1,v:j.cat.v,saved:new Date(j.cat.v||Date.now()).toISOString(),note:'Pam’s Gallery backup: the paintings’ details, collections, prints, words and settings. The photos stay on the gallery’s server; this file points to them.',cat:j.cat})})}
+// a backup file: the server checks it and says what it holds and what would change; nothing changes until Pam presses “Restore this backup”
+function importFile(f,box,lead){box.textContent='';var shut=function(){box.textContent='';var b=$('vbkUp');if(b)b.focus()};
+ if(f.size>3e6){box.appendChild(el('p','err','That file is too big to be a gallery backup.'));return}
+ box.appendChild(el('p','note','Checking the file…'));
+ f.text().then(function(s){var o=null;try{o=JSON.parse(s)}catch(e){}var c=o&&o.kind==='pams-gallery-backup'?o.cat:o;
+  if(!c||typeof c!=='object'||!Array.isArray(c.arts)){box.textContent='';box.appendChild(el('p','err','That file isn’t a gallery backup. Please choose a file whose name starts with “pams-gallery”.'));return}
+  return api({a:'catImport',cat:c,dry:true}).then(function(j){box.textContent='';if(j.error){box.appendChild(el('p','err',edErrMsg(j)));return}
+   var p=j.preview,w=el('div','vbox'),h=el('h4',null,o.v?'Backup from '+fdt(o.v):'Backup file “'+f.name+'”');h.id='vbH';h.tabIndex=-1;w.setAttribute('role','group');w.setAttribute('aria-labelledby','vbH');w.appendChild(h);
+   if(lead)w.appendChild(el('p',null,lead));
+   w.appendChild(el('p','note',p.arts+' painting'+(p.arts===1?'':'s')+' · '+p.colls+' collection'+(p.colls===1?'':'s')+' · '+p.prints+' print'+(p.prints===1?'':'s')+(p.names.length?' · '+p.names.join(', ')+(p.arts>p.names.length?'…':''):'')));
+   if(p.dropped)w.appendChild(el('p',null,p.dropped+' painting'+(p.dropped>1?'s':'')+' in the file can’t be used, so '+(p.dropped>1?'they’d':'it’d')+' be left out.'));
+   if(p.missing)w.appendChild(el('p',null,p.missing+' photo'+(p.missing>1?'s':'')+' in the backup '+(p.missing>1?'aren’t':'isn’t')+' on the gallery’s server any more, so '+(p.missing>1?'those paintings':'that painting')+' would show without a picture.'));
+   var acts=el('div','edacts');
+   if(p.same){w.appendChild(el('p',null,'This backup is the same as your live gallery, so restoring it wouldn’t change anything.'));acts.appendChild(sbtn('Close',shut))}
+   else{w.appendChild(el('p',null,'If you restore it, it goes live straight away, and the version that’s live now stays in Earlier versions. What would change:'));var ul=el('ul');p.changes.forEach(function(x){ul.appendChild(el('li',null,x))});w.appendChild(ul);
+    if(EDdirty)w.appendChild(el('p',null,'Your unpublished changes will be discarded.'));
+    var y=sbtn('Restore this backup',function(){y.disabled=true;clearTimeout(srvT);Promise.resolve(EDsrvP).then(function(){return api({a:'catImport',cat:c,base:PUBV,sid:EDSID,from:o.v||0})}).then(function(r){
+     if(r.error){if(r.code==='stale'){edRefreshLive().then(function(){importFile(f,box,'Your gallery was published again from another device or tab, so the backup wasn’t restored yet. Here’s what it would change now — please check it, then choose again.')});return}
+      y.disabled=false;box.appendChild(el('p','err',edErrMsg(r)));return}
+     edAfterLive(r,'Your backup is live again. Visitors will see it from their next visit.')})},'btn main');
+    acts.appendChild(y);acts.appendChild(sbtn('Cancel',shut))}
+   w.appendChild(acts);box.appendChild(w);h.focus()})}).catch(function(){box.textContent='';box.appendChild(el('p','err','That file couldn’t be read. Please try again, or choose another backup file.'))})}
 /* ---------- the Grow plan: how the gallery finds collectors, dealers, promoters and everyday buyers ---------- */
 function siteUrl(){return location.origin.indexOf('localhost')>=0?'https://itsamepameo.com':location.origin}
 var GROW=[
@@ -1981,40 +2036,134 @@ function drawGrow(body){if(!GROWD){body.appendChild(el('p','empty','Loading…')
    if(it.tpl)tx.appendChild(el('pre',null,it.tpl()));
    var acts=el('div','gacts');(it.acts||[]).forEach(function(a){if(a.href){var l=el('a','sb',a.t+' ↗');l.href=a.href;l.target='_blank';l.rel='noopener';acts.appendChild(l)}else acts.appendChild(sbtn(a.t,function(ev){a.go(ev.currentTarget)}))});
    if(it.tpl)acts.appendChild(sbtn('Copy the text',function(ev){copyTxt(it.tpl(),ev.currentTarget)}));
-   var nt=el('textarea','gnote');nt.placeholder='Your notes…';nt.value=GROWD.notes[it.id]||'';nt.setAttribute('aria-label','Your notes: '+it.t);nt.addEventListener('input',function(){GROWD.notes[it.id]=nt.value;growSave()});
+   var nt=el('textarea','gnote');nt.placeholder='Your notes…';nt.value=GROWD.notes[it.id]||'';lim(nt,600);nt.setAttribute('aria-label','Your notes: '+it.t);nt.addEventListener('input',function(){GROWD.notes[it.id]=nt.value;growSave()});
    if(!nt.value){nt.hidden=true;acts.appendChild(sbtn('Add a note',function(ev){nt.hidden=false;nt.focus();ev.currentTarget.remove()},'link'))}
-   if(acts.children.length)tx.appendChild(acts);tx.appendChild(nt);row.appendChild(tx);w.appendChild(row)})});
+   if(acts.children.length)tx.appendChild(acts);tx.appendChild(nt);tx.appendChild(nt._cnt);row.appendChild(tx);w.appendChild(row)})});
  body.appendChild(w)}
 function tableOf(heads){var w=el('div','tbl'),t=el('table'),th=el('thead'),tr=el('tr');heads.forEach(function(h){tr.appendChild(el('th',null,h))});th.appendChild(tr);t.appendChild(th);var tb=el('tbody');t.appendChild(tb);w.appendChild(t);return{w:w,tb:tb}}
 /* ---------- owner: paintings, favourites, collections and prints ---------- */
 var ED=null,EDdirty=false,EDopen={},EDmsg='',vRange='all';
+/* never lose a change: unpublished changes are kept on this device at once and on the server as a draft two seconds after the
+   last change (straight away when the page is hidden or the dashboard closes); every publish is kept as a version with a note of what changed */
+var PUBV=0,PUBCAT=null,EDSID=Date.now().toString(36)+Math.random().toString(36).slice(2,10),EDgen=0,EDsrv='',EDsrvGen=-1,EDsrvBusy=false,EDsrvAgain=false,EDsrvP=null,EDsrvWhy='',EDtake=false,EDfromT=0,EDlocal=true,EDbusy=false,EDerr='',EDfail='',EDnote='',EDnoteWarn=false,EDstale=false,EDlines=[],NEWER=[],OFFER=null,SRVD=null,ASK=null,EDload=null,srvT=0;
+var SEEDNOTE='Your gallery hasn’t been published from this dashboard yet, so it has started from the paintings built into the site. If you have published before, please don’t publish now — tell Claude first, because it means your saved gallery couldn’t be found.';
+function fdt(t){try{return new Date(t).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}catch(e){return''}}
+// a reply that went wrong, in words for Pam (no codes); keep: say that her changes are safe on this device
+function edErrMsg(j,keep){var k=keep?' Your changes are kept on this device.':'';return !j._s?'The gallery couldn’t be reached just now — please check your internet connection and try again.'+k:j._s===401||j._s===403?'You’re signed out. Please sign in again from “Account”, then try again.'+k:(j.error||'Something went wrong — please try again.')+(j._s===500?k:'')}
 function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function seedCat(){return{arts:ART.map(function(a){return{id:a.id,t:a.t,m:a.m||'',s:a.s==='Size on request'?'':(a.s||''),year:a.year||'',d:a.d||'',p:a.price||'',mode:a.mode||'request',auc:a.auc,status:a.status||'Available',w:a.w,h:a.h,bg:a.bg||'#cfc6d6',img:a.emb?'emb:'+a.emb:a.img,ar:!!a.ar,fr:a.fr||''}}),seen:Object.keys(EMB),
  favs:FAVS.map(function(i){return ART[i].id}),colls:COLLECTIONS.map(function(c){return{t:c.t,d:c.d||'',works:c.works.map(function(i){return ART[i].id}),soon:c.soon}}),prints:PRINTS.map(function(q){return{id:q.id,art:q.art>=0?ART[q.art].id:'',t:'',d:q.d,img:'',sizes:q.sizes,on:true}})}}
 var PV={};function edSrc(u){return PV[u]||embImg(u)}
-function loadED(cb){api({a:'catGet'}).then(function(j){if(j.error){$('dErr').textContent=j.error;return}PV=j.pv||{};ED=withEmb(j.cat)||seedCat();ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};cb()})}
-addEventListener('beforeunload',function(e){if(EDdirty){e.preventDefault();e.returnValue=''}});   // leaving the dashboard with unpublished changes: the browser asks first
-/* unpublished changes are kept on this device as a draft, so closing the page (or a phone tidying away its tabs) never loses them */
+function edNorm(c){c=withEmb(c);c.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){c[k]=c[k]||[]});c.texts=c.texts||{};c.site=c.site||{};c.site.social=c.site.social||{};c.site.banner=c.site.banner||{on:false,text:''};c.colls.forEach(function(k){if(!k.id)k.id=newId()});return c}
+// the live gallery and any unpublished changes, loaded together. Only the server saying nothing was ever published starts from the paintings built into the site
+function loadED(cb){if(!EDload){EDerr='';EDload=Promise.all([api({a:'catGet'}),api({a:'draftGet'})]).then(function(r){var j=r[0],d=r[1];
+  if(j.error){EDerr=j._s===401||j._s===403?'You’re signed out. Please sign in again from “Account”, then open the dashboard again.':edErrMsg(j);return}
+  if(!j.cat&&j.none!==true){EDerr='The gallery’s server gave an answer the dashboard didn’t expect, so nothing has been loaded. Please try again in a minute.';return}
+  PV=j.pv||{};PUBCAT=j.cat?edNorm(j.cat):null;PUBV=PUBCAT?PUBCAT.v||0:0;ED=PUBCAT?JSON.parse(JSON.stringify(PUBCAT)):edNorm(seedCat());if(!PUBCAT)ED.v=0;
+  EDdirty=false;EDstale=false;EDfail='';EDtake=false;EDfromT=0;EDsrv='';EDsrvGen=-1;EDsrvWhy='';NEWER=[];ASK=null;
+  EDnote=!PUBCAT?SEEDNOTE:j.healed?'The live copy of your gallery couldn’t be read, so it has been put back from your newest saved version ('+fdt(j.healed)+'). Please check everything looks right.':'';EDnoteWarn=!!EDnote;
+  SRVD=d&&d.draft&&d.draft.cat&&Array.isArray(d.draft.cat.arts)?d.draft:null;return edOffer()})
+  .catch(function(){if(!ED)EDerr='The dashboard couldn’t load your gallery just now. Please try again in a minute.'}).then(function(){EDload=null})}
+ EDload.then(cb)}
+function sameEd(a,b){var x=JSON.parse(JSON.stringify(a)),y=JSON.parse(JSON.stringify(b));x.v=y.v=0;return JSON.stringify(x)===JSON.stringify(y)}
+// unpublished changes found on opening, on the server (a draft) or only on this device: the newer is offered, with what it would change.
+// One that wouldn't change anything (the gallery already looks like that) is tidied away quietly
+function edOffer(){var dev=draftGet();
+ if(dev&&PUBCAT&&sameEd(edNorm(JSON.parse(JSON.stringify(dev.ed))),PUBCAT)){draftClear(1);dev=null}
+ edPick(dev);var o=OFFER;if(!o||!PUBCAT)return;
+ return api({a:'catImport',cat:o.cat,dry:true}).then(function(j){var p=j.preview;if(OFFER!==o||!p)return;
+  if(!p.same){o.changes=p.changes||[];return}
+  if(o.src==='device')draftClear(1);else{SRVD=null;api({a:'draftClear',t:o.t})}
+  return edOffer()})}
+function edPick(dev){var srv=SRVD,o=null;OFFER=null;
+ if(dev&&(!srv||dev.t>srv.t+2000))o={src:'device',t:dev.t,base:+dev.base||0,sid:dev.sid||'',cat:dev.ed};
+ else if(srv)o={src:'server',t:srv.t,base:+srv.base||0,sid:srv.sid||'',cat:srv.cat};
+ if(!o)return;o.older=srv&&o.src==='device'&&srv.sid!==o.sid?srv.t:0;o.stale=!!PUBV&&o.base!==PUBV;o.newer=[];OFFER=o;
+ if(o.stale)api({a:'catHist'}).then(function(h){if(OFFER===o&&h.list){o.newer=h.list.filter(function(x){return x.v>o.base});if(dashD.open)drawTab()}})}
+function edFail(body){body.appendChild(el('p','empty','Your paintings and settings couldn’t be loaded, so nothing can be changed right now.'));body.appendChild(el('p','err',EDerr));body.appendChild(sbtn('Try again',function(){EDerr='';drawTab()},'btn'))}
+// each time the dashboard opens: nothing unpublished → start again from the live version; unpublished changes → keep them, but learn whether the gallery was published elsewhere meanwhile
+function edSync(){if(EDbusy||EDload)return;if(!ED||(!EDdirty&&!OFFER)){ED=null;EDerr='';EDmsg='';EDlines=[];ASK=null;loadED(function(){drawTab()});return}if(EDdirty)edRefreshLive()}
+function edCalm(){var a=document.activeElement;return !(a&&$('dBody').contains(a)&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))}   // not while Pam is typing in a box
+function edRefreshLive(){return Promise.all([api({a:'catGet'}),api({a:'catHist'})]).then(function(r){var j=r[0],h=r[1];
+ if(j.cat){PUBCAT=edNorm(j.cat);PUBV=PUBCAT.v||0;Object.keys(j.pv||{}).forEach(function(k){PV[k]=j.pv[k]});if(ED&&!EDdirty&&!OFFER&&!EDbusy)ED=JSON.parse(JSON.stringify(PUBCAT))}
+ NEWER=h.list&&ED?h.list.filter(function(x){return x.v>(ED.v||0)}):[];EDstale=!!(ED&&EDdirty&&PUBV&&ED.v!==PUBV);if(/^[agrts]$/.test(dTab)&&dashD.open&&edCalm())drawTab()})}
+addEventListener('beforeunload',function(e){if(EDbusy||(EDdirty&&!(EDsrv==='saved'&&EDsrvGen===EDgen))){e.preventDefault();e.returnValue=''}});   // only while the newest changes aren't on the server yet
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')draftFlush()});addEventListener('pagehide',function(){draftFlush()});dashD.addEventListener('close',function(){draftFlush()});addEventListener('online',function(){draftSrvNow(false)});
+/* unpublished changes: a copy on this device straight away (400 ms) and a draft on the server two seconds after the last change,
+   so a closed tab, a flat battery or a phone tidying away its tabs never loses them */
 var DRAFTK='pgDashDraft',draftT=0;
-function draftSave(){clearTimeout(draftT);draftT=setTimeout(function(){try{if(EDdirty&&ED)localStorage.setItem(DRAFTK,JSON.stringify({t:Date.now(),base:ED.v||0,ed:ED}))}catch(e){}},400)}
-function draftClear(){clearTimeout(draftT);try{localStorage.removeItem(DRAFTK)}catch(e){}}
+function draftSave(){clearTimeout(draftT);draftT=setTimeout(draftLocalNow,400)}
+function draftLocalNow(){clearTimeout(draftT);if(!EDdirty||!ED||OFFER)return;try{localStorage.setItem(DRAFTK,JSON.stringify({t:Date.now(),base:ED.v||0,sid:EDSID,ed:ED}));EDlocal=true}catch(e){EDlocal=false}edState()}
+// the copy on this device is shared by every tab of this browser: it is removed only when it is this tab's own (any: when it was chosen or found unneeded)
+function draftClear(any){clearTimeout(draftT);try{var d=draftGet();if(any||!d||!d.sid||d.sid===EDSID)localStorage.removeItem(DRAFTK)}catch(e){}}
 function draftGet(){try{var d=JSON.parse(localStorage.getItem(DRAFTK)||'null');return d&&d.ed&&Array.isArray(d.ed.arts)?d:null}catch(e){return null}}
-function draftBack(){var d=draftGet();if(!d||!ED)return;var cur=ED.v;ED=withEmb(d.ed);ED.v=cur;ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDmsg='';markDirty();drawTab()}
-function markDirty(){EDdirty=true;draftSave();EDmsg='';var b=$('edPub');if(b){b.disabled=false;$('edState').textContent='Unpublished changes'}}
+function draftSrvLater(ms){clearTimeout(srvT);srvT=setTimeout(function(){draftSrvNow(false)},ms||2000)}
+function draftSrvNow(keep){clearTimeout(srvT);if(!ED||!EDdirty||OFFER||EDbusy||!TOK||EDsrvGen===EDgen)return;if(EDsrvBusy){EDsrvAgain=true;return}
+ var g=EDgen,b={a:'draftSave',draft:ED,base:ED.v||0,sid:EDSID};if(EDtake)b.take=true;EDsrvBusy=true;
+ EDsrvP=api(b,{keepalive:keep}).then(function(j){EDsrvBusy=false;
+  if(j.ok){EDtake=false;EDfromT=0;EDsrvGen=g;EDsrv='saved';EDsrvWhy=''}
+  else{var out=j._s===401||j._s===403;EDsrv=j.code==='draft_other'?'other':'local';
+   EDsrvWhy=j.code==='draft_other'?'':!j._s?'The gallery can’t be reached just now, so these changes are kept on this device for now. They’ll be saved online by themselves once the connection is back.':out?'You’re signed out, so these changes are only kept on this device. Please sign in again from “Account” to keep them safe online.':'The gallery’s server couldn’t save them just now, so they’re kept on this device for now. It will try again by itself.';
+   if(j.code!=='draft_other'&&!out&&!EDsrvAgain)draftSrvLater(30000)}   // try again in half a minute (another device's draft: on the next change)
+  edState();if(EDsrvAgain||(j.ok&&g!==EDgen)){EDsrvAgain=false;draftSrvLater()}})}
+function draftFlush(){if(!ED||!EDdirty||OFFER||EDbusy)return;draftLocalNow();draftSrvNow(true)}
+// 'Discard changes': both copies go (the server's only when it is this dashboard's own, or the draft it carried on from)
+function draftDrop(){clearTimeout(srvT);draftClear();EDsrv='';EDsrvGen=-1;EDsrvWhy='';var b={a:'draftClear',sid:EDSID};if(EDfromT)b.t=EDfromT;EDtake=false;EDfromT=0;
+ return TOK?Promise.resolve(EDsrvP).then(function(){return api(b)}):Promise.resolve({})}
+function draftNotice(body){var o=OFFER,d=el('div','mailwarn edoffer');d.setAttribute('role','region');d.setAttribute('aria-label','Unpublished changes');
+ d.appendChild(el('b',null,'You have unpublished changes from '+fdt(o.t)+'.'));d.appendChild(document.createTextNode(o.src==='server'?' They were saved as a draft.':' They were saved on this device.'));
+ if(o.changes&&o.changes.length){d.appendChild(el('p',null,'What they change:'));var cl=el('ul');o.changes.forEach(function(x){cl.appendChild(el('li',null,x))});d.appendChild(cl)}
+ if(o.stale){d.appendChild(el('p',null,'Your gallery has been published again since you started them, so they don’t include those newer changes. If you carry on, you’ll be asked to confirm before they replace the newer version.'));
+  if(o.newer.length){var ul=el('ul');o.newer.slice(0,3).forEach(function(x){ul.appendChild(el('li',null,'Published '+fdt(x.v)+': '+((x.changes||[]).slice(0,3).join('; ')||'no notes')))});if(o.newer.length>3)ul.appendChild(el('li',null,'and '+(o.newer.length-3)+' more'));d.appendChild(ul)}}
+ if(o.older)d.appendChild(el('p',null,'There’s also an older draft from '+fdt(o.older)+'. If you carry on with these changes, it will be replaced.'));
+ var acts=el('div','edacts'),cf=el('div','edconfirm'),yes=sbtn('Yes, discard them',function(){yes.disabled=true;offerDiscard()},'sb warn'),dis=sbtn('Discard them',function(){cf.hidden=false;yes.focus()},'sb warn');cf.hidden=true;
+ acts.appendChild(sbtn('Continue where I left off',offerContinue,'btn main'));acts.appendChild(dis);d.appendChild(acts);
+ cf.appendChild(el('span',null,'Discard these changes for good? They were never published, so they can’t be brought back afterwards.'));cf.appendChild(yes);cf.appendChild(sbtn('Keep them',function(){cf.hidden=true;dis.focus()}));d.appendChild(cf);body.appendChild(d)}
+// carry on: the changes come back exactly as they were, still marked with the version they started from (so publishing over newer work asks first);
+// this dashboard keeps its own session and takes over the draft
+function offerContinue(){var o=OFFER;if(!o)return;OFFER=null;ED=edNorm(JSON.parse(JSON.stringify(o.cat)));ED.v=o.base;EDtake=true;EDfromT=SRVD?SRVD.t:0;EDsrv='';EDsrvGen=-1;EDstale=!!(PUBV&&o.base!==PUBV);NEWER=o.newer||[];EDmsg='';EDlines=[];
+ EDnote='Your unpublished changes are back. Check them, then press “Publish changes” when you’re happy.';EDnoteWarn=false;markDirty();draftLocalNow();draftSrvNow(false);if(/^[agrts]$/.test(dTab))drawTab();else setTab('a')}
+// discard what was offered; an earlier copy from the same session goes with it, a draft from another session is offered next
+function offerDiscard(){var o=OFFER;if(!o)return;OFFER=null;var dev=draftGet(),srv=SRVD,job=Promise.resolve({});
+ if(o.src==='device'){draftClear(1);if(srv&&srv.sid===o.sid){SRVD=null;job=api({a:'draftClear',t:srv.t})}}
+ else{SRVD=null;job=api({a:'draftClear',t:o.t});if(dev&&dev.sid===o.sid)draftClear(1)}
+ EDnote='Your unpublished changes were discarded.';EDnoteWarn=false;job.then(function(){return edOffer()}).then(function(){drawTab()})}
+function markDirty(){EDdirty=true;EDgen++;EDmsg='';draftSave();draftSrvLater();edState()}
+function edState(){var s=$('edState'),p=$('edPub'),d=$('edDis'),e=$('edErr'),w=$('edWhy');if(!s)return;
+ s.textContent=EDbusy?'Publishing…':!EDdirty?(PUBCAT?'Everything is published':'Nothing published yet'):EDsrv==='saved'&&EDsrvGen===EDgen?'Unpublished changes — saved as a draft':EDsrv==='local'||EDsrv==='other'?(EDlocal?'Unpublished changes — saved on this device only':'Unpublished changes — not saved yet. Please keep this page open and publish when you can.'):'Unpublished changes';
+ if(p)p.disabled=EDbusy||!EDdirty;if(d)d.disabled=EDbusy||!EDdirty;if(e)e.textContent=EDfail||'';
+ if(w)w.textContent=!EDdirty||EDbusy?'':EDsrv==='other'?'Another device or tab has its own unpublished changes saved as a draft, so these are kept on this device for now. Publishing or discarding them sorts it out.':EDsrv==='local'?EDsrvWhy:''}
 function artById(id){return ED.arts.filter(function(a){return a.id===id})[0]}
-function field(label,input,cls){var l=el('label','ef'+(cls?' '+cls:''));l.appendChild(el('span',null,label));l.appendChild(input);return l}
-function inp(v,ph,on,type){var i=el(type==='area'?'textarea':'input');if(type&&type!=='area')i.type=type;i.value=v==null?'':v;if(ph)i.placeholder=ph;i.addEventListener('input',function(){on(i.value);markDirty()});return i}
+function field(label,input,cls){var l=el('label','ef'+(cls?' '+cls:''));l.appendChild(el('span',null,label));l.appendChild(input);if(input._cnt)l.appendChild(input._cnt);return l}
+function inp(v,ph,on,type,max){var i=el(type==='area'?'textarea':'input');if(type&&type!=='area')i.type=type;i.value=v==null?'':v;if(ph)i.placeholder=ph;if(max)lim(i,max);i.addEventListener('input',function(){on(i.value);markDirty()});return i}
+// a box holds exactly what the gallery keeps; near the limit a small counter says so, and a paste that doesn't fit is pointed out
+function lim(i,n){i.maxLength=n;var c=el('span','cnt');c.setAttribute('aria-live','polite');i._cnt=c;
+ function upd(){var l=i.value.length;c.classList.toggle('full',l>=n);c.textContent=l>=n?'That’s the limit — '+n+' characters.':l>=Math.floor(n*.9)?(n-l)+' character'+(n-l===1?'':'s')+' left':''}
+ i.addEventListener('input',upd);
+ i.addEventListener('paste',function(e){var t=e.clipboardData?e.clipboardData.getData('text'):'',sel=0;try{sel=Math.abs((i.selectionEnd||0)-(i.selectionStart||0))}catch(x){}
+  if(t.length>n-i.value.length+sel)setTimeout(function(){c.classList.add('full');c.textContent='Only part of what you pasted fits — this box holds up to '+n+' characters.'},0)});
+ upd();return i}
+function numLim(i,lo,hi){i.min=String(lo);i.max=String(hi);return i}
 function sbtn(t,cb,cls,aria){var b=el('button',cls||'sb',t);b.type='button';if(aria)b.setAttribute('aria-label',aria);b.addEventListener('click',cb);return b}
 function moveIn(arr,i,d){var j=i+d;if(j<0||j>=arr.length)return;var x=arr[i];arr[i]=arr[j];arr[j]=x;markDirty();drawTab()}
 function radio(name,on,label,cb){var l=el('label'),r=el('input');r.type='radio';r.name=name;r.checked=on;r.addEventListener('change',function(){if(r.checked)cb()});l.appendChild(r);l.appendChild(document.createTextNode(label));return l}
-function pubBar(body){var bar=el('div','edbar'),st=el('span','edst');st.id='edState';st.textContent=EDdirty?'Unpublished changes':'Everything is published';
- var dis=sbtn('Discard changes',function(){EDdirty=false;EDmsg='';ED=null;draftClear();drawTab()});dis.disabled=!EDdirty;
- var pub=el('button','btn main','Publish changes');pub.id='edPub';pub.type='button';pub.disabled=!EDdirty;pub.addEventListener('click',publish);
- bar.appendChild(st);bar.appendChild(dis);bar.appendChild(pub);body.appendChild(bar);
- var dft=!EDdirty&&draftGet();if(dft){var dn=el('div','mailwarn');dn.setAttribute('role','status');dn.appendChild(el('b',null,'You have changes that were never published'));
-  dn.appendChild(document.createTextNode(' (saved on this device, '+new Date(dft.t).toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'). '));
-  dn.appendChild(sbtn('Bring them back',draftBack,'btn main'));dn.appendChild(document.createTextNode(' '));dn.appendChild(sbtn('Discard them',function(){draftClear();drawTab()}));body.appendChild(dn)}
- if(EDmsg){var m=el('p','edmsg');m.appendChild(document.createTextNode(EDmsg+' '));var rl=sbtn('Reload the gallery now',function(){location.reload()},'link');m.appendChild(rl);body.appendChild(m)}}
+function pubBar(body){var bar=el('div','edbar'),st=el('span','edst');st.id='edState';
+ var dis=sbtn('Discard changes',function(){ASK={t:'Discard all your unpublished changes?',p:'They’ve never been published, so they can’t be brought back afterwards.',yes:'Yes, discard them',no:'Keep them',warn:1,back:'edDis',
+  go:function(){EDdirty=false;EDmsg='';EDlines=[];EDstale=false;EDfail='';NEWER=[];ED=null;draftDrop().then(function(){loadED(function(){if(ED&&!EDnote){EDnote='Your unpublished changes were discarded.';EDnoteWarn=false}drawTab()})})}};drawTab()});dis.id='edDis';
+ var pub=el('button','btn main','Publish changes');pub.id='edPub';pub.type='button';pub.addEventListener('click',publish);
+ var er=el('p','err');er.id='edErr';er.setAttribute('role','alert');var why=el('p','note why');why.id='edWhy';why.setAttribute('role','status');
+ bar.appendChild(st);bar.appendChild(dis);bar.appendChild(pub);bar.appendChild(er);bar.appendChild(why);if(ASK){bar.classList.add('asking');bar.appendChild(askBox())}body.appendChild(bar);edState();
+ if(EDstale&&EDdirty){var sw=el('div','mailwarn');sw.setAttribute('role','status');sw.appendChild(el('b',null,'Heads up: '));sw.appendChild(document.createTextNode('these changes were started before your gallery was last published ('+fdt(PUBV)+'). When you publish, you’ll be asked to confirm, because they’ll replace that newer version.'));body.appendChild(sw)}
+ if(EDnote)body.appendChild(el('p',EDnoteWarn?'mailwarn':'edmsg',EDnote));
+ if(EDmsg){var m=el('div','edmsg');m.id='edMsg';m.tabIndex=-1;m.appendChild(document.createTextNode(EDmsg+' '));if(!EDdirty)m.appendChild(sbtn('Reload the gallery now',function(){location.reload()},'link'));
+  if(EDlines.length){var ul=el('ul');EDlines.slice(0,4).forEach(function(x){ul.appendChild(el('li',null,x))});m.appendChild(ul);if(EDlines.length>4)m.appendChild(el('span',null,'The full list is in Settings → Earlier versions.'))}body.appendChild(m)}}
+// a question in the publish bar before anything is lost or replaced: a labelled group that takes the focus
+function askBox(){var a=ASK,w=el('div','edask'),h=el('b',null,a.t);h.id='edAskT';h.tabIndex=-1;w.setAttribute('role','group');w.setAttribute('aria-labelledby','edAskT');w.appendChild(h);
+ if(a.p)w.appendChild(el('p',null,a.p));
+ if(a.list&&a.list.length){var ul=el('ul');a.list.slice(0,10).forEach(function(x){ul.appendChild(el('li',null,x))});if(a.list.length>10)ul.appendChild(el('li',null,'and '+(a.list.length-10)+' more'));w.appendChild(ul)}
+ if(a.q)w.appendChild(el('p',null,a.q));
+ var b=el('div','edacts'),y=sbtn(a.yes,function(){y.disabled=n.disabled=true;ASK=null;a.go()},a.warn?'sb warn':'btn main'),n=sbtn(a.no||'Not yet',function(){ASK=null;drawTab();var f=$(a.back||'edPub');if(f)f.focus()});b.appendChild(y);b.appendChild(n);w.appendChild(b);
+ setTimeout(function(){var t=$('edAskT');if(t)t.focus()},0);return w}
 /* the watermark on copies that can leave the site (link previews, Pinterest, Google, the press kit) */
 function wmCanvas(im,L){var W0=im.naturalWidth,H0=im.naturalHeight,k=Math.min(1,(L||1600)/Math.max(W0,H0)),W=Math.round(W0*k),H=Math.round(H0*k),c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');x.drawImage(im,0,0,W,H);
  var fs=Math.max(14,Math.round(Math.max(W,H)*.022)),txt='© PAM’S GALLERY  ·  ITSAMEPAMEO.COM',F=' Jost, Inter, Arial, sans-serif';x.save();x.font='600 '+fs+'px'+F;var tw=x.measureText(txt).width,gap=fs*3.2,rh=fs*5.5,D=Math.hypot(W,H);
@@ -2030,25 +2179,56 @@ function ensureWM(cat){var todo=(cat.arts||[]).filter(function(a){return/^\/api\
  return todo.reduce(function(pr,a){return pr.then(function(){return new Promise(function(res){var im=new Image();
   im.onload=function(){try{var d=wmCanvas(im,1600).toDataURL('image/jpeg',.85);api({a:'imgUpload',data:d,type:'image/jpeg'}).then(function(j){if(j&&j.url){a.wm=j.url;a.wmOf=a.img}res()},function(){res()})}catch(e){res()}};
   im.onerror=function(){res()};im.src=edSrc(a.img)})})},Promise.resolve())}
-function publish(){var b=$('edPub');b.disabled=true;$('edState').textContent='Publishing…';$('dErr').textContent='';
- ensureWM(ED).then(function(){return ensureTZ(ED)}).then(function(){return api({a:'catSave',cat:ED,base:ED.v})}).then(function(j){if(j&&j.emailed)notice('Members emailed','Your new early-access work was announced to '+j.emailed+' member'+(j.emailed>1?'s':'')+' who asked for news.');return j}).then(function(j){if(j.error){$('dErr').textContent=j.error;b.disabled=false;$('edState').textContent='Not published yet';return}
-  PV=j.pv||PV;draftClear();ED=withEmb(j.cat);ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Published — visitors will see your changes from their next visit.';applySite(ED);siteRefresh();drawTab()})}
+function publish(){if(EDbusy||!ED)return;ASK=null;EDfail=edProblems();if(EDfail){$('dErr').textContent=EDfail;drawTab();return}
+ var step2=function(base){var rm=edRemovals();if(!rm.length)return doPublish(base);
+  ASK={t:'Publishing will take these out of your gallery:',list:rm,q:'Visitors won’t see them any more. The version that’s live now stays in Settings → Earlier versions, so you can bring them back.',yes:'Take them out and publish',go:function(){doPublish(base)}};drawTab()};
+ if(PUBV&&ED.v!==PUBV){ASK={t:'Your gallery was published again after you started these changes.',p:NEWER.length?'Published since then:':'The newer version is from '+fdt(PUBV)+'.',
+  list:NEWER.map(function(x){return fdt(x.v)+': '+((x.changes||[]).slice(0,3).join('; ')||'no notes')}),q:'If you publish now, your changes will replace it, including anything that was changed in it. It stays in Settings → Earlier versions, so you can bring it back.',yes:'Publish my changes anyway',go:function(){step2(PUBV)}};drawTab();return}
+ step2(ED.v||0)}
+// base: the version these changes started from (or, once Pam has confirmed, the newer one they replace)
+function doPublish(base){if(EDbusy||!ED)return;EDbusy=true;EDfail='';EDmsg='';$('dErr').textContent='';clearTimeout(draftT);clearTimeout(srvT);if(document.querySelector('#dBody .edask'))drawTab();else edState();var g=0;
+ Promise.resolve(EDsrvP).then(function(){return ensureWM(ED)}).then(function(){return ensureTZ(ED)}).then(function(){g=EDgen;return api({a:'catSave',cat:ED,base:base,sid:EDSID})}).then(function(j){if(j&&j.emailed)notice('Members emailed','Your new early-access work was announced to '+j.emailed+' member'+(j.emailed>1?'s':'')+' who asked for news.');return j}).then(function(j){EDbusy=false;
+  if(j.error){EDfail=j.code==='stale'?'Your gallery was published again from another device or tab while you were working. Nothing is lost — your changes are kept as a draft. Press “Publish changes” again to see what to do.':j.code==='base_missing'?'This page is out of date. Your changes are kept as a draft — please reload the page and publish again.':edErrMsg(j,1);
+   $('dErr').textContent=EDfail;if(j.code==='stale')edRefreshLive();draftSave();draftSrvLater();drawTab();return}
+  PV=j.pv||PV;PUBCAT=edNorm(JSON.parse(JSON.stringify(j.cat)));PUBV=PUBCAT.v;EDstale=false;EDnote='';NEWER=[];EDlines=j.unchanged?[]:(j.changes||[]);EDtake=false;
+  if(g===EDgen){ED=JSON.parse(JSON.stringify(PUBCAT));EDdirty=false;EDsrv='';EDsrvWhy='';draftClear();if(EDfromT)api({a:'draftClear',t:EDfromT});EDfromT=0;EDmsg=j.unchanged?'Nothing new to publish — your gallery already looks like this.':'Published — visitors will see your changes from their next visit.'}
+  else{ED.v=PUBV;EDmsg='Published. You made more changes while it was publishing — press “Publish changes” again to publish those too.';draftSave();draftSrvLater()}
+  applySite(PUBCAT);siteRefresh();drawTab()})}
+// paintings and collections that publishing would take off the live gallery
+function edRemovals(){if(!PUBCAT||!ED)return[];var have={},out=[];ED.arts.forEach(function(a){have[a.id]=1});
+ PUBCAT.arts.forEach(function(a){if(!have[a.id])out.push('The painting “'+(a.t||'Untitled')+'”')});
+ collPairs(PUBCAT.colls,ED.colls).forEach(function(k){out.push('The collection “'+(k.t||'Untitled collection')+'”')});return out}
+function collPairs(P,N){var uP={},uN={};   // the same rules as the server: same id, same name, most paintings in common, same place
+ function pass(score){N.forEach(function(c,j){if(uN[j])return;var best=-1,top=0;P.forEach(function(o,i){if(uP[i])return;var s=score(o,c,i,j);if(s>top){top=s;best=i}});if(best>=0){uP[best]=1;uN[j]=1}})}
+ pass(function(o,c){return o.id&&c.id&&o.id===c.id?1:0});pass(function(o,c){return o.t===c.t?1:0});
+ pass(function(o,c,i,j){var n=c.works.filter(function(x){return o.works.indexOf(x)>=0}).length;return n?n*1000-Math.abs(i-j):0});pass(function(o,c,i,j){return i===j?1:0});
+ return P.filter(function(o,i){return !uP[i]})}
+// things the server would otherwise quietly drop or blank
+function edProblems(){var S=ED.site||{},m=[];
+ if(S.email&&!/^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/.test(S.email))m.push('The email for enquiries doesn’t look right — please check it (Settings → Contact details).');
+ SOC.forEach(function(x){var u=S.social&&S.social[x[0]];if(u&&(u.length>200||!/^https:\/\/[^\s"<>]+$/.test(u)))m.push('The '+x[1]+' link doesn’t look right — please paste the whole link, starting https:// (Settings → Social media).')});
+ if(ED.prints.some(function(q){return(q.sizes||[]).some(function(z){return !String(z.l||'').trim()&&String(z.p||'').trim()})}))m.push('A print size has a price but no size — please fill in the size, or remove it with ✕ (Prints tab).');
+ ED.arts.forEach(function(a){if(a.mode==='auction'&&a.auc&&(!(+a.auc.start>=1)||!(+a.auc.step>=1)))m.push('The starting bid and bid step for “'+(a.t||'Untitled')+'” need to be at least 1 (Paintings tab).')});
+ return m.length?'Please fix this first: '+m.slice(0,3).join(' '):''}
+// a version brought back (from the list or a backup file) is live: the dashboard starts again from it
+function edAfterLive(j,msg){PV=j.pv||PV;PUBCAT=edNorm(JSON.parse(JSON.stringify(j.cat)));PUBV=PUBCAT.v;ED=JSON.parse(JSON.stringify(PUBCAT));EDdirty=false;EDstale=false;EDfail='';EDnote='';OFFER=null;ASK=null;NEWER=[];EDsrv='';EDsrvWhy='';EDtake=false;clearTimeout(srvT);draftClear();if(EDfromT)api({a:'draftClear',t:EDfromT});EDfromT=0;
+ EDlines=j.unchanged?[]:(j.changes||[]);EDmsg=msg;applySite(PUBCAT);siteRefresh();drawTab();var m=$('edMsg');if(m)m.focus()}
 function prepPhoto(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();
  im.onload=function(){var W0=im.naturalWidth,H0=im.naturalHeight,k=Math.min(1,2400/Math.max(W0,H0)),W=Math.round(W0*k),H=Math.round(H0*k),c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').drawImage(im,0,0,W,H);URL.revokeObjectURL(u);
   var q=.9,d=c.toDataURL('image/jpeg',q);while(d.length>3.3e6&&q>.5){q-=.08;d=c.toDataURL('image/jpeg',q)}res({data:d,W:W,H:H})};
  im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('That photo couldn’t be opened here — please try a JPEG or PNG.'))};im.src=u})}
 function addPhoto(file,cb){$('dErr').textContent='';var st=$('edState');if(st)st.textContent='Uploading the photo…';
  prepPhoto(file).then(function(r){return api({a:'imgUpload',data:r.data,type:'image/jpeg'}).then(function(j){if(j.error)throw new Error(j.error);var L=.7,w=r.W>=r.H?L:L*r.W/r.H,h=r.W>=r.H?L*r.H/r.W:L;cb(j.url,+w.toFixed(3),+h.toFixed(3))})})
-  .catch(function(e){$('dErr').textContent=e.message||'The upload didn’t work — please try again.';if(st)st.textContent=EDdirty?'Unpublished changes':'Everything is published'})}
+  .catch(function(e){$('dErr').textContent=e.message||'The upload didn’t work — please try again.';edState()})}
 function rotatePhoto(src,cb){$('dErr').textContent='';var st=$('edState');if(st)st.textContent='Turning the photo…';var im=new Image();
  im.onload=function(){var W=im.naturalHeight,H=im.naturalWidth,c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');x.translate(W,0);x.rotate(Math.PI/2);x.drawImage(im,0,0);
   var q=.92,d=c.toDataURL('image/jpeg',q);while(d.length>3.3e6&&q>.5){q-=.08;d=c.toDataURL('image/jpeg',q)}
-  api({a:'imgUpload',data:d,type:'image/jpeg'}).then(function(j){if(j.error){$('dErr').textContent=j.error;return}var L=.7;cb(j.url,+(W>=H?L:L*W/H).toFixed(3),+(W>=H?L*H/W:L).toFixed(3))})};
- im.onerror=function(){$('dErr').textContent='That photo couldn’t be turned — please try again.'};im.src=src}
+  api({a:'imgUpload',data:d,type:'image/jpeg'}).then(function(j){if(j.error){$('dErr').textContent=j.error;edState();return}var L=.7;cb(j.url,+(W>=H?L:L*W/H).toFixed(3),+(W>=H?L*H/W:L).toFixed(3))})};
+ im.onerror=function(){$('dErr').textContent='That photo couldn’t be turned — please try again.';edState()};im.src=src}
 function photoPicker(label,cb,cls){var up=el('label',cls||'btn edup');up.appendChild(document.createTextNode(label));var fi=el('input');fi.type='file';fi.accept='image/*';fi.hidden=true;up.appendChild(fi);
  fi.addEventListener('change',function(){var f=fi.files[0];fi.value='';if(f)addPhoto(f,cb)});return up}
 function drawArts(body){pubBar(body);var head=el('div','edhead');head.appendChild(el('h3',null,'Paintings ('+ED.arts.length+')'));
- head.appendChild(photoPicker('Add a painting',function(url,w,h){var a={id:newId(),t:'',m:'Oil on board',s:'',year:String(new Date().getFullYear()),d:'',p:'',mode:'request',status:'Available',w:w,h:h,bg:'#cfc6d6',img:url,ar:false};ED.arts.unshift(a);EDopen={};EDopen[a.id]=1;markDirty();drawTab()},'btn main edup'));
+ if(ED.arts.length>=120)head.appendChild(el('p','edhint','That’s 120 paintings — the most the gallery can hold. Remove one to add another.'));else head.appendChild(photoPicker('Add a painting',function(url,w,h){var a={id:newId(),t:'',m:'Oil on board',s:'',year:String(new Date().getFullYear()),d:'',p:'',mode:'request',status:'Available',w:w,h:h,bg:'#cfc6d6',img:url,ar:false};ED.arts.unshift(a);EDopen={};EDopen[a.id]=1;markDirty();drawTab()},'btn main edup'));
  body.appendChild(head);var nS=ED.arts.filter(function(a){return !a.s||/request/i.test(a.s)}).length,nY=ED.arts.filter(function(a){return !a.year}).length;
  if(nS||nY)body.appendChild(el('p','note edmiss','Collectors and dealers look for the size and year first. Still missing: '+[nS?'size on '+nS+' painting'+(nS>1?'s':''):'',nY?'year on '+nY:''].filter(Boolean).join(', ')+'. Open a painting below to add them.'));
  body.appendChild(el('p','edhint','Add a photo of a new painting, then fill in its details. To show it in the gallery, add it to This Month’s Favourites or to a collection on the next tab. Remember to press “Publish changes” when you’re happy.'));
@@ -2066,10 +2246,10 @@ function artRow(a,i){var row=el('div','edrow'+(EDopen[a.id]?' open':'')),top=el(
  ph.appendChild(photoPicker('Replace the photo',function(url,w,h){a.img=url;a.w=w;a.h=h;a.ar=false;markDirty();drawTab()},'sb edup'));
  ph.appendChild(sbtn('Turn the photo ↻',function(){rotatePhoto(edSrc(a.img),function(url,w,h){a.img=url;a.w=w;a.h=h;a.ar=false;markDirty();drawTab()})}));
  ph.appendChild(el('span','edhint','Tip: crop the photo to just the painting on your phone before adding it.'));f.appendChild(ph);
- f.appendChild(field('Title',inp(a.t,'e.g. Orchid in the Clouds',function(v){a.t=v})));
- f.appendChild(field('Medium',inp(a.m,'e.g. Oil on canvas',function(v){a.m=v})));
- f.appendChild(field('Size',inp(a.s,'e.g. 60 × 80 cm',function(v){a.s=v})));
- f.appendChild(field('Year',inp(a.year,'e.g. 2025',function(v){a.year=v})));
+ f.appendChild(field('Title',inp(a.t,'e.g. Orchid in the Clouds',function(v){a.t=v},null,90)));
+ f.appendChild(field('Medium',inp(a.m,'e.g. Oil on canvas',function(v){a.m=v},null,80)));
+ f.appendChild(field('Size',inp(a.s,'e.g. 60 × 80 cm',function(v){a.s=v},null,80)));
+ f.appendChild(field('Year',inp(a.year,'e.g. 2025',function(v){a.year=v},null,12)));
  var st=el('select');['Available','On hold','Sold'].forEach(function(o){var op=el('option',null,o);op.value=o;if(a.status===o)op.selected=true;st.appendChild(op)});st.addEventListener('change',function(){a.status=st.value;markDirty()});f.appendChild(field('Availability',st));
  var frs=el('select'),fa=el('option',null,'Automatic: '+FRAMES[frameAuto(a)]);fa.value='';frs.appendChild(fa);Object.keys(FRAMES).forEach(function(kk){var op=el('option',null,FRAMES[kk]);op.value=kk;if(a.fr===kk)op.selected=true;frs.appendChild(op)});
  frs.addEventListener('change',function(){a.fr=frs.value;markDirty()});f.appendChild(field('Frame',frs));
@@ -2079,18 +2259,18 @@ function artRow(a,i){var row=el('div','edrow'+(EDopen[a.id]?' open':'')),top=el(
   ec.addEventListener('change',function(){ed.disabled=!ec.checked;a.early=ec.checked?new Date(ed.value).getTime():0;markDirty()});ed.addEventListener('change',function(){if(ec.checked){a.early=new Date(ed.value).getTime();markDirty()}});
   eb.appendChild(el2);eb.appendChild(field('Members only until',ed));eb.appendChild(eh);f.appendChild(eb)}
  else f.appendChild(el('p','note','Early access (members see it first) is for new paintings you upload; the paintings built into the site are already public.'));
- var pr=el('div','ef efp');pr.appendChild(el('span',null,'Price'));var rad=el('div','rad'),pi=el('input');pi.type='text';pi.value=a.p||'';pi.placeholder='e.g. £450';pi.setAttribute('aria-label','Price');pi.classList.toggle('dim',a.mode!=='price');
+ var pr=el('div','ef efp');pr.appendChild(el('span',null,'Price'));var rad=el('div','rad'),pi=el('input');pi.type='text';pi.value=a.p||'';lim(pi,40);pi.placeholder='e.g. £450';pi.setAttribute('aria-label','Price');pi.classList.toggle('dim',a.mode!=='price');
  pi.addEventListener('input',function(){a.p=pi.value;if(a.mode!=='price'){var was=a.mode;a.mode='price';r2.querySelector('input').checked=true;pi.classList.remove('dim');if(was==='auction'){markDirty();drawTab();return}}markDirty()});
  rad.appendChild(radio('pm'+a.id,a.mode!=='price'&&a.mode!=='auction',' “Price on request” — visitors enquire to buy',function(){var was=a.mode;a.mode='request';pi.classList.add('dim');markDirty();if(was==='auction')drawTab()}));
- var r2=radio('pm'+a.id,a.mode==='price',' Show a price:',function(){var was=a.mode;a.mode='price';pi.classList.remove('dim');markDirty();if(was==='auction')drawTab();else pi.focus()});r2.appendChild(pi);rad.appendChild(r2);
+ var r2=radio('pm'+a.id,a.mode==='price',' Show a price:',function(){var was=a.mode;a.mode='price';pi.classList.remove('dim');markDirty();if(was==='auction')drawTab();else pi.focus()});r2.appendChild(pi);r2.appendChild(pi._cnt);rad.appendChild(r2);
  rad.appendChild(radio('pm'+a.id,a.mode==='auction',' Auction — visitors bid until a closing date',function(){a.mode='auction';a.auc=a.auc||{start:100,step:10,ends:Date.now()+7*864e5};pi.classList.add('dim');markDirty();drawTab()}));
  if(a.mode==='auction'){a.auc=a.auc||{start:100,step:10,ends:Date.now()+7*864e5};var af=el('div','aucf');
-  af.appendChild(field('Starting bid',inp(a.auc.start,'e.g. 200',function(v){a.auc.start=parseFloat(v)||0},'number')));
-  af.appendChild(field('Each bid beats the last by at least',inp(a.auc.step,'e.g. 10',function(v){a.auc.step=parseFloat(v)||1},'number')));
+  af.appendChild(field('Starting bid',numLim(inp(a.auc.start,'e.g. 200',function(v){a.auc.start=parseFloat(v)||0},'number'),1,10000000)));
+  af.appendChild(field('Each bid beats the last by at least',numLim(inp(a.auc.step,'e.g. 10',function(v){a.auc.step=parseFloat(v)||1},'number'),1,1000000)));
   var dt=el('input');dt.type='datetime-local';var z=new Date(a.auc.ends);dt.value=new Date(z.getTime()-z.getTimezoneOffset()*6e4).toISOString().slice(0,16);
   dt.addEventListener('input',function(){var t=new Date(dt.value).getTime();if(isFinite(t)){a.auc.ends=t;markDirty()}});af.appendChild(field('Auction closes',dt));rad.appendChild(af)}
  pr.appendChild(rad);f.appendChild(pr);
- f.appendChild(field('About this painting (optional)',inp(a.d,'A sentence or two visitors will read in the painting’s details…',function(v){a.d=v},'area'),'wide'));
+ f.appendChild(field('About this painting (optional)',inp(a.d,'A sentence or two visitors will read in the painting’s details…',function(v){a.d=v},'area',1200),'wide'));
  row.appendChild(f);return row}
 function pickRow(a,btns){var li=el('li','pk'),im=el('img');im.src=edSrc(a.img);im.alt='';li.appendChild(im);li.appendChild(el('span',null,a.t||'Untitled'));var d=el('div','edacts');btns.forEach(function(b){d.appendChild(b)});li.appendChild(d);return li}
 function addPicker(opts,cb,ph){var w=el('div','edadd'),sl=el('select');sl.setAttribute('aria-label',ph);var o0=el('option',null,ph);o0.value='';sl.appendChild(o0);opts.forEach(function(a){var o=el('option',null,a.t||'Untitled');o.value=a.id;sl.appendChild(o)});sl.disabled=!opts.length;sl.addEventListener('change',function(){if(sl.value)cb(sl.value)});w.appendChild(sl);return w}
@@ -2103,28 +2283,28 @@ function drawGallery(body){pubBar(body);
  var s2=el('section','edsec');s2.appendChild(el('h3',null,'Collections'));s2.appendChild(el('p','edhint',''+(COLMAIN?'Every collection hangs in the main gallery hall, in this order, round the walls from the right; this month’s favourites have the room through the portal.':'Every collection gets its own wall in the 3D Collections hall. Each wall is as long as its collection needs, and the hall grows to fit them all.')+' Every collection also appears on the Collections page.'));
  ED.colls.forEach(function(c,ci){var card=el('div','edcoll'),hd=el('div','edtop');hd.appendChild(el('b',null,'Collection '+roman(ci)));
   var acts=el('div','edacts');acts.appendChild(sbtn('↑',function(){moveIn(ED.colls,ci,-1)},'sb ic','Move up'));acts.appendChild(sbtn('↓',function(){moveIn(ED.colls,ci,1)},'sb ic','Move down'));acts.appendChild(sbtn('Remove',function(){ED.colls.splice(ci,1);markDirty();drawTab()},'sb warn'));hd.appendChild(acts);card.appendChild(hd);
-  var f=el('div','edform');f.appendChild(field('Name',inp(c.t,'e.g. The Dreaming Garden',function(v){c.t=v})));
+  var f=el('div','edform');f.appendChild(field('Name',inp(c.t,'e.g. The Dreaming Garden',function(v){c.t=v},null,60)));
   var so=inp(String(c.soon==null?3:c.soon),'',function(v){c.soon=Math.max(0,Math.min(6,parseInt(v,10)||0))},'number');so.min='0';so.max='6';f.appendChild(field('“Coming soon” frames',so));
-  f.appendChild(field('Description',inp(c.d,'One or two sentences about this collection',function(v){c.d=v},'area'),'wide'));card.appendChild(f);
+  f.appendChild(field('Description',inp(c.d,'One or two sentences about this collection',function(v){c.d=v},'area',400),'wide'));card.appendChild(f);
   card.appendChild(el('span','edlab','Paintings in this collection'));var wl=el('ol','edpick');
   c.works.forEach(function(id,i){var a=artById(id);if(!a)return;wl.appendChild(pickRow(a,[sbtn('↑',function(){moveIn(c.works,i,-1)},'sb ic','Move up'),sbtn('↓',function(){moveIn(c.works,i,1)},'sb ic','Move down'),sbtn('Take out',function(){c.works.splice(i,1);markDirty();drawTab()},'sb warn')]))});card.appendChild(wl);
-  card.appendChild(addPicker(ED.arts.filter(function(a){return c.works.indexOf(a.id)<0}),function(id){c.works.push(id);markDirty();drawTab()},'Add a painting to this collection…'));s2.appendChild(card)});
- if(ED.colls.length<12)s2.appendChild(sbtn('Add a collection',function(){ED.colls.push({t:'New collection',d:'',works:[],soon:3});markDirty();drawTab()},'btn'));
+  if(c.works.length>=12)card.appendChild(el('p','edhint','That’s twelve — take one out to add another.'));else card.appendChild(addPicker(ED.arts.filter(function(a){return c.works.indexOf(a.id)<0}),function(id){c.works.push(id);markDirty();drawTab()},'Add a painting to this collection…'));s2.appendChild(card)});
+ if(ED.colls.length<12)s2.appendChild(sbtn('Add a collection',function(){ED.colls.push({id:newId(),t:'New collection',d:'',works:[],soon:3});markDirty();drawTab()},'btn'));
  body.appendChild(s2)}
 var SIZES0=[{l:'A4 · 21 × 29.7 cm',p:''},{l:'A3 · 29.7 × 42 cm',p:''},{l:'A2 · 42 × 59.4 cm',p:''}];
 function drawPrintsEd(body){pubBar(body);var head=el('div','edhead');head.appendChild(el('h3',null,'Prints ('+ED.prints.length+')'));
- head.appendChild(sbtn('Add a print',function(){var a=ED.arts[0];ED.prints.unshift({id:newId(),art:a?a.id:'',t:'',d:'',img:'',sizes:JSON.parse(JSON.stringify(SIZES0)),on:true});markDirty();drawTab()},'btn main'));body.appendChild(head);
+ if(ED.prints.length>=80)head.appendChild(el('p','edhint','That’s 80 prints — the most the Prints page can hold.'));else head.appendChild(sbtn('Add a print',function(){var a=ED.arts[0];ED.prints.unshift({id:newId(),art:a?a.id:'',t:'',d:'',img:'',sizes:JSON.parse(JSON.stringify(SIZES0)),on:true});markDirty();drawTab()},'btn main'));body.appendChild(head);
  body.appendChild(el('p','edhint','Each print is made from one of your paintings. Give every size its own price — visitors pick a size on the Prints page and send you a request. A print shows once it has at least one size.'));
  if(!ED.prints.length)body.appendChild(el('p','empty','No prints yet — press “Add a print” to start.'));
  ED.prints.forEach(function(P,pi){var card=el('div','edcoll'),hd=el('div','edtop'),src=artById(P.art)||{},th=el('img','edth');th.src=embImg(P.img||src.img||'');th.alt='';hd.appendChild(th);hd.appendChild(el('b',null,P.t||src.t||'Print'));
   var acts=el('div','edacts');acts.appendChild(sbtn('↑',function(){moveIn(ED.prints,pi,-1)},'sb ic','Move up'));acts.appendChild(sbtn('↓',function(){moveIn(ED.prints,pi,1)},'sb ic','Move down'));acts.appendChild(sbtn('Remove',function(){ED.prints.splice(pi,1);markDirty();drawTab()},'sb warn'));hd.appendChild(acts);card.appendChild(hd);
   var f=el('div','edform'),sel=el('select');ED.arts.forEach(function(a){var o=el('option',null,a.t||'Untitled');o.value=a.id;if(a.id===P.art)o.selected=true;sel.appendChild(o)});sel.addEventListener('change',function(){P.art=sel.value;markDirty();drawTab()});
-  f.appendChild(field('From the painting',sel));f.appendChild(field('Title (optional)',inp(P.t,'Leave blank to use the painting’s title',function(v){P.t=v})));
+  f.appendChild(field('From the painting',sel));f.appendChild(field('Title (optional)',inp(P.t,'Leave blank to use the painting’s title',function(v){P.t=v},null,90)));
   var on=el('input');on.type='checkbox';on.checked=P.on!==false;on.addEventListener('change',function(){P.on=on.checked;markDirty()});var onl=el('label','efc');onl.appendChild(on);onl.appendChild(document.createTextNode('Show on the Prints page'));f.appendChild(onl);
-  f.appendChild(field('Description (optional)',inp(P.d,'e.g. Giclée print on 310gsm cotton rag, signed by Pam',function(v){P.d=v},'area'),'wide'));card.appendChild(f);
+  f.appendChild(field('Description (optional)',inp(P.d,'e.g. Giclée print on 310gsm cotton rag, signed by Pam',function(v){P.d=v},'area',600),'wide'));card.appendChild(f);
   card.appendChild(el('span','edlab','Sizes and prices'));var tb=el('div','edsizes');
-  (P.sizes||[]).forEach(function(z,zi){var r=el('div','edsz'),li=inp(z.l,'Size, e.g. A3 · 29.7 × 42 cm',function(v){z.l=v}),lp=inp(z.p,'Price, e.g. £65',function(v){z.p=v});li.setAttribute('aria-label','Size');lp.setAttribute('aria-label','Price');r.appendChild(li);r.appendChild(lp);r.appendChild(sbtn('✕',function(){P.sizes.splice(zi,1);markDirty();drawTab()},'sb ic','Remove this size'));tb.appendChild(r)});
-  card.appendChild(tb);card.appendChild(sbtn('Add a size',function(){P.sizes=P.sizes||[];P.sizes.push({l:'',p:''});markDirty();drawTab()}));body.appendChild(card)})}
+  (P.sizes||[]).forEach(function(z,zi){var r=el('div','edsz'),li=inp(z.l,'Size, e.g. A3 · 29.7 × 42 cm',function(v){z.l=v},null,60),lp=inp(z.p,'Price, e.g. £65',function(v){z.p=v},null,30);li.setAttribute('aria-label','Size');lp.setAttribute('aria-label','Price');r.appendChild(li);r.appendChild(lp);r.appendChild(sbtn('✕',function(){P.sizes.splice(zi,1);markDirty();drawTab()},'sb ic','Remove this size'));tb.appendChild(r);tb.appendChild(li._cnt);tb.appendChild(lp._cnt)});
+  card.appendChild(tb);if((P.sizes||[]).length>=10)card.appendChild(el('p','edhint','That’s ten sizes — the most a print can have.'));else card.appendChild(sbtn('Add a size',function(){P.sizes=P.sizes||[];P.sizes.push({l:'',p:''});markDirty();drawTab()}));body.appendChild(card)})}
 var RN=null;try{RN=new Intl.DisplayNames(['en'],{type:'region'})}catch(e){}
 function flagOf(cc){if(!/^[A-Z]{2}$/.test(cc)||cc==='XX')return'🌐';return String.fromCodePoint(127397+cc.charCodeAt(0),127397+cc.charCodeAt(1))}
 function cname(cc){if(cc==='XX')return'Unknown';try{return RN?RN.of(cc):cc}catch(e){return cc}}
@@ -2271,8 +2451,8 @@ function vaChart(box,S,hourly){
  var tb=el('table','vasr');tb.appendChild(el('caption',null,'Unique visitors and page views '+(hourly?'by hour':'by day')));var th=el('tr');['When','Unique visitors','Page views'].forEach(function(h){th.appendChild(el('th',null,h))});tb.appendChild(th);
  S.forEach(function(s){var tr=el('tr');tr.appendChild(el('td',null,fmtT(s.t)));tr.appendChild(el('td',null,String(s.uv)));tr.appendChild(el('td',null,String(s.pv)));tb.appendChild(tr)});wrap.appendChild(tb)}
 addEventListener('resize',function(){clearTimeout(VA.rz);VA.rz=setTimeout(function(){if(dTab==='v'&&VA.st==='ok'&&$('vaTrend')&&dashD&&dashD.open)vaRender()},250)});
-function drawTab(){var body=$('dBody'),j=DASH;body.textContent='';if(dTab!=='v')clearTimeout(VA.timer);
- if(dTab==='a'||dTab==='g'||dTab==='r'||dTab==='t'||dTab==='s'){if(!ED){body.appendChild(el('p','empty','Loading…'));loadED(drawTab);return}({a:drawArts,g:drawGallery,r:drawPrintsEd,t:drawTexts,s:drawSettings})[dTab](body);return}
+function drawTab(){var body=$('dBody'),j=DASH;body.textContent='';if(dTab!=='v')clearTimeout(VA.timer);if(OFFER)draftNotice(body);
+ if(dTab==='a'||dTab==='g'||dTab==='r'||dTab==='t'||dTab==='s'){if(!ED){if(EDerr){edFail(body);return}body.appendChild(el('p','empty','Loading…'));loadED(drawTab);return}if(OFFER){body.appendChild(el('p','note','Choose what to do with your unpublished changes above, then you can carry on editing.'));return}({a:drawArts,g:drawGallery,r:drawPrintsEd,t:drawTexts,s:drawSettings})[dTab](body);return}
  if(dTab==='w'){drawGrow(body);return}
  if(dTab==='v'){drawVisitors(body);return}
  if(!j)return;
