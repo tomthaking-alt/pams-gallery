@@ -19,6 +19,8 @@ give a time estimate before longer jobs, and send a short progress report when e
     variable named `gl` in the source. `split4.py` moves pictures into `lib/`, adding watermarks and EXIF copyright.
     `fill4.py` puts the built-in catalogue into the server. `webp.py`, `sharecard.py`. `csp.py` script hashes, always last).
   - `dev/test/`: local server, pretend database and tests.
+  - Run by hand, not by build.sh: `dev/build/film.sh` (opening films; `INK=1` makes only the ink-drawn ones via `inkfilm.py`, no AI credits)
+    and `python3 dev/build/armodel.py --all api/app.js lib ar` (the phones' AR models, `ar/p1…p15`, from the built-in paintings).
 
 ## Build, test, publish
 

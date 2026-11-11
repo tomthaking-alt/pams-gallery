@@ -193,7 +193,7 @@ function cleanCat(c) {
     id: String(a.id), t: str(a.t, 90) || 'Untitled', m: str(a.m, 80), s: str(a.s, 80), year: str(a.year, 12), d: str(a.d, 1200),
     p: str(a.p, 40), mode: ['price', 'auction'].indexOf(a.mode) >= 0 ? a.mode : 'request', status: ['Available', 'On hold', 'Sold'].indexOf(a.status) >= 0 ? a.status : 'Available',
     w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, early: okUp(a.img) && num(a.early, 0, 4e12, 0) > 0 ? Math.round(num(a.early, 0, 4e12, 0)) : undefined,
-    tz: okUp(a.tz) && a.tzOf === a.img ? a.tz : undefined, tzOf: okUp(a.tz) && a.tzOf === a.img ? a.img : undefined, ar: !!a.ar && /^emb:p[1-6]$/.test(a.img), wm: okUp(a.wm) && a.wmOf === a.img ? a.wm : undefined, wmOf: okUp(a.wm) && a.wmOf === a.img ? a.img : undefined, bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6', fr: FR_OK.indexOf(a.fr) >= 0 ? a.fr : undefined,
+    tz: okUp(a.tz) && a.tzOf === a.img ? a.tz : undefined, tzOf: okUp(a.tz) && a.tzOf === a.img ? a.img : undefined, ar: !!a.ar && /^emb:p([1-9]|1[0-5])$/.test(a.img), wm: okUp(a.wm) && a.wmOf === a.img ? a.wm : undefined, wmOf: okUp(a.wm) && a.wmOf === a.img ? a.img : undefined, bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6', fr: FR_OK.indexOf(a.fr) >= 0 ? a.fr : undefined,
     auc: a.mode === 'auction' && a.auc ? { start: num(a.auc.start, 1, 1e7, 100), step: num(a.auc.step, 1, 1e6, 10), ends: Math.round(num(a.auc.ends, 0, 4e12, 0)) } : undefined
   }));
   const ids = new Set(arts.map(a => a.id));
