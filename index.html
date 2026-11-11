@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-npYIf3GbGXgBNnUCggvtFfnGsrT8VscvRVoB5SMSOXY=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-t3nz+/W+2XMkVFGd060UsYHvq685Rt4wIS2YKpvSQjI=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -4182,6 +4182,7 @@ function bloomPass(){var n=BL.length,u=BDM.uniforms,i;
 // the balcony figure is only seen above the rail: whatever of him a solid rail would hide stays hidden (his legs showed between the balusters)
 var CRCLIP=new THREE.Plane(new THREE.Vector3(0,1,0),1e4);
 var VC=new THREE.PerspectiveCamera();VC.matrixAutoUpdate=false;var SYM=new THREE.Matrix4().makeScale(1,-1,1),CLR=new THREE.Color().setRGB(.02,.015,.012,LINEAR);
+var PERFI=/[?&]perf\b/.test(location.search)?{calls:0,tris:0}:null;   // ?perf only: draw calls and triangles of the scene pass, for the speed label
 function render(time){
  var as=RT.w/RT.h;cam.fov=fovFor(as);
  var eye=[cam.x,cam.y,cam.z],dd=camDir();
@@ -4201,7 +4202,7 @@ function render(time){
   REFLHIDE.forEach(function(x,i){x.visible=keep[i]});var j=0;DYNL.forEach(function(d){d.pool.forEach(function(x){x.visible=dv[j++]})})}
  G3.uReflTex.value=reflRT?reflRT.texture:null;REFLU.forEach(function(q){q[1].value=(Q.refl&&reflRT)?q[0].refl:0});
  G3.uRes.value.set(RT.w,RT.h);
- R3.setRenderTarget(sceneRT);R3.clear(true,true,false);R3.render(S3,C3);
+ R3.setRenderTarget(sceneRT);R3.clear(true,true,false);R3.render(S3,C3);if(PERFI){PERFI.calls=R3.info.render.calls;PERFI.tris=R3.info.render.triangles}
  var finalTex=sceneRT.texture,cu=COMPM.uniforms;if(cu.uDraw)cu.uDraw.value=typeof drawAmt==='function'?drawAmt():1;
  if(Q.bloom&&BL.length){bloomPass();cu.uB.value=BL[0].texture;cu.uBK.value=BLOOMK}else{cu.uB.value=BLACK;cu.uBK.value=0}
  if(Q.ao){var au=AOM.uniforms,ty=Math.tan(cam.fov/2);au.uT.value=sceneRT.texture;au.uTan.value.set(ty*as,ty);au.uPx.value.set(1/RT.w,1/RT.h);au.uAsp.value=as;pass(AOM,aoRT);cu.uA.value=aoRT.texture;cu.uAOK.value=.85}else{cu.uA.value=BLACK;cu.uAOK.value=0}
@@ -4288,6 +4289,22 @@ function frame(time){
  hint.style.opacity=Math.max(0,1-p*28);titleEl.style.opacity=Math.max(0,1-p*18);
  var l=cam.z<ZF+.2?'The Balcony':atDoor()?'Welcome':roomName(route);if(l!==lastLab){lastLab=l;lab.textContent=l}
 }
+/* ---------- ?perf: a small speed label, so Pam can check the gallery on her own phone and laptop (itsamepameo.com/?perf). Only with ?perf in the
+   address. It sits at the top left, just below the header. Hidden from screen readers and never takes a tap or a click. It shows the frame time (ema, ms), the quality step (Q), the drawing size, the edge
+   smoothing (MSAA samples), the draw calls and triangles of the scene, and the seconds from opening the page until the doors opened. ---------- */
+if(/[?&]perf\b/.test(location.search))(function(){var el=document.createElement('div'),ld=document.getElementById('loading'),doors=0;
+ el.id='perfLabel';el.setAttribute('aria-hidden','true');
+ el.style.cssText='position:fixed;left:calc(env(safe-area-inset-left,0px) + 6px);top:calc(var(--barh,56px) + 6px);z-index:2147483000;pointer-events:none;user-select:none;-webkit-user-select:none;margin:0;padding:3px 7px;border-radius:4px;background:rgba(24,19,15,.86);color:#fff;font:600 11px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;letter-spacing:0;text-align:left';
+ document.body.appendChild(el);
+ function opened(){return !ld||ld.style.display==='none'||ld.style.opacity==='0'}   // both ways in (with or without the opening film) set the loading screen's opacity to 0 as the doors open
+ if(ld&&window.MutationObserver){var mo=new MutationObserver(function(){if(!doors&&opened()){doors=performance.now();mo.disconnect()}});mo.observe(ld,{attributes:true,attributeFilter:['style']})}
+ function d1(n){return (Math.round(n*10)/10).toFixed(1)}
+ function tri(n){return n>=1e6?d1(n/1e6)+'M':n>=1e3?Math.round(n/1e3)+'k':String(n)}
+ function tick(){if(!doors&&opened())doors=performance.now();
+  var bn=document.getElementById('banner');el.style.top='calc(var(--barh,56px) + '+((bn&&document.body.classList.contains('hasBanner')?bn.offsetHeight:0)+6)+'px)';   // just below the header (and the notice banner when one shows): clear of George, the arrows and the price bar
+  var pi=typeof PERFI!=='undefined'&&PERFI?PERFI:null,sz=typeof RT!=='undefined'?RT.w+'×'+RT.h:'?',ms=typeof sceneRT!=='undefined'&&sceneRT?sceneRT.samples:'?';
+  el.textContent='ema '+d1(ema)+' ms  Q'+Q.level+'  '+sz+'  MSAA '+ms+'\n'+(pi?pi.calls+' calls  '+tri(pi.tris)+' tris  ':'')+'doors '+(doors?d1(doors/1000)+' s':'… '+Math.floor(performance.now()/1000)+' s')}
+ tick();setInterval(tick,500)})();
 /* ---------- previous / next: the arrows turn you the way they point; right for the favourites, left for the collections ---------- */
 function favStops(S,k0){ARTPOS.forEach(function(a,i){S.push({k:k0+2*i+.5,label:'<i>'+esc(ART[a.k].t)+'</i> · '+(i+1)+'/'+ARTPOS.length,art:a.k})});return k0+2*ARTPOS.length}
 function collStopsL(S,k,want){(COLMAIN?collOrder():COLPOS.map(function(a,ci){return ci})).forEach(function(ci){var a=COLPOS[ci];if(!a||!want(ci))return;var c=COLLECTIONS[ci];S.push({k:k+.5,label:(soonOnly(c)?'Coming soon':'Collection '+roman(ci))+' · <i>'+esc(c.t)+'</i>',coll:ci});k+=2;

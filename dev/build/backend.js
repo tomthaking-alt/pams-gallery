@@ -335,6 +335,7 @@ function bloomPass(){var n=BL.length,u=BDM.uniforms,i;
 // the balcony figure is only seen above the rail: whatever of him a solid rail would hide stays hidden (his legs showed between the balusters)
 var CRCLIP=new THREE.Plane(new THREE.Vector3(0,1,0),1e4);
 var VC=new THREE.PerspectiveCamera();VC.matrixAutoUpdate=false;var SYM=new THREE.Matrix4().makeScale(1,-1,1),CLR=new THREE.Color().setRGB(.02,.015,.012,LINEAR);
+var PERFI=/[?&]perf\b/.test(location.search)?{calls:0,tris:0}:null;   // ?perf only: draw calls and triangles of the scene pass, for the speed label
 function render(time){
  var as=RT.w/RT.h;cam.fov=fovFor(as);
  var eye=[cam.x,cam.y,cam.z],dd=camDir();
@@ -354,7 +355,7 @@ function render(time){
   REFLHIDE.forEach(function(x,i){x.visible=keep[i]});var j=0;DYNL.forEach(function(d){d.pool.forEach(function(x){x.visible=dv[j++]})})}
  G3.uReflTex.value=reflRT?reflRT.texture:null;REFLU.forEach(function(q){q[1].value=(Q.refl&&reflRT)?q[0].refl:0});
  G3.uRes.value.set(RT.w,RT.h);
- R3.setRenderTarget(sceneRT);R3.clear(true,true,false);R3.render(S3,C3);
+ R3.setRenderTarget(sceneRT);R3.clear(true,true,false);R3.render(S3,C3);if(PERFI){PERFI.calls=R3.info.render.calls;PERFI.tris=R3.info.render.triangles}
  var finalTex=sceneRT.texture,cu=COMPM.uniforms;if(cu.uDraw)cu.uDraw.value=typeof drawAmt==='function'?drawAmt():1;
  if(Q.bloom&&BL.length){bloomPass();cu.uB.value=BL[0].texture;cu.uBK.value=BLOOMK}else{cu.uB.value=BLACK;cu.uBK.value=0}
  if(Q.ao){var au=AOM.uniforms,ty=Math.tan(cam.fov/2);au.uT.value=sceneRT.texture;au.uTan.value.set(ty*as,ty);au.uPx.value.set(1/RT.w,1/RT.h);au.uAsp.value=as;pass(AOM,aoRT);cu.uA.value=aoRT.texture;cu.uAOK.value=.85}else{cu.uA.value=BLACK;cu.uAOK.value=0}

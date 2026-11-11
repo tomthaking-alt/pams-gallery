@@ -4133,6 +4133,22 @@ function frame(time){
  hint.style.opacity=Math.max(0,1-p*28);titleEl.style.opacity=Math.max(0,1-p*18);
  var l=cam.z<ZF+.2?'The Balcony':atDoor()?'Welcome':roomName(route);if(l!==lastLab){lastLab=l;lab.textContent=l}
 }
+/* ---------- ?perf: a small speed label, so Pam can check the gallery on her own phone and laptop (itsamepameo.com/?perf). Only with ?perf in the
+   address. It sits at the top left, just below the header. Hidden from screen readers and never takes a tap or a click. It shows the frame time (ema, ms), the quality step (Q), the drawing size, the edge
+   smoothing (MSAA samples), the draw calls and triangles of the scene, and the seconds from opening the page until the doors opened. ---------- */
+if(/[?&]perf\b/.test(location.search))(function(){var el=document.createElement('div'),ld=document.getElementById('loading'),doors=0;
+ el.id='perfLabel';el.setAttribute('aria-hidden','true');
+ el.style.cssText='position:fixed;left:calc(env(safe-area-inset-left,0px) + 6px);top:calc(var(--barh,56px) + 6px);z-index:2147483000;pointer-events:none;user-select:none;-webkit-user-select:none;margin:0;padding:3px 7px;border-radius:4px;background:rgba(24,19,15,.86);color:#fff;font:600 11px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;letter-spacing:0;text-align:left';
+ document.body.appendChild(el);
+ function opened(){return !ld||ld.style.display==='none'||ld.style.opacity==='0'}   // both ways in (with or without the opening film) set the loading screen's opacity to 0 as the doors open
+ if(ld&&window.MutationObserver){var mo=new MutationObserver(function(){if(!doors&&opened()){doors=performance.now();mo.disconnect()}});mo.observe(ld,{attributes:true,attributeFilter:['style']})}
+ function d1(n){return (Math.round(n*10)/10).toFixed(1)}
+ function tri(n){return n>=1e6?d1(n/1e6)+'M':n>=1e3?Math.round(n/1e3)+'k':String(n)}
+ function tick(){if(!doors&&opened())doors=performance.now();
+  var bn=document.getElementById('banner');el.style.top='calc(var(--barh,56px) + '+((bn&&document.body.classList.contains('hasBanner')?bn.offsetHeight:0)+6)+'px)';   // just below the header (and the notice banner when one shows): clear of George, the arrows and the price bar
+  var pi=typeof PERFI!=='undefined'&&PERFI?PERFI:null,sz=typeof RT!=='undefined'?RT.w+'×'+RT.h:'?',ms=typeof sceneRT!=='undefined'&&sceneRT?sceneRT.samples:'?';
+  el.textContent='ema '+d1(ema)+' ms  Q'+Q.level+'  '+sz+'  MSAA '+ms+'\n'+(pi?pi.calls+' calls  '+tri(pi.tris)+' tris  ':'')+'doors '+(doors?d1(doors/1000)+' s':'… '+Math.floor(performance.now()/1000)+' s')}
+ tick();setInterval(tick,500)})();
 /* ---------- previous / next: the arrows turn you the way they point; right for the favourites, left for the collections ---------- */
 function favStops(S,k0){ARTPOS.forEach(function(a,i){S.push({k:k0+2*i+.5,label:'<i>'+esc(ART[a.k].t)+'</i> · '+(i+1)+'/'+ARTPOS.length,art:a.k})});return k0+2*ARTPOS.length}
 function collStopsL(S,k,want){(COLMAIN?collOrder():COLPOS.map(function(a,ci){return ci})).forEach(function(ci){var a=COLPOS[ci];if(!a||!want(ci))return;var c=COLLECTIONS[ci];S.push({k:k+.5,label:(soonOnly(c)?'Coming soon':'Collection '+roman(ci))+' · <i>'+esc(c.t)+'</i>',coll:ci});k+=2;
