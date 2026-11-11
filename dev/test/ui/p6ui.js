@@ -318,7 +318,7 @@ async function step(name, fn) { try { await fn() } catch (e) { ok(false, name + 
     ok(m.startsWith('Published. You made more changes while it was publishing — press “Publish changes” again to publish those too.'), '(k) “' + m.slice(0, 110) + '…”');
     ok(live.arts[3].t === 'P6UI First edit' && await pA.evaluate(() => EDdirty && ED.arts[3].t === 'P6UI Second edit' && ED.v === PUBV), '(k) the first change is live; the one made meanwhile is kept, unpublished, on top of it');
     ok(await waitState(pA, /saved as a draft$/, 12000), '(k) and saved as a draft');
-    await shot(pA, 'k-changed-while-publishing');
+    await pA.evaluate(() => document.getElementById('edMsg').scrollIntoView()); await shot(pA, 'k-changed-while-publishing');
     await click(pA, '#edPub');
     ok(await until(pA, () => !EDbusy && /^Published —/.test(EDmsg || '')) && (await P({ a: 'catGet' }, OT)).cat.arts[3].t === 'P6UI Second edit', '(k) Publish again publishes it, with no question asked');
   });
