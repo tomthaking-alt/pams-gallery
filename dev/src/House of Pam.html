@@ -1854,6 +1854,7 @@ function loadDash(){$('dBody').textContent='';$('dBody').appendChild(el('p','emp
 function drawDash(){var j=DASH,v=j.visits,today=v.perDay[v.perDay.length-1],wk=v.perDay.slice(-7).reduce(function(a,b){return a+b},0),newO=j.orders.filter(function(o){return o.status==='new'}).length,unread=j.msgs.filter(function(m){return !m.read}).length;
  var st=$('dStats');st.textContent='';[[today,'Visits today'],[v.uniquePerDay[v.uniquePerDay.length-1],'Visitors today'],[wk,'Visits, last 7 days'],[v.total,'Visits, all time'],[v.unique,'Different visitors'],[j.members.count,'Members'],[newO,'New enquiries'],[unread,'Unread messages']].forEach(function(x){var d=el('div','stat');d.appendChild(el('b',null,String(x[0])));d.appendChild(el('span',null,x[1]));st.appendChild(d)});
  var ch=$('dChart'),mx=Math.max.apply(null,v.perDay.concat([1]));ch.textContent='';v.perDay.forEach(function(n,i){var c=el('div'),b=el('i');b.style.height=Math.round(n/mx*100)+'%';b.title=v.days[i]+': '+n+' visits';c.appendChild(b);if((v.perDay.length-1-i)%(innerWidth<600?4:2)===0)c.appendChild(el('small',null,v.days[i].slice(5)));ch.appendChild(c)});
+ if(OFFER&&document.activeElement&&document.activeElement.id==='edOfT')OFFERfocus=true;   // the numbers above pushed the focused offer down: show it again
  drawTab()}
 function drawOrders(body,j){
  (j.auctions||[]).forEach(function(A){var c=el('section','auc'),top=A.bids[0];c.appendChild(el('h3',null,'Auction: '+A.t));
