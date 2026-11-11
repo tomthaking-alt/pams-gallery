@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-Fbwkq8bE7n7RZVdMUoLuGDHPb1Fq37mCg791Etgn87M=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-DUaPUUjFT6gpG8YEY2+2S81NRCEGILOBHgla7Q3gZIk=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -1309,7 +1309,7 @@ var TX=[['film.title','Opening film','Title','#loading .lt'],['film.sub','Openin
  ['george.artwall','King George — around the gallery','Added after a painting line on phones',null],
  ['george.coll','King George — around the gallery','At each collection wall',null,1],['george.collend','King George — around the gallery','At the end of the collections',null,1],
  ['george.leftp','King George — around the gallery','Back at the entrance after the collections — on phones',null,1],['george.leftc','King George — around the gallery','Back at the entrance after the collections — on computers',null,1],
- ['george.balcony','King George — around the gallery','On the balcony',null,1],
+ 
  ['george.menu','King George — when visitors tap him','His question',null],['george.buy','King George — when visitors tap him','“How do I buy a painting?”',null,1],
  ['george.prints','King George — when visitors tap him','“Can I buy a print?” (when you have prints)',null,1],['george.noprints','King George — when visitors tap him','“Can I buy a print?” (before you have prints)',null,1],
  ['george.members','King George — when visitors tap him','“The collectors’ circle”',null,1],['george.contact','King George — when visitors tap him','“Contact Pam”',null,1],
@@ -1510,6 +1510,7 @@ if(COLMAIN)$('enqCol').textContent='See this month’s favourites';$('enqCol').a
 $('enqCopy').addEventListener('click',function(){var note=$('enqNote');function sel(){var r=document.createRange();r.selectNodeContents($('enqMail'));var s=getSelection();s.removeAllRanges();s.addRange(r);note.textContent='Email selected — copy it from here'}
  try{navigator.clipboard.writeText(EMAIL).then(function(){note.textContent='Email copied'},sel)}catch(e){sel()}});
 $('enqAsk').addEventListener('click',function(){openMsg()});
+$('enqWorks').addEventListener('wheel',function(e){var s=$('enqWorks');if(s.scrollWidth<=s.clientWidth+2)return;e.preventDefault();e.stopPropagation();s.scrollLeft+=Math.abs(e.deltaY)>Math.abs(e.deltaX)?e.deltaY:e.deltaX},{passive:false});   // a mouse wheel over the paintings scrolls along them, instead of walking away from the balcony
 var enqSig='';
 function enqWorks(){var box=$('enqWorks');if(!box)return;var L=ART.map(function(p,k){return{p:p,k:k}}).filter(function(o){return o.p&&!teaser(o.p)});
  L.sort(function(a,b){return(isSold(a.p)?1:0)-(isSold(b.p)?1:0)||a.k-b.k});L=L.slice(0,12);
@@ -4035,7 +4036,7 @@ nowEl.addEventListener('click',function(){var a=stopAt();if(a.d>=.6)return;var S
 addEventListener('keydown',function(e){if(dlg.open||zv.open||about.open||!col.hidden||!prs.hidden||anyPage()||(buyD&&buyD.open))return;if(e.key==='ArrowRight'){e.preventDefault();step(1)}else if(e.key==='ArrowLeft'){e.preventDefault();step(-1)}});
 /* swipe on phones: swipe right to go on (to the right), left to go back; at the entrance right is the favourites, left the collections */
 (function(){var sx=0,sy=0,st=0,on=false;
- addEventListener('touchstart',function(e){if(e.touches.length!==1||dlg.open||about.open||!col.hidden||e.target.closest('#bar,#walk,#ways,#pzoom,#artBar,#george,#gTab,#wall,dialog,#collection,#prints,section.page')){on=false;return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();on=true},{passive:true});
+ addEventListener('touchstart',function(e){if(e.touches.length!==1||dlg.open||about.open||!col.hidden||e.target.closest('#bar,#walk,#ways,#pzoom,#artBar,#george,#gTab,#wall,dialog,#collection,#prints,section.page,#enqPanel')){on=false;return}var t=e.touches[0];sx=t.clientX;sy=t.clientY;st=Date.now();on=true},{passive:true});
  addEventListener('touchend',function(e){if(!on)return;on=false;var t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
   if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.4&&Date.now()-st<900){George.stopTour();swiped();step(dx>0?1:-1);updateWalk()}},{passive:true});})();
 /* ---------- George the wood pigeon: a friendly guide who offers tours and tips ---------- */
@@ -4067,7 +4068,7 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  function speakStop(i,tour){var st=STOPS[i],last=i===STOPS.length-1,next=tour?[{t:last?'Thank you, King George':'Onward',pri:1,go:function(){if(last){stopTour();close()}else tourAt(i+1)}},{t:'End the tour',go:function(){stopTour();close()}}]:null;
   if(st.art==null&&st.coll!=null){say(collLine(st.coll),next||[{t:'See the whole collection',pri:1,go:function(){close();openCollectionAt(st.coll)}},{t:'Thanks',go:close}],!!tour,i);return}
   if(st.art!=null){var b=next||[{t:'Show me details',pri:1,go:function(){close();openArt(st.art)}}];if(TOUCH&&!tour)b.push({t:'See it on my wall',go:function(){close();viewOnWall(st.art)}});say(paintingLine(st.art),b,!!tour,i)}
-  else if(last)say(GL('george.balcony'),next||[{t:'Email Pam',pri:1,href:'mailto:'+EMAIL},{t:COLMAIN?'See this month’s favourites':'See the collections',go:function(){close();goPlan({r:'col',i:1})}},{t:'Thanks',go:close}],!!tour,i)
+  else if(last){if(tour)stopTour();close()}   // the balcony: the enquiry panel takes over, so he bows out quietly
   else say(GL(TOUCH?'george.doorp':'george.doorc'),next||[{t:'Got it',go:close}],!!tour,i)}
  function menu(){var a=stopAt(),here=a.d<.35&&STOPS[a.i].art!=null?STOPS[a.i].art:null,b=COLMAIN?[{t:'Tour the collections',pri:1,go:function(){touring=true;tourAt(0,'fav')}},{t:'Show me this month’s favourites',go:function(){touring=true;tourAt(1,'col')}}]:[{t:'Tour this month’s favourites',pri:1,go:function(){touring=true;tourAt(0,'fav')}},{t:'Show me the collections',go:function(){touring=true;tourAt(1,'col')}}];b.push({t:'How this gallery works',go:function(){intro(1)}},{t:'How do I buy a painting?',go:buy});
   if(TOUCH)b.push({t:'See a painting on my wall',go:function(){if(here!=null){close();viewOnWall(here)}else say(GL('george.wall'),[{t:'OK',go:close}])}});
@@ -4082,7 +4083,7 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
  $('gX').addEventListener('click',function(){if(introOn){endIntro('skip');return}stopTour();close()});tab.addEventListener('click',show);
  function onStop(){if(!started||touring||muted||introOn||bub.classList.contains('on'))return;if(pend)return;var a=stopAt();if(a.d>.03)return;
   if(leftCol&&!seen.leftCol&&route==='fav'&&a.i===0){seen.leftCol=1;say(GL(TOUCH?'george.leftp':'george.leftc'),[{t:COLMAIN?'Show me the collections':'Show me the favourites',pri:1,go:function(){close();goPlan({r:'fav',i:1})}},{t:'Not now',go:close}]);return}if(seen[route+a.i])return;seen[route+a.i]=1;
-  if(a.i===STOPS.length-1)speakStop(a.i,false)}
+ }   // (at the balcony he stays quiet: the enquiry panel says it all)
  setInterval(onStop,600);
  setInterval(function(){if(!bub.classList.contains('on')||moving||introOn)return;var a=dest();if(!arrived){if(a.i===bubAt&&a.d<.1)arrived=true;return}if(a.i!==bubAt&&a.d<.45){stopTour();close()}},250);   // moved to another painting: stop talking about the old one
  var GREET=GL('george.greet');
