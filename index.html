@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-olxcB6Xvz+ygbQFQl9dgC66fnV9TnS4GD3ng0KE6M78=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-Fbwkq8bE7n7RZVdMUoLuGDHPb1Fq37mCg791Etgn87M=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -1911,7 +1911,7 @@ function drawSettings(body){pubBar(body);var S=ED.site;
  api({a:'catHist'}).then(function(j){hl.textContent='';if(j.error||!j.list||!j.list.length){hl.appendChild(el('p','note',j.error||'Nothing published yet.'));return}
   j.list.forEach(function(v,i){var r=el('div','hrow');r.appendChild(el('span',null,new Date(v.v).toLocaleString(undefined,{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})+' — '+v.arts+' paintings, '+v.colls+' collections, '+v.prints+' prints'+(i===0?' (live now)':'')+(v.names&&v.names.length?' · '+v.names.join(', ')+(v.arts>v.names.length?'…':''):'')));
    if(i>0){var b=sbtn('Restore',function(){if(b.dataset.c!=='1'){b.dataset.c='1';b.textContent='Tap again to restore';return}b.disabled=true;api({a:'catRestore',v:v.v}).then(function(r){if(r.error){$('dErr').textContent=r.error;b.disabled=false;return}
-    ED=withEmb(r.cat);ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Restored the version from '+new Date(v.v).toLocaleString()+'.';applySite(ED);siteRefresh();drawTab()})});r.appendChild(b)}hl.appendChild(r)})})}
+    ED=withEmb(r.cat);ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;draftClear();EDmsg='Restored the version from '+new Date(v.v).toLocaleString()+'.';applySite(ED);siteRefresh();drawTab()})});r.appendChild(b)}hl.appendChild(r)})})}
 /* ---------- the Grow plan: how the gallery finds collectors, dealers, promoters and everyday buyers ---------- */
 function siteUrl(){return location.origin.indexOf('localhost')>=0?'https://itsamepameo.com':location.origin}
 var GROW=[
@@ -1993,7 +1993,13 @@ function seedCat(){return{arts:ART.map(function(a){return{id:a.id,t:a.t,m:a.m||'
 var PV={};function edSrc(u){return PV[u]||embImg(u)}
 function loadED(cb){api({a:'catGet'}).then(function(j){if(j.error){$('dErr').textContent=j.error;return}PV=j.pv||{};ED=withEmb(j.cat)||seedCat();ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};cb()})}
 addEventListener('beforeunload',function(e){if(EDdirty){e.preventDefault();e.returnValue=''}});   // leaving the dashboard with unpublished changes: the browser asks first
-function markDirty(){EDdirty=true;EDmsg='';var b=$('edPub');if(b){b.disabled=false;$('edState').textContent='Unpublished changes'}}
+/* unpublished changes are kept on this device as a draft, so closing the page (or a phone tidying away its tabs) never loses them */
+var DRAFTK='pgDashDraft',draftT=0;
+function draftSave(){clearTimeout(draftT);draftT=setTimeout(function(){try{if(EDdirty&&ED)localStorage.setItem(DRAFTK,JSON.stringify({t:Date.now(),base:ED.v||0,ed:ED}))}catch(e){}},400)}
+function draftClear(){clearTimeout(draftT);try{localStorage.removeItem(DRAFTK)}catch(e){}}
+function draftGet(){try{var d=JSON.parse(localStorage.getItem(DRAFTK)||'null');return d&&d.ed&&Array.isArray(d.ed.arts)?d:null}catch(e){return null}}
+function draftBack(){var d=draftGet();if(!d||!ED)return;var cur=ED.v;ED=withEmb(d.ed);ED.v=cur;ED.seen=Object.keys(EMB);['arts','favs','colls','prints'].forEach(function(k){ED[k]=ED[k]||[]});ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDmsg='';markDirty();drawTab()}
+function markDirty(){EDdirty=true;draftSave();EDmsg='';var b=$('edPub');if(b){b.disabled=false;$('edState').textContent='Unpublished changes'}}
 function artById(id){return ED.arts.filter(function(a){return a.id===id})[0]}
 function field(label,input,cls){var l=el('label','ef'+(cls?' '+cls:''));l.appendChild(el('span',null,label));l.appendChild(input);return l}
 function inp(v,ph,on,type){var i=el(type==='area'?'textarea':'input');if(type&&type!=='area')i.type=type;i.value=v==null?'':v;if(ph)i.placeholder=ph;i.addEventListener('input',function(){on(i.value);markDirty()});return i}
@@ -2001,9 +2007,12 @@ function sbtn(t,cb,cls,aria){var b=el('button',cls||'sb',t);b.type='button';if(a
 function moveIn(arr,i,d){var j=i+d;if(j<0||j>=arr.length)return;var x=arr[i];arr[i]=arr[j];arr[j]=x;markDirty();drawTab()}
 function radio(name,on,label,cb){var l=el('label'),r=el('input');r.type='radio';r.name=name;r.checked=on;r.addEventListener('change',function(){if(r.checked)cb()});l.appendChild(r);l.appendChild(document.createTextNode(label));return l}
 function pubBar(body){var bar=el('div','edbar'),st=el('span','edst');st.id='edState';st.textContent=EDdirty?'Unpublished changes':'Everything is published';
- var dis=sbtn('Discard changes',function(){EDdirty=false;EDmsg='';ED=null;drawTab()});dis.disabled=!EDdirty;
+ var dis=sbtn('Discard changes',function(){EDdirty=false;EDmsg='';ED=null;draftClear();drawTab()});dis.disabled=!EDdirty;
  var pub=el('button','btn main','Publish changes');pub.id='edPub';pub.type='button';pub.disabled=!EDdirty;pub.addEventListener('click',publish);
  bar.appendChild(st);bar.appendChild(dis);bar.appendChild(pub);body.appendChild(bar);
+ var dft=!EDdirty&&draftGet();if(dft){var dn=el('div','mailwarn');dn.setAttribute('role','status');dn.appendChild(el('b',null,'You have changes that were never published'));
+  dn.appendChild(document.createTextNode(' (saved on this device, '+new Date(dft.t).toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'). '));
+  dn.appendChild(sbtn('Bring them back',draftBack,'btn main'));dn.appendChild(document.createTextNode(' '));dn.appendChild(sbtn('Discard them',function(){draftClear();drawTab()}));body.appendChild(dn)}
  if(EDmsg){var m=el('p','edmsg');m.appendChild(document.createTextNode(EDmsg+' '));var rl=sbtn('Reload the gallery now',function(){location.reload()},'link');m.appendChild(rl);body.appendChild(m)}}
 /* the watermark on copies that can leave the site (link previews, Pinterest, Google, the press kit) */
 function wmCanvas(im,L){var W0=im.naturalWidth,H0=im.naturalHeight,k=Math.min(1,(L||1600)/Math.max(W0,H0)),W=Math.round(W0*k),H=Math.round(H0*k),c=document.createElement('canvas');c.width=W;c.height=H;var x=c.getContext('2d');x.drawImage(im,0,0,W,H);
@@ -2022,7 +2031,7 @@ function ensureWM(cat){var todo=(cat.arts||[]).filter(function(a){return/^\/api\
   im.onerror=function(){res()};im.src=edSrc(a.img)})})},Promise.resolve())}
 function publish(){var b=$('edPub');b.disabled=true;$('edState').textContent='Publishing…';$('dErr').textContent='';
  ensureWM(ED).then(function(){return ensureTZ(ED)}).then(function(){return api({a:'catSave',cat:ED,base:ED.v})}).then(function(j){if(j&&j.emailed)notice('Members emailed','Your new early-access work was announced to '+j.emailed+' member'+(j.emailed>1?'s':'')+' who asked for news.');return j}).then(function(j){if(j.error){$('dErr').textContent=j.error;b.disabled=false;$('edState').textContent='Not published yet';return}
-  PV=j.pv||PV;ED=withEmb(j.cat);ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Published — visitors will see your changes from their next visit.';applySite(ED);siteRefresh();drawTab()})}
+  PV=j.pv||PV;draftClear();ED=withEmb(j.cat);ED.texts=ED.texts||{};ED.site=ED.site||{};ED.site.social=ED.site.social||{};ED.site.banner=ED.site.banner||{on:false,text:''};EDdirty=false;EDmsg='Published — visitors will see your changes from their next visit.';applySite(ED);siteRefresh();drawTab()})}
 function prepPhoto(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();
  im.onload=function(){var W0=im.naturalWidth,H0=im.naturalHeight,k=Math.min(1,2400/Math.max(W0,H0)),W=Math.round(W0*k),H=Math.round(H0*k),c=document.createElement('canvas');c.width=W;c.height=H;c.getContext('2d').drawImage(im,0,0,W,H);URL.revokeObjectURL(u);
   var q=.9,d=c.toDataURL('image/jpeg',q);while(d.length>3.3e6&&q>.5){q-=.08;d=c.toDataURL('image/jpeg',q)}res({data:d,W:W,H:H})};
@@ -3922,7 +3931,7 @@ var idleT=0,lastT=0,ema=16,samplesN=0,rendered=false;
 var lastFT=0;
 function frame(time){
  requestAnimationFrame(frame);
- if(!col.hidden||!prs.hidden||anyPage()||(window.INTRO&&INTRO.up))return;        // a page (or the opening film) covers the 3D: don't draw
+ if(!col.hidden||!prs.hidden||anyPage()||(window.INTRO&&INTRO.up)||document.querySelector('dialog[open]')||(window.wallEl&&!wallEl.hidden))return;        // a page, a window (the dashboard, a painting's details), the wall view or the opening film covers the 3D: don't draw (the last picture stays)
  NOWS=time/1000;if(!reduce&&!dlg.open&&!zv.open&&!about.open&&time-idleT>ambGap(time)){dirty=Math.max(dirty,1);idleT=time}
  var p=progress(),prev=cur;var dts=Math.min(.1,Math.max(.001,(time-lastFT)/1000||.016));lastFT=time;cur+=(p-cur)*(reduce?1:1-Math.exp(-dts*3.8));if(Math.abs(p-cur)<1e-5)cur=p;
  camAt(cur*(K.length-1));if(cur!==prev)dirty=Math.max(dirty,1);if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());
