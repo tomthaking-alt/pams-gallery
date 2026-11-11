@@ -73,7 +73,7 @@ if(DRM){var skyHead='uniform float uSecs,uFar,uPass;uniform vec3 uDomeC;varying 
 
 /* paintings and plaques show their true colours, untouched by the grade */
 var ARTV='varying vec2 vU;varying vec3 vWp;void main(){vU=uv;vec4 w=modelMatrix*vec4(position,1.);vWp=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}';
-var ARTF='uniform sampler2D map;uniform float uFar,uPaint;varying vec2 vU;varying vec3 vWp;void main(){vec4 t=texture2D(map,vU);vec3 c=t.rgb;'+
+var ARTF='uniform sampler2D map;uniform float uFar,uPaint;varying vec2 vU;varying vec3 vWp;vec4 art(vec2 u){vec2 dx=dFdx(u)*.2,dy=dFdy(u)*.2;return .25*(texture2D(map,u+dx+dy,-1.25)+texture2D(map,u+dx-dy,-1.25)+texture2D(map,u-dx+dy,-1.25)+texture2D(map,u-dx-dy,-1.25));}void main(){vec4 t=art(vU);vec3 c=t.rgb;'+   // paintings and plaques: four reads around each pixel, a step sharper (the brushwork shows; the colours stay the same)
  'if(uPaint>.5){c*=mix(.82,1.,smoothstep(0.,.04,vU.y))*mix(.93,1.,smoothstep(0.,.018,min(vU.x,1.-vU.x)))*mix(.96,1.,smoothstep(0.,.02,1.-vU.y));}'+   // the frame's soft shadow from the picture light above
  'gl_FragColor=vec4(c,-max(length(vWp-cameraPosition)/uFar,.0005));}';
 function artMat(m){return new THREE.ShaderMaterial({uniforms:{map:{value:m.tex},uFar:G3.uFar,uPaint:{value:m.isPaint?1:0}},vertexShader:ARTV,fragmentShader:ARTF,side:THREE.DoubleSide})}
@@ -155,7 +155,7 @@ function patchShader(sh,extra){var U=sh.uniforms;U.uPass=G3.uPass;U.uFar=G3.uFar
   .replace('#include <lights_fragment_end>',REFLF+'#include <lights_fragment_end>')
   .replace('#include <aomap_fragment>','#include <aomap_fragment>\n'+AOF)
   .replace('#include <opaque_fragment>','#include <opaque_fragment>\n#ifdef OPAQUE\ngl_FragColor.a=length(vWPos-cameraPosition)/uFar;\n#endif\n')
-  .replace('#include <dithering_fragment>','#include <dithering_fragment>\n#ifdef DREAM_PULSE\ngl_FragColor.rgb*=.8+.2*sin(uSecs*.8+vWPos.y*7.+vWPos.x*3.);\n#endif\n'+MISTF+FOGF+'if(uPass>1.5)gl_FragColor.rgb=min(gl_FragColor.rgb,vec3(4.));\n#ifdef KEEP_COLOUR\nif(uPass<.5){vec3 kc=gl_FragColor.rgb;float lm=dot(kc,vec3(.2126,.7152,.0722));kc=clamp(mix(vec3(lm),kc,1.3)/(1.+lm*.75)*1.2,0.,1.);gl_FragColor=vec4(kc,-max(length(vWPos-cameraPosition)/uFar,.0005));}\n#endif\n')}
+  .replace('#include <dithering_fragment>','#include <dithering_fragment>\n#ifdef DREAM_PULSE\ngl_FragColor.rgb*=.8+.2*sin(uSecs*.8+vWPos.y*7.+vWPos.x*3.);\n#endif\n'+MISTF+FOGF+'if(uPass>1.5)gl_FragColor.rgb=min(gl_FragColor.rgb,vec3(4.));\n#ifdef KEEP_COLOUR\nif(uPass<.5){const vec3 LW=vec3(.2126,.7152,.0722);float sh=dot(outgoingLight,LW)/max(dot(diffuseColor.rgb,LW),.02);vec3 kc=diffuseColor.rgb*sh;float lm=dot(kc,LW);kc=clamp(mix(vec3(lm),kc,1.05)*1.2/(1.+lm*.75),0.,1.);gl_FragColor=vec4(kc,-max(length(vWPos-cameraPosition)/uFar,.0005));}\n#endif\n')}   // Pam's statues: their own colours, lit by the light's brightness only (no warm cast from the sun, the clay walls or the sheen)
 function mkBC(extra){return function(sh){patchShader(sh,extra)}}
 function blendOpts(m,o){if(!m.blend)return;o.transparent=true;o.opacity=m.alpha;o.depthWrite=false;o.polygonOffset=true;o.polygonOffsetFactor=-1;o.polygonOffsetUnits=-4;
  o.blending=THREE.CustomBlending;o.blendSrc=THREE.SrcAlphaFactor;o.blendDst=THREE.OneMinusSrcAlphaFactor;o.blendSrcAlpha=THREE.ZeroFactor;o.blendDstAlpha=THREE.OneFactor}
@@ -323,7 +323,7 @@ function resize(){
  R3.setPixelRatio(1);R3.setSize(w,h,false);RT.w=w;RT.h=h;
  [sceneRT,reflRT,aoRT,dofRT,rayRT].concat(BL).forEach(function(t){if(t)t.dispose()});BL=[];
  sceneRT=mkRT(w,h,{depthBuffer:true,samples:Math.min(Q.samples,dpr>=1.5?2:4,R3.capabilities.maxSamples||4)});   // on sharp screens 2x edge smoothing is plenty (4x used several times the memory)
- reflRT=Q.refl?mkRT(w>>1,h>>1,{depthBuffer:true,generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter}):null;
+ reflRT=Q.refl&&REFLU.length?mkRT(w>>1,h>>1,{depthBuffer:true,generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter}):null;   // a mirror target only when something in the room reflects (the dream look's floor; nothing does in the ink or colour look)
  aoRT=mkRT(Math.max(1,w>>1),Math.max(1,h>>1));dofRT=Q.dof?mkRT(w,h):null;rayRT=mkRT(Math.max(1,w>>1),Math.max(1,h>>1));
  var bw=w>>1,bh=h>>1;for(var i=0;i<5&&bw>=4&&bh>=4;i++){BL.push(mkRT(bw,bh));bw>>=1;bh>>=1}
  dirty=2}
@@ -349,7 +349,7 @@ function render(time){
  DYNL.forEach(function(d){for(var i=d.n;i<d.pool.length;i++)d.pool[i].visible=false});
  syncBlend();
  R3.setClearColor(CLR,1);
- if(Q.refl&&reflRT){var keep=[];REFLHIDE.forEach(function(x){keep.push(x.visible);x.visible=false});var dv=[];DYNL.forEach(function(d){d.pool.forEach(function(x){dv.push(x.visible);x.visible=false})});
+ if(Q.refl&&reflRT&&REFLU.length){var keep=[];REFLHIDE.forEach(function(x){keep.push(x.visible);x.visible=false});var dv=[];DYNL.forEach(function(d){d.pool.forEach(function(x){dv.push(x.visible);x.visible=false})});
   VC.projectionMatrix.copy(C3.projectionMatrix);VC.projectionMatrixInverse.copy(C3.projectionMatrixInverse);VC.matrix.multiplyMatrices(SYM,C3.matrixWorld);VC.matrixWorldNeedsUpdate=true;
   G3.uPass.value=1;R3.setRenderTarget(reflRT);R3.clear(true,true,false);R3.render(S3,VC);G3.uPass.value=0;
   REFLHIDE.forEach(function(x,i){x.visible=keep[i]});var j=0;DYNL.forEach(function(d){d.pool.forEach(function(x){x.visible=dv[j++]})})}
@@ -357,10 +357,10 @@ function render(time){
  G3.uRes.value.set(RT.w,RT.h);
  R3.setRenderTarget(sceneRT);R3.clear(true,true,false);R3.render(S3,C3);if(PERFI){PERFI.calls=R3.info.render.calls;PERFI.tris=R3.info.render.triangles}
  var finalTex=sceneRT.texture,cu=COMPM.uniforms;if(cu.uDraw)cu.uDraw.value=typeof drawAmt==='function'?drawAmt():1;
- if(Q.bloom&&BL.length){bloomPass();cu.uB.value=BL[0].texture;cu.uBK.value=BLOOMK}else{cu.uB.value=BLACK;cu.uBK.value=0}
+ if(Q.bloom&&BL.length&&BLOOMK>0){bloomPass();cu.uB.value=BL[0].texture;cu.uBK.value=BLOOMK}else{cu.uB.value=BLACK;cu.uBK.value=0}
  if(Q.ao){var au=AOM.uniforms,ty=Math.tan(cam.fov/2);au.uT.value=sceneRT.texture;au.uTan.value.set(ty*as,ty);au.uPx.value.set(1/RT.w,1/RT.h);au.uAsp.value=as;pass(AOM,aoRT);cu.uA.value=aoRT.texture;cu.uAOK.value=.85}else{cu.uA.value=BLACK;cu.uAOK.value=0}
  SUNV.set(eye[0]+SKYSD[0]*120,eye[1]+SKYSD[1]*120,eye[2]+SKYSD[2]*120).project(C3);var front=v3.dot(dd,SKYSD)>.05;
- if(Q.rays&&front){RAYM.uniforms.uT.value=sceneRT.texture;RAYM.uniforms.uSun.value.set(SUNV.x*.5+.5,SUNV.y*.5+.5);pass(RAYM,rayRT);cu.uRy.value=rayRT.texture;cu.uRayK.value=RAYK*Math.min(1,(v3.dot(dd,SKYSD)-.05)*3)}else{cu.uRy.value=BLACK;cu.uRayK.value=0}
+ if(Q.rays&&front&&RAYK>0){RAYM.uniforms.uT.value=sceneRT.texture;RAYM.uniforms.uSun.value.set(SUNV.x*.5+.5,SUNV.y*.5+.5);pass(RAYM,rayRT);cu.uRy.value=rayRT.texture;cu.uRayK.value=RAYK*Math.min(1,(v3.dot(dd,SKYSD)-.05)*3)}else{cu.uRy.value=BLACK;cu.uRayK.value=0}   // the ink look has no glow and no light shafts (BLOOMK, RAYK 0): their passes are skipped instead of drawn and thrown away
  if(Q.dof){var du=DOFM.uniforms;du.uT.value=sceneRT.texture;du.uFocus.value=focus;du.uK.value=cam.z<ZF?.25:1.4;du.uMax.value=Math.max(3,RT.h/150);du.uPx.value.set(1/RT.w,1/RT.h);pass(DOFM,dofRT);finalTex=dofRT.texture}
  cu.uT.value=finalTex;cu.uExp.value=EXPOSURE;cu.uTime.value=(time||0)%100;cu.uBurn.value=burnAmt();cu.uSec.value=((time||0)/1000)%600;cu.uRes.value.set(RT.w,RT.h);cu.uAPx.value.set(1/aoRT.width,1/aoRT.height);cu.uS.value=SCROLLTEX||BLACK;
  pass(COMPM,null)}
