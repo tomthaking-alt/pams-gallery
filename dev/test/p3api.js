@@ -7,13 +7,14 @@ const fs=require('fs');
 (async()=>{
  const OT=(await P({a:'login',email:'pts98@hotmail.co.uk',password:'testpass123'})).token, BT=(await P({a:'login',email:'bob@example.com',password:'bobpass123'})).token;
  ok(OT&&BT,'signed in as owner and member');
+ const V=async()=>(((await P({a:'catGet'},OT)).cat)||{}).v||0;   // the live version, which every publish must name
  const px='data:image/jpeg;base64,'+fs.readFileSync(require('path').join(__dirname,'fixtures')+'/wm_p7.jpg').toString('base64');
  const img=(await P({a:'imgUpload',data:px,type:'image/jpeg'},OT)).url, tz=(await P({a:'imgUpload',data:px,type:'image/jpeg'},OT)).url;
  ok(img&&tz,'uploaded a new painting and its preview');
  const cat0=(await P({a:'catGet'},OT)).cat, until=Date.now()+48*36e5;
  const cat=JSON.parse(JSON.stringify(cat0));cat.site.earlyHours=48;
  cat.arts.push({id:'p99',t:'Secret Garden',m:'Oil on canvas',s:'40 × 50 cm',year:'2026',d:'A walled garden at dusk.',p:'£900',mode:'price',status:'Available',w:.4,h:.5,bg:'#556b4f',img,tz,tzOf:img,early:until});
- let r=await P({a:'catSave',cat},OT);ok(r.ok&&r.cat.arts.find(a=>a.id==='p99').early===until&&r.cat.site.earlyHours===48,'saved a members-only painting (emailed '+r.emailed+')');
+ let r=await P({a:'catSave',cat,base:cat0.v},OT);ok(r.ok&&r.cat.arts.find(a=>a.id==='p99').early===until&&r.cat.site.earlyHours===48,'saved a members-only painting (emailed '+r.emailed+')');
  // visitors: a teaser only
  const pub=await (await fetch(U+'?cat=1')).json(), pa=pub.cat.arts.find(a=>a.id==='p99');
  ok(pa&&pa.ea===until&&pa.img===tz&&!pa.p&&!pa.d&&!pa.early&&!pa.full&&!pa.wm,'visitors get the blurred preview, no price, no description, no full image');
@@ -48,17 +49,17 @@ const fs=require('fs');
  r=await P({a:'news',on:false},BT);me=await P({a:'me'},BT);ok(me.me&&me.me.news===false,'member opts out');
  // it opens to everyone on time
  const c2=JSON.parse(JSON.stringify(r.cat||(await P({a:'catGet'},OT)).cat));c2.arts.find(a=>a.id==='p99').early=Date.now()-1000;
- r=await P({a:'catSave',cat:c2},OT);ok(r.ok,'window ended');
+ r=await P({a:'catSave',cat:c2,base:await V()},OT);ok(r.ok,'window ended');
  const pub2=await (await fetch(U+'?cat=1')).json(),pb=pub2.cat.arts.find(a=>a.id==='p99');
  ok(pb&&pb.p==='£900'&&pb.img===img&&!pb.ea,'after the window everyone sees the painting and price');
  ok((await G(img)).s===200,'the image is public now');
  pg=await G('/art/secret-garden');ok(/£900/.test(pg.t)&&!/noindex/.test(pg.t),'the painting page is full and indexable');
  // an expired early date in the database counts as public even without a save
- const c3=JSON.parse(JSON.stringify(c2));c3.arts.find(a=>a.id==='p99').early=Date.now()+3000;await P({a:'catSave',cat:c3},OT);
+ const c3=JSON.parse(JSON.stringify(c2));c3.arts.find(a=>a.id==='p99').early=Date.now()+3000;await P({a:'catSave',cat:c3,base:await V()},OT);
  ok((await G(img)).s>=400,'set early again: image gated');
  await new Promise(r=>setTimeout(r,3500));
  ok((await G(img)).s===200,'opens by itself when the time passes');
  const p3=await (await fetch(U+'?cat=1')).json();ok(!p3.cat.arts.find(a=>a.id==='p99').ea,'catalogue public by itself too');
  // tidy up
- r=await P({a:'catSave',cat:cat0},OT);ok(r.ok,'restored the test catalogue');
+ r=await P({a:'catSave',cat:cat0,base:await V()},OT);ok(r.ok,'restored the test catalogue');
 })();

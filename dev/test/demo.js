@@ -8,4 +8,4 @@ async function P(b,tok){const r=await fetch(U,{method:'POST',headers:Object.assi
  cat.colls=[{t:'The Dreaming Garden',d:'Soft, dreamlike worlds of flowers and clouds.',works:['p1','p2'],soon:3},{t:'The Masquerade',d:'Masks and faces in jewel colours.',works:['p3','p4','p9','p10','p7'],soon:3},
   {t:'Embers & Omens',d:'Fire, warnings and wonder.',works:['p5','p6'],soon:3},{t:'Ink & Line',d:'Pen and ink drawings.',works:['p11','p12','p13'],soon:2},{t:'Bird vacation',d:'Birds with somewhere to be.',works:['p14','p15'],soon:1}];
  cat.seen=cat.arts.map(a=>a.id);cat.favs=['p1','p2','p3','p4','p5','p6'];
- const r=await P({a:'catSave',cat},OT);console.log(r.error||'demo catalogue saved: '+r.cat.arts.length+' works, '+r.cat.colls.length+' collections')})();
+ const r=await P({a:'catSave',cat,base:cat.v},OT);console.log(r.error||'demo catalogue saved: '+r.cat.arts.length+' works, '+r.cat.colls.length+' collections')})();
