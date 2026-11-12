@@ -322,7 +322,7 @@ function resize(){
  var cap=Math.sqrt((mobile?1.7e6:4.2e6)/Math.max(1,innerWidth*innerHeight)),dpr=Math.min(devicePixelRatio||1,Q.dpr,Math.max(1,cap)),w=Math.max(2,Math.round(innerWidth*dpr)),h=Math.max(2,Math.round(innerHeight*dpr));   // a pixel budget: big high-resolution screens no longer ask for 7-15 million pixels
  R3.setPixelRatio(1);R3.setSize(w,h,false);RT.w=w;RT.h=h;
  [sceneRT,reflRT,aoRT,dofRT,rayRT].concat(BL).forEach(function(t){if(t)t.dispose()});BL=[];
- sceneRT=mkRT(w,h,{depthBuffer:true,samples:Math.min(Q.samples,dpr>=1.5?2:4,R3.capabilities.maxSamples||4)});   // on sharp screens 2x edge smoothing is plenty (4x used several times the memory)
+ sceneRT=mkRT(w,h,{depthBuffer:true,samples:(typeof LOOKNOW!=='undefined'&&LOOKNOW==='ink')?0:Math.min(Q.samples,dpr>=1.5?2:4,R3.capabilities.maxSamples||4)});   // on sharp screens 2x edge smoothing is plenty (4x used several times the memory); the ink look uses none: the pen draws its edges, and exact depth keeps them clean
  reflRT=Q.refl&&REFLU.length?mkRT(w>>1,h>>1,{depthBuffer:true,generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter}):null;   // a mirror target only when something in the room reflects (the dream look's floor; nothing does in the ink or colour look)
  aoRT=mkRT(Math.max(1,w>>1),Math.max(1,h>>1));dofRT=Q.dof?mkRT(w,h):null;rayRT=mkRT(Math.max(1,w>>1),Math.max(1,h>>1));
  var bw=w>>1,bh=h>>1;for(var i=0;i<5&&bw>=4&&bh>=4;i++){BL.push(mkRT(bw,bh));bw>>=1;bh>>=1}
@@ -356,7 +356,7 @@ function render(time){
  G3.uReflTex.value=reflRT?reflRT.texture:null;REFLU.forEach(function(q){q[1].value=(Q.refl&&reflRT)?q[0].refl:0});
  G3.uRes.value.set(RT.w,RT.h);
  R3.setRenderTarget(sceneRT);R3.clear(true,true,false);R3.render(S3,C3);if(PERFI){PERFI.calls=R3.info.render.calls;PERFI.tris=R3.info.render.triangles}
- var finalTex=sceneRT.texture,cu=COMPM.uniforms;if(cu.uDraw)cu.uDraw.value=typeof drawAmt==='function'?drawAmt():1;
+ var finalTex=sceneRT.texture,cu=COMPM.uniforms;if(cu.uDraw)cu.uDraw.value=typeof drawAmt==='function'?drawAmt():1;if(cu.uLw)cu.uLw.value=.4245/Math.tan(cam.fov/2);   // the pen's reach follows the view angle: 1 on computers, .68 on portrait phones
  if(Q.bloom&&BL.length&&BLOOMK>0){bloomPass();cu.uB.value=BL[0].texture;cu.uBK.value=BLOOMK}else{cu.uB.value=BLACK;cu.uBK.value=0}
  if(Q.ao){var au=AOM.uniforms,ty=Math.tan(cam.fov/2);au.uT.value=sceneRT.texture;au.uTan.value.set(ty*as,ty);au.uPx.value.set(1/RT.w,1/RT.h);au.uAsp.value=as;pass(AOM,aoRT);cu.uA.value=aoRT.texture;cu.uAOK.value=.85}else{cu.uA.value=BLACK;cu.uAOK.value=0}
  SUNV.set(eye[0]+SKYSD[0]*120,eye[1]+SKYSD[1]*120,eye[2]+SKYSD[2]*120).project(C3);var front=v3.dot(dd,SKYSD)>.05;
