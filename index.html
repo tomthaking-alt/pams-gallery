@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-EfgB5gRV9qOUlivWO34nVQ0thQL6JjYGMamyRkbVsfc=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-DrDJbp8NptnhldEpXC+LLlXBLmmjrGuRo9ycqwJyXoc=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -1090,7 +1090,7 @@ if(DREAM_DEFAULT)addEventListener('DOMContentLoaded',function(){var n=document.c
  [['ink','Ink drawing'],['paint','Painted'],['dream','Dream'],['clay','Today’s clay']].forEach(function(q){var a=document.createElement('a');a.href='?look='+q[0];a.textContent=q[1];
   if(q[0]===LOOK)a.setAttribute('aria-current','page');n.appendChild(a)});document.body.appendChild(n)});
 /* photo-real material maps (generated, seamless): marble, plaster, mahogany, travertine */
-var MATSRC={clay:"/lib/clay-v2.webp",clayH:"/lib/clay-h-v2.webp",   /* (the retired clay frames: frOrchid:"/lib/frame-orchid-v2.webp",frEmber:"/lib/frame-ember-v2.webp") */   /* smooth fine-grained clay surface for the clay look (made by dev/build/claytex.py) */
+var MATSRC={clay:"/lib/clay-v2.webp",clayH:"/lib/clay-h-v2.webp",frOrchid:"/lib/frame-orchid-v2.webp",frEmber:"/lib/frame-ember-v2.webp",   /* smooth fine-grained clay surface for the clay look (made by dev/build/claytex.py) */
 crSk:"/lib/g-cfdc0ff8f22e.jpg",crSkH:"/lib/g-9940bf64a504.jpg",crLf:"/lib/g-4a714519abc5.jpg",crLfH:"/lib/g-d08bc612d4f8.jpg",crSt:"/lib/g-41330875d7df.jpg",crStH:"/lib/g-8f94bedf5f8f.jpg",floor:"/lib/g-b9ab7c65d0bd.jpg",
 marble:"/lib/g-f54d14ab06e4.jpg",
 plaster:"/lib/g-af8bc3bbd0f8.jpg",
@@ -1105,7 +1105,8 @@ var LDN=0,LDD=0;function ldTick(){LDD++;if(window.INTRO)INTRO.progress(.92*LDD/M
 function preArt(){if(window.INTRO)INTRO.art((FAVS.length?FAVS:ART.map(function(p,i){return i})).slice(0,6).map(function(i){return{src:ART[i].tn||ART[i].img,t:ART[i].t}}));
  LDN+=ART.length-LDA;return Promise.all(ART.map(function(p){return new Promise(function(res){if(!p.img){ldTick();return res()}var im=new Image();im.onload=im.onerror=function(){ldTick();res()};im.src=p.img})}))}
 var LDA=0;function loadMats(){if(window.NO3D)return CATP;   // no 3D here: skip the gallery's pictures and go straight to the list of works
- var ks=Object.keys(MATSRC);LDA=ART.length;LDN+=ks.length+1+LDA;return Promise.all(ks.map(function(k){return new Promise(function(res){var im=new Image();im.onload=function(){MATIMG[k]=im;ldTick();res()};im.onerror=function(){ldTick();res()};im.src=MATSRC[k]})}).concat([CATP.then(function(){ldTick();return preArt()})]))}
+ var ks=Object.keys(MATSRC).filter(function(k){return CLAYFRAMES||!/^fr(Orchid|Ember)$/.test(k)});LDA=ART.length;   // the retired clay frames' pictures aren't fetched
+ LDN+=ks.length+1+LDA;return Promise.all(ks.map(function(k){return new Promise(function(res){var im=new Image();im.onload=function(){MATIMG[k]=im;ldTick();res()};im.onerror=function(){ldTick();res()};im.src=MATSRC[k]})}).concat([CATP.then(function(){ldTick();return preArt()})]))}
 // always begin the walk at the welcome view, not where the visitor was last time
 try{if("scrollRestoration" in history)history.scrollRestoration="manual"}catch(e){}
 scrollTo(0,0);
@@ -1187,6 +1188,7 @@ var EMB={},FAVS=[],PRINTS=[];
 ART.forEach(function(p,i){p.id='p'+(i+1);p.emb=p.id;p.ar=i<6;p.mode='request';p.price='';p.p='Price on request';p.wm=p.wm||'';if(typeof p.d!=='string')p.d='';EMB[p.id]={img:p.img,full:p.full||p.img,tn:p.tn||p.img,wm:p.wm,t:p.t,m:p.m,d:p.d,w:p.w,h:p.h,bg:p.bg}});
 FAVS=ART.slice(0,6).map(function(p,i){return i});
 /* frames: each painting has one that suits it (Pam can choose another in her dashboard) */
+var CLAYFRAMES=false;   /* November 2026: Pam asked for every frame to be vintage, so the two sculpted clay frames (Orchid in the Clouds, White Bloom over Ember) are put away. true brings them back */
 var FRAMES={gilt:'Antique gilt with shell corners',rococo:'Rococo scrolls, ivory and worn gold',garland:'Victorian flower garland, antique gold',venetian:'Venetian, tarnished silver',bronze:'Old bronze gone green',
  nouveau:'Art Nouveau, walnut and brass',florentine:'Florentine leaf, gold over red clay',temple:'Greek key, temple gold',cottage:'Cottage frame, worn painted pine',gothic:'Black Gothic with jewels',sunburst:'1920s sunburst, aged gold',
  rope:'Black and gold with a rope edge, aged mount',pearl:'Black and gold with a pearl edge, aged mount',ribbon:'Black and gold with a ribbon edge, aged mount',walnut:'Old walnut with a gilt slip'},
@@ -3340,7 +3342,6 @@ function paintMat(k){if(ARTM[k])return ARTM[k];var p=ART[k];
    with Higgsfield (files made by dev/build/statue.py). Paintings not listed here get gold clay. */
 /* pic: a sculpted clay frame made as a picture with Higgsfield and cut out (dev/media/clay/frame-*-v2.png); open = the
    opening in pixels [left, top, right, bottom], which is fitted exactly to the painting so nothing of it is covered. side = its edge colour. */
-var CLAYFRAMES=false;   /* November 2026: Pam asked for every frame to be vintage, so the two sculpted clay frames are put away. true brings them back (and add their pictures to MATSRC again) */
 var CLAYFR={'Orchid in the Clouds':{roll:['#efe6f4','#c9a9df'],orn:'frame-orchid-v1',pic:{img:'frOrchid',w:1006,h:1248,open:[152,131,848,1114],side:'#e2c9e4'}},
  'White Bloom over Ember':{roll:['#e8762e','#b8321f'],orn:'frame-ember-v1',pic:{img:'frEmber',w:994,h:1287,open:[136,135,855,1149],side:'#d4492a'}}},ROPEM={},PICM={};
 function picMat(q){if(PICM[q.img])return PICM[q.img];var im=MATIMG[q.img],c=cnv(im.naturalWidth,im.naturalHeight);c.getContext('2d').drawImage(im,0,0);
