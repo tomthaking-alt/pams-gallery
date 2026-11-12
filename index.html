@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-Cz+w2bMGzapJRXhOQD6oN7U9Pz1+0Vyh7u/y6Ldb1NU=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-oVmeRP/ZlUxCBSbPtLM3RCl9AhwBk8oUJqL2cxSzv3w=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -3044,19 +3044,19 @@ function dreamFinish(){if(!DREAM||typeof COMPM==='undefined')return;var f=COMPM.
    paint: the room is smeared along swirling brushstrokes and pushed towards the violets, teals and golds of Pam's work, on canvas.
    Paintings and plaques are drawn separately and never pass through here, so they keep their true colours. */
 var INKFN='vec4 TF(vec2 o){ivec2 s=textureSize(uT,0)-1;return texelFetch(uT,clamp(ivec2(gl_FragCoord.xy)+ivec2(round(o*uRes)),ivec2(0),s),0);}\n'+   // the pen reads whole pixels, exactly one pixel away (no blur from in-between reads, no dotted second outline)
- 'vec3 itap(vec2 o,float lc,float dc){vec4 a=TF(o);float la=dot(a.rgb,vec3(.3,.5,.2))*uExp*1.18;\n'+
- ' bool ok=min(a.r,min(a.g,a.b))>=0.&&la<4096.;return vec3(pow(clamp(ok?la:lc,0.,1.),.4545),ok?max(abs(a.a),1e-4):dc,ok?step(a.a,-.00001):0.);}\n';   // each read: brightness, depth, and whether it is a painting, plaque or statue; a broken or blinding pixel counts as this one
+ 'vec4 itap(vec2 o,float lc,float dc){vec4 a=TF(o);float la=dot(a.rgb,vec3(.3,.5,.2))*uExp*1.18;\n'+
+ ' bool ok=min(a.r,min(a.g,a.b))>=0.&&la<4096.;float d1=ok?max(abs(a.a),1e-4):dc,dm=d1;if(ok&&d1>dc*1.01)dm=min(d1,max(abs(TF(o*2.).a),1e-4));return vec4(pow(clamp(ok?la:lc,0.,1.),.4545),d1,ok?step(a.a,-.00001):0.,dm);}\n';   // each read: brightness, depth, and whether it is a painting, plaque or statue; a broken or blinding pixel counts as this one; .w, the depth for outlines: where the next pixel is farther it also looks one pixel past it, so a lone far speck gets no ring of ink
 var INKF='{float L=dot(c,vec3(.2126,.7152,.0722)),k=max(1.,uRes.y/820.),d0=max(abs(s0.a),1e-4),lr0=dot(s0.rgb,vec3(.3,.5,.2))*uExp*1.18;vec2 e=px*max(1.,uRes.y*uLw/820.);\n'+   // e: the pen's reach, 1 px (2 px on sharp screens); on tall phones it follows the view angle (uLw)
- ' vec3 t1=itap(vec2(-e.x,e.y),lr0,d0),t2=itap(vec2(0.,e.y),lr0,d0),t3=itap(e,lr0,d0),t4=itap(-vec2(e.x,0.),lr0,d0),t6=itap(vec2(e.x,0.),lr0,d0),t7=itap(-e,lr0,d0),t8=itap(-vec2(0.,e.y),lr0,d0),t9=itap(vec2(e.x,-e.y),lr0,d0);\n'+
+ ' vec4 t1=itap(vec2(-e.x,e.y),lr0,d0),t2=itap(vec2(0.,e.y),lr0,d0),t3=itap(e,lr0,d0),t4=itap(-vec2(e.x,0.),lr0,d0),t6=itap(vec2(e.x,0.),lr0,d0),t7=itap(-e,lr0,d0),t8=itap(-vec2(0.,e.y),lr0,d0),t9=itap(vec2(e.x,-e.y),lr0,d0);\n'+
  ' float dn=min(d0,min(min(min(t1.y,t2.y),min(t3.y,t4.y)),min(min(t6.y,t7.y),min(t8.y,t9.y)))),dmx=max(max(max(t1.y,t2.y),max(t3.y,t4.y)),max(max(t6.y,t7.y),max(t8.y,t9.y)));\n'+
  ' float hole=max(step(dmx*1.03,d0),(lr0>=0.&&lr0<4096.)?0.:1.);\n'+   // a pinhole (a pixel behind all its neighbours) or a broken pixel gets no outline
- ' float sx=t4.y+t6.y-2.*d0,sy=t2.y+t8.y-2.*d0,sa=(t1.y+t9.y-2.*d0)*.5,sb=(t3.y+t7.y-2.*d0)*.5;\n'+   // outlines where the depth bends or steps (second differences), one pixel wide
- ' float pz=max(max(sx,sy),max(sa,sb))/d0,nz=max(max(-sx,-sy),max(-sa,-sb))/d0;\n'+
+ ' float sx=t4.y+t6.y-2.*d0,sy=t2.y+t8.y-2.*d0,sa=(t1.y+t9.y-2.*d0)*.5,sb=(t3.y+t7.y-2.*d0)*.5;float sxp=t4.w+t6.w-2.*d0,syp=t2.w+t8.w-2.*d0,sap=(t1.w+t9.w-2.*d0)*.5,sbp=(t3.w+t7.w-2.*d0)*.5;\n'+   // outlines where the depth bends or steps (second differences), one pixel wide; steps use the speck-proof depth (.w)
+ ' float pz=max(max(sxp,syp),max(sap,sbp))/d0,nz=max(max(-sx,-sy),max(-sa,-sb))/d0;\n'+
  ' float geo=max(smoothstep(.006,.025,pz),smoothstep(.006,.02,nz)*(1.-smoothstep(.02,.04,nz)));\n'+
  ' geo=max(geo,max(max(t2.z,t4.z),max(t6.z,t8.z)))*(1.-hole);\n'+   // and a pen line beside each painting, plaque and statue: their own pixels are never inked
  ' float gx=(t3.x+2.*t6.x+t9.x)-(t1.x+2.*t4.x+t7.x),gy=(t1.x+2.*t2.x+t3.x)-(t7.x+2.*t8.x+t9.x),le=length(vec2(gx,gy))*.25*(1.-hole);\n'+
  ' float far=smoothstep(30.,55.,dn*60.),farT=smoothstep(30.,55.,d0*60.)*(1.-hole),nr=1.-smoothstep(3.,12.,dn*60.),fd=smoothstep(5.,14.,dn*60.);\n'+
- ' float ink=max(geo*(.82+.18*nr),smoothstep(.06,.15,le)*.75*(1.-far))*(1.-far*.7)*(1.-fd*.3);\n'+
+ ' float ink=max(geo*(.82+.18*nr),smoothstep(.06+.08*fd*(1.-far),.15+.08*fd*(1.-far),le)*.75)*(1.-far*.7)*(1.-fd*.3);\n'+   // brightness edges: a higher threshold from 5 m on (no streaks of rail shadow on the balcony floor), back to normal in the far sky so the moon keeps its faint outline
  ' float lc0=pow(clamp(lr0,0.,1.),.4545),la=(t1.x+t2.x+t3.x+t4.x+t6.x+t7.x+t8.x+t9.x)*.125;\n'+
  ' vec2 sp=gl_FragCoord.xy/k;float wob=(vn(sp*.012)-.5)*.5+(vn(sp*.07)-.5)*.1;\n'+
  ' float h1=1.-smoothstep(.0,.16,abs(fract((sp.x+sp.y)/6.5+wob)-.5)),h2=1.-smoothstep(.0,.16,abs(fract((sp.x-sp.y)/6.5+wob*.8)-.5)),h3=1.-smoothstep(.0,.2,abs(fract(sp.y/5.+wob*.6)-.5));\n'+
@@ -3480,7 +3480,7 @@ function lockedCanvas(){if(LOCKC)return LOCKC;var R=rnd;LOCKC=textCanvas(600,800
  x.strokeStyle=D?'#e8d3a8':'#6c6359';x.lineWidth=12;x.lineCap='round';x.beginPath();x.moveTo(cx-25,cy-4);x.lineTo(cx-25,cy-28);x.arc(cx,cy-28,25,Math.PI,0);x.lineTo(cx+25,cy-4);x.stroke();
  x.fillStyle=D?'#e8d3a8':'#6c6359';rrect(x,cx-40,cy-8,80,62,11);x.fill();x.fillStyle=D?'#2a2440':'rgba(251,249,245,.95)';x.beginPath();x.arc(cx,cy+16,8,0,7);x.fill();x.fillRect(cx-3.5,cy+18,7,17);
  x.textAlign='center';x.fillStyle=D?'#e8d3a8':'#4f4840';x.font='500 42px Jost,Helvetica,Arial,sans-serif';spaced(x,'COMING SOON',cx,cy+170,9);
- x.font='italic 500 40px "Cormorant Garamond",Georgia,serif';x.fillStyle=D?'#cdbb98':'#5c544b';x.fillText('in the studio',cx,cy+224)});return LOCKC}
+ x.font='italic 600 56px "Cormorant Garamond",Georgia,serif';x.fillStyle=D?'#cdbb98':'#5c544b';x.fillText('in the studio',cx,cy+236)});return LOCKC}   // 56 px: the pen draws its letters (at 40 px they became a scribble)
 function lockedFrame(o,ry,w,h,f,ct){var b=B(o,ry),fm=DREAM?Mx.goldDark:Mx.gold24,ow=w/2,oh=h/2,zt=.045;
  box(fm,b,[0,oh+f/2,zt/2],[w+2*f,f,zt]);box(fm,b,[0,-oh-f/2,zt/2],[w+2*f,f,zt]);box(fm,b,[-ow-f/2,0,zt/2],[f,h,zt]);box(fm,b,[ow+f/2,0,zt/2],[f,h,zt]);
  function roll(x0,y0,x1,y1,z,r){var p0=bx(b,[x0,y0,z]),dir=v3.sub(bx(b,[x1,y1,z]),p0),L=Math.hypot(dir[0],dir[1],dir[2]);cyl(fm,aim(p0,dir),[0,0,0],r,L,12)}
