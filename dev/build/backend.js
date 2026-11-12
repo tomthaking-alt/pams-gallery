@@ -73,7 +73,7 @@ if(DRM){var skyHead='uniform float uSecs,uFar,uPass;uniform vec3 uDomeC;varying 
 
 /* paintings and plaques show their true colours, untouched by the grade */
 var ARTV='varying vec2 vU;varying vec3 vWp;void main(){vU=uv;vec4 w=modelMatrix*vec4(position,1.);vWp=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}';
-var ARTF='uniform sampler2D map;uniform float uFar,uPaint;varying vec2 vU;varying vec3 vWp;vec4 art(vec2 u){vec2 dx=dFdx(u)*.2,dy=dFdy(u)*.2;return .25*(texture2D(map,u+dx+dy,-1.25)+texture2D(map,u+dx-dy,-1.25)+texture2D(map,u-dx+dy,-1.25)+texture2D(map,u-dx-dy,-1.25));}void main(){vec4 t=art(vU);vec3 c=t.rgb;'+   // paintings and plaques: four reads around each pixel, a step sharper (the brushwork shows; the colours stay the same)
+var ARTF='uniform sampler2D map;uniform float uFar,uPaint;varying vec2 vU;varying vec3 vWp;vec4 art(vec2 u){vec2 dx=dFdx(u)*.25,dy=dFdy(u)*.25;return .25*(texture2D(map,u+dx+dy,-1.)+texture2D(map,u+dx-dy,-1.)+texture2D(map,u-dx+dy,-1.)+texture2D(map,u-dx-dy,-1.));}void main(){vec4 t=art(vU);vec3 c=t.rgb;'+   // paintings and plaques: four reads a quarter-pixel around each pixel, a step sharper (the brushwork shows without sparkling as you walk; the colours stay the same)
  'if(uPaint>.5){c*=mix(.82,1.,smoothstep(0.,.04,vU.y))*mix(.93,1.,smoothstep(0.,.018,min(vU.x,1.-vU.x)))*mix(.96,1.,smoothstep(0.,.02,1.-vU.y));}'+   // the frame's soft shadow from the picture light above
  'gl_FragColor=vec4(c,-max(length(vWp-cameraPosition)/uFar,.0005));}';
 function artMat(m){return new THREE.ShaderMaterial({uniforms:{map:{value:m.tex},uFar:G3.uFar,uPaint:{value:m.isPaint?1:0}},vertexShader:ARTV,fragmentShader:ARTF,side:THREE.DoubleSide})}

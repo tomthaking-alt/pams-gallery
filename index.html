@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-0aOslgyqKSy2JS04w06cGxNv59nTuoTIfj0raUvGY+M=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-t5CdZnoVnMz8Xb8QA3aH55QwlbjjNb01PaFlTq6XQ7s=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -561,11 +561,11 @@ dialog{border:0;border-radius:2px;padding:0;max-width:min(94vw,880px);width:100%
 #about .kick{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 @media (max-width:700px){#about .abw{grid-template-columns:1fr}#about figure img{max-height:52vh;height:auto}}
 @media (max-width:700px){#dlg .btns{position:sticky;bottom:0;background:var(--paper);padding:.6rem 0;z-index:2}#dlg .wrap{grid-template-columns:1fr}#dlg .pic{min-height:0}#dlg .pic img{max-height:36vh}#bar .name{font-size:1.2rem;white-space:nowrap}#where{display:none}#bar nav{gap:.85rem}#bar nav button{white-space:nowrap;font-size:.8rem}#bar .name{font-size:1.08rem!important}#music .mw{display:none}#bar .wide{display:none}}
-/* the top menu: underline only on hover, focus and the current choice; 44-px targets on touch screens; fits 360-430-px phones */
+/* the top menu: underline only on hover, focus and the current choice; 44-px targets on touch screens (the bar keeps its height); fits 320-430-px phones, with the colour button keeping its word */
 #bar nav{align-items:center}#bar button{border-bottom-color:transparent}
 #bar button:hover,#bar button:focus-visible,#bar button[aria-pressed=true],#bar button[aria-current]{border-bottom-color:var(--bronze)}
-@media (pointer:coarse){#bar nav button{min-height:44px;padding:0}}
-@media (max-width:430px){#bar{padding-left:12px;padding-right:12px;gap:.5rem}#bar nav{gap:.5rem}#lookBtn .mw{display:none}#lookBtn{min-width:28px!important}#music{min-width:24px}#bar .name{font-size:.98rem!important}#bar nav button{font-size:.76rem}}
+@media (pointer:coarse){#bar nav button{min-height:44px;padding:0;margin-top:-11.5px;margin-bottom:-11.5px}}@media (pointer:coarse) and (max-width:700px){#bar nav button{margin-top:-2px;margin-bottom:-2px}}
+@media (max-width:430px){#bar{padding-left:12px;padding-right:12px;gap:.4rem}#bar nav{gap:.42rem}#lookBtn span[aria-hidden]{display:none}#lookBtn{min-width:0!important}#music{min-width:20px}#bar .name{font-size:.92rem!important}#bar nav button{font-size:.72rem}}
 dialog::backdrop{background:rgba(22,15,11,.7);backdrop-filter:blur(3px)}
 /* ---------- the arrows and the zoom button on the walk bar ---------- */
 #walk button.end{opacity:.28;cursor:default}
@@ -723,8 +723,10 @@ body.hasBanner #pnow,body.hasBanner #wallText{margin-top:34px}
 }
 @media (max-width:700px) and (prefers-reduced-motion:reduce){#ways .ar,#swipeHint .trk::after{animation:none!important}}
 /* phones: the entrance's FAVOURITES/COLLECTIONS words sit clear of the big title; the subtitle fits a 360-px screen */
-@media (max-width:700px){body.atDoor #ways{top:calc(50% - 150px)}#ways .tx{font-size:.68rem;letter-spacing:.14em}}@media (max-width:380px){#title p{letter-spacing:.12em;font-size:.66rem}}
+@media (max-width:700px){body.atDoor #ways{top:calc(50% - 150px)}#ways{transition:opacity .45s ease,transform .45s ease,top .45s ease}#ways .tx{font-size:.68rem;letter-spacing:.14em}}@media (max-width:700px) and (prefers-reduced-motion:reduce){#ways{transition:opacity .45s ease,transform .45s ease}}@media (max-width:380px){#title p{letter-spacing:.12em;font-size:.66rem}}
 body:has(#gBub.on) #swipeHint{opacity:0!important;transition:none}   /* no swipe hint under King George's bubble */
+body:has(#gBub.on) #wallText{opacity:0!important;transition:none}   /* nor the collection card: his bubble would sit over it (his line names the collection; still read out) */
+@media (max-height:500px){#wallText{opacity:0!important}}   /* short screens (phones on their side): the card would cover the paintings; the walk bar and the wall's title name the collection */
 @media (max-width:700px){#artBar .abt{white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-height:1.1}}   /* phones: a long title on two lines instead of '...' */
 html:not(.ink) #title p{background:rgba(28,16,8,.42);padding:.45em 1.1em;border-radius:99px}   /* colour look: the subtitle reads over the balustrade */
 @media (max-width:700px){#pzoom{position:fixed;z-index:4;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 22px);width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--walnut);background:rgba(250,249,247,.92);border:1px solid rgba(176,141,87,.6);box-shadow:0 8px 24px rgba(20,12,8,.28);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition:opacity .3s,transform .3s;-webkit-tap-highlight-color:transparent}
@@ -3883,7 +3885,7 @@ if(DRM){var skyHead='uniform float uSecs,uFar,uPass;uniform vec3 uDomeC;varying 
 
 /* paintings and plaques show their true colours, untouched by the grade */
 var ARTV='varying vec2 vU;varying vec3 vWp;void main(){vU=uv;vec4 w=modelMatrix*vec4(position,1.);vWp=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}';
-var ARTF='uniform sampler2D map;uniform float uFar,uPaint;varying vec2 vU;varying vec3 vWp;vec4 art(vec2 u){vec2 dx=dFdx(u)*.2,dy=dFdy(u)*.2;return .25*(texture2D(map,u+dx+dy,-1.25)+texture2D(map,u+dx-dy,-1.25)+texture2D(map,u-dx+dy,-1.25)+texture2D(map,u-dx-dy,-1.25));}void main(){vec4 t=art(vU);vec3 c=t.rgb;'+   // paintings and plaques: four reads around each pixel, a step sharper (the brushwork shows; the colours stay the same)
+var ARTF='uniform sampler2D map;uniform float uFar,uPaint;varying vec2 vU;varying vec3 vWp;vec4 art(vec2 u){vec2 dx=dFdx(u)*.25,dy=dFdy(u)*.25;return .25*(texture2D(map,u+dx+dy,-1.)+texture2D(map,u+dx-dy,-1.)+texture2D(map,u-dx+dy,-1.)+texture2D(map,u-dx-dy,-1.));}void main(){vec4 t=art(vU);vec3 c=t.rgb;'+   // paintings and plaques: four reads a quarter-pixel around each pixel, a step sharper (the brushwork shows without sparkling as you walk; the colours stay the same)
  'if(uPaint>.5){c*=mix(.82,1.,smoothstep(0.,.04,vU.y))*mix(.93,1.,smoothstep(0.,.018,min(vU.x,1.-vU.x)))*mix(.96,1.,smoothstep(0.,.02,1.-vU.y));}'+   // the frame's soft shadow from the picture light above
  'gl_FragColor=vec4(c,-max(length(vWp-cameraPosition)/uFar,.0005));}';
 function artMat(m){return new THREE.ShaderMaterial({uniforms:{map:{value:m.tex},uFar:G3.uFar,uPaint:{value:m.isPaint?1:0}},vertexShader:ARTV,fragmentShader:ARTF,side:THREE.DoubleSide})}
