@@ -62,3 +62,8 @@ git add -A && git commit -m "…" && git push        # Vercel publishes main aut
 - Privacy: visitor analytics are cookieless and store nothing on visitors' devices. Keep the Privacy page (`/privacy`,
   rendered in app.src.js) in step with anything new that's collected.
 - Accessibility: real buttons and labels, keyboard support, `prefers-reduced-motion` respected, text contrast ≥ 4.5:1.
+- Frames: every frame is vintage (Pam's choice, November 2026), and each built-in painting has one made to suit it. The fifteen
+  styles are in `frameStyle()` in the source (a moulding cross-section carried round the picture by `sweep()`, plus carving, with an
+  aged patina); which painting gets which is `FRDEF`, in the source and in `app.src.js` (which also draws each frame as a ring on the
+  plain pages). 'View on your wall' builds the same frames through `window.__frame3`. Nothing may ever cover part of a painting. The
+  two playful clay frames are switched off (`CLAYFRAMES`), and the phones' AR models still carry the earlier plain gilt frame.
