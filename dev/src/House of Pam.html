@@ -3022,7 +3022,8 @@ if(LOOKTOG&&CLAY){var lk=function(m,pc,pm){LOOKMATS.push({m:m,ink:{col:m.col.sli
   [Mx.jewelA,'#3d7a76'],[Mx.jewelB,'#94506c'],[Mx.jewelC,'#a88a5a'],[Mx.jewelD,'#4d5a8c'],[Mx.gold24,'#a88a5a'],[Mx.decoGold,'#a88a5a'],[Mx.brass,'#a88a5a'],[Mx.goldDark,'#4e3520']].forEach(function(q){lk(q[0],q[1])});   // dusty rose, antique gilt
  lk(Mx.gold,'#9c8058',.15);lk(Mx.steel,'#9c8058',.15);
  Mx.dado=mat({col:Mx.marble.col.slice(),tex:CLAYT,htex:CLAYH,bump:.3,rough:.85,uvs:[1.8,1.8]});lk(Mx.dado,'#9e8a96');   // the band along the foot of the walls: mauve in colour
- [Mx.gold24,Mx.decoGold,Mx.brass,Mx.goldDark].forEach(function(m){LOOKMATS.forEach(function(q){if(q.m!==m)return;q.ink.col=q.ink.col.map(function(v){return v*.6});q.ink.metal=0;q.ink.env=.7;q.paint.env=m===Mx.gold24?.7:1})})}   // picture frames in ink: darker and matte; colour keeps today's reflections; Mx.gold is the room's trim, leave it
+ [Mx.gold24,Mx.decoGold,Mx.brass,Mx.goldDark].forEach(function(m){LOOKMATS.forEach(function(q){if(q.m!==m)return;q.ink.col=q.ink.col.map(function(v){return v*.6});q.ink.metal=0;q.ink.env=.7;q.paint.env=m===Mx.gold24?.7:1})});   // picture frames in ink: darker and matte; colour keeps today's reflections; Mx.gold is the room's trim, leave it
+ LOOKMATS.push({m:Mx.gap,ink:{col:[.8,.77,.72],metal:0},paint:{col:Mx.gap.col.slice(),metal:Mx.gap.metal}})}   // the 4-mm strip round each canvas: light in ink (near-black became a dashed hatch net)
 if(DREAM){var dm=function(m,c,r,d,dc){m.col=lin(c);m.rough=r;m.metal=0;m.bump=Math.min(m.bump,.12);m.refl=0;m.mist=1;if(d)m.dream=d;if(dc)m.dreamC=dc};
  dm(Mx.wall,'#463f55',.85,[1,.04,.3],[.58,.54,.62]);      // deep, muted aubergine-plum (so the paintings are the richest colour); the collections room is deeper still
  dm(Mx.floor,'#231f30',.22,[2,.1],[.85,.85,.95]);         // a night lake with faint rings of light
@@ -3045,17 +3046,25 @@ function dreamFinish(){if(!DREAM||typeof COMPM==='undefined')return;var f=COMPM.
 /* ink: every surface becomes pen lines and hatching on warm paper; outlines come from changes in depth and brightness.
    paint: the room is smeared along swirling brushstrokes and pushed towards the violets, teals and golds of Pam's work, on canvas.
    Paintings and plaques are drawn separately and never pass through here, so they keep their true colours. */
-var INKFN='float dpt(vec2 o){return min(abs(texture(uT,vU+o).a),abs(texture(uT,vU+o*2.).a));}\n';   // depth for the outlines, ignoring hairline gaps a pixel wide
-var INKF='{float L=dot(c,vec3(.2126,.7152,.0722)),k=max(1.,uRes.y/820.),d0=abs(s0.a);vec2 e=px*k;\n'+
- ' float a1=dpt(vec2(-e.x,e.y)),a2=dpt(vec2(0.,e.y)),a3=dpt(e),a4=dpt(-vec2(e.x,0.)),a6=dpt(vec2(e.x,0.)),a7=dpt(-e),a8=dpt(-vec2(0.,e.y)),a9=dpt(vec2(e.x,-e.y));\n'+
- ' float gx=(a3+2.*a6+a9)-(a1+2.*a4+a7),gy=(a1+2.*a2+a3)-(a7+2.*a8+a9),dz=length(vec2(gx,gy))/max(d0,1e-4);\n'+
- ' float lc=dot(texture(uT,vU).rgb,vec3(.3,.5,.2)),l1=dot(texture(uT,vU+vec2(e.x,0.)).rgb,vec3(.3,.5,.2)),l2=dot(texture(uT,vU+vec2(0.,e.y)).rgb,vec3(.3,.5,.2));\n'+
- ' float le=length(vec2(l1-lc,l2-lc))/max(lc+.05,.05);float far=smoothstep(30.,55.,d0*60.),nr=1.-smoothstep(3.,12.,d0*60.);\n'+
- ' float ink=max(smoothstep(.06,.2,dz)*(.82+.18*nr),smoothstep(.22,.6,le)*.75)*(1.-far*.7);\n'+
+var INKFN='vec4 TF(vec2 o){ivec2 s=textureSize(uT,0)-1;return texelFetch(uT,clamp(ivec2(gl_FragCoord.xy)+ivec2(round(o*uRes)),ivec2(0),s),0);}\n'+   // the pen reads whole pixels, exactly one pixel away (no blur from in-between reads, no dotted second outline)
+ 'vec3 itap(vec2 o,float lc,float dc){vec4 a=TF(o);float la=dot(a.rgb,vec3(.3,.5,.2))*uExp*1.18;\n'+
+ ' bool ok=min(a.r,min(a.g,a.b))>=0.&&la<4096.;return vec3(pow(clamp(ok?la:lc,0.,1.),.4545),ok?max(abs(a.a),1e-4):dc,ok?step(a.a,-.00001):0.);}\n';   // each read: brightness, depth, and whether it is a painting, plaque or statue; a broken or blinding pixel counts as this one
+var INKF='{float L=dot(c,vec3(.2126,.7152,.0722)),k=max(1.,uRes.y/820.),d0=max(abs(s0.a),1e-4),lr0=dot(s0.rgb,vec3(.3,.5,.2))*uExp*1.18;vec2 e=px*max(1.,uRes.y*uLw/820.);\n'+   // e: the pen's reach, 1 px (2 px on sharp screens); on tall phones it follows the view angle (uLw)
+ ' vec3 t1=itap(vec2(-e.x,e.y),lr0,d0),t2=itap(vec2(0.,e.y),lr0,d0),t3=itap(e,lr0,d0),t4=itap(-vec2(e.x,0.),lr0,d0),t6=itap(vec2(e.x,0.),lr0,d0),t7=itap(-e,lr0,d0),t8=itap(-vec2(0.,e.y),lr0,d0),t9=itap(vec2(e.x,-e.y),lr0,d0);\n'+
+ ' float dn=min(d0,min(min(min(t1.y,t2.y),min(t3.y,t4.y)),min(min(t6.y,t7.y),min(t8.y,t9.y)))),dmx=max(max(max(t1.y,t2.y),max(t3.y,t4.y)),max(max(t6.y,t7.y),max(t8.y,t9.y)));\n'+
+ ' float hole=max(step(dmx*1.03,d0),(lr0>=0.&&lr0<4096.)?0.:1.);\n'+   // a pinhole (a pixel behind all its neighbours) or a broken pixel gets no outline
+ ' float sx=t4.y+t6.y-2.*d0,sy=t2.y+t8.y-2.*d0,sa=(t1.y+t9.y-2.*d0)*.5,sb=(t3.y+t7.y-2.*d0)*.5;\n'+   // outlines where the depth bends or steps (second differences), one pixel wide
+ ' float pz=max(max(sx,sy),max(sa,sb))/d0,nz=max(max(-sx,-sy),max(-sa,-sb))/d0;\n'+
+ ' float geo=max(smoothstep(.006,.025,pz),smoothstep(.006,.02,nz)*(1.-smoothstep(.02,.04,nz)));\n'+
+ ' geo=max(geo,max(max(t2.z,t4.z),max(t6.z,t8.z)))*(1.-hole);\n'+   // and a pen line beside each painting, plaque and statue: their own pixels are never inked
+ ' float gx=(t3.x+2.*t6.x+t9.x)-(t1.x+2.*t4.x+t7.x),gy=(t1.x+2.*t2.x+t3.x)-(t7.x+2.*t8.x+t9.x),le=length(vec2(gx,gy))*.25*(1.-hole);\n'+
+ ' float far=smoothstep(30.,55.,dn*60.),farT=smoothstep(30.,55.,d0*60.)*(1.-hole),nr=1.-smoothstep(3.,12.,dn*60.),fd=smoothstep(5.,14.,dn*60.);\n'+
+ ' float ink=max(geo*(.82+.18*nr),smoothstep(.06,.15,le)*.75*(1.-far))*(1.-far*.7)*(1.-fd*.3);\n'+
+ ' float lc0=pow(clamp(lr0,0.,1.),.4545),la=(t1.x+t2.x+t3.x+t4.x+t6.x+t7.x+t8.x+t9.x)*.125;\n'+
  ' vec2 sp=gl_FragCoord.xy/k;float wob=(vn(sp*.012)-.5)*.5+(vn(sp*.07)-.5)*.1;\n'+
  ' float h1=1.-smoothstep(.0,.16,abs(fract((sp.x+sp.y)/6.5+wob)-.5)),h2=1.-smoothstep(.0,.16,abs(fract((sp.x-sp.y)/6.5+wob*.8)-.5)),h3=1.-smoothstep(.0,.2,abs(fract(sp.y/5.+wob*.6)-.5));\n'+
  ' float rv=.12+.62*vn(sp*.0035)+.18*(1.-gl_FragCoord.y/uRes.y),rl=smoothstep(rv-.1,rv,uDraw*1.15),rh=smoothstep(rv,rv+.12,uDraw*1.15-.12);\n'+   // the pen goes round first, the shading follows
- ' float tone=L*(1.-far*.5)+far*.45;float dark=max(ink*rl,max(h1*.5*smoothstep(.6,.38,tone),max(h2*.55*smoothstep(.4,.22,tone),h3*.6*smoothstep(.22,.08,tone)))*rh);\n'+
+ ' float tone=(hole>.5?la:clamp(L+(la-lc0)*.75,0.,1.))*(1.-farT*.5)+farT*.45;float dark=max(ink*rl,max(h1*.5*smoothstep(.6,.38,tone),max(h2*.55*smoothstep(.4,.22,tone),h3*.6*smoothstep(.22,.08,tone)))*rh);\n'+
  ' vec3 paper=vec3(.962,.947,.912)*(.975+.025*fbm(gl_FragCoord.xy*.012))*(.985+.015*vn(gl_FragCoord.xy*.9));\n'+
  ' c=mix(paper,vec3(.16,.14,.15),dark*(.88+.12*vn(sp*.2)));}\n';
 var PAINTFN='float dabs(vec2 p){float v=0.,b=-1.;for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec2 g=floor(p/38.)+vec2(float(i),float(j)),f=p-(g+.5)*38.-(vec2(hsh(g+5.),hsh(g+9.))-.5)*34.;float a=.9+(hsh(g)-.5)*1.3,s=.75+.5*hsh(g+21.);vec2 u=vec2(dot(f,vec2(cos(a),sin(a))),dot(f,vec2(-sin(a),cos(a))));float m=1.-smoothstep(.55,1.,length(u/(vec2(40.,13.)*s))),pr=hsh(g+13.);if(m>.02&&pr>b){b=pr;v=mix(v,(hsh(g+3.)-.5)*.05+(vn(vec2(u.x*.05,u.y*.55)+g*7.)-.5)*.035,m);}}return v;}\n'+   // dabs of paint, each with its own angle and length (value only, about 2.5%)
@@ -3078,7 +3087,7 @@ var COMP_INK=null,COMP_PAINT=null,SKY_INK=null,SKY_PAINT=null;
 function lookFinish(){if(!LOOKTOG||typeof COMPM==='undefined')return;
  var base=COMPM.fragmentShader,grain='c+=(hsh(gl_FragCoord.xy+fract(uTime*7.3)*97.)-.5)*.014;',ea='if(s0.a<-.00001){o=vec4(toSRGB(s0.rgb),1.);return;}',mn='void main(){vec4 s0=';
  if(base.indexOf(grain)<0||base.indexOf(ea)<0||base.indexOf('uniform float uBK,')<0||base.indexOf(mn)<0){console.warn('lookFinish: anchors not found');return}
- base=base.replace('uniform float uBK,','uniform float uDraw,uBK,');COMPM.uniforms.uDraw={value:1};
+ base=base.replace('uniform float uBK,','uniform float uDraw,uLw,uBK,');COMPM.uniforms.uDraw={value:1};COMPM.uniforms.uLw={value:1};   // uLw: set by render() each frame
  COMP_INK=base.replace(ea,'if(s0.a<-.00001){o=vec4(mix(vec3(.962,.947,.912),toSRGB(s0.rgb),smoothstep(.62,1.,uDraw)),1.);return;}').replace(grain,INKF+grain).replace(mn,INKFN+mn);
  COMP_PAINT=base.replace('c*=vec3(1.015,.985,.975)*1.2;','c*=vec3(1.,.99,.99)*1.1;').replace(grain,PAINTF+grain).replace(mn,PAINTFN+mn).replace('vec3 c0=s0.rgb,','vec3 c0=kuwa(vU),');
  if(typeof SKYM!=='undefined'){SKY_INK=SKYM.fragmentShader;SKY_PAINT=SKY_INK.replace('vec3(.3,.6,.9)*pow(1.-nn.z,3.)*.6','vec3(.3,.6,.9)*pow(1.-nn.z,3.)*.2').replace('mix(vec3(.10,.2,.05),vec3(.5,.6,.13),band)','mix(vec3(.05,.12,.14),vec3(.2,.4,.38),band)').replace('vec3(.5,.22,.08)','vec3(.34,.13,.28)').replace('vec3(.8,.78,.4)','vec3(.85,.6,.45)');SKY_INK=SKY_INK.replace('c+=vec3(1.)*step(.996,hsh(sg))*smoothstep(.1,.5,e)*.8;','')}}   // the ink sky has no stars (under the pen they read as dust); the colour sky keeps them
@@ -3088,12 +3097,16 @@ function setLook(lk,first){if(!LOOKTOG)return;LOOKNOW=lk;var P=lk==='paint';docu
  [Mx.gold,Mx.steel].forEach(function(m){(m._3||[]).forEach(function(x){if(x.material.envMapIntensity!=null)x.material.envMapIntensity=P?.7:1.25})});
  MATS.forEach(function(m){if(m.keep||m.art||m.cut||!(m.bump>0))return;(m._3||[]).forEach(function(x){var M=x.material;if(M.bumpScale!=null)M.bumpScale=P?m.bump*.02:0})});   // ink: no clay relief on the room (it became speckle under the pen); the cut-out frame pictures keep theirs (it draws their carving)
  (Mx.floor._3||[]).forEach(function(x){var M=x.material;if(M.sheenColor){M.sheen=P?.15:.45;M.sheenRoughness=P?.5:.8;M.sheenColor.setRGB(P?.6:1,P?.4:.93,P?.65:.82,LINEAR)}});   // a plum satin floor in colour
+ chandLook(!P);   // the chandelier: a light pen drawing in ink, its own colours and sparkle in colour
  EXPOSURE=P?.83:LK0.exp;RAYK=P?LK0.ray:0;BLOOMK=P?LK0.bloom:0;   // the painted room sits a step below the paintings; no glow or light shafts on paper
  if(COMP_INK&&COMP_PAINT){COMPM.fragmentShader=P?COMP_PAINT:COMP_INK;COMPM.needsUpdate=true}
  if(SKY_INK&&SKY_PAINT){SKYM.fragmentShader=P?SKY_PAINT:SKY_INK;SKYM.needsUpdate=true}
- if(!first){if(!P)window.DRAW_T0=performance.now();envAt=Date.now()+300;try{localStorage.setItem('pgLook',lk)}catch(e){}}   // back to ink: the drawing draws itself in again
+ if(!first){if(!P)window.DRAW_T0=performance.now();envAt=Date.now()+300;resize();try{localStorage.setItem('pgLook',lk)}catch(e){}}   // back to ink: the drawing draws itself in again; resize(): the ink look draws without edge smoothing (MSAA), colour with it
  dirty=2}
 window.__setLook=setLook;
+/* the chandelier in the ink look: plain, near-white and matte with a soft glow (.6), so it reads as a light pen drawing: no black lattice and
+   no band across the teardrop. A 1x1 white picture stands in for its colours, so switching looks never rebuilds a shader; colour restores it exactly. */
+var CHAND=null,WHITE1=null;function chandLook(ink){if(!CHAND)return;if(!WHITE1){WHITE1=new THREE.DataTexture(new Uint8Array([255,255,255,255]),1,1);WHITE1.colorSpace=THREE.SRGBColorSpace;WHITE1.needsUpdate=true}var e=CHAND.emis,em=Math.max(e[0],e[1],e[2])||1;(CHAND._3||[]).forEach(function(x){var M=x.material;if(!('map0' in M.userData))M.userData.map0=M.map;M.map=ink?WHITE1:M.userData.map0;M.color.setRGB(ink?.95:CHAND.col[0],ink?.93:CHAND.col[1],ink?.9:CHAND.col[2],LINEAR);M.emissive.setRGB(ink?1:e[0]/em,ink?.97:e[1]/em,ink?.92:e[2]/em,LINEAR);M.emissiveIntensity=ink?.6:em;M.roughness=ink?.85:Math.max(.035,CHAND.rough)});dirty=2}
 // once the room is built: everything else gets a soft clay finish (no glaze, no mirror shine). Paintings, labels, lights and the sky keep theirs.
 function clayFinish(){if(!CLAY)return;var art=[];for(var k in ARTM)art.push(ARTM[k]);
  // the colour of the whole picture: warm and natural, like sunlit fired clay (not an over-saturated stop-motion set)
@@ -3351,7 +3364,7 @@ function paintMat(k){if(ARTM[k])return ARTM[k];var p=ART[k];
 var CLAYFR={'Orchid in the Clouds':{roll:['#efe6f4','#c9a9df'],orn:'frame-orchid-v1',pic:{img:'frOrchid',w:1006,h:1248,open:[152,131,848,1114],side:'#e2c9e4'}},
  'White Bloom over Ember':{roll:['#e8762e','#b8321f'],orn:'frame-ember-v1',pic:{img:'frEmber',w:994,h:1287,open:[136,135,855,1149],side:'#d4492a'}}},ROPEM={},PICM={};
 function picMat(q){if(PICM[q.img])return PICM[q.img];var im=MATIMG[q.img],c=cnv(im.naturalWidth,im.naturalHeight);c.getContext('2d').drawImage(im,0,0);
- return PICM[q.img]=mat({tex:texFrom(c,{clamp:1}),unit:1,rough:.9,bump:.4,cut:.5,col:[.94,.94,.94]})}
+ var M=PICM[q.img]=mat({tex:texFrom(c,{clamp:1}),unit:1,rough:.9,bump:.4,cut:.5,col:[.94,.94,.94]});if(LOOKTOG&&CLAY)LOOKMATS.push({m:M,ink:{col:[.56,.56,.56],metal:0},paint:{col:[.94,.94,.94],metal:0}});return M}   // in ink a step darker, like the other frames; colour as today
 function ropeMat(col){return ROPEM[col]||(ROPEM[col]=mat({col:lin(col),tex:CLAYT,htex:CLAYH,bump:.35,rough:.8,uvs:[1.2,1.2]}))}
 function frameStyle(key){var G=Mx.gold24,D=Mx.goldDark;return({
  gilt:{t:'baroque',fw:CLAY?.14:.1,gap:.055,base:G,rolls:[G,G,G],orn:G,cove:D},
@@ -3674,10 +3687,10 @@ function clayGeo(name){CMC=CMC||{};if(CMC[name])return CMC[name];   /* frames ca
  return C}
 // Higgsfield 3D models (files made by dev/build/statue.py), placed once the gallery has started: place(lo,hi) gives one matrix or several, o sets the finish
 function clayModel(name,place,o){o=o||{};
- clayGeo(name).then(function(G){var m=mat({unit:1,keep:!!o.keep,tex:o.tex||G.tex,htex:o.htex||null,bump:o.bump||0,col:o.col||[1,1,1],rough:o.rough==null?.75:o.rough,emis:o.emis||[0,0,0]});
+ clayGeo(name).then(function(G){var m=mat({unit:1,keep:!!o.keep,tex:o.tex||G.tex,htex:o.htex||null,bump:o.bump||0,col:o.col||[1,1,1],rough:o.rough==null?.75:o.rough,emis:o.emis||[0,0,0]});if(name==='chandelier-v1'&&LOOKTOG)CHAND=m;
   if(o.sheen!==false)m.x3=typeof c3==='function'?{sheen:.5,sheenRoughness:.7,sheenColor:c3([1,.95,.85])}:null;   // soft clay sheen
   var Ms=place(G.lo,G.hi);(Array.isArray(Ms)?Ms:[Ms]).forEach(function(M){bake({v:G.v},M,m)});
-  if(typeof LIT==='undefined'||LIT){upload();dirty=2;   // before the first upload, the gallery's own start-up builds it (after the clay finish)
+  if(typeof LIT==='undefined'||LIT){upload();dirty=2;if(m===CHAND)chandLook(LOOKNOW==='ink');   // before the first upload, the gallery's own start-up builds it (after the clay finish)
    if(typeof R3!=='undefined'&&R3.shadowMap)R3.shadowMap.needsUpdate=true}})   /* it casts shadows too */
  .catch(function(){})}   // without it, that piece is simply missing
 function clayCentre(lo,hi,top){return mT(-(lo[0]+hi[0])/2,top?-hi[1]:-lo[1],-(lo[2]+hi[2])/2)}
@@ -3932,6 +3945,7 @@ var AOFS=`#version 300 es
 precision highp float;in vec2 vU;out vec4 o;uniform sampler2D uT;uniform vec2 uTan,uPx;uniform float uFar,uR,uAsp;
 vec3 P(vec2 uv){float d=abs(texture(uT,uv).a)*uFar;vec3 r=normalize(vec3((uv*2.-1.)*uTan,-1.));return r*d;}
 void main(){float d=abs(texture(uT,vU).a)*uFar;if(d>16.||d<.05){o=vec4(1.);return;}
+ float dX=max(max(abs(texture(uT,vU+vec2(uPx.x,0.)).a),abs(texture(uT,vU-vec2(uPx.x,0.)).a)),max(abs(texture(uT,vU+vec2(0.,uPx.y)).a),abs(texture(uT,vU-vec2(0.,uPx.y)).a)))*uFar;if(d>dX*1.02){o=vec4(1.);return;}
  vec3 p=P(vU),a1=P(vU+vec2(uPx.x,0.))-p,a2=p-P(vU-vec2(uPx.x,0.)),b1=P(vU+vec2(0.,uPx.y))-p,b2=p-P(vU-vec2(0.,uPx.y));
  vec3 dx=dot(a1,a1)<dot(a2,a2)?a1:a2,dy=dot(b1,b1)<dot(b2,b2)?b1:b2;vec3 n=normalize(cross(dx,dy));if(dot(n,p)>0.)n=-n;
  float rad=uR/(2.*uTan.y*d);float nz=fract(52.9829189*fract(dot(gl_FragCoord.xy,vec2(.06711056,.00583715))));
@@ -3949,6 +3963,8 @@ vec3 toSRGB(vec3 c){c=clamp(c,0.,1.);return mix(c*12.92,1.055*pow(c,vec3(1./2.4)
 void main(){vec4 s0=texture(uT,vU);if(s0.a<-.00001){o=vec4(toSRGB(s0.rgb),1.);return;}
  vec2 q=vU-.5;vec2 ca=vec2(0.);vec2 px=1./uRes;
  vec3 c0=s0.rgb,n1=texture(uT,vU+vec2(px.x,0.)).rgb,n2=texture(uT,vU-vec2(px.x,0.)).rgb,n3=texture(uT,vU+vec2(0.,px.y)).rgb,n4=texture(uT,vU-vec2(0.,px.y)).rgb;
+ if(!(min(n1.r,min(n1.g,n1.b))>=0.&&dot(n1,vec3(1.))<1e4))n1=n2;if(!(min(n2.r,min(n2.g,n2.b))>=0.&&dot(n2,vec3(1.))<1e4))n2=n1;if(!(min(n3.r,min(n3.g,n3.b))>=0.&&dot(n3,vec3(1.))<1e4))n3=n4;if(!(min(n4.r,min(n4.g,n4.b))>=0.&&dot(n4,vec3(1.))<1e4))n4=n3;if(!(min(c0.r,min(c0.g,c0.b))>=0.&&dot(c0,vec3(1.))<1e4)){c0=(n1+n2+n3+n4)*.25;s0.rgb=c0;}
+ if(!(min(n1.r,min(n1.g,n1.b))>=0.&&dot(n1,vec3(1.))<1e4))n1=c0;if(!(min(n2.r,min(n2.g,n2.b))>=0.&&dot(n2,vec3(1.))<1e4))n2=c0;if(!(min(n3.r,min(n3.g,n3.b))>=0.&&dot(n3,vec3(1.))<1e4))n3=c0;if(!(min(n4.r,min(n4.g,n4.b))>=0.&&dot(n4,vec3(1.))<1e4))n4=c0;
  vec3 mn=min(c0,min(min(n1,n2),min(n3,n4))),mx=max(c0,max(max(n1,n2),max(n3,n4)));vec3 c=clamp(c0+(c0-(n1+n2+n3+n4)*.25)*.55,mn,mx)+texture(uB,vU).rgb*.15;   // gentle sharpening without halos
  float ao=(texture(uA,vU+uAPx*vec2(.6,.2)).r+texture(uA,vU-uAPx*vec2(.6,.2)).r+texture(uA,vU+uAPx*vec2(-.2,.6)).r+texture(uA,vU-uAPx*vec2(-.2,.6)).r)*.25;
  c*=mix(1.,ao,uAOK);c*=uExp*1.18;c=neutral(c);
