@@ -25,7 +25,8 @@ const SET_REWARD = 'a signed print of your choice';
 // the artworks built into the site; used until Pam saves her own catalogue
 const ARTS = Object.keys(EMB).map(k => EMB[k].t);
 // the frames Pam can choose for a painting (empty = chosen automatically to suit it)
-const FR_OK = ['gilt', 'silver', 'ivory', 'deco', 'walnut', 'ebony', 'emerald', 'teal', 'jewel', 'maple', 'brass', 'white', 'black', 'oak', 'alu'];
+const FR_OK = ['gilt', 'rococo', 'garland', 'venetian', 'bronze', 'nouveau', 'florentine', 'temple', 'cottage', 'gothic', 'sunburst', 'rope', 'pearl', 'ribbon', 'walnut'];   // every frame is vintage (November 2026)
+const FR_OLD = { ivory: 'rococo', silver: 'venetian', deco: 'sunburst', ebony: 'gothic', emerald: 'bronze', teal: 'cottage', jewel: 'gothic', maple: 'walnut', brass: 'nouveau', white: 'cottage', black: 'rope', oak: 'ribbon', alu: 'pearl' };   // the frames' earlier names, still understood
 const BASE_SETS = [
   { name: 'The Dreaming Garden', arts: ['p1', 'p2'] },
   { name: 'The Masquerade', arts: ['p3', 'p4'] },
@@ -223,7 +224,7 @@ function cleanCat(c) {
     id: String(a.id), t: str(a.t, 90) || 'Untitled', m: str(a.m, 80), s: str(a.s, 80), year: str(a.year, 12), d: str(a.d, 1200),
     p: str(a.p, 40), mode: ['price', 'auction'].indexOf(a.mode) >= 0 ? a.mode : 'request', status: ['Available', 'On hold', 'Sold'].indexOf(a.status) >= 0 ? a.status : 'Available',
     w: num(a.w, .15, 1.6, .5), h: num(a.h, .15, 1.6, .7), img: a.img, early: okUp(a.img) && num(a.early, 0, 4e12, 0) > 0 ? Math.round(num(a.early, 0, 4e12, 0)) : undefined,
-    tz: okUp(a.tz) && a.tzOf === a.img ? a.tz : undefined, tzOf: okUp(a.tz) && a.tzOf === a.img ? a.img : undefined, ar: !!a.ar && /^emb:p([1-9]|1[0-5])$/.test(a.img), wm: okUp(a.wm) && a.wmOf === a.img ? a.wm : undefined, wmOf: okUp(a.wm) && a.wmOf === a.img ? a.img : undefined, bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6', fr: FR_OK.indexOf(a.fr) >= 0 ? a.fr : undefined,
+    tz: okUp(a.tz) && a.tzOf === a.img ? a.tz : undefined, tzOf: okUp(a.tz) && a.tzOf === a.img ? a.img : undefined, ar: !!a.ar && /^emb:p([1-9]|1[0-5])$/.test(a.img), wm: okUp(a.wm) && a.wmOf === a.img ? a.wm : undefined, wmOf: okUp(a.wm) && a.wmOf === a.img ? a.img : undefined, bg: /^#[0-9a-f]{6}$/i.test(a.bg || '') ? a.bg : '#cfc6d6', fr: FR_OK.indexOf(FR_OLD[a.fr] || a.fr) >= 0 ? (FR_OLD[a.fr] || a.fr) : undefined,
     auc: a.mode === 'auction' && a.auc ? { start: num(a.auc.start, 1, 1e7, 100), step: num(a.auc.step, 1, 1e6, 10), ends: Math.round(num(a.auc.ends, 0, 4e12, 0)) } : undefined
   }));
   const ids = new Set(arts.map(a => a.id));
@@ -1039,16 +1040,18 @@ async function getImage(key, res, q) {
 // They are made on the server from Pam's live catalogue, so search engines and link previews see real content, and anyone on
 // a slow connection, an older phone or with JavaScript off can still browse, read every detail and enquire.
 const FONTS = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=optional';
-const FRDEF = { p1: 'ivory', p2: 'gilt', p3: 'silver', p4: 'emerald', p5: 'walnut', p6: 'ebony', p7: 'deco', p8: 'maple', p9: 'jewel', p10: 'teal', p11: 'black', p12: 'oak', p13: 'alu', p14: 'brass', p15: 'white' };
-const RING = { gilt: '0 0 0 2px #8a6a2e,0 0 0 7px #d2ab5f,0 0 0 8px #7a5a22', silver: '0 0 0 2px #6f7278,0 0 0 7px #d3d6da,0 0 0 8px #6f7278', ivory: '0 0 0 2px #b8955a,0 0 0 7px #efe6d2,0 0 0 8px #b8955a',
-  deco: '0 0 0 2px #e2c27a,0 0 0 3px #6e4f1c,0 0 0 6px #d9b45f,0 0 0 7px #6e4f1c,0 0 0 9px #e2c27a', walnut: '0 0 0 2px #d2ab5f,0 0 0 9px #573823', ebony: '0 0 0 2px #d2ab5f,0 0 0 9px #161414',
-  emerald: '0 0 0 2px #d2ab5f,0 0 0 9px #1d5c46', teal: '0 0 0 2px #d2ab5f,0 0 0 9px #1c6a70', jewel: '0 0 0 2px #1e8a8a,0 0 0 3px #b0306a,0 0 0 4px #d4a531,0 0 0 5px #2a4fb0,0 0 0 10px #141212',
-  maple: '0 0 0 3px #2c2420,0 0 0 8px #dcc29a', brass: '0 0 0 3px #2c2420,0 0 0 6px #c19a4e', white: '0 0 0 3px #cfc9bf,0 0 0 7px #f4f1ea',
-  black: '0 0 0 1px #e3ddd0,0 0 0 10px #f7f4ec,0 0 0 13px #1b1a19', oak: '0 0 0 1px #e3ddd0,0 0 0 10px #f7f4ec,0 0 0 13px #c49a6c', alu: '0 0 0 1px #e3ddd0,0 0 0 10px #f7f4ec,0 0 0 13px #b5b8bd' };
+const FRDEF = { p1: 'rococo', p2: 'garland', p3: 'venetian', p4: 'bronze', p5: 'nouveau', p6: 'florentine', p7: 'temple', p8: 'cottage', p9: 'gothic', p10: 'sunburst', p11: 'rope', p12: 'pearl', p13: 'ribbon', p14: 'sunburst', p15: 'walnut' };
+// each vintage frame as a ring of colour round the picture on these plain pages
+const HOG = '0 0 0 1px #d9cfb8,0 0 0 10px #efe5cf,0 0 0 11px #b8944e,0 0 0 14px #16110f,0 0 0 15px #b8944e';
+const RING = { gilt: '0 0 0 2px #8a6a2e,0 0 0 4px #735632,0 0 0 8px #b8944e,0 0 0 9px #6e5220', rococo: '0 0 0 2px #b8944e,0 0 0 5px #cbb794,0 0 0 9px #ede2cb,0 0 0 10px #b8944e',
+  garland: '0 0 0 2px #b8944e,0 0 0 7px #735632,0 0 0 10px #b8944e', venetian: '0 0 0 2px #a3a6a8,0 0 0 6px #45474e,0 0 0 10px #a3a6a8', bronze: '0 0 0 2px #6a5236,0 0 0 9px #4f8f7c,0 0 0 10px #6a5236',
+  nouveau: '0 0 0 2px #b8944e,0 0 0 9px #5a3a22,0 0 0 10px #b8944e', florentine: '0 0 0 2px #b8944e,0 0 0 8px #6e2c1c,0 0 0 10px #b8944e', temple: '0 0 0 2px #b8944e,0 0 0 3px #6e5220,0 0 0 7px #a88a5a,0 0 0 8px #6e5220,0 0 0 10px #b8944e',
+  cottage: '0 0 0 2px #a9824f,0 0 0 8px #8aaba3,0 0 0 9px #a9824f', gothic: '0 0 0 2px #b8944e,0 0 0 4px #16110f,0 0 0 5px #3d7a76,0 0 0 6px #94506c,0 0 0 7px #4d5a8c,0 0 0 10px #16110f',
+  sunburst: '0 0 0 2px #b8944e,0 0 0 3px #16110f,0 0 0 6px #b8944e,0 0 0 7px #16110f,0 0 0 9px #b8944e,0 0 0 10px #16110f', rope: HOG, pearl: HOG, ribbon: HOG, walnut: '0 0 0 2px #b8944e,0 0 0 4px #40261a,0 0 0 8px #5a3a22,0 0 0 10px #40261a' };
 function frameKey(a) {
-  if (a.fr && RING[a.fr]) return a.fr; const id = /^emb:/.test(a.img || '') ? a.img.slice(4) : '';
+  const f = FR_OLD[a.fr] || a.fr; if (f && RING[f]) return f; const id = /^emb:/.test(a.img || '') ? a.img.slice(4) : '';
   if (FRDEF[id]) return FRDEF[id]; const m = String(a.m || '');
-  return /ink|pen\b|pencil|drawing|charcoal|graphite|etching|linocut|print/i.test(m) ? 'black' : /digital/i.test(m) ? 'brass' : /watercolou?r|gouache|pastel/i.test(m) ? 'oak' : 'gilt';
+  return /ink|pen\b|pencil|drawing|charcoal|graphite|etching|linocut|print/i.test(m) ? 'pearl' : /digital/i.test(m) ? 'walnut' : /watercolou?r|gouache|pastel/i.test(m) ? 'ribbon' : 'gilt';
 }
 function slugify(t) { return String(t || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/&/g, ' and ').replace(/[’'`]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'painting' }
 function slugMap(arts) { const by = {}, used = {}; arts.forEach(a => { const s = slugify(a.t); let k = s, n = 2; while (used[k]) k = s + '-' + (n++); used[k] = a; by[a.id] = k }); return { used, by } }

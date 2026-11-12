@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-npYIf3GbGXgBNnUCggvtFfnGsrT8VscvRVoB5SMSOXY=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-eg0A3CGeUoHD+7FnHvHOIZzID5zeob40o8OK2G8KqmA=' 'sha256-cL/85ilWqQURDrHNpcXRnNsCbcpTIioAyiPB7dvxL5o=' 'sha256-i7x1SgPJsG8pwLwKUxWILnUGEhbjEw0+gvAdsvCTW68=' 'sha256-EfgB5gRV9qOUlivWO34nVQ0thQL6JjYGMamyRkbVsfc=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://accounts.google.com/gsi/; frame-src https://accounts.google.com/gsi/; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pam’s Gallery — Original Paintings</title>
 <meta name="description" content="Original oil and acrylic paintings by Pam. Browse the collections, see sizes and prices, and enquire to buy. Trade and dealer enquiries welcome.">
@@ -1090,7 +1090,7 @@ if(DREAM_DEFAULT)addEventListener('DOMContentLoaded',function(){var n=document.c
  [['ink','Ink drawing'],['paint','Painted'],['dream','Dream'],['clay','Today’s clay']].forEach(function(q){var a=document.createElement('a');a.href='?look='+q[0];a.textContent=q[1];
   if(q[0]===LOOK)a.setAttribute('aria-current','page');n.appendChild(a)});document.body.appendChild(n)});
 /* photo-real material maps (generated, seamless): marble, plaster, mahogany, travertine */
-var MATSRC={clay:"/lib/clay-v2.webp",clayH:"/lib/clay-h-v2.webp",frOrchid:"/lib/frame-orchid-v2.webp",frEmber:"/lib/frame-ember-v2.webp",   /* smooth fine-grained clay surface for the clay look (made by dev/build/claytex.py) */
+var MATSRC={clay:"/lib/clay-v2.webp",clayH:"/lib/clay-h-v2.webp",   /* (the retired clay frames: frOrchid:"/lib/frame-orchid-v2.webp",frEmber:"/lib/frame-ember-v2.webp") */   /* smooth fine-grained clay surface for the clay look (made by dev/build/claytex.py) */
 crSk:"/lib/g-cfdc0ff8f22e.jpg",crSkH:"/lib/g-9940bf64a504.jpg",crLf:"/lib/g-4a714519abc5.jpg",crLfH:"/lib/g-d08bc612d4f8.jpg",crSt:"/lib/g-41330875d7df.jpg",crStH:"/lib/g-8f94bedf5f8f.jpg",floor:"/lib/g-b9ab7c65d0bd.jpg",
 marble:"/lib/g-f54d14ab06e4.jpg",
 plaster:"/lib/g-af8bc3bbd0f8.jpg",
@@ -1187,9 +1187,13 @@ var EMB={},FAVS=[],PRINTS=[];
 ART.forEach(function(p,i){p.id='p'+(i+1);p.emb=p.id;p.ar=i<6;p.mode='request';p.price='';p.p='Price on request';p.wm=p.wm||'';if(typeof p.d!=='string')p.d='';EMB[p.id]={img:p.img,full:p.full||p.img,tn:p.tn||p.img,wm:p.wm,t:p.t,m:p.m,d:p.d,w:p.w,h:p.h,bg:p.bg}});
 FAVS=ART.slice(0,6).map(function(p,i){return i});
 /* frames: each painting has one that suits it (Pam can choose another in her dashboard) */
-var FRAMES={"gilt": "Gilded baroque", "silver": "Silver baroque", "ivory": "Ivory & gold baroque", "deco": "Art deco gold", "walnut": "Walnut with a gold slip", "ebony": "Ebony with a gold slip", "emerald": "Emerald lacquer with gold", "teal": "Teal lacquer with gold", "jewel": "Black with jewel colours", "maple": "Pale maple float", "brass": "Slim brass float", "white": "Slim white float", "black": "Slim black with a white mount", "oak": "Natural oak with a white mount", "alu": "Brushed silver with a white mount"},FRDEF={"p1": "ivory", "p2": "gilt", "p3": "silver", "p4": "emerald", "p5": "walnut", "p6": "ebony", "p7": "deco", "p8": "maple", "p9": "jewel", "p10": "teal", "p11": "black", "p12": "oak", "p13": "alu", "p14": "brass", "p15": "white"};
-function frameAuto(p){var id=p.emb||(/^emb:/.test(p.img||'')?p.img.slice(4):'');return FRDEF[id]||(/ink|pen\b|pencil|drawing|charcoal|graphite|etching|linocut|print/i.test(p.m||'')?'black':/digital/i.test(p.m||'')?'brass':/watercolou?r|gouache|pastel/i.test(p.m||'')?'oak':'gilt')}
-function frameOf(p){return p&&p.fr&&FRAMES[p.fr]?p.fr:frameAuto(p||{})}
+var FRAMES={gilt:'Antique gilt with shell corners',rococo:'Rococo scrolls, ivory and worn gold',garland:'Victorian flower garland, antique gold',venetian:'Venetian, tarnished silver',bronze:'Old bronze gone green',
+ nouveau:'Art Nouveau, walnut and brass',florentine:'Florentine leaf, gold over red clay',temple:'Greek key, temple gold',cottage:'Cottage frame, worn painted pine',gothic:'Black Gothic with jewels',sunburst:'1920s sunburst, aged gold',
+ rope:'Black and gold with a rope edge, aged mount',pearl:'Black and gold with a pearl edge, aged mount',ribbon:'Black and gold with a ribbon edge, aged mount',walnut:'Old walnut with a gilt slip'},
+ FRDEF={p1:'rococo',p2:'garland',p3:'venetian',p4:'bronze',p5:'nouveau',p6:'florentine',p7:'temple',p8:'cottage',p9:'gothic',p10:'sunburst',p11:'rope',p12:'pearl',p13:'ribbon',p14:'sunburst',p15:'walnut'},
+ FROLD={ivory:'rococo',silver:'venetian',deco:'sunburst',ebony:'gothic',emerald:'bronze',teal:'cottage',jewel:'gothic',maple:'walnut',brass:'nouveau',white:'cottage',black:'rope',oak:'ribbon',alu:'pearl'};   // the frames' names before they all became vintage (November 2026)
+function frameAuto(p){var id=p.emb||(/^emb:/.test(p.img||'')?p.img.slice(4):'');return FRDEF[id]||(/ink|pen\b|pencil|drawing|charcoal|graphite|etching|linocut|print/i.test(p.m||'')?'pearl':/digital/i.test(p.m||'')?'walnut':/watercolou?r|gouache|pastel/i.test(p.m||'')?'ribbon':'gilt')}
+function frameOf(p){var f=p&&p.fr&&(FROLD[p.fr]||p.fr);return f&&FRAMES[f]?f:frameAuto(p||{})}
 function priceOf(a){return a.mode==='auction'?'Auction':a.mode==='price'&&a.p?a.p:'Price on request'}
 function wpOf(u){return /^\/lib\/[\w-]+\.jpg$/.test(u||'')?u.replace(/\.jpg$/,'.webp'):u}   // the build makes a WebP copy of every built-in painting and thumbnail
 function embImg(v){return /^emb:/.test(v||'')&&EMB[v.slice(4)]?wpOf(EMB[v.slice(4)].img):v}
@@ -1657,7 +1661,8 @@ function w3Mats(){if(W3.M)return W3.M;var T=THREE,m=function(c,o){return new T.M
   maple:m(0xffffff,{map:grain('#dcbd8f','#a37f4f',50),roughness:.6}),oak:m(0xffffff,{map:grain('#bb8d5a','#6e4a26',60),roughness:.62}),brass:m(0xc9a24b,{metalness:1,roughness:.3}),whiteLac:m(0xf3f0e9,{roughness:.3}),
   satin:m(0x1d1d1d,{roughness:.5}),alu:m(0xc6cacd,{metalness:1,roughness:.36}),mount:m(0xf7f4ec,{roughness:.95}),liner:m(0x3b2c21,{roughness:.85}),edge:m(0xece5d8,{roughness:.95}),gapDark:m(0x15110e,{roughness:1}),
   ruby:m(0x7b2240,{metalness:.3,roughness:.25})};return W3.M}
-// frame recipes: the same fifteen frames as in the gallery (widths and depths in metres)
+// simple stand-in frames, used only when the 3D gallery isn't running (widths and depths in metres); W3OLD says which stands in for each vintage frame
+var W3OLD={rococo:'ivory',garland:'gilt',venetian:'silver',bronze:'emerald',nouveau:'walnut',florentine:'gilt',temple:'deco',cottage:'teal',gothic:'jewel',sunburst:'deco',rope:'black',pearl:'black',ribbon:'black'};
 var W3F={gilt:{t:'baroque',fw:.1,gap:.03,b:'gold',c:'goldDark'},silver:{t:'baroque',fw:.1,gap:.03,b:'silver',c:'silverDark'},ivory:{t:'baroque',fw:.1,gap:.03,b:'ivory',c:'gold'},
  deco:{t:'deco',fw:.11,gap:.02,b:'gold',c:'goldDark'},walnut:{t:'slip',fw:.085,gap:.02,b:'walnut',c:'gold'},ebony:{t:'slip',fw:.085,gap:.02,b:'ebony',c:'gold'},emerald:{t:'slip',fw:.085,gap:.02,b:'emerald',c:'gold'},
  teal:{t:'slip',fw:.085,gap:.02,b:'teal',c:'gold'},jewel:{t:'slip',fw:.085,gap:.025,b:'ebony',c:'ruby'},maple:{t:'float',fw:.022,gap:.012,b:'maple'},brass:{t:'float',fw:.016,gap:.012,b:'brass'},
@@ -1665,8 +1670,8 @@ var W3F={gilt:{t:'baroque',fw:.1,gap:.03,b:'gold',c:'goldDark'},silver:{t:'baroq
 function w3Ring(ow,oh,iw,ih,d,bv){var T=THREE;bv=Math.min(bv||0,(ow-iw)/5,d/3);var a=ow/2-bv,b=oh/2-bv,c=iw/2+bv,e=ih/2+bv,sh=new T.Shape();sh.moveTo(-a,-b);sh.lineTo(a,-b);sh.lineTo(a,b);sh.lineTo(-a,b);sh.lineTo(-a,-b);
  var hl=new T.Path();hl.moveTo(-c,-e);hl.lineTo(-c,e);hl.lineTo(c,e);hl.lineTo(c,-e);hl.lineTo(-c,-e);sh.holes.push(hl);
  var g=new T.ExtrudeGeometry(sh,{depth:Math.max(.0005,d-2*bv),bevelEnabled:bv>0,bevelThickness:bv,bevelSize:bv,bevelSegments:bv>0?4:0,curveSegments:1});g.translate(0,0,bv);return g}
-function w3Build(k,key){var T=THREE,p=ART[k],M=w3Mats(),F=key==='none'?null:W3F[key]||null;W3.key=key||'';W3.k=k;
- if(W3.grp){W3.sc.remove(W3.grp);W3.grp.traverse(function(o){if(o.geometry)o.geometry.dispose()})}
+function w3Build(k,key){var T=THREE,p=ART[k],M=w3Mats(),F=key==='none'?null:W3F[key]||W3F[W3OLD[key]]||null;W3.key=key||'';W3.k=k;
+ if(W3.grp){W3.sc.remove(W3.grp);W3.grp.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.userData.vm)o.material.dispose()})}
  var g=new T.Group();W3.grp=g;W3.sc.add(g);
  var ratio=(+p.w||.5)/(+p.h||.7),big=Math.max(+p.w||.5,+p.h||.7),sz=/(\d+(?:[.,]\d+)?)\s*[×x]\s*(\d+(?:[.,]\d+)?)\s*(cm|mm|in)?/i.exec(p.s||'');
  if(sz){var u=/mm/i.test(sz[3]||'')?1000:/in/i.test(sz[3]||'')?39.37:100;big=Math.max(parseFloat(sz[1].replace(',','.')),parseFloat(sz[2].replace(',','.')))/u}   // the real size when Pam has given one
@@ -1675,9 +1680,14 @@ function w3Build(k,key){var T=THREE,p=ART[k],M=w3Mats(),F=key==='none'?null:W3F[
  var add=function(geo,mat,z){var o=new T.Mesh(geo,mat);o.position.z=z||0;o.castShadow=true;o.receiveShadow=true;g.add(o);return o};
  var src=p.full||p.img||thumb(k),tx=W3.tex[src];if(!tx){tx=new T.TextureLoader().load(src,function(){w3Render()});tx.colorSpace=T.SRGBColorSpace;tx.anisotropy=Math.min(8,W3.r.capabilities.getMaxAnisotropy());W3.tex[src]=tx}
  var face=new T.MeshStandardMaterial({map:tx,roughness:.62}),pz=F&&F.t==='mount'?.008:F&&F.t==='float'?.014:0;
- add(new T.BoxGeometry(w,h,cd),[M.edge,M.edge,M.edge,M.edge,face,M.edge],pz+cd/2);
+ // the gallery's own vintage frame (the same moulding and carving), scaled to suit the painting's real size
+ var VG=null,fs=Math.max(.45,Math.min(1.15,Math.min(w,h)/.8));if(key!=='none'&&window.__frame3){try{VG=window.__frame3(key,w/fs,h/fs)}catch(e){VG=null}}
  var Wo=w,Ho=h,D=pz+cd;
- if(F){var sc=Math.max(.65,Math.min(1.5,Math.min(w,h)/.5)),fw=F.fw*sc,gp=F.gap*(F.t==='mount'?sc:1),iw=w+2*gp,ih=h+2*gp,ow=iw+2*fw,oh=ih+2*fw,B=M[F.b],C=M[F.c]||M.goldDark;Wo=ow;Ho=oh;
+ if(VG){VG.parts.forEach(function(P){var ib=new T.InterleavedBuffer(P.v,8),g2=new T.BufferGeometry(),c=new T.Color();g2.setAttribute('position',new T.InterleavedBufferAttribute(ib,3,0));g2.setAttribute('normal',new T.InterleavedBufferAttribute(ib,3,3));
+   c.setRGB(P.col[0],P.col[1],P.col[2],T.LinearSRGBColorSpace);var o=add(g2,new T.MeshStandardMaterial({color:c,roughness:Math.max(.3,P.rough),metalness:Math.min(.6,P.metal),side:T.DoubleSide}));o.scale.setScalar(fs);o.userData.vm=1});
+  add(new T.PlaneGeometry(w,h),face,VG.z*fs+.0006);Wo=w+2*(VG.gap+VG.fw)*fs;Ho=h+2*(VG.gap+VG.fw)*fs;D=.1*fs}
+ else add(new T.BoxGeometry(w,h,cd),[M.edge,M.edge,M.edge,M.edge,face,M.edge],pz+cd/2);
+ if(!VG&&F){var sc=Math.max(.65,Math.min(1.5,Math.min(w,h)/.5)),fw=F.fw*sc,gp=F.gap*(F.t==='mount'?sc:1),iw=w+2*gp,ih=h+2*gp,ow=iw+2*fw,oh=ih+2*fw,B=M[F.b],C=M[F.c]||M.goldDark;Wo=ow;Ho=oh;
   if(F.t==='baroque'){add(w3Ring(iw+.002,ih+.002,w,h,.03,0),M.liner);                               // a dark liner between canvas and frame
    add(w3Ring(ow,oh,iw,ih,.058,.016),B);                                                             // the body, with a rounded outer edge
    add(w3Ring(iw+fw*1.45,ih+fw*1.45,iw+fw*.7,ih+fw*.7,.075,.014),F.b==='ivory'?M.gold:B);           // a raised carved ridge
@@ -1694,8 +1704,8 @@ function w3Size(){if(!W3.on||!W3.r||!W3.dim)return;var a=$('wallArt'),cw=a.clien
  W3.r.setPixelRatio(Math.min(2,devicePixelRatio||1));W3.r.setSize(cw,ch,false);var cam=W3.cam;cam.aspect=cw/ch;var dist=(W3.dim.h*1.6)/(2*Math.tan(cam.fov*Math.PI/360));cam.position.set(0,0,dist+W3.dim.d);cam.lookAt(0,0,0);cam.near=dist/20;cam.far=dist*4;cam.updateProjectionMatrix();w3Render()}
 function w3Render(){if(W3.on&&W3.r&&!wallEl.hidden)W3.r.render(W3.sc,W3.cam)}
 function w3Chips(k){var box=$('wallFrames');if(!box)return;var p=ART[k],mine=frameOf(p),cur=W3.key||mine;box.textContent='';
- var keys=[mine].concat(['gilt','silver','deco','walnut','ebony','emerald','maple','brass','white','black','oak','none'].filter(function(x){return x!==mine}));
- var SW={gilt:'#d8ad55',silver:'#d9d9d9',ivory:'#eee3cd',deco:'#c9a24b',walnut:'#5e3d27',ebony:'#1c1917',emerald:'#0d4a36',teal:'#0e5357',jewel:'#7b2240',maple:'#dcbd8f',brass:'#c9a24b',white:'#f3f0e9',black:'#1d1d1d',oak:'#bb8d5a',alu:'#c6cacd',none:'transparent'};
+ var keys=[mine].concat(['gilt','rococo','garland','venetian','bronze','nouveau','florentine','temple','cottage','gothic','sunburst','pearl','walnut','none'].filter(function(x){return x!==mine}));
+ var SW={gilt:'#c39a52',rococo:'#e6d8bc',garland:'#a88a5a',venetian:'#a3a6a8',bronze:'#4f8f7c',nouveau:'#5a3a22',florentine:'#6e2c1c',temple:'#b8944e',cottage:'#8aaba3',gothic:'#2a1f3a',sunburst:'#d0aa55',rope:'#1b1716',pearl:'#1b1716',ribbon:'#1b1716',walnut:'#4a2e1c',none:'transparent'};
  keys.forEach(function(x){var b=el('button','wchip'+(x===cur?' on':''));b.type='button';b.setAttribute('aria-pressed',String(x===cur));var i=el('i');i.style.background=SW[x]||'#ccc';if(x==='none')i.style.border='1px dashed #fff';b.appendChild(i);
   b.appendChild(el('span',null,x==='none'?'No frame':x===mine?'Pam’s choice · '+FRAMES[x]:FRAMES[x]));b.addEventListener('click',function(){W3.key=x;if(W3.on)w3Build(wallK,x)});box.appendChild(b)})}
 addEventListener('resize',function(){if(W3.on&&!wallEl.hidden)w3Size()});
@@ -3330,32 +3340,182 @@ function paintMat(k){if(ARTM[k])return ARTM[k];var p=ART[k];
    with Higgsfield (files made by dev/build/statue.py). Paintings not listed here get gold clay. */
 /* pic: a sculpted clay frame made as a picture with Higgsfield and cut out (dev/media/clay/frame-*-v2.png); open = the
    opening in pixels [left, top, right, bottom], which is fitted exactly to the painting so nothing of it is covered. side = its edge colour. */
+var CLAYFRAMES=false;   /* November 2026: Pam asked for every frame to be vintage, so the two sculpted clay frames are put away. true brings them back (and add their pictures to MATSRC again) */
 var CLAYFR={'Orchid in the Clouds':{roll:['#efe6f4','#c9a9df'],orn:'frame-orchid-v1',pic:{img:'frOrchid',w:1006,h:1248,open:[152,131,848,1114],side:'#e2c9e4'}},
  'White Bloom over Ember':{roll:['#e8762e','#b8321f'],orn:'frame-ember-v1',pic:{img:'frEmber',w:994,h:1287,open:[136,135,855,1149],side:'#d4492a'}}},ROPEM={},PICM={};
 function picMat(q){if(PICM[q.img])return PICM[q.img];var im=MATIMG[q.img],c=cnv(im.naturalWidth,im.naturalHeight);c.getContext('2d').drawImage(im,0,0);
  return PICM[q.img]=mat({tex:texFrom(c,{clamp:1}),unit:1,rough:.9,bump:.4,cut:.5,col:[.94,.94,.94]})}
 function ropeMat(col){return ROPEM[col]||(ROPEM[col]=mat({col:lin(col),tex:CLAYT,htex:CLAYH,bump:.35,rough:.8,uvs:[1.2,1.2]}))}
-function frameStyle(key){var G=Mx.gold24,D=Mx.goldDark;return({
- gilt:{t:'baroque',fw:CLAY?.14:.1,gap:.055,base:G,rolls:[G,G,G],orn:G,cove:D},
- silver:{t:'baroque',fw:.1,gap:.055,base:Mx.silver,rolls:[Mx.silver,Mx.silver,Mx.silver],orn:Mx.silver,cove:Mx.silverDark},
- ivory:{t:'baroque',fw:.1,gap:.055,base:Mx.ivory,rolls:[G,Mx.ivory,G],orn:G,cove:Mx.ivoryDark},
- deco:{t:'deco',fw:.12,gap:.035,m:Mx.decoGold,dk:D},
- walnut:{t:'slip',fw:.1,gap:.055,m:Mx.walnut,slip:[G,G,G,G]},
- ebony:{t:'slip',fw:.1,gap:.055,m:Mx.ebony,slip:[G,G,G,G]},
- emerald:{t:'slip',fw:.1,gap:.055,m:Mx.emerald,slip:[G,G,G,G]},
- teal:{t:'slip',fw:.1,gap:.055,m:Mx.teal,slip:[G,G,G,G]},
- jewel:{t:'slip',fw:.1,gap:.055,m:Mx.ebony,slip:[Mx.jewelA,Mx.jewelB,Mx.jewelC,Mx.jewelD],sw:.032},
- maple:{t:'float',fw:.04,gap:.05,m:Mx.maple},
- brass:{t:'float',fw:.028,gap:.045,m:Mx.brass},
- white:{t:'float',fw:.032,gap:.045,m:Mx.whiteLac},
- black:{t:'mount',fw:.035,gap:.12,m:Mx.satin},
- oak:{t:'mount',fw:.04,gap:.115,m:Mx.oak},
- alu:{t:'mount',fw:.03,gap:.125,m:Mx.alu}})[key]||null}
+/* ---------- vintage frames (November 2026): every frame is an antique, and each built-in painting has one made to suit it ----------
+   A style is: fw (the moulding's width), gap (the slip or mount between frame and picture), m (its materials), prof (the moulding's
+   cross-section, carried round the opening with mitred corners: points [d,z,mi] where d = distance out from the opening, z = height
+   off the wall and mi = which material covers the stretch that starts there), orn (the carving: runs along the rails, corner and
+   centre pieces) and inn ('slip' = a narrow fillet sloping to the picture, 'mount' = an aged card mount for works on paper).
+   Nothing ever overlaps the painting. */
+// a patina to lay over a frame's colour: soft stains and rubbed patches. Kept smooth, so the ink drawing doesn't pick the marks up as lines.
+// blots: [how many, 'r,g,b', faintest, strongest, smallest, largest]
+function patinaTex(seed,base,blots){var W=256,c=cnv(W,W),x=c.getContext('2d'),r=function(){seed=seed*16807%2147483647;return seed/2147483647};x.fillStyle=base;x.fillRect(0,0,W,W);
+ blots.forEach(function(q){for(var i=0;i<q[0];i++){var px=r()*W,py=r()*W,R=q[4]+r()*(q[5]-q[4]),al=(q[2]+r()*(q[3]-q[2])).toFixed(3);
+  for(var ox=-W;ox<=W;ox+=W)for(var oy=-W;oy<=W;oy+=W){var g=x.createRadialGradient(px+ox,py+oy,0,px+ox,py+oy,R);g.addColorStop(0,'rgba('+q[1]+','+al+')');g.addColorStop(1,'rgba('+q[1]+',0)');x.fillStyle=g;x.fillRect(px+ox-R,py+oy-R,2*R,2*R)}}});
+ return texFrom(c)}
+var VMT=null;
+function vmats(){if(VMT)return VMT;
+ var pg=patinaTex(7,'#f6efdc',[[30,'70,45,22',.1,.24,16,48],[14,'150,62,38',.16,.34,5,15]]),     // old gold: dulled in patches, rubbed back to the red clay here and there
+  ps=patinaTex(11,'#f1f1ee',[[34,'38,38,48',.15,.42,10,40],[8,'90,70,40',.1,.2,8,22]]),          // silver and bronze: tarnish
+  pw=patinaTex(13,'#f3ebe0',[[26,'40,22,12',.12,.3,16,50],[10,'255,240,220',.1,.2,10,30]]);      // wood and paint: years of handling
+ // base = the colour in the ink drawing (and any other look), paint = the antique colour in the painted look
+ var cl=function(base,paint,rough,metal,tex,bump){var m=mat(CLAY?{col:base,tex:tex||CLAYT,htex:CLAYH,bump:bump==null?.3:bump,rough:rough,metal:metal||0,uvs:[.35,.35]}:{col:LOOKTOG?base:paint,rough:rough,metal:metal||0});
+  if(LOOKTOG&&CLAY)lk(m,paint);return m};
+ return VMT={gilt:cl('#c9a35e','#a88a5a',.5,.3,pg),giltShade:cl('#b08a45','#735632',.6,.25,pg),giltDeep:cl('#a87a2c','#4e3520',.6,.2,pg),bole:cl('#b5673f','#6e2c1c',.7,0,pw),
+  ivory:cl('#efdcbe','#ede2cb',.8,0,pw),ivoryShade:cl('#cdbd9c','#cbb794',.8,0,pw),silver:cl('#cfd0cc','#a3a6a8',.42,.35,ps),silverDark:cl('#7c7d80','#45474e',.6,.2,ps),
+  bronze:cl('#8c6b47','#6a5236',.5,.4,ps),verdi:cl('#a9c4b4','#4f8f7c',.85,0,pw),wood:cl('#7a5234','#5a3a22',.6,0,pw),ebon:cl('#1c1917','#16110f',.42),
+  chalk:cl('#dfe5df','#8aaba3',.9,0,pw),pine:cl('#caa678','#a9824f',.8,0,pw),mount:cl('#f3eddf','#efe5cf',.95,0,null,.12)}}
+// points on an arc for a moulding's cross-section: centre (cx,cz), radii rx,rz, from angle a0 to a1 in quarter turns
+// (0 = pointing away from the picture, 1 = up off the wall, 2 = towards the picture, 3 = down)
+function arcP(cx,cz,rx,rz,a0,a1,n,mi){var P=[];for(var i=0;i<=n;i++){var a=(a0+(a1-a0)*i/n)*Math.PI/2;P.push([cx+Math.cos(a)*rx,cz+Math.sin(a)*rz,mi||0])}return P}
+function ripP(d0,z0,n,p,amp,rise,mi){var P=[];for(var i=0;i<n;i++){P.push([d0+i*p,z0+i*rise,mi||0],[d0+(i+.5)*p,z0+i*rise+amp,mi||0])}P.push([d0+n*p,z0+n*rise,mi||0]);return P}
+function profP(){return Array.prototype.concat.apply([],arguments)}
+// the moulding: the cross-section carried along all four sides, mitred at the corners. Gentle bends are shaded as curves, sharp ones as steps.
+function sweep(ms,b,ow,oh,prof){var pr=[prof[0]],i;for(i=1;i<prof.length;i++){var a=pr[pr.length-1],q=prof[i];if(Math.hypot(q[0]-a[0],q[1]-a[1])>1e-5)pr.push(q);else a[2]=q[2]}
+ var n=pr.length,sn=[];for(i=0;i<n-1;i++){var dd=pr[i+1][0]-pr[i][0],dz=pr[i+1][1]-pr[i][1],l=Math.hypot(dd,dz);sn.push([-dz/l,dd/l])}
+ function nrm(s,t){var a=sn[s],q=sn[t];if(!q||a[0]*q[0]+a[1]*q[1]<.6)return a;var x=a[0]+q[0],y=a[1]+q[1],l=Math.hypot(x,y)||1;return[x/l,y/l]}
+ for(i=0;i<n-1;i++){(function(p0,p1,m,n0,n1){
+  [[1,0,1],[1,0,-1],[0,1,0],[0,-1,0]].forEach(function(S){   // top, bottom, right, left
+   var V=function(p,nn,sg){var x=S[0]?sg*(ow+p[0]):S[1]*(ow+p[0]),y=S[0]?S[2]*(oh+p[0]):sg*(oh+p[0]);
+    return{p:bx(b,[x,y,p[1]]),n:bn(b,S[0]?[0,S[2]*nn[0],nn[1]]:[S[1]*nn[0],0,nn[1]]),u:[0,0]}};
+   var A=V(p0,n0,-1),Bq=V(p0,n0,1),C=V(p1,n1,1),D=V(p1,n1,-1);tri(m,A,Bq,C);tri(m,A,C,D)})})(pr[i],pr[i+1],ms[pr[i][2]||0],nrm(i,i-1),nrm(i,i+1))}}
+// carving: half an ellipsoid standing on the frame. s = [half-length, half-width, height, point]; point > 0 draws the far end to a tip, like a leaf
+function dome(m,b,c,s,rot,rings,segs){rings=rings||2;segs=segs||7;var cr=Math.cos(rot||0),sr=Math.sin(rot||0),pt=s[3]||0;
+ var P=function(I,K){var th=I/rings*Math.PI/2,ph=K/segs*Math.PI*2,ux=Math.sin(th)*Math.cos(ph),uy=Math.sin(th)*Math.sin(ph),uz=Math.cos(th),
+   tp=1-pt*Math.max(0,ux)*Math.max(0,ux),lx=ux*s[0],ly=uy*s[1]*tp,nx=ux/s[0],ny=uy/s[1],nz=uz/s[2];
+  return{p:bx(b,[c[0]+lx*cr-ly*sr,c[1]+lx*sr+ly*cr,c[2]+uz*s[2]]),n:bn(b,[nx*cr-ny*sr,nx*sr+ny*cr,nz]),u:[K/segs,I/rings]}};
+ for(var i=0;i<rings;i++)for(var k=0;k<segs;k++){var A=P(i,k),Bq=P(i,k+1),C=P(i+1,k+1),D=P(i+1,k);if(i)tri(m,A,Bq,C);tri(m,A,C,D)}}
+function frameStyle(key){key=FROLD[key]||key;var V=vmats(),G=V.gilt,T=V.giltShade,D=V.giltDeep,PI=Math.PI,cos=Math.cos,sin=Math.sin;
+ // the black-and-gold print frame for works on paper, with an aged mount: only the carving along its outer edge changes
+ function hogarth(edge){return{fw:.05,gap:.1,inn:'mount',m:[V.ebon,G],
+  prof:profP([[0,.04,1],[0,.05,1]],arcP(.007,.05,.007,.008,2,0,3,1),[[.014,.05,0]],arcP(.014,.066,.02,.016,3,4,3,0),[[.034,.068,0],[.036,.068,1]],arcP(.043,.068,.007,.009,2,0,3,1),[[.05,.06,0],[.05,0,0]]),orn:edge}}
+ switch(key){
+ case'gilt':return{fw:.14,gap:.02,inn:'slip',m:[G,T,D],   // the classic: a deep hollow, a rounded top with leaf tips, shells at the corners and centres
+  prof:profP([[0,.05,0]],arcP(.011,.05,.011,.013,2,0,4,0),[[.022,.047,2],[.028,.047,1]],arcP(.028,.08,.05,.033,3,4,5,1),arcP(.1,.08,.022,.017,2,0,5,0),arcP(.14,.08,.018,.035,2,3,3,0),[[.14,.045,2],[.14,0,2]]),
+  orn:function(k){k.run(.1,.058,function(x,y,a,o,dir){k.lobe(0,x,y,null,.034,.015,.011,a+(dir<0?PI:0),.7)},{end:.15,mid:.1});
+   k.corners(function(sx,sy,a){k.fan(0,sx*(k.ow+.085),sy*(k.oh+.085),null,a-1.15,a+1.15,7,.098,.018,.016)});
+   k.centres(function(ux,uy,a,i){k.fan(0,ux*(k.ow+.1),uy*(k.oh+.1),null,a-1.3,a+1.3,i%2?5:7,i%2?.05:.075,.015,.013)})}};
+ case'rococo':return{fw:.145,gap:.02,inn:'slip',slip:1,m:[V.ivory,G,V.ivoryShade],   // Orchid in the Clouds: scrolls curling like clouds, faded ivory and worn gold
+  prof:profP([[0,.05,1]],arcP(.009,.05,.009,.011,2,0,3,1),[[.018,.047,2],[.024,.047,2]],arcP(.024,.084,.058,.037,3,4,6,2),arcP(.108,.084,.026,.014,2,0,5,0),arcP(.134,.05,.011,.034,1,0,3,1),[[.145,.05,2],[.145,0,2]]),
+  orn:function(k){
+   k.corners(function(sx,sy,a){var cx=sx*(k.ow+.095),cy=sy*(k.oh+.095),c1=[cx-sx*.2,sy*(k.oh+.084)],c2=[sx*(k.ow+.084),cy-sy*.2];
+    k.fan(1,cx,cy,null,a-1.05,a+1.05,7,.1,.018,.016);                                                                      // a shell across the corner
+    k.strand(1,[[cx-sx*.07,cy+sy*.02]].concat(k.scroll(c1[0],c1[1],sx,sy,0,1.05,5.6,.056,.01,13)),.014,.007);               // a scroll curling away from it along the top or bottom rail
+    k.strand(1,[[cx+sx*.02,cy-sy*.07]].concat(k.scroll(c2[0],c2[1],sx,sy,1,1.05,5.6,.056,.01,13)),.014,.007);               // and one down the side
+    k.lobe(1,c1[0]-sx*.085,c1[1]+sy*.02,null,.04,.014,.012,Math.atan2(sy*.25,-sx),.8);k.lobe(1,c2[0]+sx*.02,c2[1]-sy*.085,null,.04,.014,.012,Math.atan2(-sy,sx*.25),.8);   // a leaf springing from each
+    if(k.ow>.34){k.lobe(0,c1[0]-sx*.14,c1[1],null,.036,.024,.014);k.lobe(0,c1[0]-sx*.185,c1[1]+sy*.01,null,.026,.018,.011)}                                               // and soft puffs trailing away, like cloud
+    if(k.oh>.34){k.lobe(0,c2[0],c2[1]-sy*.14,null,.024,.036,.014);k.lobe(0,c2[0]+sx*.01,c2[1]-sy*.185,null,.018,.026,.011)}});
+   k.centres(function(ux,uy,a,i){k.fan(1,ux*(k.ow+.1),uy*(k.oh+.1),null,a-1.2,a+1.2,i%2?5:7,i%2?.05:.08,.015,.014);
+    if((ux?k.oh:k.ow)>.34)[1,-1].forEach(function(s){k.strand(1,ux?k.scroll(ux*(k.ow+.086),s*.09,ux,s,1,2.2,4.4,.034,.008,9):k.scroll(s*.09,uy*(k.oh+.086),s,uy,0,2.2,4.4,.034,.008,9),.01,.005)})})}};
+ case'garland':return{fw:.14,gap:.02,inn:'slip',m:[G,T,D],   // Violet Garden: a Victorian garland of flowers and leaves
+  prof:profP([[0,.05,0]],arcP(.008,.05,.008,.01,2,0,3,0),[[.016,.047,2],[.022,.047,1]],arcP(.064,.047,.042,.016,2,0,7,1),[[.106,.05,0]],arcP(.123,.05,.017,.034,2,0,5,0),[[.14,.05,2],[.14,0,2]]),
+  orn:function(k){k.run(.064,.1,function(x,y,a,o,dir,i){var d=a+(dir<0?PI:0);if(i%2)k.rosette(0,x,y,null,.04,5,0,a+.3);
+    else[.42,-.42].forEach(function(t){k.lobe(0,x+cos(d+t)*.014,y+sin(d+t)*.014,null,.045,.016,.011,d+t,.75)})},{end:.15,even:1});
+   k.corners(function(sx,sy,a){var cx=sx*(k.ow+.064),cy=sy*(k.oh+.064);[-1.25,-.62,.62,1.25].forEach(function(t){k.lobe(0,cx+cos(a+t)*.05,cy+sin(a+t)*.05,null,.048,.016,.012,a+t,.75)});k.rosette(0,cx,cy,null,.05,6,0,a)})}};
+ case'venetian':return{fw:.145,gap:.02,inn:'slip',m:[V.silver,V.silverDark],   // Three Masks in Blue: a Venetian carnival frame in tarnished silver, with a crest
+  prof:profP([[0,.05,0]],arcP(.012,.05,.012,.016,2,0,4,0),[[.024,.05,1]],arcP(.06,.058,.036,.018,2,4,6,1),arcP(.1205,.058,.0245,.03,2,0,6,0),[[.145,.04,1],[.145,0,1]]),
+  orn:function(k){k.run(.1205,.036,function(x,y,a,o,dir){k.lobe(0,x,y,null,.019,.0085,.013,a+.8*dir)},{end:.115,mid:.085});
+   k.corners(function(sx,sy,a){var cx=sx*(k.ow+.06),cy=sy*(k.oh+.06);k.fan(0,cx+cos(a)*.05,cy+sin(a)*.05,null,a-.95,a+.95,5,.068,.015,.014);
+    k.lobe(0,cx,cy,null,.035,.035,.036,0,0,1);for(var i=0;i<10;i++)k.lobe(0,cx+cos(i*.6283)*.045,cy+sin(i*.6283)*.045,null,.007,.007,.008)});
+   k.centres(function(ux,uy,a,i){var cx=ux*(k.ow+.06),cy=uy*(k.oh+.06);k.lobe(0,cx,cy,null,ux?.022:.038,ux?.038:.022,.03,0,0,1);
+    k.fan(0,ux*(k.ow+.112),uy*(k.oh+.112),null,a-1.3,a+1.3,i===0?9:i===2?7:5,i===0?.095:i===2?.06:.04,.015,.014)})}};
+ case'bronze':return{fw:.14,gap:.02,inn:'slip',m:[V.bronze,V.verdi],   // Three Masks in Green: old bronze gone green, studded and strapped at the corners
+  prof:profP([[0,.05,0],[0,.058,0],[.012,.058,0],[.012,.05,1],[.05,.05,1],[.05,.058,1]],arcP(.092,.058,.042,.04,2,1,5,1),arcP(.092,.07,.03,.028,1,0,4,1),[[.122,.052,1],[.134,.052,0],[.134,.044,0],[.14,.044,0],[.14,0,0]]),
+  orn:function(k){k.run(.031,.064,function(x,y){k.lobe(0,x,y,null,.012,.012,.011)},{end:.031});
+   k.corners(function(sx,sy,a){var x1=sx*(k.OX-.21),y1=sy*(k.OY-.21),dx=sx*(k.ow+.074),dy=sy*(k.oh+.074);
+    k.bar(0,x1,dy,.04,.026,.125,.064);k.bar(0,dx,y1,.04,.125,.026,.064);                       // two straps clasp each corner
+    [-.036,.036].forEach(function(t){k.lobe(0,x1,dy+t,.104,.008,.008,.006);k.lobe(0,dx+t,y1,.104,.008,.008,.006)});
+    k.lobe(0,sx*(k.ow+.084),sy*(k.oh+.084),null,.032,.032,.024,0,0,1)})}};
+ case'nouveau':return{fw:.14,gap:.02,inn:'slip',slip:1,m:[V.wood,G],   // The Messenger: Art Nouveau, brass stems that sway like the painting's swirls
+  prof:profP([[0,.05,1],[0,.056,1],[.008,.056,1],[.008,.052,0]],arcP(.07,.052,.062,.028,2,0,8,0),[[.132,.052,1]],arcP(.136,.052,.004,.008,2,0,2,1),[[.14,.052,0],[.14,0,0]]),
+  orn:function(k){var n=20,y0=-k.OY+.045,y1=k.OY-.12,i,t;
+   [1,-1].forEach(function(sx){var P=[],xs=function(t){return sx*(k.ow+.07+.03*sin(t*PI*3))};for(i=0;i<=n;i++){t=i/n;P.push([xs(t),y0+t*(y1-y0)])}
+    k.strand(1,P,.014,.009);                                                                                   // a stem up each side
+    k.strand(1,k.scroll(sx*(k.ow+.07),k.OY-.075,sx,1,0,-PI/2,4.9,.045,.008,12),.0095,.006);                    // curling into a bud at the top corner
+    [[1/6,1],[.5,-1],[5/6,1]].forEach(function(q){var yy=y0+q[0]*(y1-y0),an=PI/2-sx*q[1]*.8;k.lobe(1,xs(q[0])+cos(an)*.04,yy+sin(an)*.04,null,.05,.017,.01,an,.8)});
+    var Bt=[],Tp=[];for(i=0;i<=12;i++){t=i/12;Bt.push([sx*(.02+t*(k.OX-.095)),-(k.oh+.07+.024*sin(t*PI*2))]);Tp.push([sx*(.04+t*(k.OX-.17)),k.oh+.07+.022*sin(t*PI*2)])}
+    k.strand(1,Bt,.012,.007);k.strand(1,Tp,.007,.01)});
+   k.lobe(1,0,-(k.oh+.07),null,.034,.02,.014,PI/2,.8);k.rosette(1,0,k.oh+.07,null,.046,5,null,PI/2)}};
+ case'florentine':return{fw:.145,gap:.02,inn:'slip',m:[G,V.bole,D],   // White Bloom over Ember: Florentine leaves like flames, the gold rubbed back to the red clay beneath
+  prof:profP([[0,.05,0]],arcP(.009,.05,.009,.011,2,0,3,0),[[.018,.047,2],[.024,.047,1]],arcP(.078,.047,.054,.036,2,0,8,1),[[.132,.05,0]],arcP(.1385,.05,.0065,.012,2,0,3,0),[[.145,.05,2],[.145,0,2]]),
+  orn:function(k){k.run(.078,.088,function(x,y,a,o,dir){var d=a+(dir<0?PI:0);k.lobe(0,x+cos(d)*.03,y+sin(d)*.03,null,.066,.027,.02,d,.6);
+    [.75,-.75].forEach(function(t){k.lobe(0,x+cos(d+t)*.024,y+sin(d+t)*.024,null,.05,.019,.016,d+t,.6)})},{end:.13,mid:.075});
+   k.corners(function(sx,sy,a){var cx=sx*(k.ow+.062),cy=sy*(k.oh+.062);[[-1,.075],[-.5,.105],[0,.135],[.5,.105],[1,.075]].forEach(function(q){k.lobe(0,cx+cos(a+q[0])*q[1]*.5,cy+sin(a+q[0])*q[1]*.5,null,q[1]*.5,.02,.018,a+q[0],.85)});k.lobe(0,cx,cy,null,.024,.024,.02)});
+   k.centres(function(ux,uy,a){var cx=ux*(k.ow+.078),cy=uy*(k.oh+.078);k.lobe(0,cx,cy,null,.026,.026,.022,0,0,1);[-.6,0,.6].forEach(function(t){k.lobe(0,cx+cos(a+t)*.036,cy+sin(a+t)*.036,null,.042,.015,.014,a+t,.85)})})}};
+ case'temple':return{fw:.14,gap:.02,inn:'slip',m:[G,T,D],   // The Hall of Many Stairs: a Greek temple frame, steps climbing from the picture and a key pattern
+  prof:profP([[0,.05,0],[0,.054,0],[.012,.054,0],[.012,.06,0],[.024,.06,0],[.024,.066,0],[.03,.066,0],[.03,.06,1],[.08,.06,1],[.08,.066,0],[.086,.066,0]],arcP(.086,.09,.022,.024,3,4,3,0),[[.108,.094,0],[.12,.094,0]],arcP(.12,.08,.014,.014,1,0,3,0),[[.134,.06,2],[.14,.06,0],[.14,0,2]]),
+  orn:function(k){var v0=.037,v1=.073,vm=.055,tk=.0065,z=.06,hg=.0055;
+   k.rails(function(R){var half=R.half+.03,nu=Math.max(2,Math.round(2*half/.072)),u=2*half/nu;R.bar(0,0,v0,2*half,tk,z,hg);
+    for(var j=0;j<nu;j++){var s=-half+(j+.2)*u;R.bar(0,s,(v0+v1)/2,tk,v1-v0+tk,z,hg);R.bar(0,s+.3*u,v1,.6*u+tk,tk,z,hg);R.bar(0,s+.6*u,(v1+vm)/2,tk,v1-vm+tk,z,hg);R.bar(0,s+.45*u,vm,.3*u+tk,tk,z,hg)}});
+   k.corners(function(sx,sy,a){var cx=sx*(k.ow+.055),cy=sy*(k.oh+.055);k.bar(1,cx,cy,.058,.052,.052,.01);k.rosette(0,cx,cy,.068,.023,6,0)})}};
+ case'cottage':return{fw:.11,gap:.02,inn:'slip',slip:1,m:[V.chalk,V.pine],   // The Paper Nest: a cottage frame, chalky paint worn back to the pine at the edges
+  prof:profP([[0,.05,1],[0,.054,1],[.006,.058,1],[.006,.058,0]],arcP(.006,.078,.03,.02,3,4,4,0),[[.036,.078,0],[.09,.078,0]],arcP(.09,.066,.012,.012,1,0,3,1),[[.102,.066,0],[.11,.056,0],[.11,0,0]]),
+  orn:function(k){var h=function(i,j){var v=sin(i*12.9898+j*78.233)*43758.5453;return v-Math.floor(v)};
+   k.rails(function(R,ri){for(var i=0;i<4;i++){var s=(h(i,ri)-.5)*2*(R.half-.06);R.lobe(1,s,.046+h(i,ri+9)*.034,null,.014+h(i,ri+5)*.02,.004+h(i,ri+3)*.006,.0013,0)}});   // paint worn through here and there
+   k.corners(function(sx,sy){[.04,.082].forEach(function(d){k.lobe(1,sx*(k.ow+d),sy*(k.oh+d),null,.0055,.0055,.003)})})}};                                              // the pegs through each joint
+ case'gothic':return{fw:.135,gap:.02,inn:'slip',slip:1,m:[V.ebon,G,Mx.jewelA,Mx.jewelB,Mx.jewelC,Mx.jewelD],   // The Petal Choir: black Gothic with jewels, like a church window
+  prof:profP([[0,.05,1],[0,.056,1],[.01,.062,1],[.01,.062,0],[.02,.07,0],[.03,.07,0]],arcP(.066,.07,.036,.022,2,4,6,0),[[.102,.078,0],[.107,.078,1],[.116,.078,0],[.123,.078,0]],arcP(.123,.066,.012,.012,1,0,3,0),[[.135,.066,0],[.135,0,0]]),
+  orn:function(k){k.run(.066,.066,function(x,y,a,o,dir,i){if(i%2)k.lobe(1,x,y,null,.008,.008,.009);else{k.lobe(1,x,y,null,.027,.027,.008);k.lobe(2+(i/2+(a?1:0)+(x+y<0?2:0))%4,x,y,k.zAt(x,y)+.003,.02,.02,.018,0,0,1)}},{end:.135,even:1});
+   k.corners(function(sx,sy,a){var cx=sx*(k.ow+.066),cy=sy*(k.oh+.066);k.rosette(1,cx,cy,null,.052,4,null,PI/4);k.lobe(2+(sx>0?0:1)+(sy>0?0:2),cx,cy,k.zAt(cx,cy)+.005,.021,.021,.022,0,0,1)})}};
+ case'sunburst':return{fw:.13,gap:.02,inn:'slip',m:[G,V.ebon,D],   // The Stair Keepers: the 1920s, stepped like stairs, a sun rising in every corner
+  prof:[[0,.05,0],[0,.096,0],[.012,.096,2],[.012,.09,0],[.046,.09,2],[.046,.074,0],[.088,.074,2],[.088,.058,0],[.124,.058,2],[.124,.046,0],[.13,.046,2],[.13,0,2]],
+  orn:function(k){var f=k.fw;
+   k.corners(function(sx,sy){k.bar(1,sx*(k.ow+f/2),sy*(k.oh+f/2),.04,f,f,.058);var ix=sx*(k.ow+.03),iy=sy*(k.oh+.03);
+    for(var i=0;i<7;i++){var ph=.09+(PI/2-.18)*i/6,L=.93*(f-.03)/Math.max(cos(ph),sin(ph))*(i%2?.8:1),an=Math.atan2(sin(ph)*sy,cos(ph)*sx);k.lobe(0,ix+cos(an)*L*.5,iy+sin(an)*L*.5,.098,L*.5,.011,.007,an,.9)}
+    k.lobe(0,ix,iy,.098,.027,.027,.013,0,0,1)});
+   [1,-1].forEach(function(sy){k.bar(1,0,sy*(k.oh+f/2),.04,.25,f,.058);var iy=sy*(k.oh+.028);
+    for(var i=0;i<9;i++){var ph=.2+(PI-.4)*i/8,L=.92*Math.min((f-.028)/Math.max(.2,sin(ph)),.125/Math.max(.2,Math.abs(cos(ph))))*(i%2?.8:1),an=Math.atan2(sin(ph)*sy,cos(ph));k.lobe(0,cos(an)*L*.5,iy+sin(an)*L*.5,.098,L*.5,.011,.007,an,.9)}
+    k.lobe(0,0,iy,.098,.029,.025,.013,0,0,1)})}};
+ case'rope':return hogarth(function(k){k.run(.043,.025,function(x,y,a,o,dir){k.lobe(1,x,y,null,.013,.0055,.0095,a+.8*(dir||1))})});      // Unravelling: a twist of rope, like the thread coming loose
+ case'pearl':return hogarth(function(k){k.run(.043,.023,function(x,y){k.lobe(1,x,y,null,.0068,.0068,.0085)})});                          // Three in the Tangle: a string of pearls, like its bubbles
+ case'ribbon':return hogarth(function(k){k.run(.043,.054,function(x,y,a){k.lobe(1,x,y,null,.021,.0052,.008,a+.7);k.lobe(1,x,y,null,.021,.0052,.008,a-.7)})});   // The Dance of the Petal Folk: a ribbon winding round a stick
+ case'walnut':return{fw:.13,gap:.02,inn:'slip',slip:1,m:[V.wood,G],   // old walnut with rippled mouldings and a gilt slip
+  prof:profP([[0,.05,1],[0,.056,1],[.008,.062,1],[.008,.062,0]],ripP(.008,.062,4,.007,.006,0,0),[[.036,.062,0]],arcP(.064,.062,.028,.008,2,0,4,0),ripP(.092,.062,4,.007,.006,.004,0),[[.12,.078,0],[.124,.078,0],[.13,.07,0],[.13,0,0]]),
+  orn:function(k){k.corners(function(sx,sy,a){var cx=sx*(k.ow+.064),cy=sy*(k.oh+.064);[.5,-.5].forEach(function(t){k.lobe(1,cx+cos(a+PI+t)*.03,cy+sin(a+PI+t)*.03,null,.03,.009,.005,a+PI+t,.8)});k.lobe(1,cx,cy,null,.008,.008,.007)})}}}
+ return null}
+// builds a vintage frame round a painting w × h; returns how far off the wall the painting hangs
+function vFrame(F,b,w,h){var fw=F.fw,gap=F.gap,ow=w/2+gap,oh=h/2+gap,M=F.m,TAU=Math.PI*2;
+ sweep(M,b,ow,oh,F.prof);
+ var k={ow:ow,oh:oh,fw:fw,OX:ow+fw,OY:oh+fw,
+  // how high the moulding stands at a point of the frame
+  zAt:function(x,y){var d=Math.max(0,Math.min(fw,Math.max(Math.abs(x)-ow,Math.abs(y)-oh))),P=F.prof,z=0;for(var i=0;i<P.length-1;i++){var a=P[i],q=P[i+1],lo=Math.min(a[0],q[0]),hi=Math.max(a[0],q[0]);
+    if(d<lo-1e-6||d>hi+1e-6)continue;z=Math.max(z,hi-lo<1e-6?Math.max(a[1],q[1]):a[1]+(q[1]-a[1])*(d-a[0])/(q[0]-a[0]))}return z},
+  // a rounded boss, bead or leaf: half-length a, half-width c, height hg, turned by rot; pt draws it to a point. With no z it sits on the moulding
+  lobe:function(mi,x,y,z,a,c,hg,rot,pt,big){dome(M[mi],b,[x,y,z==null?k.zAt(x,y)-hg*.3:z],[a,c,hg*(z==null?1.3:1),pt||0],rot||0,big?3:2,big?10:7)},
+  bar:function(mi,x,y,z,sx,sy,hg){box(M[mi],b,[x,y,z+hg/2],[sx,sy,hg],[5])},
+  // fn(x,y,along,out,dir,i,n): evenly along all four rails, d out from the opening. along = the rail's direction, dir = which side of the rail's middle (-1, 0, 1).
+  // end keeps clear of the corners, mid of the middles, even makes the count even
+  run:function(d,step,fn,o){o=o||{};var e=o.end||0,mid=o.mid||0;
+   [[ow,oh],[oh,ow]].forEach(function(q,v){var L=q[0]+d-e,n=Math.max(2,Math.round(2*L/step));if(o.even&&n%2)n++;var s=2*L/n,off=q[1]+d,i0=v&&!e?1:0,i1=v&&!e?n-1:n;
+    for(var i=i0;i<=i1;i++){(function(t,i){if(Math.abs(t)<mid)return;var dir=t<-1e-6?-1:t>1e-6?1:0;
+     [1,-1].forEach(function(sg){if(v)fn(sg*off,t,Math.PI/2,sg>0?0:Math.PI,dir,i,n);else fn(t,sg*off,0,sg*Math.PI/2,dir,i,n)})})(-L+i*s,i)}})},
+  // each rail in its own coordinates: s along it, v out from the opening
+  rails:function(fn){[[1,0,1],[0,1,1],[1,0,-1],[0,1,-1]].forEach(function(q,ri){var hz=q[0],sg=q[2],at=function(s,v){return hz?[s,sg*(oh+v)]:[sg*(ow+v),s]};
+   fn({half:hz?ow:oh,bar:function(mi,s,v,ls,lv,z,hg){var p=at(s,v);k.bar(mi,p[0],p[1],z,hz?ls:lv,hz?lv:ls,hg)},
+    lobe:function(mi,s,v,z,a,c,hg,rot,pt){var p=at(s,v);k.lobe(mi,p[0],p[1],z,a,c,hg,(rot||0)+(hz?0:Math.PI/2),pt)}},ri)})},
+  corners:function(fn){[[1,1],[-1,1],[-1,-1],[1,-1]].forEach(function(q){fn(q[0],q[1],Math.atan2(q[1],q[0]))})},
+  centres:function(fn){[[0,1],[1,0],[0,-1],[-1,0]].forEach(function(q,i){fn(q[0],q[1],Math.atan2(q[1],q[0]),i)})},   // top, right, bottom, left
+  fan:function(mi,cx,cy,z,a0,a1,n,len,wid,hg){for(var i=0;i<n;i++){var a=a0+(a1-a0)*i/(n-1),l=len*(.72+.28*Math.sin(Math.PI*i/(n-1)));k.lobe(mi,cx+Math.cos(a)*l*.5,cy+Math.sin(a)*l*.5,z,l*.5,wid,hg,a,.55)}
+   k.lobe(mi,cx,cy,z,wid*1.5,wid*1.5,hg*1.5)},
+  rosette:function(mi,cx,cy,z,r,n,ci,a0){for(var i=0;i<n;i++){var a=i/n*TAU+(a0||0);k.lobe(mi,cx+Math.cos(a)*r*.55,cy+Math.sin(a)*r*.55,z,r*.48,r*.3,r*.2,a)}k.lobe(ci==null?mi:ci,cx,cy,z,r*.27,r*.27,r*.32)},
+  // a carved line through the points, r0 thick at the start and r1 at the end
+  strand:function(mi,pts,r0,r1,z){var n=pts.length-1;for(var i=0;i<n;i++){var p=pts[i],q=pts[i+1],r=r0+(r1-r0)*i/Math.max(1,n-1);k.lobe(mi,(p[0]+q[0])/2,(p[1]+q[1])/2,z,Math.hypot(q[0]-p[0],q[1]-p[1])*1.05,r,r,Math.atan2(q[1]-p[1],q[0]-p[0]))}},
+  // points along a scroll: from angle a0 at radius R0, winding by turn to radius R1. mx,my = ±1 mirror it into each corner; swap turns it to run along a side rail
+  scroll:function(cx,cy,mx,my,swap,a0,turn,R0,R1,n){var P=[];for(var i=0;i<=n;i++){var t=i/n,a=a0+turn*t,R=R0+(R1-R0)*t,c=Math.cos(a)*R,s=Math.sin(a)*R;P.push([cx+mx*(swap?s:c),cy+my*(swap?c:s)])}return P}};
+ if(F.orn)F.orn(k);
+ if(F.inn==='mount'){var V=vmats();quadL(V.mount,b,[0,0,.01],[1,0,0],[0,1,0],ow,oh,[0,0,1]);band(V.mount,b,ow,oh,w/2+.006,h/2+.006,.01,.03);band(Mx.bevel,b,w/2+.006,h/2+.006,w/2,h/2,.01,.029);
+  band(V.giltDeep,b,w/2+.031,h/2+.031,w/2+.028,h/2+.028,.04,.0005);return .036}                              // an aged mount with a fine drawn line round the opening
+ box(Mx.edge,b,[0,0,.0295],[w,h,.035],[4]);sweep([M[F.slip||0]],b,w/2,h/2,[[0,.04,0],[0,.0485,0],[gap,.05,0]]);return .047}   // a narrow slip sloping down to the picture
 // a rectangular band between an outer and an inner half-size, standing proud of the wall by d (per-side materials allowed)
 function band(m,b,X,Y,ix,iy,z0,d){var M=Array.isArray(m)?m:[m,m,m,m];
  box(M[0],b,[0,(Y+iy)/2,z0+d/2],[2*X,Y-iy,d]);box(M[2],b,[0,-(Y+iy)/2,z0+d/2],[2*X,Y-iy,d]);
  box(M[3],b,[-(X+ix)/2,0,z0+d/2],[X-ix,2*iy,d]);box(M[1],b,[(X+ix)/2,0,z0+d/2],[X-ix,2*iy,d])}
-function frameBuild(F,b,w,h){if(!F)F=frameStyle('gilt');var fw=F.fw,gap=F.gap,ow=w/2+gap,oh=h/2+gap,OX=ow+fw,OY=oh+fw;
+function frameBuild(F,b,w,h){if(!F)F=frameStyle('gilt');if(F.prof)return vFrame(F,b,w,h);var fw=F.fw,gap=F.gap,ow=w/2+gap,oh=h/2+gap,OX=ow+fw,OY=oh+fw;
  function roll(m,x0,y0,x1,y1,z,r){var p0=bx(b,[x0,y0,z]),dir=v3.sub(bx(b,[x1,y1,z]),p0),L=Math.hypot(dir[0],dir[1],dir[2]);cyl(m,aim(p0,dir),[0,0,0],r,L,14)}
  function rollRing(m,X,Y,z,r){roll(m,-X-r,Y,X+r,Y,z,r);roll(m,-X-r,-Y,X+r,-Y,z,r);roll(m,-X,-Y-r,-X,Y+r,z,r);roll(m,X,-Y-r,X,Y+r,z,r)}
  function panel(){quadL(Mx.liner,b,[0,0,.012],[1,0,0],[0,1,0],ow,oh,[0,0,1]);box(Mx.gap,b,[0,0,.03],[w+.008,h+.008,.004],[4]);box(Mx.edge,b,[0,0,.0295],[w,h,.035],[4]);return .047}
@@ -3415,10 +3575,10 @@ function frameBuild(F,b,w,h){if(!F)F=frameStyle('gilt');var fw=F.fw,gap=F.gap,ow
  return .036}
 // opt: sc = scale, col = hung in the collections hall (no plaque or own spotlight; tapping walks up close)
 function hang(k,o,ry,opt){opt=opt||{};
- var p=ART[k],SC=opt.sc||SCALE,w=p.w*SC,h=p.h*SC,b=B(o,ry),F=(CLAY||DREAM)&&CLAYFR[p.t]?(CLAYFR[p.t].pic&&MATIMG[CLAYFR[p.t].pic.img]?{t:'claypic',fw:w*CLAYFR[p.t].pic.open[0]/(CLAYFR[p.t].pic.open[2]-CLAYFR[p.t].pic.open[0]),gap:0,spec:CLAYFR[p.t]}:{t:'clay',fw:.15,gap:.05,spec:CLAYFR[p.t]}):frameStyle(frameOf(p)),fw=F.fw,gap=F.gap,artZ=frameBuild(F,b,w,h);
+ var p=ART[k],SC=opt.sc||SCALE,w=p.w*SC,h=p.h*SC,b=B(o,ry),F=CLAYFRAMES&&(CLAY||DREAM)&&CLAYFR[p.t]?(CLAYFR[p.t].pic&&MATIMG[CLAYFR[p.t].pic.img]?{t:'claypic',fw:w*CLAYFR[p.t].pic.open[0]/(CLAYFR[p.t].pic.open[2]-CLAYFR[p.t].pic.open[0]),gap:0,spec:CLAYFR[p.t]}:{t:'clay',fw:.15,gap:.05,spec:CLAYFR[p.t]}):frameStyle(frameOf(p)),fw=F.fw,gap=F.gap,artZ=frameBuild(F,b,w,h);
  var pm=paintMat(k);quadL(pm,b,[0,0,artZ],[1,0,0],[0,1,0],w/2,h/2,[0,0,1]);
  var ax=bn(b,[1,0,0]),ay=[0,1,0],n=bn(b,[0,0,1]),tipT='<i>'+p.t+'</i> · '+p.p,center=bx(b,[0,0,0]),go=opt.col?function(){colTap(k)}:function(){openArt(k)};
- PICK.push({c:bx(b,[0,0,.05]),ax:ax,ay:ay,hw:w/2+fw,hh:h/2+fw,n:n,go:go,tip:tipT,far:opt.col?14:0});
+ PICK.push({c:bx(b,[0,0,.05]),ax:ax,ay:ay,hw:w/2+gap+fw,hh:h/2+gap+fw,n:n,go:go,tip:tipT,far:opt.col?14:0});
  if(opt.col)return{k:k,c:center,n:n,ax:ax,w:w+2*(gap+fw),h:h+2*(gap+fw)};
  var lc=bx(b,[w/2+fw+.46,-.3,.03]);
  LABELS.push(function(){label(plaqueCanvas(p),lc,ax,ay,.6,.3375,n,{go:function(){openArt(k)},tip:tipT},{art:1,blend:0})});
@@ -3453,10 +3613,9 @@ function lockedCanvas(){if(LOCKC)return LOCKC;var R=rnd;LOCKC=textCanvas(600,800
  x.fillStyle=D?'#e8d3a8':'#6c6359';rrect(x,cx-40,cy-8,80,62,11);x.fill();x.fillStyle=D?'#2a2440':'rgba(251,249,245,.95)';x.beginPath();x.arc(cx,cy+16,8,0,7);x.fill();x.fillRect(cx-3.5,cy+18,7,17);
  x.textAlign='center';x.fillStyle=D?'#e8d3a8':'#4f4840';x.font='500 42px Jost,Helvetica,Arial,sans-serif';spaced(x,'COMING SOON',cx,cy+170,9);
  x.font='italic 500 40px "Cormorant Garamond",Georgia,serif';x.fillStyle=D?'#cdbb98':'#5c544b';x.fillText('in the studio',cx,cy+224)});return LOCKC}
-function lockedFrame(o,ry,w,h,f,ct){var b=B(o,ry),fm=DREAM?Mx.goldDark:Mx.gold24,ow=w/2,oh=h/2,zt=.045;
- box(fm,b,[0,oh+f/2,zt/2],[w+2*f,f,zt]);box(fm,b,[0,-oh-f/2,zt/2],[w+2*f,f,zt]);box(fm,b,[-ow-f/2,0,zt/2],[f,h,zt]);box(fm,b,[ow+f/2,0,zt/2],[f,h,zt]);
- function roll(x0,y0,x1,y1,z,r){var p0=bx(b,[x0,y0,z]),dir=v3.sub(bx(b,[x1,y1,z]),p0),L=Math.hypot(dir[0],dir[1],dir[2]);cyl(fm,aim(p0,dir),[0,0,0],r,L,12)}
- [[ow+f-.014,oh+f-.014,.014],[ow+f*.45,oh+f*.45,.007],[ow+.006,oh+.006,.006]].forEach(function(q){var X=q[0],Y=q[1],r=q[2];roll(-X-r,Y,X+r,Y,zt,r);roll(-X-r,-Y,X+r,-Y,zt,r);roll(-X,-Y-r,-X,Y+r,zt,r);roll(X,-Y-r,X,Y+r,zt,r)});
+function lockedFrame(o,ry,w,h,f,ct){var b=B(o,ry),V=vmats(),ow=w/2,oh=h/2,q=f/.075;
+ sweep([V.gilt,V.giltShade],b,ow,oh,profP([[0,.02,0]],arcP(.006*q,.03,.006*q,.008,2,0,3,0),[[.012*q,.028,1]],arcP(.012*q,.05,.03*q,.022,3,4,3,1),arcP(.056*q,.05,.014*q,.012,2,0,4,0),[[.07*q,.05,0],[.075*q,.04,0],[.075*q,0,1]]));   // a slim antique gilt moulding
+ [[1,1],[-1,1],[-1,-1],[1,-1]].forEach(function(c){dome(V.gilt,b,[c[0]*(ow+f*.75),c[1]*(oh+f*.75),.054],[.02*q,.02*q,.012,0],0)});                                                                   // with a boss at each corner
  box(Mx.edge,b,[0,0,.012],[w,h,.024],[4]);
  var n=bn(b,[0,0,1]),ax=bn(b,[1,0,0]),c=bx(b,[0,0,.0245]);
  LABELS.push(function(){label(lockedCanvas(),c,ax,[0,1,0],w,h,n,{go:function(){},tip:'<i>Coming soon</i> · a new painting for '+esc(ct),far:14},{blend:0,rough:.85})})}
@@ -4510,6 +4669,13 @@ var George=(function(){var root=$('george'),svg=$('gSvg'),bub=$('gBub'),txt=$('g
 addEventListener('wheel',function(){George.stopTour()},{passive:true});
 window.goArt=function(k){var q=null;[['fav',SF],['col',SC]].forEach(function(w){w[1].forEach(function(S,i){if(!q&&S.art===k)q={r:w[0],i:i}})});if(q)goPlan(q);return !!q};   // a shared link: walk to the painting
 window.goSide=function(){goPlan({r:'col',i:1})};
+/* 'View on your wall' shows the very same vintage frame: its moulding and carving as plain triangles (each wound to face outwards), in the antique colours */
+window.__frame3=function(key,w,h){var F=frameStyle(key);if(!F||!F.prof)return null;var keep=MATS.map(function(m){return m.v}),z,out=[];MATS.forEach(function(m){m.v=[]});
+ try{z=vFrame(F,B([0,0,0],0),w,h)}finally{MATS.forEach(function(m,i){var v=m.v;m.v=keep[i];if(!v||!v.length)return;
+  for(var t=0;t<v.length;t+=24){var ax=v[t+8]-v[t],ay=v[t+9]-v[t+1],az=v[t+10]-v[t+2],ex=v[t+16]-v[t],ey=v[t+17]-v[t+1],ez=v[t+18]-v[t+2],nx=ay*ez-az*ey,ny=az*ex-ax*ez,nz=ax*ey-ay*ex;
+   if(nx*(v[t+3]+v[t+11]+v[t+19])+ny*(v[t+4]+v[t+12]+v[t+20])+nz*(v[t+5]+v[t+13]+v[t+21])<0)for(var c=0;c<8;c++){var sw=v[t+8+c];v[t+8+c]=v[t+16+c];v[t+16+c]=sw}}
+  var lm=null;LOOKMATS.forEach(function(q){if(q.m===m)lm=q});out.push({v:new Float32Array(v),col:(lm?lm.paint.col:m.col).slice(0,3),metal:m.metal,rough:m.rough})})}
+ return{z:z,fw:F.fw,gap:F.gap,parts:out}};
 window.__house={state:function(){var a=stopAt();return{route:route,t:+(cur*(K.length-1)).toFixed(2),n:K.length-1,i:a.i,d:+a.d.toFixed(2),pend:pend?pend.r+pend.i:null,head:heading(),tgt:tgtI,label:STOPS[a.i].label}},route:function(r){setRoute(r);return K.length},cur:function(){return cur},setFocus:function(){focus=focusT=sceneDist()},Q:Q,render:function(c){cur=c;camAt(c*(K.length-1));focus=focusT=sceneDist();if(SKYTEXT.m)SKYTEXT.m.alpha=0;showEnq(enqFade());render(0)},K:K,cam:cam};
 
 var fontReady=document.fonts&&document.fonts.load?Promise.race([Promise.all([document.fonts.load('italic 400 80px "Cormorant Garamond"'),document.fonts.load('italic 500 50px "Cormorant Garamond"'),document.fonts.load('300 27px Jost')]),new Promise(function(r){setTimeout(r,2500)})]).catch(function(){}):Promise.resolve();
